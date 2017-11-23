@@ -4,7 +4,7 @@
   <artifactId>mod-calendar</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <name>Calendar module</name>
-  
+
   <licenses>
     <license>
       <name>Apache License 2.0</name>
@@ -19,7 +19,7 @@
       <url>https://repository.folio.org/repository/maven-folio</url>
     </repository>
   </repositories>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -33,31 +33,18 @@
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
 
   </properties>
-  
+
   <dependencies>
 
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>domain-models-runtime</artifactId>
       <version>${folio.domain-models-runtime.version}</version>
-      <!-- TEMP fix: verx-unit is a compile dep in RMB, and it can bring a wrong CommandFactory for vertx -->
-      <!-- if dependencies processed in wrong order. This can cause -->
-      <!-- "The command 'run' is not a valid command." -->
-      <!-- error message when running a fat jar -->
-      <exclusions>
-        <exclusion>
-          <groupId>io.vertx</groupId>
-          <artifactId>vertx-unit</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-web-client</artifactId>
-      <version>${vertx.version}</version>
-    </dependency>
 
+
+    <!-- Dependencies for testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
@@ -102,7 +89,6 @@
         <artifactId>vertx-web</artifactId>
         <version>${vertx.version}</version>
       </dependency>
-
 
       <dependency>
         <groupId>io.vertx</groupId>
@@ -370,6 +356,6 @@
 
     </plugins>
   </build>
-  
-  
+
+
 </project>
