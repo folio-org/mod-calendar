@@ -27,3 +27,5 @@ target/
 .settings/
 bin/
 src/main/java/org/folio/rest/jaxrs
+*.iml
+.idea
