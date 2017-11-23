@@ -1,0 +1,30 @@
+{
+  "mocks": [
+    {
+      "url": "/calendar/events",
+      "method": "get",
+      "status": 200,
+      "receivedData": {
+        "events": [
+          {
+            "id": "0",
+            "eventType": "Opening Day",
+            "startDate": "2017-08-23T12:47:46.165+0000",
+            "endDate": "2017-11-23T12:47:46.165+0000",
+            "allDay": true
+          },
+          {
+            "id": "1",
+            "eventType": "Opening Day",
+            "startDate": "2017-11-23T12:47:46.165+0000",
+            "endDate": "2017-12-23T12:47:46.165+0000",
+            "allDay": true
+          }
+        ],
+        "totalrecords": 2
+      },
+      "receivedPath": "",
+      "sendData": {}
+    }
+  ]
+}
