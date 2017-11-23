@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Calendar event exception description",
+  "type": "object",
+  "properties": {
+    "exceptions": {
+      "type": "array",
+      "id": "exceptions",
+      "items": {
+        "type": "object",
+        "$ref": "CalendarEventExceptionDescription"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "descriptions",
+    "totalRecords"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Calendar event",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "startHour": {
+      "type": "integer"
+    },
+    "startMinute": {
+      "type": "integer"
+    },
+    "endHour": {
+      "type": "integer"
+    },
+    "endMinute": {
+      "type": "integer"
+    },
+    "daysIncluded": {
+      "type": "string"
+    },
+    "creationDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "startDate",
+    "endDate"
+  ]
+}

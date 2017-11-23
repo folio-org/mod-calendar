@@ -29,7 +29,7 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
-  /edit/events:
+  /eventdescriptions:
     get:
       description: List event intervals
       responses:
@@ -42,7 +42,6 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
-  /edit/addevents:
     post:
       body:
         application/json:
@@ -59,21 +58,7 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
-  /edit/addexceptions:
-    post:
-      description: Add exceptional events
-      body:
-        application/json:
-          schema: CalendarEventExceptionDescription
-      responses:
-        201:
-          description: Returns the created exception descriptor
-        500:
-          description: "Internal server error"
-          body:
-            text/plain:
-              example: "Internal server error"
-  /edit/listexceptions:
+  /exceptions:
     get:
       description: Add exceptional events
       responses:
@@ -87,4 +72,18 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
+    post:
+      description: Add exceptional events
+      body:
+        application/json:
+          schema: CalendarEventExceptionDescription
+      responses:
+        201:
+          description: Returns the created exception descriptor
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+
   

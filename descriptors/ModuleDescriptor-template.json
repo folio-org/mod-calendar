@@ -14,37 +14,23 @@
         },
         {
           "methods": [
-            "GET"
+            "GET",
+            "POST"
           ],
-          "pathPattern": "/calendar/edit/events",
+          "pathPattern": "/calendar/eventdescriptions",
           "permissionsRequired": [
+            "calendar.collection.add",
             "calendar.collection.get"
           ]
         },
         {
           "methods": [
+            "GET",
             "POST"
           ],
-          "pathPattern": "/calendar/edit/addevents",
+          "pathPattern": "/calendar/exceptions",
           "permissionsRequired": [
-            "calendar.collection.add"
-          ]
-        },
-        {
-          "methods": [
-            "POST"
-          ],
-          "pathPattern": "/calendar/edit/addexceptions",
-          "permissionsRequired": [
-            "calendar.collection.add"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/edit/listexceptions",
-          "permissionsRequired": [
+            "calendar.collection.add",
             "calendar.collection.get"
           ]
         }

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Calendar event",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "eventType": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "allDay": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "eventType",
+    "startDate",
+    "endDate"
+  ]
+}

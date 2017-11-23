@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Calendar event description",
+  "type": "object",
+  "properties": {
+    "descriptions": {
+      "type": "array",
+      "id": "descriptions",
+      "items": {
+        "type": "object",
+        "$ref": "CalendarEventDescription"
+      }
+    },
+    "totalRecords": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "descriptions",
+    "totalRecords"
+  ]
+}
