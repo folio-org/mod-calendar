@@ -1,0 +1,90 @@
+#%RAML 0.8
+title: Login
+version: v1
+baseUri: https://github.com/qultoltd/mod-calendar
+
+documentation:
+  - title: mod-calendar API
+    content: This module provides a backend for the calendar functionalities
+
+schemas:
+  - CalendarEvent: !include schemas/CalendarEvent.json
+  - CalendarEventCollection: !include schemas/CalendarEventCollection.json
+  - CalendarEventDescription: !include schemas/CalendarEventDescription.json
+  - CalendarEventDescriptionCollection: !include schemas/CalendarEventDescriptionCollection.json
+  - CalendarEventExceptionDescription: !include schemas/CalendarEventExceptionDescription.json
+  - CalendarEventExceptionDescriptionCollection: !include schemas/CalendarEventExceptionDescriptionCollection.json
+
+/calendar:
+  /events:
+    get:
+      description: List events for the calendar view
+      responses:
+        200:
+          body:
+            application/json:
+              schema: CalendarEventCollection
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+  /edit/events:
+    get:
+      description: List event intervals
+      responses:
+        200:
+          body:
+            application/json:
+              schema: CalendarEventDescriptionCollection
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+  /edit/addevents:
+    post:
+      body:
+        application/json:
+          schema: CalendarEventDescription
+      description: Saves the calendar event description and generates the calendar events
+      responses:
+        201:
+          description: Returns the created event description
+          body:
+            application/json:
+              schema: CalendarEventDescription
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+  /edit/addexceptions:
+    post:
+      description: Add exceptional events
+      body:
+        application/json:
+          schema: CalendarEventExceptionDescription
+      responses:
+        201:
+          description: Returns the created exception descriptor
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+  /edit/listexceptions:
+    get:
+      description: Add exceptional events
+      responses:
+        200:
+          description: Returns the exception descriptors
+          body:
+            application/json:
+              schema: CalendarEventExceptionDescriptionCollection
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+  
