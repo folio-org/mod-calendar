@@ -12,8 +12,8 @@ schemas:
   - CalendarEventCollection: !include schemas/CalendarEventCollection.json
   - CalendarEventDescription: !include schemas/CalendarEventDescription.json
   - CalendarEventDescriptionCollection: !include schemas/CalendarEventDescriptionCollection.json
-  - CalendarEventExceptionDescription: !include schemas/CalendarEventExceptionDescription.json
-  - CalendarEventExceptionDescriptionCollection: !include schemas/CalendarEventExceptionDescriptionCollection.json
+  - CalendarEventExclusionDescription: !include schemas/CalendarEventExclusionDescription.json
+  - CalendarEventExclusionDescriptionCollection: !include schemas/CalendarEventExclusionDescriptionCollection.json
 
 /calendar:
   /events:
@@ -58,32 +58,31 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
-  /exceptions:
+  /exclusions:
     get:
-      description: Add exceptional events
+      description: Add exclusion events
       responses:
         200:
-          description: Returns the exception descriptors
+          description: Returns the exclusion descriptors
           body:
             application/json:
-              schema: CalendarEventExceptionDescriptionCollection
+              schema: CalendarEventExclusionDescriptionCollection
         500:
           description: "Internal server error"
           body:
             text/plain:
               example: "Internal server error"
     post:
-      description: Add exceptional events
+      description: Add exclusion events
       body:
         application/json:
-          schema: CalendarEventExceptionDescription
+          schema: CalendarEventExclusionDescription
       responses:
         201:
-          description: Returns the created exception descriptor
+          description: Returns the created exclusion descriptor
         500:
           description: "Internal server error"
           body:
             text/plain:
               example: "Internal server error"
 
-  

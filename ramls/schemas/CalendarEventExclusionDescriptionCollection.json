@@ -3,12 +3,12 @@
   "title": "Calendar event exception description",
   "type": "object",
   "properties": {
-    "exceptions": {
+    "exclusions": {
       "type": "array",
-      "id": "exceptions",
+      "id": "exclusions",
       "items": {
         "type": "object",
-        "$ref": "CalendarEventExceptionDescription"
+        "$ref": "CalendarEventExclusionDescription"
       }
     },
     "totalRecords": {

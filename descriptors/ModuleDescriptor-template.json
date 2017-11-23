@@ -28,7 +28,7 @@
             "GET",
             "POST"
           ],
-          "pathPattern": "/calendar/exceptions",
+          "pathPattern": "/calendar/exclusions",
           "permissionsRequired": [
             "calendar.collection.add",
             "calendar.collection.get"
