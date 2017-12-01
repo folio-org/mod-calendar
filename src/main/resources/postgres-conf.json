@@ -1,0 +1,11 @@
+{
+  "host" : "localhost",
+  "port" : 5555,
+  "maxPoolSize" : 500,
+  "username" : "postgres",
+  "password" : "postinor",
+  "schema": "public",
+  "database" : "mod_calendar",
+  "charset"  : "utf8",
+  "queryTimeout" : 15000
+}
