@@ -1,17 +1,30 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.*;
-import org.folio.rest.jaxrs.model.*;
-import org.folio.rest.jaxrs.resource.CalendarResource;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.utils.TenantTool;
+import static org.folio.rest.tools.ClientGenerator.*;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
-import java.util.*;
 
-import static org.folio.rest.tools.ClientGenerator.OKAPI_HEADER_TENANT;
+import org.folio.rest.jaxrs.model.CalendarEventCollection;
+import org.folio.rest.jaxrs.model.CalendarEventDescriptionCollection;
+import org.folio.rest.jaxrs.model.CalendarEventExclusionDescriptionCollection;
+import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Event;
+import org.folio.rest.jaxrs.model.Exclusion;
+import org.folio.rest.jaxrs.resource.CalendarResource;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.tools.utils.TenantTool;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 public class CalendarAPI implements CalendarResource {
   public static final String EVENT_DESCRIPTION = "event_description";
@@ -54,7 +67,6 @@ public class CalendarAPI implements CalendarResource {
       .handle(Future.succeededFuture(GetCalendarEventdescriptionsResponse.withJsonOK(new CalendarEventDescriptionCollection())));
   }
 
-
   @Override
   public void postCalendarEventdescriptions(Description entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
 
@@ -66,8 +78,16 @@ public class CalendarAPI implements CalendarResource {
 
     Event event = new Event();
     event.setId(entity.getId());
-    event.setStartDate(entity.getStartDate());
-    event.setEndDate(entity.getEndDate());
+    Calendar startCal = Calendar.getInstance();
+    startCal.setTimeInMillis(entity.getStartDate().getTime());
+    startCal.set(Calendar.HOUR, entity.getStartHour());
+    startCal.set(Calendar.MINUTE, entity.getStartMinute());
+    event.setStartDate(startCal.getTime());
+    Calendar endCal = Calendar.getInstance();
+    endCal.setTimeInMillis(entity.getEndDate().getTime());
+    endCal.set(Calendar.HOUR, entity.getEndHour());
+    endCal.set(Calendar.MINUTE, entity.getEndMinute());
+    event.setEndDate(endCal.getTime());
     event.setEventType(DEFAULT_EVENT_TYPE);
 
     vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
