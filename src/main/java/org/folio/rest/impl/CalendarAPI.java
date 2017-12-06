@@ -63,8 +63,34 @@ public class CalendarAPI implements CalendarResource {
 
   @Override
   public void getCalendarEventdescriptions(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    asyncResultHandler
-      .handle(Future.succeededFuture(GetCalendarEventdescriptionsResponse.withJsonOK(new CalendarEventDescriptionCollection())));
+
+    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    Criteria idCrit = new Criteria().setJSONB(true);
+    Criterion criterion = new Criterion(idCrit);
+    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
+      try {
+        postgresClient.get(EVENT_DESCRIPTION, Description.class, criterion, true, true,
+          resultOfSelect -> {
+
+            if (resultOfSelect.succeeded()) {
+              CalendarEventDescriptionCollection calendarEventCollection = new CalendarEventDescriptionCollection();
+              calendarEventCollection.setDescriptions((List<Description>) resultOfSelect.result().getResults());
+              calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
+              asyncResultHandler
+                .handle(Future.succeededFuture(GetCalendarEventdescriptionsResponse.withJsonOK(calendarEventCollection)));
+            } else {
+              asyncResultHandler.handle(Future.succeededFuture(
+                GetCalendarEventdescriptionsResponse.withPlainInternalServerError(
+                  resultOfSelect.cause().getMessage())));
+            }
+          });
+      } catch (Exception e) {
+        asyncResultHandler.handle(Future.succeededFuture(
+          GetCalendarEventdescriptionsResponse.withPlainInternalServerError(
+            e.getMessage())));
+      }
+    }));
   }
 
   @Override
