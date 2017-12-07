@@ -15,7 +15,8 @@
       "format": "date-time"
     },
     "daysIncluded": {
-      "type": "string"
+      "type": "object",
+      "$ref": "DaysIncluded"
     },
     "creationDate": {
       "type": "string",

@@ -1,20 +1,14 @@
 package org.folio.rest.impl;
 
 import static org.folio.rest.tools.ClientGenerator.*;
+import static org.folio.rest.utils.CalendarConstants.*;
+import static org.folio.rest.utils.CalendarService.separateEvents;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.ws.rs.core.Response;
 
-import org.folio.rest.jaxrs.model.CalendarEventCollection;
-import org.folio.rest.jaxrs.model.CalendarEventDescriptionCollection;
-import org.folio.rest.jaxrs.model.CalendarEventExclusionDescriptionCollection;
-import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.Event;
-import org.folio.rest.jaxrs.model.Exclusion;
+import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.jaxrs.resource.CalendarResource;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -27,9 +21,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 public class CalendarAPI implements CalendarResource {
-  public static final String EVENT_DESCRIPTION = "event_description";
-  public static final String EVENT = "event";
-  public static final String DEFAULT_EVENT_TYPE = "opening days";
 
   @Override
   public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
@@ -94,41 +85,27 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
-  public void postCalendarEventdescriptions(Description entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void postCalendarEventdescriptions(Description description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
 
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    if (entity.getCreationDate() == null) {
-      entity.setCreationDate(new Date());
+    if (description.getCreationDate() == null) {
+      description.setCreationDate(new Date());
     }
-
-    Event event = new Event();
-    event.setId(entity.getId());
-    Calendar startCal = Calendar.getInstance();
-    startCal.setTimeInMillis(entity.getStartDate().getTime());
-    startCal.set(Calendar.HOUR, entity.getStartHour());
-    startCal.set(Calendar.MINUTE, entity.getStartMinute());
-    event.setStartDate(startCal.getTime());
-    Calendar endCal = Calendar.getInstance();
-    endCal.setTimeInMillis(entity.getEndDate().getTime());
-    endCal.set(Calendar.HOUR, entity.getEndHour());
-    endCal.set(Calendar.MINUTE, entity.getEndMinute());
-    event.setEndDate(endCal.getTime());
-    event.setEventType(DEFAULT_EVENT_TYPE);
 
     vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
       try {
-        postgresClient.save(beginTx, EVENT_DESCRIPTION, entity, replyDescriptor -> {
+        postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
           if (replyDescriptor.succeeded()) {
+            List<Object> events = separateEvents(description, replyDescriptor.result());
             try {
-              postgresClient.save(beginTx, EVENT, event, replyEvent -> {
+              postgresClient.saveBatch(EVENT, events, replyEvent -> {
                 if (!replyEvent.succeeded()) {
-                  event.setId(replyDescriptor.result());
                   asyncResultHandler.handle(Future.succeededFuture(
                     PostCalendarEventdescriptionsResponse.withPlainInternalServerError(replyEvent.cause().getMessage())));
                 } else {
                   postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(
-                    Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(entity))));
+                    Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(description))));
                 }
               });
             } catch (Exception e) {
@@ -136,6 +113,7 @@ public class CalendarAPI implements CalendarResource {
                 PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
                   e.getMessage())));
             }
+
           } else {
             asyncResultHandler.handle(Future.succeededFuture(
               PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
@@ -157,7 +135,9 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
-  public void postCalendarExclusions(Exclusion entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void postCalendarExclusions(Exclusion exclusion, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
 
   }
+
+
 }

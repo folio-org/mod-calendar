@@ -30,3 +30,4 @@ src/main/java/org/folio/rest/jaxrs
 *.iml
 .idea
 src/main/java/org/folio/rest/client/
+src/test/resources/postgres-conf-local.json

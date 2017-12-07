@@ -43,7 +43,6 @@ public class CalendarAPITest {
 
     RestAssured.port = PORT;
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-
   }
 
   @After
@@ -65,6 +64,7 @@ public class CalendarAPITest {
   }
 
   @Test
+  @Ignore
   public void testGetCalendarEvents() {
     given()
       .header(TENANT_HEADER)
