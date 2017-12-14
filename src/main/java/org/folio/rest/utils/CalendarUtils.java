@@ -1,12 +1,18 @@
 package org.folio.rest.utils;
 
-import org.folio.rest.jaxrs.model.DaysIncluded;
+import static java.util.Calendar.*;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import static java.util.Calendar.DAY_OF_MONTH;
+import org.folio.rest.jaxrs.model.DaysIncluded;
 
 public class CalendarUtils {
 
@@ -22,19 +28,24 @@ public class CalendarUtils {
     Map<DayOfWeek, Boolean> daysIsIncluded = setDaysWithIncluding(daysIncluded);
 
     while (startCal.before(endCal)) {
-      for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-        if (dayOfWeek.equals(dayOfDate(startCal.getTime())) && daysIsIncluded.get(dayOfWeek)) {
-          Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
-          tempCal.setTime(startCal.getTime());
-          calendars.add(tempCal);
-          break;
+      if (daysIncluded.getAllDays()) {
+        Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
+        tempCal.setTime(startCal.getTime());
+        calendars.add(tempCal);
+      } else {
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+          if (dayOfWeek.equals(dayOfDate(startCal.getTime())) && daysIsIncluded.get(dayOfWeek)) {
+            Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
+            tempCal.setTime(startCal.getTime());
+            calendars.add(tempCal);
+            break;
+          }
         }
       }
       startCal.add(DAY_OF_MONTH, 1);
     }
     return calendars;
   }
-
 
   public static Map<DayOfWeek, Boolean> setDaysWithIncluding(DaysIncluded daysIncluded) {
 

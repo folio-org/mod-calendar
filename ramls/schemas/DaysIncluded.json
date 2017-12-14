@@ -24,7 +24,7 @@
     "sunday": {
       "type": "boolean"
     },
-    "allDay": {
+    "allDays": {
       "type": "boolean"
     }
   },

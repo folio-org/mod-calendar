@@ -1,10 +1,13 @@
 package org.folio.rest.utils;
 
-import org.folio.rest.jaxrs.model.*;
+import static org.folio.rest.utils.CalendarConstants.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
-import static org.folio.rest.utils.CalendarConstants.OPENING_DAYS;
+import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Event;
 
 public class CalendarService {
 
@@ -21,28 +24,15 @@ public class CalendarService {
     endCal.set(Calendar.HOUR, entity.getEndHour());
     endCal.set(Calendar.MINUTE, entity.getEndMinute());
 
-    if (!entity.getDaysIncluded().getAllDay()) {
-      List<Calendar> datesToSave = CalendarUtils.itarateDates(startCal, endCal, entity.getDaysIncluded());
-      for (Calendar dates : datesToSave) {
-        Event event = new Event();
-        event.setAllDay(entity.getDaysIncluded().getAllDay());
-        event.setId(entity.getId());
-        event.setStartDate(dates.getTime());
-        dates.set(Calendar.HOUR, entity.getEndHour());
-        dates.set(Calendar.MINUTE, entity.getEndMinute());
-        event.setEndDate(dates.getTime());
-        event.setEventType(OPENING_DAYS);
-        event.setId(generatedId);
-        events.add(event);
-      }
-    }
-
-    if(entity.getDaysIncluded().getAllDay() || events.size() == 0) {
+    List<Calendar> datesToSave = CalendarUtils.itarateDates(startCal, endCal, entity.getDaysIncluded());
+    for (Calendar dates : datesToSave) {
       Event event = new Event();
-      event.setAllDay(entity.getDaysIncluded().getAllDay());
+      event.setAllDay(false);
       event.setId(entity.getId());
-      event.setStartDate(startCal.getTime());
-      event.setEndDate(endCal.getTime());
+      event.setStartDate(dates.getTime());
+      dates.set(Calendar.HOUR, entity.getEndHour());
+      dates.set(Calendar.MINUTE, entity.getEndMinute());
+      event.setEndDate(dates.getTime());
       event.setEventType(OPENING_DAYS);
       event.setId(generatedId);
       events.add(event);
@@ -50,6 +40,5 @@ public class CalendarService {
 
     return events;
   }
-
 
 }
