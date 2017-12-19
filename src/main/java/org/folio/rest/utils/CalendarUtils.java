@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.folio.rest.jaxrs.model.DaysIncluded;
 
 public class CalendarUtils {
@@ -28,7 +29,7 @@ public class CalendarUtils {
     Map<DayOfWeek, Boolean> daysIsIncluded = setDaysWithIncluding(daysIncluded);
 
     while (startCal.before(endCal)) {
-      if (daysIncluded.getAllDays()) {
+      if (BooleanUtils.isTrue(daysIncluded.getAllDays())) {
         Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
         tempCal.setTime(startCal.getTime());
         calendars.add(tempCal);
@@ -51,14 +52,15 @@ public class CalendarUtils {
 
     Map<DayOfWeek, Boolean> daysIsIncluded = new HashMap<>();
 
-    daysIsIncluded.put(DayOfWeek.MONDAY, daysIncluded.getMonday());
-    daysIsIncluded.put(DayOfWeek.TUESDAY, daysIncluded.getTuesday());
-    daysIsIncluded.put(DayOfWeek.WEDNESDAY, daysIncluded.getWednesday());
-    daysIsIncluded.put(DayOfWeek.THURSDAY, daysIncluded.getThursday());
-    daysIsIncluded.put(DayOfWeek.FRIDAY, daysIncluded.getFriday());
-    daysIsIncluded.put(DayOfWeek.SATURDAY, daysIncluded.getSaturday());
-    daysIsIncluded.put(DayOfWeek.SUNDAY, daysIncluded.getSunday());
+    daysIsIncluded.put(DayOfWeek.MONDAY, BooleanUtils.isTrue(daysIncluded.getMonday()));
+    daysIsIncluded.put(DayOfWeek.TUESDAY, BooleanUtils.isTrue(daysIncluded.getTuesday()));
+    daysIsIncluded.put(DayOfWeek.WEDNESDAY, BooleanUtils.isTrue(daysIncluded.getWednesday()));
+    daysIsIncluded.put(DayOfWeek.THURSDAY, BooleanUtils.isTrue(daysIncluded.getThursday()));
+    daysIsIncluded.put(DayOfWeek.FRIDAY, BooleanUtils.isTrue(daysIncluded.getFriday()));
+    daysIsIncluded.put(DayOfWeek.SATURDAY, BooleanUtils.isTrue(daysIncluded.getSaturday()));
+    daysIsIncluded.put(DayOfWeek.SUNDAY, BooleanUtils.isTrue(daysIncluded.getSunday()));
 
     return daysIsIncluded;
   }
+
 }
