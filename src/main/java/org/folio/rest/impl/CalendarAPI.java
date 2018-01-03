@@ -2,13 +2,20 @@ package org.folio.rest.impl;
 
 import static org.folio.rest.tools.ClientGenerator.*;
 import static org.folio.rest.utils.CalendarConstants.*;
-import static org.folio.rest.utils.CalendarService.separateEvents;
+import static org.folio.rest.utils.CalendarUtils.*;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response;
 
-import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.jaxrs.model.CalendarEventCollection;
+import org.folio.rest.jaxrs.model.CalendarEventDescriptionCollection;
+import org.folio.rest.jaxrs.model.CalendarEventExclusionDescriptionCollection;
+import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Event;
+import org.folio.rest.jaxrs.model.Exclusion;
 import org.folio.rest.jaxrs.resource.CalendarResource;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -138,6 +145,5 @@ public class CalendarAPI implements CalendarResource {
   public void postCalendarExclusions(Exclusion exclusion, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
 
   }
-
 
 }

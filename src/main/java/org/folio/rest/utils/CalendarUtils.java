@@ -13,7 +13,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.folio.rest.jaxrs.model.DaysIncluded;
+import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Event;
+import org.folio.rest.jaxrs.model.OpeningDay;
 
 public class CalendarUtils {
 
@@ -24,43 +26,90 @@ public class CalendarUtils {
     return nameOfday;
   }
 
-  public static List<Calendar> itarateDates(Calendar startCal, Calendar endCal, DaysIncluded daysIncluded) {
-    List<Calendar> calendars = new ArrayList<>();
-    Map<DayOfWeek, Boolean> daysIsIncluded = setDaysWithIncluding(daysIncluded);
+  public static List<Object> separateEvents(Description entity, String generatedId) {
+    List<Object> events = new ArrayList<>();
+
+    Calendar startCal = Calendar.getInstance();
+    startCal.setTimeInMillis(entity.getStartDate().getTime());
+    startCal.set(Calendar.SECOND, 0);
+    startCal.set(Calendar.MILLISECOND, 0);
+
+    Calendar endCal = Calendar.getInstance();
+    endCal.setTimeInMillis(entity.getEndDate().getTime());
+    endCal.set(Calendar.SECOND, 0);
+    endCal.set(Calendar.MILLISECOND, 0);
+
+    Map<DayOfWeek, OpeningDay> openingDays = getOpeningDays(entity);
 
     while (startCal.before(endCal)) {
-      if (BooleanUtils.isTrue(daysIncluded.getAllDays())) {
-        Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
-        tempCal.setTime(startCal.getTime());
-        calendars.add(tempCal);
-      } else {
-        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-          if (dayOfWeek.equals(dayOfDate(startCal.getTime())) && daysIsIncluded.get(dayOfWeek)) {
-            Calendar tempCal = Calendar.getInstance(); //because passing by reference is not good for us now
-            tempCal.setTime(startCal.getTime());
-            calendars.add(tempCal);
-            break;
-          }
-        }
+      OpeningDay openingDay = openingDays.get(dayOfDate(startCal.getTime()));
+
+      if (openingDay != null && BooleanUtils.isTrue(openingDay.getOpen())) {
+        Calendar currentStartDate = Calendar.getInstance();
+        currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
+        currentStartDate.set(Calendar.HOUR, openingDay.getStartHour());
+        currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
+
+        Calendar currentEndDate = Calendar.getInstance();
+        currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
+        currentEndDate.set(Calendar.HOUR, openingDay.getEndHour());
+        currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
+
+        Event event = new Event();
+        event.setAllDay(openingDay.getAllDay());
+        event.setId(entity.getId());
+        event.setStartDate(currentStartDate.getTime());
+        event.setEndDate(currentEndDate.getTime());
+        event.setEventType(CalendarConstants.OPENING_DAY);
+        event.setId(generatedId);
+        events.add(event);
       }
+
       startCal.add(DAY_OF_MONTH, 1);
     }
-    return calendars;
+
+    return events;
   }
 
-  public static Map<DayOfWeek, Boolean> setDaysWithIncluding(DaysIncluded daysIncluded) {
+  private static Map<DayOfWeek, OpeningDay> getOpeningDays(Description entity) {
 
-    Map<DayOfWeek, Boolean> daysIsIncluded = new HashMap<>();
+    Map<DayOfWeek, OpeningDay> openingDays = new HashMap<>();
 
-    daysIsIncluded.put(DayOfWeek.MONDAY, BooleanUtils.isTrue(daysIncluded.getMonday()));
-    daysIsIncluded.put(DayOfWeek.TUESDAY, BooleanUtils.isTrue(daysIncluded.getTuesday()));
-    daysIsIncluded.put(DayOfWeek.WEDNESDAY, BooleanUtils.isTrue(daysIncluded.getWednesday()));
-    daysIsIncluded.put(DayOfWeek.THURSDAY, BooleanUtils.isTrue(daysIncluded.getThursday()));
-    daysIsIncluded.put(DayOfWeek.FRIDAY, BooleanUtils.isTrue(daysIncluded.getFriday()));
-    daysIsIncluded.put(DayOfWeek.SATURDAY, BooleanUtils.isTrue(daysIncluded.getSaturday()));
-    daysIsIncluded.put(DayOfWeek.SUNDAY, BooleanUtils.isTrue(daysIncluded.getSunday()));
+    for (OpeningDay openingDay : entity.getOpeningDays()) {
 
-    return daysIsIncluded;
+      switch (openingDay.getDay()) {
+        case MONDAY: {
+          openingDays.put(DayOfWeek.MONDAY, openingDay);
+          break;
+        }
+        case TUESDAY: {
+          openingDays.put(DayOfWeek.TUESDAY, openingDay);
+          break;
+        }
+        case WEDNESDAY: {
+          openingDays.put(DayOfWeek.WEDNESDAY, openingDay);
+          break;
+        }
+        case THURSDAY: {
+          openingDays.put(DayOfWeek.THURSDAY, openingDay);
+          break;
+        }
+        case FRIDAY: {
+          openingDays.put(DayOfWeek.FRIDAY, openingDay);
+          break;
+        }
+        case SATURDAY: {
+          openingDays.put(DayOfWeek.SATURDAY, openingDay);
+          break;
+        }
+        case SUNDAY: {
+          openingDays.put(DayOfWeek.SUNDAY, openingDay);
+          break;
+        }
+      }
+    }
+
+    return openingDays;
   }
 
 }

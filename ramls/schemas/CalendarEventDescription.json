@@ -6,6 +6,9 @@
     "id": {
       "type": "string"
     },
+    "description": {
+      "type": "string"
+    },
     "startDate": {
       "type": "string",
       "format": "date-time"
@@ -14,21 +17,12 @@
       "type": "string",
       "format": "date-time"
     },
-    "startHour": {
-      "type": "integer"
-    },
-    "startMinute": {
-      "type": "integer"
-    },
-    "endHour": {
-      "type": "integer"
-    },
-    "endMinute": {
-      "type": "integer"
-    },
-    "daysIncluded": {
-      "type": "object",
-      "$ref": "DaysIncluded"
+    "openingDays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "OpeningDay"
+      }
     },
     "creationDate": {
       "type": "string",
