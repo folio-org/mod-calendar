@@ -27,9 +27,6 @@
     "endMinute": {
       "type": "integer"
     },
-    "twelveHour": {
-      "type": "boolean"
-    },
     "allDay": {
       "type": "boolean"
     },

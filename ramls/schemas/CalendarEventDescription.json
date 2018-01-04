@@ -17,6 +17,9 @@
       "type": "string",
       "format": "date-time"
     },
+    "twelveHour": {
+      "type": "boolean"
+    },
     "openingDays": {
       "type": "array",
       "items": {
