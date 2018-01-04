@@ -25,8 +25,28 @@
         },
         {
           "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
+          "permissionsRequired": [
+            "calendar.collection.add"
+          ]
+        },
+        {
+          "methods": [
+            "PUT"
+          ],
+          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
+          "permissionsRequired": [
+            "calendar.collection.add"
+          ]
+        },
+        {
+          "methods": [
             "GET",
-            "POST"
+            "POST",
+            "PUT",
+            "DELETE"
           ],
           "pathPattern": "/calendar/exclusions",
           "permissionsRequired": [

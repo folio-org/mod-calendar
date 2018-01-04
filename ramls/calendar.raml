@@ -60,6 +60,57 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
+
+    /{eventDescriptionId}:
+      delete:
+        description: Delete EventDescription by Id
+        responses:
+          204:
+           description: "EventDescription deleted successfully"
+          404:
+            description: "EventDescription with a given ID not found"
+            body:
+              text/plain:
+                example: |
+                  "<<resourcePathName|!singularize>> not found"
+          400:
+            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            body:
+              text/plain:
+                example: |
+                  "unable to delete <<resourcePathName|!singularize>> -- constraint violation"
+          500:
+            description: "Internal server error, e.g. due to misconfiguration"
+            body:
+              text/plain:
+                example: "Internal server error, contact administrator"
+
+      put:
+        description: Modify EventDescription
+        body:
+          application/json:
+              schema: CalendarEventDescription
+        responses:
+          204:
+            description: "EventDescription successfully updated"
+          404:
+            description: "EventDescription with a given ID not found"
+            body:
+              text/plain:
+                example: |
+                  "Exclusion not found"
+          400:
+            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            body:
+              text/plain:
+                example: |
+                  "unable to update event"
+          500:
+            description: "Internal server error, e.g. due to misconfiguration"
+            body:
+              text/plain:
+                example: "internal server error, contact administrator"
+
   /exclusions:
     get:
       description: Add exclusion events
@@ -87,4 +138,53 @@ schemas:
           body:
             text/plain:
               example: "Internal server error"
+    /{exclusionId}:
+      delete:
+        description: Delete Exclusion by Id
+        responses:
+          204:
+           description: "Exclusion deleted successfully"
+          404:
+            description: "Exclusion with a given ID not found"
+            body:
+              text/plain:
+                example: |
+                  "<<resourcePathName|!singularize>> not found"
+          400:
+            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            body:
+              text/plain:
+                example: |
+                  "unable to delete <<resourcePathName|!singularize>> -- constraint violation"
+          500:
+            description: "Internal server error, e.g. due to misconfiguration"
+            body:
+              text/plain:
+                example: "Internal server error, contact administrator"
+
+      put:
+        description: Modify Exclusion
+        body:
+          application/json:
+              schema: CalendarEventExclusionDescription
+        responses:
+          204:
+            description: "Exclusion successfully updated"
+          404:
+            description: "Exclusion with a given ID not found"
+            body:
+              text/plain:
+                example: |
+                  "Exclusion not found"
+          400:
+            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            body:
+              text/plain:
+                example: |
+                  "unable to update event"
+          500:
+            description: "Internal server error, e.g. due to misconfiguration"
+            body:
+              text/plain:
+                example: "internal server error, contact administrator"
 
