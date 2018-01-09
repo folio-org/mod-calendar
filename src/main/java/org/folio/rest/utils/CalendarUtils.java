@@ -37,7 +37,7 @@ public class CalendarUtils {
     Calendar endCal = Calendar.getInstance();
     endCal.setTimeInMillis(entity.getEndDate().getTime());
     endCal.set(Calendar.SECOND, 0);
-    endCal.set(Calendar.MILLISECOND, 0);
+    endCal.set(Calendar.MILLISECOND, 1);
 
     Map<DayOfWeek, OpeningDay> openingDays = getOpeningDays(entity);
 
