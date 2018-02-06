@@ -14,13 +14,6 @@
       "withMetadata": true,
       "withAuditing": true,
       "generateId": true
-    },
-    {
-      "tableName": "exclusion",
-      "pkColumnName": "_id",
-      "withMetadata": true,
-      "withAuditing": true,
-      "generateId": true
     }
   ]
 }

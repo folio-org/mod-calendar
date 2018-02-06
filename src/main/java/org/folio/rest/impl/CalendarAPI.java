@@ -203,27 +203,6 @@ public class CalendarAPI implements CalendarResource {
 
   }
 
-  @Override
-  public void getCalendarExclusions(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    asyncResultHandler
-      .handle(Future.succeededFuture(GetCalendarExclusionsResponse.withJsonOK(new CalendarEventExclusionDescriptionCollection())));
-  }
-
-  @Override
-  public void postCalendarExclusions(Exclusion exclusion, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-
-  }
-
-  @Override
-  public void deleteCalendarExclusionsByExclusionId(String exclusionId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-
-  }
-
-  @Override
-  public void putCalendarExclusionsByExclusionId(String exclusionId, Exclusion entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-
-  }
-
   private static void deleteEventsByDescriptionId(PostgresClient postgresClient, AsyncResult<Results> replyGetDescriptionId, String eventDescriptionId, Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> future, Context vertxContext) {
     try {
       Criterion criteriaOfEvent = new Criterion(

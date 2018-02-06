@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Calendar event",
+  "title": "Calendar event description",
   "type": "object",
   "properties": {
     "id": {
@@ -8,6 +8,13 @@
     },
     "description": {
       "type": "string"
+    },
+    "descriptionType": {
+      "type": "string",
+      "enum": [
+        "OPENING_DAY",
+        "EXCLUSION"
+      ]
     },
     "startDate": {
       "type": "string",

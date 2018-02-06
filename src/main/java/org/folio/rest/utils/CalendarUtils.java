@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 
@@ -60,7 +61,11 @@ public class CalendarUtils {
         event.setId(entity.getId());
         event.setStartDate(currentStartDate.getTime());
         event.setEndDate(currentEndDate.getTime());
-        event.setEventType(CalendarConstants.OPENING_DAY);
+        if (entity.getDescriptionType() == DescriptionType.OPENING_DAY) {
+          event.setEventType(CalendarConstants.OPENING_DAY);
+        } else {
+          event.setEventType(CalendarConstants.EXCLUSION);
+        }
         event.setId(generatedId);
         events.add(event);
       }

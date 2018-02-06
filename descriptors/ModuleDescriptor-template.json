@@ -29,7 +29,7 @@
           ],
           "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
           "permissionsRequired": [
-            "calendar.collection.add"
+            "calendar.collection.remove"
           ]
         },
         {
@@ -39,19 +39,6 @@
           "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
           "permissionsRequired": [
             "calendar.collection.add"
-          ]
-        },
-        {
-          "methods": [
-            "GET",
-            "POST",
-            "PUT",
-            "DELETE"
-          ],
-          "pathPattern": "/calendar/exclusions",
-          "permissionsRequired": [
-            "calendar.collection.add",
-            "calendar.collection.get"
           ]
         }
       ]
@@ -81,12 +68,24 @@
       "description": ""
     },
     {
+      "permissionName": "calendar.collection.update",
+      "displayName": "Update existing calendar event description",
+      "description": ""
+    },
+    {
+      "permissionName": "calendar.collection.remove",
+      "displayName": "Remove calendar event description",
+      "description": ""
+    },
+    {
       "permissionName": "calendar.collection.all",
       "displayName": "Calendar permissions",
       "description": "",
       "subPermissions": [
         "calendar.collection.get",
-        "calendar.collection.add"
+        "calendar.collection.add",
+        "calendar.collection.update",
+        "calendar.collection.remove"
       ],
       "visible": true
     }
