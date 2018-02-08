@@ -61,10 +61,10 @@ public class CalendarUtils {
         event.setId(entity.getId());
         event.setStartDate(currentStartDate.getTime());
         event.setEndDate(currentEndDate.getTime());
-        if (entity.getDescriptionType() == DescriptionType.OPENING_DAY) {
-          event.setEventType(CalendarConstants.OPENING_DAY);
-        } else {
+        if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
           event.setEventType(CalendarConstants.EXCLUSION);
+        } else {
+          event.setEventType(CalendarConstants.OPENING_DAY);
         }
         event.setId(generatedId);
         events.add(event);
