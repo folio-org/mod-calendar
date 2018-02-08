@@ -19,6 +19,9 @@
     },
     "allDay": {
       "type": "boolean"
+    },
+    "open": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false,

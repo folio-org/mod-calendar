@@ -45,7 +45,7 @@ public class CalendarUtils {
     while (startCal.before(endCal)) {
       OpeningDay openingDay = openingDays.get(dayOfDate(startCal.getTime()));
 
-      if (openingDay != null && BooleanUtils.isTrue(openingDay.getOpen())) {
+      if (openingDay != null) {
         Calendar currentStartDate = Calendar.getInstance();
         currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
         currentStartDate.set(Calendar.HOUR, openingDay.getStartHour());
@@ -65,6 +65,11 @@ public class CalendarUtils {
           event.setEventType(CalendarConstants.EXCLUSION);
         } else {
           event.setEventType(CalendarConstants.OPENING_DAY);
+        }
+        if (BooleanUtils.isTrue(openingDay.getOpen())) {
+          event.setOpen(true);
+        } else {
+          event.setOpen(false);
         }
         event.setId(generatedId);
         events.add(event);

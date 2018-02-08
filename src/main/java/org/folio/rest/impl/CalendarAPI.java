@@ -103,6 +103,10 @@ public class CalendarAPI implements CalendarResource {
       description.setCreationDate(new Date());
     }
 
+    //    TODO: first check if the interval is unique
+    // for opening days there is no other opening day description
+    // for exclusions there is no other exclusion
+
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
@@ -127,6 +131,8 @@ public class CalendarAPI implements CalendarResource {
                   if (replyDescriptor.succeeded()) {
                     List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
                     if (events.isEmpty()) {
+                      //TODO: delete event description
+                      // TODO: this may will not be an issue if we save closing events explicitly!
                       asyncResultHandler.handle(Future.succeededFuture(
                         PostCalendarEventdescriptionsResponse.withPlainInternalServerError("Can not add empty event set!")));
                     }
@@ -184,6 +190,7 @@ public class CalendarAPI implements CalendarResource {
     });
   }
 
+  // TODO: bad request or not found if the description does not exist anymore
   private static Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> deleteEventDescriptionsAndEvents(String eventDescriptionId, Context vertxContext, Map<String, String> okapiHeaders) {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -193,6 +200,7 @@ public class CalendarAPI implements CalendarResource {
       try {
         CQLWrapper cql = new CQLWrapper();
         cql.setQuery("_" + ID_FIELD + "=" + eventDescriptionId);
+        //TODO: check if rollback is possible on failure!
         postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true,
           replyOfGetDescriptionById -> {
             try {
