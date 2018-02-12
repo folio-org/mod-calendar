@@ -8,7 +8,7 @@
       "id": "events",
       "items": {
         "type": "object",
-        "$ref": "CalendarEvent"
+        "$ref": "CalendarEvent.json"
       }
     },
     "totalRecords": {

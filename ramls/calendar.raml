@@ -8,11 +8,11 @@ documentation:
     content: This module provides a backend for the calendar functionalities
 
 schemas:
-  - CalendarEvent: !include schemas/CalendarEvent.json
+  - CalendarEvent.json: !include schemas/CalendarEvent.json
   - CalendarEventCollection: !include schemas/CalendarEventCollection.json
-  - CalendarEventDescription: !include schemas/CalendarEventDescription.json
+  - CalendarEventDescription.json: !include schemas/CalendarEventDescription.json
   - CalendarEventDescriptionCollection: !include schemas/CalendarEventDescriptionCollection.json
-  - OpeningDay: !include schemas/OpeningDay.json
+  - OpeningDay.json: !include schemas/OpeningDay.json
 
 /calendar:
   /events:
@@ -44,14 +44,14 @@ schemas:
     post:
       body:
         application/json:
-          schema: CalendarEventDescription
+          schema: CalendarEventDescription.json
       description: Saves the calendar event description and generates the calendar events
       responses:
         201:
           description: Returns the created event description
           body:
             application/json:
-              schema: CalendarEventDescription
+              schema: CalendarEventDescription.json
         500:
           description: "Internal server error"
           body:
@@ -86,7 +86,7 @@ schemas:
         description: Modify EventDescription
         body:
           application/json:
-              schema: CalendarEventDescription
+              schema: CalendarEventDescription.json
         responses:
           204:
             description: "EventDescription successfully updated"

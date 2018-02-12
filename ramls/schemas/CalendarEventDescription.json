@@ -31,7 +31,7 @@
       "type": "array",
       "items": {
         "type": "object",
-        "$ref": "OpeningDay"
+        "$ref": "OpeningDay.json"
       }
     },
     "creationDate": {
