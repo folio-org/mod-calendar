@@ -38,7 +38,10 @@ public class CalendarAPI implements CalendarResource {
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
       try {
-        CQLWrapper cql = new CQLWrapper();
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("open").append("=").append(true);
+        CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+        CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
         postgresClient.get(EVENT, Event.class, cql, true, true,
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
