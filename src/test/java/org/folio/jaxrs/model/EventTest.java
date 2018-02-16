@@ -9,7 +9,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
-public class CalendarTest {
+public class EventTest {
 
   @Test
   public void testEventCreation() {
@@ -17,12 +17,14 @@ public class CalendarTest {
     Event otherEvent = new Event()
       .withId(event.getId())
       .withAllDay(event.getAllDay())
+      .withOpen(event.getOpen())
       .withStartDate(event.getStartDate())
       .withEndDate(event.getEndDate())
       .withEventType(event.getEventType());
 
     assertEquals(event.getId(), otherEvent.getId());
     assertEquals(event.getAllDay(), otherEvent.getAllDay());
+    assertEquals(event.getOpen(), otherEvent.getOpen());
     assertEquals(event.getStartDate(), otherEvent.getStartDate());
     assertEquals(event.getEndDate(), otherEvent.getEndDate());
     assertEquals(event.getEventType(), otherEvent.getEventType());
@@ -37,12 +39,14 @@ public class CalendarTest {
     otherCalendarEventCollection.setTotalRecords(calendarEventCollection.getTotalRecords());
 
     assertEquals(calendarEventCollection.getEvents(), otherCalendarEventCollection.getEvents());
+    assertEquals(calendarEventCollection.getTotalRecords(), otherCalendarEventCollection.getTotalRecords());
   }
 
   private Event createEvent() {
     Event event = new Event();
     event.setId(UUID.randomUUID().toString());
     event.setAllDay(true);
+    event.setOpen(true);
     event.setStartDate(new Date());
     event.setEndDate(new Date());
     event.setEventType(UUID.randomUUID().toString());
@@ -57,6 +61,5 @@ public class CalendarTest {
 
     return calendarEventCollection;
   }
-
 
 }
