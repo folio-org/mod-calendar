@@ -1,8 +1,5 @@
-package org.folio.jaxrs.model;
+package org.folio.rest.jaxrs.model;
 
-import org.folio.rest.jaxrs.model.CalendarEventDescriptionCollection;
-import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.OpeningDay;
 import org.junit.Test;
 
 import java.util.ArrayList;

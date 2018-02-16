@@ -1,30 +1,23 @@
 package org.folio.rest.utils;
 
-import static java.util.Calendar.*;
-
-import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.folio.rest.jaxrs.model.Description;
 import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.util.*;
+
+import static java.util.Calendar.DAY_OF_MONTH;
+
 public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
   public static DayOfWeek dayOfDate(Date inputDate) {
-    DayOfWeek nameOfday = DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
-    return nameOfday;
+    return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
   }
 
   public static List<Object> separateEvents(Description entity, String generatedId) {
@@ -46,39 +39,7 @@ public class CalendarUtils {
       OpeningDay openingDay = openingDays.get(dayOfDate(startCal.getTime()));
 
       if (openingDay != null) {
-        Calendar currentStartDate = Calendar.getInstance();
-        currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
-
-        Calendar currentEndDate = Calendar.getInstance();
-        currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
-
-        Event event = new Event();
-        if (openingDay.getAllDay()) {
-          currentStartDate.set(Calendar.HOUR, 0);
-          currentStartDate.set(Calendar.MINUTE, 0);
-          currentEndDate.set(Calendar.HOUR, 23);
-          currentEndDate.set(Calendar.MINUTE, 59);
-        } else {
-          currentStartDate.set(Calendar.HOUR, openingDay.getStartHour());
-          currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
-          currentEndDate.set(Calendar.HOUR, openingDay.getEndHour());
-          currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
-        }
-        event.setAllDay(openingDay.getAllDay());
-        event.setId(entity.getId());
-        event.setStartDate(currentStartDate.getTime());
-        event.setEndDate(currentEndDate.getTime());
-        if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
-          event.setEventType(CalendarConstants.EXCLUSION);
-        } else {
-          event.setEventType(CalendarConstants.OPENING_DAY);
-        }
-        if (BooleanUtils.isTrue(openingDay.getOpen())) {
-          event.setOpen(true);
-        } else {
-          event.setOpen(false);
-        }
-        event.setId(generatedId);
+        Event event = createEvent(openingDay, startCal, entity, generatedId);
         events.add(event);
       }
 
@@ -86,6 +47,44 @@ public class CalendarUtils {
     }
 
     return events;
+  }
+
+  private static Event createEvent(OpeningDay openingDay, Calendar startCal, Description entity, String generatedId) {
+    Calendar currentStartDate = Calendar.getInstance();
+    currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
+
+    Calendar currentEndDate = Calendar.getInstance();
+    currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
+
+    Event event = new Event();
+    if (openingDay.getAllDay()) {
+      currentStartDate.set(Calendar.HOUR_OF_DAY, 0);
+      currentStartDate.set(Calendar.MINUTE, 0);
+      currentEndDate.set(Calendar.HOUR_OF_DAY, 23);
+      currentEndDate.set(Calendar.MINUTE, 59);
+    } else {
+      currentStartDate.set(Calendar.HOUR_OF_DAY, openingDay.getStartHour());
+      currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
+      currentEndDate.set(Calendar.HOUR_OF_DAY, openingDay.getEndHour());
+      currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
+    }
+    event.setAllDay(openingDay.getAllDay());
+    event.setId(entity.getId());
+    event.setStartDate(currentStartDate.getTime());
+    event.setEndDate(currentEndDate.getTime());
+    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
+      event.setEventType(CalendarConstants.EXCLUSION);
+    } else {
+      event.setEventType(CalendarConstants.OPENING_DAY);
+    }
+    if (BooleanUtils.isTrue(openingDay.getOpen())) {
+      event.setOpen(true);
+    } else {
+      event.setOpen(false);
+    }
+    event.setId(generatedId);
+
+    return event;
   }
 
   private static Map<DayOfWeek, OpeningDay> getOpeningDays(Description entity) {

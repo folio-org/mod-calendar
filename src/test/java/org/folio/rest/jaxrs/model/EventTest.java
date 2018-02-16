@@ -1,7 +1,5 @@
-package org.folio.jaxrs.model;
+package org.folio.rest.jaxrs.model;
 
-import org.folio.rest.jaxrs.model.CalendarEventCollection;
-import org.folio.rest.jaxrs.model.Event;
 import org.junit.Test;
 
 import java.util.Date;
