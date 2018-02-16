@@ -48,15 +48,22 @@ public class CalendarUtils {
       if (openingDay != null) {
         Calendar currentStartDate = Calendar.getInstance();
         currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
-        currentStartDate.set(Calendar.HOUR, openingDay.getStartHour());
-        currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
 
         Calendar currentEndDate = Calendar.getInstance();
         currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
-        currentEndDate.set(Calendar.HOUR, openingDay.getEndHour());
-        currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
 
         Event event = new Event();
+        if (openingDay.getAllDay()) {
+          currentStartDate.set(Calendar.HOUR, 0);
+          currentStartDate.set(Calendar.MINUTE, 0);
+          currentEndDate.set(Calendar.HOUR, 23);
+          currentEndDate.set(Calendar.MINUTE, 59);
+        } else {
+          currentStartDate.set(Calendar.HOUR, openingDay.getStartHour());
+          currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
+          currentEndDate.set(Calendar.HOUR, openingDay.getEndHour());
+          currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
+        }
         event.setAllDay(openingDay.getAllDay());
         event.setId(entity.getId());
         event.setStartDate(currentStartDate.getTime());
