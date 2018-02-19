@@ -1,16 +1,6 @@
 package org.folio.rest.impl;
 
-import static org.folio.rest.tools.ClientGenerator.*;
-import static org.folio.rest.utils.CalendarConstants.*;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.Response;
-
+import io.vertx.core.*;
 import org.folio.rest.jaxrs.model.CalendarEventCollection;
 import org.folio.rest.jaxrs.model.CalendarEventDescriptionCollection;
 import org.folio.rest.jaxrs.model.Description;
@@ -24,11 +14,15 @@ import org.folio.rest.utils.CalendarConstants;
 import org.folio.rest.utils.CalendarUtils;
 import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import javax.ws.rs.core.Response;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static org.folio.rest.tools.ClientGenerator.OKAPI_HEADER_TENANT;
+import static org.folio.rest.utils.CalendarConstants.*;
 
 public class CalendarAPI implements CalendarResource {
 
@@ -127,15 +121,17 @@ public class CalendarAPI implements CalendarResource {
         CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
         postgresClient.get(EVENT, Event.class, cql, true,
           replyOfGetEventsByDate -> {
-            if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
+            if (replyOfGetEventsByDate.failed()) {
+              asyncResultHandler.handle(Future.succeededFuture(
+                PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
+                  "Error while listing events.")));
+            } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
 
               try {
                 postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
                   if (replyDescriptor.succeeded()) {
                     List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
                     if (events.isEmpty()) {
-                      //TODO: delete event description
-                      // TODO: this may will not be an issue if we save closing events explicitly!
                       asyncResultHandler.handle(Future.succeededFuture(
                         PostCalendarEventdescriptionsResponse.withPlainInternalServerError("Can not add empty event set!")));
                     }
