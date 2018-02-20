@@ -58,18 +58,15 @@ public class DescriptionTest {
     OpeningDay openingDay = createOpeningDay();
     OpeningDay otherOpeningDay = new OpeningDay()
       .withDay(openingDay.getDay())
-      .withStartHour(openingDay.getStartHour())
-      .withStartMinute(openingDay.getStartMinute())
-      .withEndHour(openingDay.getEndHour())
-      .withEndMinute(openingDay.getEndMinute())
+      .withOpeningHour(openingDay.getOpeningHour())
       .withAllDay(openingDay.getAllDay())
       .withOpen(openingDay.getOpen());
 
     assertEquals(openingDay.getDay(), otherOpeningDay.getDay());
-    assertEquals(openingDay.getStartHour(), otherOpeningDay.getStartHour());
-    assertEquals(openingDay.getStartMinute(), otherOpeningDay.getStartMinute());
-    assertEquals(openingDay.getEndHour(), otherOpeningDay.getEndHour());
-    assertEquals(openingDay.getEndMinute(), otherOpeningDay.getEndMinute());
+    assertEquals(openingDay.getOpeningHour().get(0).getStartHour(), otherOpeningDay.getOpeningHour().get(0).getStartHour());
+    assertEquals(openingDay.getOpeningHour().get(0).getStartMinute(), otherOpeningDay.getOpeningHour().get(0).getStartMinute());
+    assertEquals(openingDay.getOpeningHour().get(0).getEndHour(), otherOpeningDay.getOpeningHour().get(0).getEndHour());
+    assertEquals(openingDay.getOpeningHour().get(0).getEndMinute(), otherOpeningDay.getOpeningHour().get(0).getEndMinute());
     assertEquals(openingDay.getAllDay(), otherOpeningDay.getAllDay());
     assertEquals(openingDay.getOpen(), otherOpeningDay.getOpen());
   }
@@ -92,12 +89,14 @@ public class DescriptionTest {
   }
 
   private OpeningDay createOpeningDay() {
+    OpeningHour openingHour = new OpeningHour();
+    openingHour.setStartHour(0);
+    openingHour.setStartMinute(0);
+    openingHour.setEndHour(23);
+    openingHour.setEndMinute(59);
     OpeningDay openingDay = new OpeningDay();
     openingDay.setDay(OpeningDay.Day.MONDAY);
-    openingDay.setStartHour(0);
-    openingDay.setStartMinute(0);
-    openingDay.setEndHour(23);
-    openingDay.setEndMinute(59);
+    openingDay.getOpeningHour().add(openingHour);
     openingDay.setAllDay(Boolean.FALSE);
     openingDay.setOpen(Boolean.TRUE);
 

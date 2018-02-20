@@ -3,6 +3,7 @@ package org.folio.rest.utils;
 import org.folio.rest.jaxrs.model.Description;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
 import org.junit.Test;
 
 import java.time.DayOfWeek;
@@ -76,12 +77,14 @@ public class TestCalendarUtils {
   }
 
   private OpeningDay createOpeningDay(OpeningDay.Day day) {
+    OpeningHour openingHour = new OpeningHour();
+    openingHour.setStartHour(START_HOUR);
+    openingHour.setStartMinute(START_MINUTE);
+    openingHour.setEndHour(END_HOUR);
+    openingHour.setEndMinute(END_MINUTE);
     OpeningDay openingDay = new OpeningDay();
+    openingDay.getOpeningHour().add(openingHour);
     openingDay.setDay(day);
-    openingDay.setStartHour(START_HOUR);
-    openingDay.setStartMinute(START_MINUTE);
-    openingDay.setEndHour(END_HOUR);
-    openingDay.setEndMinute(END_MINUTE);
     openingDay.setAllDay(Boolean.FALSE);
     openingDay.setOpen(Boolean.TRUE);
 

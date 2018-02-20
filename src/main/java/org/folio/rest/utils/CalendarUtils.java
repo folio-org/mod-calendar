@@ -5,6 +5,7 @@ import org.folio.rest.jaxrs.model.Description;
 import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -38,8 +39,8 @@ public class CalendarUtils {
     while (startCal.before(endCal)) {
       OpeningDay openingDay = openingDays.get(dayOfDate(startCal.getTime()));
 
-      Event event = createEvent(openingDay, startCal, entity, generatedId);
-      events.add(event);
+      List<Event> event = createEvents(openingDay, startCal, entity, generatedId);
+      events.addAll(event);
 
       startCal.add(DAY_OF_MONTH, 1);
     }
@@ -47,50 +48,56 @@ public class CalendarUtils {
     return events;
   }
 
-  private static Event createEvent(OpeningDay openingDay, Calendar startCal, Description entity, String generatedId) {
+  private static List<Event> createEvents(OpeningDay openingDay, Calendar startCal, Description entity, String generatedId) {
     Calendar currentStartDate = Calendar.getInstance();
     currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
 
     Calendar currentEndDate = Calendar.getInstance();
     currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
 
-    Event event = new Event();
-    if (openingDay != null) {
-      if (openingDay.getAllDay()) {
-        currentStartDate.set(Calendar.HOUR_OF_DAY, 0);
-        currentStartDate.set(Calendar.MINUTE, 0);
-        currentEndDate.set(Calendar.HOUR_OF_DAY, 23);
-        currentEndDate.set(Calendar.MINUTE, 59);
-      } else {
-        currentStartDate.set(Calendar.HOUR_OF_DAY, openingDay.getStartHour());
-        currentStartDate.set(Calendar.MINUTE, openingDay.getStartMinute());
-        currentEndDate.set(Calendar.HOUR_OF_DAY, openingDay.getEndHour());
-        currentEndDate.set(Calendar.MINUTE, openingDay.getEndMinute());
-      }
-      event.setAllDay(openingDay.getAllDay());
+    List<Event> events = new ArrayList<>();
+    String eventType = CalendarConstants.OPENING_DAY;
+    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
+      eventType = CalendarConstants.EXCLUSION;
+    }
 
-      if (BooleanUtils.isTrue(openingDay.getOpen())) {
-        event.setOpen(true);
-      } else {
-        event.setOpen(false);
-      }
-    } else {
+    boolean allDay = true;
+    boolean open = false;
+    if (openingDay != null) {
+      allDay = openingDay.getAllDay();
+      open = BooleanUtils.isTrue(openingDay.getOpen());
+    }
+
+    if (openingDay == null || openingDay.getAllDay() || BooleanUtils.isFalse(openingDay.getOpen())
+      || openingDay.getOpeningHour() == null) {
       currentStartDate.set(Calendar.HOUR_OF_DAY, 0);
       currentStartDate.set(Calendar.MINUTE, 0);
       currentEndDate.set(Calendar.HOUR_OF_DAY, 23);
       currentEndDate.set(Calendar.MINUTE, 59);
-      event.setOpen(false);
-    }
-    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
-      event.setEventType(CalendarConstants.EXCLUSION);
+      events.add(new Event()
+        .withId(generatedId)
+        .withEventType(eventType)
+        .withAllDay(allDay)
+        .withOpen(open)
+        .withStartDate(currentStartDate.getTime())
+        .withEndDate(currentEndDate.getTime()));
     } else {
-      event.setEventType(CalendarConstants.OPENING_DAY);
+      for (OpeningHour opening : openingDay.getOpeningHour()) {
+        currentStartDate.set(Calendar.HOUR_OF_DAY, opening.getStartHour());
+        currentStartDate.set(Calendar.MINUTE, opening.getStartMinute());
+        currentEndDate.set(Calendar.HOUR_OF_DAY, opening.getEndHour());
+        currentEndDate.set(Calendar.MINUTE, opening.getEndMinute());
+        events.add(new Event()
+          .withId(generatedId)
+          .withEventType(eventType)
+          .withAllDay(allDay)
+          .withOpen(open)
+          .withStartDate(currentStartDate.getTime())
+          .withEndDate(currentEndDate.getTime()));
+      }
     }
-    event.setStartDate(currentStartDate.getTime());
-    event.setEndDate(currentEndDate.getTime());
-    event.setId(generatedId);
 
-    return event;
+    return events;
   }
 
   private static Map<DayOfWeek, OpeningDay> getOpeningDays(Description entity) {

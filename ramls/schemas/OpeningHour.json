@@ -15,12 +15,17 @@
         "SUNDAY"
       ]
     },
-    "openingHour": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "OpeningHour.json"
-      }
+    "startHour": {
+      "type": "integer"
+    },
+    "startMinute": {
+      "type": "integer"
+    },
+    "endHour": {
+      "type": "integer"
+    },
+    "endMinute": {
+      "type": "integer"
     },
     "allDay": {
       "type": "boolean"
