@@ -81,9 +81,9 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
-    startDate.set(2017, 0, 1, 0, 0, 0);
+    startDate.set(2017, Calendar.JANUARY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, 0, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.JANUARY, 31, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -111,9 +111,9 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
-    startDate.set(2017, 1, 1, 0, 0, 0);
+    startDate.set(2017, Calendar.FEBRUARY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, 1, 28, 23, 59, 59);
+    endDate.set(2017, Calendar.FEBRUARY, 28, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -126,6 +126,51 @@ public class CalendarIT {
     }).compose(v -> {
       Future<String> f = Future.future();
       updateDescription(f1.result()).setHandler(f.completer());
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testDeleteDescription(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.MARCH, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.MARCH, 31, 23, 59, 59);
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
+    openingDays.add(monday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      deleteDescription(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(handler -> {
+        if (handler.failed() && "Can not find description object.".equals(handler.cause().getMessage())) {
+          System.out.println("Delete was successful.");
+          f.complete();
+        } else {
+          f.fail("Failed to delete description.");
+        }
+      });
       return f;
     });
 
@@ -189,7 +234,7 @@ public class CalendarIT {
             }
             future.fail("Can not find description object.");
           } else {
-            future.fail("Unable to read proper data from JSON return value: " + buf.toString());
+            future.fail("Can not find description object.");
           }
         });
       } else {
@@ -291,6 +336,29 @@ public class CalendarIT {
       //.putHeader(TOKEN_HEADER_KEY, TOKEN)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
+    return future;
+  }
+
+  private Future<String> deleteDescription(String descriptionId) {
+
+    System.out.println("Deleting a description\n");
+    Future future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.delete(port, HOST, "/calendar/eventdescriptions/" + descriptionId, res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        future.complete();
+      } else {
+        future.fail("Failed to delete description with status: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, "text/plain")
       .exceptionHandler(e -> {
         future.fail(e);
       })
