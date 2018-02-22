@@ -6,14 +6,16 @@
       "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,
-      "generateId": true
+      "generateId": true,
+      "populateJsonWithId": true
     },
     {
       "tableName": "event",
       "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,
-      "generateId": true
+      "generateId": true,
+      "populateJsonWithId": true
     }
   ]
 }

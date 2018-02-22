@@ -75,7 +75,7 @@ public class CalendarUtils {
       currentEndDate.set(Calendar.HOUR_OF_DAY, 23);
       currentEndDate.set(Calendar.MINUTE, 59);
       events.add(new Event()
-        .withId(generatedId)
+        .withDescriptionId(generatedId)
         .withEventType(eventType)
         .withAllDay(allDay)
         .withOpen(open)
@@ -88,7 +88,7 @@ public class CalendarUtils {
         currentEndDate.set(Calendar.HOUR_OF_DAY, opening.getEndHour());
         currentEndDate.set(Calendar.MINUTE, opening.getEndMinute());
         events.add(new Event()
-          .withId(generatedId)
+          .withDescriptionId(generatedId)
           .withEventType(eventType)
           .withAllDay(allDay)
           .withOpen(open)

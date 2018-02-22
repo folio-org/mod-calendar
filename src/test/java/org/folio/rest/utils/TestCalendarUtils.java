@@ -66,7 +66,7 @@ public class TestCalendarUtils {
       assertEquals(START_MINUTE, openingStart.get(Calendar.MINUTE));
       assertEquals(END_HOUR, openingEnd.get(Calendar.HOUR_OF_DAY));
       assertEquals(END_MINUTE, openingEnd.get(Calendar.MINUTE));
-      assertEquals(generatedId, event.getId());
+      assertEquals(generatedId, event.getDescriptionId());
       assertEquals(Boolean.TRUE, event.getOpen());
       assertEquals(Boolean.FALSE, event.getAllDay());
       assertEquals(CalendarConstants.OPENING_DAY, event.getEventType());

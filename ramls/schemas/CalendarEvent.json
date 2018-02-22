@@ -6,6 +6,9 @@
     "id": {
       "type": "string"
     },
+    "descriptionId": {
+      "type": "string"
+    },
     "eventType": {
       "type": "string"
     },
@@ -27,6 +30,7 @@
   "additionalProperties": false,
   "required": [
     "id",
+    "descriptionId",
     "eventType",
     "startDate",
     "endDate"

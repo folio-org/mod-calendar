@@ -7,6 +7,8 @@ import org.folio.rest.jaxrs.model.Description;
 import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.resource.CalendarResource;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.TenantTool;
@@ -30,7 +32,7 @@ public class CalendarAPI implements CalendarResource {
   public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
+    vertxContext.runOnContext(v -> {
       try {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("open").append("=").append(true);
@@ -55,7 +57,7 @@ public class CalendarAPI implements CalendarResource {
           GetCalendarEventsResponse.withPlainInternalServerError(
             e.getMessage())));
       }
-    }));
+    });
   }
 
   @Override
@@ -64,7 +66,7 @@ public class CalendarAPI implements CalendarResource {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
 
-    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
+    vertxContext.runOnContext(v -> {
       try {
         CQLWrapper cql = new CQLWrapper();
 
@@ -88,7 +90,7 @@ public class CalendarAPI implements CalendarResource {
           GetCalendarEventdescriptionsResponse.withPlainInternalServerError(
             e.getMessage())));
       }
-    }));
+    });
   }
 
   @Override
@@ -100,13 +102,9 @@ public class CalendarAPI implements CalendarResource {
       description.setCreationDate(new Date());
     }
 
-    //    TODO: first check if the interval is unique
-    // for opening days there is no other opening day description
-    // for exclusions there is no other exclusion
-
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
+    vertxContext.runOnContext(v -> {
       try {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("startDate >= ").append(format.format(description.getStartDate()))
@@ -126,42 +124,52 @@ public class CalendarAPI implements CalendarResource {
                 PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
                   "Error while listing events.")));
             } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
-
-              try {
-                postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
-                  if (replyDescriptor.succeeded()) {
-                    List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
-                    if (events.isEmpty()) {
-                      asyncResultHandler.handle(Future.succeededFuture(
-                        PostCalendarEventdescriptionsResponse.withPlainInternalServerError("Can not add empty event set!")));
-                    }
-                    try {
-                      postgresClient.saveBatch(EVENT, events, replyEvent -> {
-                        if (!replyEvent.succeeded()) {
+              postgresClient.startTx(beginTx -> {
+                try {
+                  postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
+                    if (replyDescriptor.succeeded()) {
+                      List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
+                      if (events.isEmpty()) {
+                        postgresClient.rollbackTx(beginTx, rollbackHandler -> {
                           asyncResultHandler.handle(Future.succeededFuture(
-                            PostCalendarEventdescriptionsResponse.withPlainInternalServerError(replyEvent.cause().getMessage())));
-                        } else {
-                          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(
-                            Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(description))));
+                            PostCalendarEventdescriptionsResponse.withPlainInternalServerError("Can not add empty event set!")));
+                        });
+                      } else {
+                        try {
+                          postgresClient.saveBatch(EVENT, events, replyEvent -> {
+                            if (!replyEvent.succeeded()) {
+                              postgresClient.rollbackTx(beginTx, rollbackHandler -> {
+                                asyncResultHandler.handle(Future.succeededFuture(
+                                  PostCalendarEventdescriptionsResponse.withPlainInternalServerError(replyEvent.cause().getMessage())));
+                              });
+                            } else {
+                              Description createdDescription = description;
+                              createdDescription.setId(replyDescriptor.result());
+
+                              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(
+                                Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(createdDescription))));
+                            }
+                          });
+                        } catch (Exception e) {
+                          asyncResultHandler.handle(Future.succeededFuture(
+                            PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
+                              e.getMessage())));
                         }
-                      });
-                    } catch (Exception e) {
+                      }
+
+                    } else {
                       asyncResultHandler.handle(Future.succeededFuture(
                         PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                          e.getMessage())));
+                          replyDescriptor.cause().getMessage())));
                     }
+                  });
 
-                  } else {
-                    asyncResultHandler.handle(Future.succeededFuture(
-                      PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                        replyDescriptor.cause().getMessage())));
-                  }
-                });
-              } catch (Exception e) {
-                asyncResultHandler.handle(Future.succeededFuture(
-                  PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                    e.getMessage())));
-              }
+                } catch (Exception e) {
+                  asyncResultHandler.handle(Future.succeededFuture(
+                    PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
+                      e.getMessage())));
+                }
+              });
             } else {
               asyncResultHandler.handle(Future.succeededFuture(
                 PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
@@ -173,12 +181,12 @@ public class CalendarAPI implements CalendarResource {
           PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
             e.getMessage())));
       }
-    }));
+    });
   }
 
   @Override
   public void deleteCalendarEventdescriptionsByEventDescriptionId(String uiEventDescriptionId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> future = deleteEventDescriptionsAndEvents(uiEventDescriptionId, vertxContext, okapiHeaders);
+    Future<Void> future = deleteEventDescriptionsAndEvents(uiEventDescriptionId, vertxContext, okapiHeaders);
     future.setHandler(resultHandler -> {
       if (future.succeeded()) {
         asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
@@ -190,12 +198,12 @@ public class CalendarAPI implements CalendarResource {
   }
 
   // TODO: bad request or not found if the description does not exist anymore
-  private static Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> deleteEventDescriptionsAndEvents(String eventDescriptionId, Context vertxContext, Map<String, String> okapiHeaders) {
+  private static Future<Void> deleteEventDescriptionsAndEvents(String eventDescriptionId, Context vertxContext, Map<String, String> okapiHeaders) {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
 
-    Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> future = Future.future();
-    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
+    Future<Void> future = Future.future();
+    vertxContext.runOnContext(v -> {
       try {
         CQLWrapper cql = new CQLWrapper();
         cql.setQuery("_" + ID_FIELD + "=" + eventDescriptionId);
@@ -207,7 +215,14 @@ public class CalendarAPI implements CalendarResource {
                 if (replyOfGetDescriptionById.result().getResults().size() == 0) {
                   future.fail("There is no event description with this id: " + eventDescriptionId);
                 } else {
-                  deleteEventsByDescriptionId(postgresClient, eventDescriptionId, future, vertxContext);
+                  Future deleteEventsFuture = deleteEventsByDescriptionId(postgresClient, eventDescriptionId);
+                  deleteEventsFuture.setHandler(handler -> {
+                    if (deleteEventsFuture.succeeded()) {
+                      deleteEventDescription(postgresClient, eventDescriptionId).setHandler(future.completer());
+                    } else {
+                      future.fail("Failed to delete events.");
+                    }
+                  });
                 }
               } else {
                 future.fail(replyOfGetDescriptionById.cause().getMessage());
@@ -219,31 +234,111 @@ public class CalendarAPI implements CalendarResource {
       } catch (Exception e) {
         future.fail(e.getMessage());
       }
-    }));
+    });
     return future;
   }
 
   @Override
-  public void putCalendarEventdescriptionsByEventDescriptionId(String eventDescriptionId, Description eventDescription, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> future = deleteEventDescriptionsAndEvents(eventDescriptionId, vertxContext, okapiHeaders);
-    future.setHandler(resultHandler -> {
-      if (future.succeeded() && future.isComplete()) {
-        try {
-          postCalendarEventdescriptions(eventDescription, okapiHeaders, asyncResultHandler, vertxContext);
-          asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
-        } catch (Exception e) {
-          asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarEventdescriptionsByEventDescriptionIdResponse
-            .withPlainInternalServerError(String.valueOf(future.result()))));
+  public void putCalendarEventdescriptionsByEventDescriptionId(String eventDescriptionId, Description description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    PostgresClient postgresClientForEventDelete = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    vertxContext.runOnContext(v -> {
+      Future<Void> future = deleteEventsByDescriptionId(postgresClientForEventDelete, eventDescriptionId);
+
+      future.setHandler(resultHandler -> {
+        if (future.succeeded() && future.isComplete()) {
+          try {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+            vertxContext.runOnContext(vc -> {
+              try {
+                StringBuilder queryBuilder = new StringBuilder();
+                queryBuilder.append("startDate >= ").append(format.format(description.getStartDate()))
+                  .append(" AND endDate <= ").append(format.format(description.getEndDate()))
+                  .append(" AND descriptionId <> ").append(description.getId())
+                  .append(" AND eventType = ");
+                if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCLUSION) {
+                  queryBuilder.append(CalendarConstants.EXCLUSION);
+                } else {
+                  queryBuilder.append(CalendarConstants.OPENING_DAY);
+                }
+                CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+                CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
+                postgresClient.get(EVENT, Event.class, cql, true,
+                  replyOfGetEventsByDate -> {
+                    if (replyOfGetEventsByDate.failed()) {
+                      asyncResultHandler.handle(Future.succeededFuture(
+                        PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
+                          "Error while listing events.")));
+                    } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
+
+                      try {
+                        Criteria idCrit = new Criteria();
+                        idCrit.addField("'id'");
+                        idCrit.setOperation("=");
+                        idCrit.setValue(description.getId());
+                        postgresClient.update(EVENT_DESCRIPTION, description, new Criterion(idCrit), true, replyDescriptor -> {
+                          if (replyDescriptor.succeeded()) {
+                            List<Object> events = CalendarUtils.separateEvents(description, description.getId());
+                            if (events.isEmpty()) {
+                              asyncResultHandler.handle(Future.succeededFuture(
+                                PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError("Can not add empty event set!")));
+                            } else {
+                              try {
+                                postgresClient.saveBatch(EVENT, events, replyEvent -> {
+                                  if (!replyEvent.succeeded()) {
+                                    asyncResultHandler.handle(Future.succeededFuture(
+                                      PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(replyEvent.cause().getMessage())));
+                                  } else {
+                                    asyncResultHandler.handle(
+                                      Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
+                                  }
+                                });
+                              } catch (Exception e) {
+                                asyncResultHandler.handle(Future.succeededFuture(
+                                  PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                                    e.getMessage())));
+                              }
+                            }
+
+                          } else {
+                            asyncResultHandler.handle(Future.succeededFuture(
+                              PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                                replyDescriptor.cause().getMessage())));
+                          }
+                        });
+                      } catch (Exception e) {
+                        asyncResultHandler.handle(Future.succeededFuture(
+                          PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                            e.getMessage())));
+                      }
+                    } else {
+                      asyncResultHandler.handle(Future.succeededFuture(
+                        PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                          "Intervals can not overlap!")));
+                    }
+                  });
+              } catch (Exception e) {
+                asyncResultHandler.handle(Future.succeededFuture(
+                  PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                    e.getMessage())));
+              }
+            });
+          } catch (Exception e) {
+            asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
+              .withPlainInternalServerError(String.valueOf(future.result()))));
+          }
+        } else {
+          asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
+            .withPlainInternalServerError(future.cause().getMessage())));
         }
-      } else {
-        asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarEventdescriptionsByEventDescriptionIdResponse
-          .withPlainInternalServerError(future.cause().getMessage())));
-      }
+      });
     });
 
   }
 
-  private static void deleteEventsByDescriptionId(PostgresClient postgresClient, String eventDescriptionId, Future<DeleteCalendarEventdescriptionsByEventDescriptionIdResponse> future, Context vertxContext) {
+  private static Future deleteEventsByDescriptionId(PostgresClient postgresClient, String eventDescriptionId) {
+    Future future = Future.future();
     try {
       StringBuilder queryBuilder = new StringBuilder();
       queryBuilder.append(ID_FIELD).append("=").append(eventDescriptionId);
@@ -271,17 +366,7 @@ public class CalendarAPI implements CalendarResource {
             }
             CompositeFuture.all(deleteFutureResults).setHandler(ar -> {
               if (ar.succeeded()) {
-                try {
-                  postgresClient.delete(EVENT_DESCRIPTION, eventDescriptionId, replyDeleteDescription -> {
-                    if (replyDeleteDescription.failed()) {
-                      future.fail(replyDeleteDescription.cause().getMessage());
-                    } else {
-                      future.complete();
-                    }
-                  });
-                } catch (Exception e) {
-                  future.fail(e.getMessage());
-                }
+                future.complete();
               } else {
                 future.fail("Failed to delete all events!");
               }
@@ -293,5 +378,22 @@ public class CalendarAPI implements CalendarResource {
     } catch (Exception e) {
       future.fail(e.getMessage());
     }
+    return future;
+  }
+
+  private static Future deleteEventDescription(PostgresClient postgresClient, String eventDescriptionId) {
+    Future future = Future.future();
+    try {
+      postgresClient.delete(EVENT_DESCRIPTION, eventDescriptionId, replyDeleteDescription -> {
+        if (replyDeleteDescription.failed()) {
+          future.fail(replyDeleteDescription.cause().getMessage());
+        } else {
+          future.complete();
+        }
+      });
+    } catch (Exception e) {
+      future.fail(e.getMessage());
+    }
+    return future;
   }
 }
