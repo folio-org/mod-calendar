@@ -11,7 +11,9 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.CalendarEventCollection;
 import org.folio.rest.jaxrs.model.Description;
+import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -171,6 +173,52 @@ public class CalendarIT {
           f.fail("Failed to delete description.");
         }
       });
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testListEvents(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.APRIL, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.APRIL, 30, 23, 59, 59);
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
+    openingDays.add(monday);
+    OpeningDay tuesday = new OpeningDay().withDay(OpeningDay.Day.TUESDAY).withOpen(true).withAllDay(true);
+    openingDays.add(tuesday);
+    OpeningDay wednesday = new OpeningDay().withDay(OpeningDay.Day.WEDNESDAY).withOpen(true).withAllDay(true);
+    openingDays.add(wednesday);
+    OpeningDay thursday = new OpeningDay().withDay(OpeningDay.Day.THURSDAY).withOpen(true).withAllDay(true);
+    openingDays.add(thursday);
+    OpeningDay friday = new OpeningDay().withDay(OpeningDay.Day.FRIDAY).withOpen(true).withAllDay(true);
+    openingDays.add(friday);
+    OpeningDay saturday = new OpeningDay().withDay(OpeningDay.Day.SATURDAY).withOpen(true).withAllDay(true);
+    openingDays.add(saturday);
+    OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
+    openingDays.add(sunday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      listEvents(f1.result(), 30).setHandler(f.completer());
       return f;
     });
 
@@ -366,11 +414,46 @@ public class CalendarIT {
     return future;
   }
 
-  /*private Future<Void> listEvents(TestContext context) {
+  private Future<String> listEvents(String descriptionId, int numberOfExpectedEvents) {
+
+    System.out.println("Retrieving events for a description\n");
     Future future = Future.future();
-    future.complete();
+    HttpClient client = vertx.createHttpClient();
+    client.get(port, HOST, "/calendar/events", res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(buf -> {
+          CalendarEventCollection eventListObject = buf.toJsonObject().mapTo(CalendarEventCollection.class);
+          if (eventListObject.getTotalRecords() > 0) {
+            List<Event> eventList = eventListObject.getEvents();
+            List<Event> foundEvents = new ArrayList<>();
+            for (Event event : eventList) {
+              if (descriptionId.equals(event.getDescriptionId())) {
+                foundEvents.add(event);
+              }
+            }
+            if (foundEvents.size() == numberOfExpectedEvents) {
+              future.complete(descriptionId);
+            } else {
+              future.fail("Can not find event object.");
+            }
+          } else {
+            future.fail("Can not find event object.");
+          }
+        });
+      } else {
+        future.fail("Bad response: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
     return future;
-  }*/
+  }
 
   private Description generateDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
 
