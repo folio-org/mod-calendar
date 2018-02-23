@@ -132,7 +132,7 @@ public class CalendarAPI implements CalendarResource {
                       if (events.isEmpty()) {
                         postgresClient.rollbackTx(beginTx, rollbackHandler -> {
                           asyncResultHandler.handle(Future.succeededFuture(
-                            PostCalendarEventdescriptionsResponse.withPlainInternalServerError("Can not add empty event set!")));
+                            PostCalendarEventdescriptionsResponse.withPlainBadRequest("No events can be generated in the given interval")));
                         });
                       } else {
                         try {

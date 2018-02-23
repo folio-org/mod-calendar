@@ -273,6 +273,27 @@ public class CalendarIT {
     });
   }
 
+  @Test
+  public void testAddNewDescriptionWithoutEvents(TestContext context) {
+    Async async = context.async();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.FEBRUARY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JANUARY, 1, 23, 59, 59);
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
+    openingDays.add(monday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(res -> {
+      if (res.succeeded()) {
+        context.fail("Saving invalid interval should have failed.");
+      } else {
+        res.cause().printStackTrace();
+        async.complete();
+      }
+    });
+  }
+
   private Future<String> postDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
     System.out.println("Creating a new description\n");
     Future<String> future = Future.future();

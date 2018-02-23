@@ -53,11 +53,16 @@ schemas:
           body:
             application/json:
               schema: CalendarEventDescription.json
+        400:
+          description: "Bad request"
+          body:
+            text/plain:
+              example: "No events can be generated in the given interval"
         409:
           description: "There is already a description in the given interval"
           body:
             text/plain:
-              example: "Conflict"
+              example: "Intervals can not overlap"
         500:
           description: "Internal server error"
           body:
