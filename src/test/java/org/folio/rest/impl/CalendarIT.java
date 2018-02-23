@@ -232,6 +232,47 @@ public class CalendarIT {
     });
   }
 
+  @Test
+  public void testAddExistingDescription(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.MAY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.MAY, 31, 23, 59, 59);
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
+    openingDays.add(monday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      postDescription(startDate, endDate, openingDays).setHandler(handler -> {
+        if (handler.failed() && "Failed to add description. Conflict".equals(handler.cause().getMessage())) {
+          System.out.println("Does not allow to add overlapping periods.");
+          f.complete();
+        } else {
+          f.fail("Should not allow to add the same interval multiple times.");
+        }
+      });
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
   private Future<String> postDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
     System.out.println("Creating a new description\n");
     Future<String> future = Future.future();
@@ -245,7 +286,7 @@ public class CalendarIT {
           future.complete(descriptionResponse.getId());
         });
       } else {
-        future.fail("Got status code: " + res.statusCode());
+        future.fail("Failed to add description. " + res.statusMessage());
       }
     })
       .putHeader(TENANT_HEADER_KEY, TENANT)

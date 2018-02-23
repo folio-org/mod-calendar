@@ -172,8 +172,8 @@ public class CalendarAPI implements CalendarResource {
               });
             } else {
               asyncResultHandler.handle(Future.succeededFuture(
-                PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                  "Intervals can not overlap!")));
+                PostCalendarEventdescriptionsResponse.withPlainConflict(
+                  "Intervals can not overlap")));
             }
           });
       } catch (Exception e) {

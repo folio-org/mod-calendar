@@ -53,6 +53,11 @@ schemas:
           body:
             application/json:
               schema: CalendarEventDescription.json
+        409:
+          description: "There is already a description in the given interval"
+          body:
+            text/plain:
+              example: "Conflict"
         500:
           description: "Internal server error"
           body:
