@@ -6,5 +6,6 @@ public final class CalendarConstants {
   public static final String OPENING_DAY = "opening day";
   public static final String EXCLUSION = "exclusion";
   public static final String ID_FIELD = "id";
+  public static final String DESCRIPTION_ID_FIELD = "descriptionId";
 
 }

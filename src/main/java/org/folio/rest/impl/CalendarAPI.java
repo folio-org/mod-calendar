@@ -341,7 +341,7 @@ public class CalendarAPI implements CalendarResource {
     Future future = Future.future();
     try {
       StringBuilder queryBuilder = new StringBuilder();
-      queryBuilder.append(ID_FIELD).append("=").append(eventDescriptionId);
+      queryBuilder.append(DESCRIPTION_ID_FIELD).append("=").append(eventDescriptionId);
       CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
       CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
       postgresClient.get(EVENT, Event.class, cql, true,

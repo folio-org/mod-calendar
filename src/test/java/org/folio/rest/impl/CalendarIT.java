@@ -1,8 +1,6 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -11,21 +9,13 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.CalendarEventCollection;
-import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.Event;
-import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -147,9 +137,9 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
-    startDate.set(2017, Calendar.MARCH, 1, 0, 0, 0);
+    startDate.set(2017, Calendar.SEPTEMBER, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.MARCH, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.SEPTEMBER, 30, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -380,7 +370,15 @@ public class CalendarIT {
               if (object instanceof JsonObject) {
                 Description mappedDescription = ((JsonObject) object).mapTo(Description.class);
                 if (descriptionId.equals(mappedDescription.getId())) {
+                  Date previousStartDate = mappedDescription.getStartDate();
+                  Date previousEndDate = mappedDescription.getEndDate();
                   mappedDescription.setDescription("TEST_DESCRIPTION");
+                  Calendar startDate = Calendar.getInstance();
+                  startDate.set(2017, Calendar.MARCH, 1, 12, 0, 0);
+                  Calendar endDate = Calendar.getInstance();
+                  endDate.set(2017, Calendar.MARCH, 31, 18, 0, 0);
+                  mappedDescription.setStartDate(startDate.getTime());
+                  mappedDescription.setEndDate(endDate.getTime());
                   HttpClient clientForPut = vertx.createHttpClient();
                   clientForPut.put(port, HOST, "/calendar/eventdescriptions/" + descriptionId, updateResponse -> {
                     if (res.statusCode() >= 200 && res.statusCode() < 300) {
@@ -395,7 +393,11 @@ public class CalendarIT {
                                 if (updatedObject instanceof JsonObject) {
                                   Description mappedUpdatedDescription = ((JsonObject) updatedObject).mapTo(Description.class);
                                   if (descriptionId.equals(mappedUpdatedDescription.getId())) {
-                                    if (mappedUpdatedDescription.getDescription().equals(mappedDescription.getDescription())) {
+                                    if (mappedUpdatedDescription.getDescription().equals(mappedDescription.getDescription())
+                                      && mappedUpdatedDescription.getStartDate().equals(mappedDescription.getStartDate())
+                                      && mappedUpdatedDescription.getEndDate().equals(mappedDescription.getEndDate())
+                                      && !previousStartDate.equals(mappedUpdatedDescription.getStartDate())
+                                      && !previousEndDate.equals(mappedUpdatedDescription.getEndDate())) {
                                       future.complete(descriptionId);
                                     } else {
                                       future.fail("Failed to update event description.");
