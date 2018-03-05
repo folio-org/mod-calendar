@@ -7,8 +7,6 @@ import org.folio.rest.jaxrs.model.Description;
 import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.resource.CalendarResource;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.TenantTool;
@@ -273,11 +271,7 @@ public class CalendarAPI implements CalendarResource {
                     } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
 
                       try {
-                        Criteria idCrit = new Criteria();
-                        idCrit.addField("'id'");
-                        idCrit.setOperation("=");
-                        idCrit.setValue(description.getId());
-                        postgresClient.update(EVENT_DESCRIPTION, description, new Criterion(idCrit), true, replyDescriptor -> {
+                        postgresClient.update(EVENT_DESCRIPTION, description, description.getId(), replyDescriptor -> {
                           if (replyDescriptor.succeeded()) {
                             List<Object> events = CalendarUtils.separateEvents(description, description.getId());
                             if (events.isEmpty()) {
