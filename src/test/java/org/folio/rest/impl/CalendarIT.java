@@ -1,6 +1,8 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -12,7 +14,10 @@ import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.*;
+import org.folio.rest.utils.CalendarUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.*;
@@ -137,9 +142,9 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
-    startDate.set(2017, Calendar.SEPTEMBER, 1, 0, 0, 0);
+    startDate.set(2017, Calendar.MARCH, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.SEPTEMBER, 30, 23, 59, 59);
+    endDate.set(2017, Calendar.MARCH, 31, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -223,7 +228,12 @@ public class CalendarIT {
   }
 
   @Test
-  public void testAddExistingDescription(TestContext context) {
+  public void testListEventsWithOpeningHours(TestContext context) {
+    int startHour = 8;
+    int startMinute = 30;
+    int endHour = 18;
+    int endMinute = 40;
+
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
@@ -231,6 +241,60 @@ public class CalendarIT {
     startDate.set(2017, Calendar.MAY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.MAY, 31, 23, 59, 59);
+    List<OpeningHour> openingHourList = new ArrayList<>();
+    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour, startMinute))
+      .withEndTime(getParsedTimeForHourAndMinute(endHour, endMinute)));
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(false);
+    monday.setOpeningHour(openingHourList);
+    openingDays.add(monday);
+    OpeningDay tuesday = new OpeningDay().withDay(OpeningDay.Day.TUESDAY).withOpen(true).withAllDay(false);
+    tuesday.setOpeningHour(openingHourList);
+    openingDays.add(tuesday);
+    OpeningDay wednesday = new OpeningDay().withDay(OpeningDay.Day.WEDNESDAY).withOpen(true).withAllDay(false);
+    wednesday.setOpeningHour(openingHourList);
+    openingDays.add(wednesday);
+    OpeningDay thursday = new OpeningDay().withDay(OpeningDay.Day.THURSDAY).withOpen(true).withAllDay(false);
+    thursday.setOpeningHour(openingHourList);
+    openingDays.add(thursday);
+    OpeningDay friday = new OpeningDay().withDay(OpeningDay.Day.FRIDAY).withOpen(true).withAllDay(false);
+    friday.setOpeningHour(openingHourList);
+    openingDays.add(friday);
+    OpeningDay saturday = new OpeningDay().withDay(OpeningDay.Day.SATURDAY).withOpen(true).withAllDay(true);
+    openingDays.add(saturday);
+    OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
+    openingDays.add(sunday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      listEvents(f1.result(), 31).setHandler(f.completer());
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testAddExistingDescription(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JUNE, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JUNE, 30, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -342,7 +406,6 @@ public class CalendarIT {
       }
     })
       .putHeader(TENANT_HEADER_KEY, TENANT)
-      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .exceptionHandler(e -> {
@@ -412,7 +475,6 @@ public class CalendarIT {
                         }
                       })
                         .putHeader(TENANT_HEADER_KEY, TENANT)
-                        //.putHeader(TOKEN_HEADER_KEY, TOKEN)
                         .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
                         .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
                         .exceptionHandler(e -> {
@@ -445,7 +507,6 @@ public class CalendarIT {
       }
     })
       .putHeader(TENANT_HEADER_KEY, TENANT)
-      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .exceptionHandler(e -> {
@@ -468,7 +529,6 @@ public class CalendarIT {
       }
     })
       .putHeader(TENANT_HEADER_KEY, TENANT)
-      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, "text/plain")
       .exceptionHandler(e -> {
@@ -509,7 +569,6 @@ public class CalendarIT {
       }
     })
       .putHeader(TENANT_HEADER_KEY, TENANT)
-      //.putHeader(TOKEN_HEADER_KEY, TOKEN)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .exceptionHandler(e -> {
@@ -528,6 +587,13 @@ public class CalendarIT {
       .withStartDate(startDate.getTime())
       .withEndDate(endDate.getTime())
       .withOpeningDays(openingDays);
+  }
+
+  private String getParsedTimeForHourAndMinute(int hour, int minute) {
+    Calendar cal = Calendar.getInstance();
+    cal.set(Calendar.HOUR_OF_DAY, hour);
+    cal.set(Calendar.MINUTE, minute);
+    return CalendarUtils.TIME_FORMAT.format(cal.getTime());
   }
 
 }

@@ -31,3 +31,4 @@ src/main/java/org/folio/rest/jaxrs
 .idea
 src/main/java/org/folio/rest/client/
 src/test/resources/postgres-conf-local.json
+.vertx/

@@ -7,6 +7,7 @@ import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
@@ -16,6 +17,9 @@ import static java.util.Calendar.DAY_OF_MONTH;
 public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
+
+  private static final String TIME_PATTERN = "HH:mm:ss.SSS";
+  public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(TIME_PATTERN);
 
   public static DayOfWeek dayOfDate(Date inputDate) {
     return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
@@ -83,17 +87,27 @@ public class CalendarUtils {
         .withEndDate(currentEndDate.getTime()));
     } else {
       for (OpeningHour opening : openingDay.getOpeningHour()) {
-        currentStartDate.set(Calendar.HOUR_OF_DAY, opening.getStartHour());
-        currentStartDate.set(Calendar.MINUTE, opening.getStartMinute());
-        currentEndDate.set(Calendar.HOUR_OF_DAY, opening.getEndHour());
-        currentEndDate.set(Calendar.MINUTE, opening.getEndMinute());
-        events.add(new Event()
-          .withDescriptionId(generatedId)
-          .withEventType(eventType)
-          .withAllDay(allDay)
-          .withOpen(open)
-          .withStartDate(currentStartDate.getTime())
-          .withEndDate(currentEndDate.getTime()));
+        Calendar cal = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        try {
+          cal.setTime(TIME_FORMAT.parse(opening.getStartTime()));
+          cal2.setTime(TIME_FORMAT.parse(opening.getEndTime()));
+
+          currentStartDate.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+          currentStartDate.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+          currentEndDate.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+          currentEndDate.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+          events.add(new Event()
+            .withDescriptionId(generatedId)
+            .withEventType(eventType)
+            .withAllDay(allDay)
+            .withOpen(open)
+            .withStartDate(currentStartDate.getTime())
+            .withEndDate(currentEndDate.getTime()));
+
+        } catch (ParseException e) {
+          e.printStackTrace();
+        }
       }
     }
 

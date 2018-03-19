@@ -1,5 +1,6 @@
 package org.folio.rest.jaxrs.model;
 
+import org.folio.rest.utils.CalendarUtils;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -63,10 +64,8 @@ public class DescriptionTest {
       .withOpen(openingDay.getOpen());
 
     assertEquals(openingDay.getDay(), otherOpeningDay.getDay());
-    assertEquals(openingDay.getOpeningHour().get(0).getStartHour(), otherOpeningDay.getOpeningHour().get(0).getStartHour());
-    assertEquals(openingDay.getOpeningHour().get(0).getStartMinute(), otherOpeningDay.getOpeningHour().get(0).getStartMinute());
-    assertEquals(openingDay.getOpeningHour().get(0).getEndHour(), otherOpeningDay.getOpeningHour().get(0).getEndHour());
-    assertEquals(openingDay.getOpeningHour().get(0).getEndMinute(), otherOpeningDay.getOpeningHour().get(0).getEndMinute());
+    assertEquals(openingDay.getOpeningHour().get(0).getStartTime(), otherOpeningDay.getOpeningHour().get(0).getStartTime());
+    assertEquals(openingDay.getOpeningHour().get(0).getEndTime(), otherOpeningDay.getOpeningHour().get(0).getEndTime());
     assertEquals(openingDay.getAllDay(), otherOpeningDay.getAllDay());
     assertEquals(openingDay.getOpen(), otherOpeningDay.getOpen());
   }
@@ -90,10 +89,8 @@ public class DescriptionTest {
 
   private OpeningDay createOpeningDay() {
     OpeningHour openingHour = new OpeningHour();
-    openingHour.setStartHour(0);
-    openingHour.setStartMinute(0);
-    openingHour.setEndHour(23);
-    openingHour.setEndMinute(59);
+    openingHour.setStartTime(CalendarUtils.TIME_FORMAT.format(new Date()));
+    openingHour.setEndTime(CalendarUtils.TIME_FORMAT.format(new Date()));
     OpeningDay openingDay = new OpeningDay();
     openingDay.setDay(OpeningDay.Day.MONDAY);
     openingDay.getOpeningHour().add(openingHour);

@@ -1,37 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Opening day",
+  "title": "Opening hour",
   "type": "object",
   "properties": {
-    "day": {
-      "type": "string",
-      "enum": [
-        "MONDAY",
-        "TUESDAY",
-        "WEDNESDAY",
-        "THURSDAY",
-        "FRIDAY",
-        "SATURDAY",
-        "SUNDAY"
-      ]
+    "startTime": {
+      "type": "string"
     },
-    "startHour": {
-      "type": "integer"
-    },
-    "startMinute": {
-      "type": "integer"
-    },
-    "endHour": {
-      "type": "integer"
-    },
-    "endMinute": {
-      "type": "integer"
-    },
-    "allDay": {
-      "type": "boolean"
-    },
-    "open": {
-      "type": "boolean"
+    "endTime": {
+      "type": "string"
     }
   },
   "additionalProperties": false
