@@ -13,7 +13,7 @@
       "type": "string",
       "enum": [
         "OPENING_DAY",
-        "EXCLUSION"
+        "EXCEPTION"
       ]
     },
     "startDate": {

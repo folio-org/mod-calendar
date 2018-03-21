@@ -26,6 +26,8 @@ import static org.folio.rest.utils.CalendarConstants.*;
 
 public class CalendarAPI implements CalendarResource {
 
+  private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
   @Override
   public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -100,16 +102,14 @@ public class CalendarAPI implements CalendarResource {
       description.setCreationDate(new Date());
     }
 
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
     vertxContext.runOnContext(v -> {
       try {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("startDate >= ").append(format.format(description.getStartDate()))
           .append(" AND endDate <= ").append(format.format(description.getEndDate()))
           .append(" AND eventType = ");
-        if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCLUSION) {
-          queryBuilder.append(CalendarConstants.EXCLUSION);
+        if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
+          queryBuilder.append(CalendarConstants.EXCEPTION);
         } else {
           queryBuilder.append(CalendarConstants.OPENING_DAY);
         }
@@ -255,8 +255,8 @@ public class CalendarAPI implements CalendarResource {
                   .append(" AND endDate <= ").append(format.format(description.getEndDate()))
                   .append(" AND descriptionId <> ").append(description.getId())
                   .append(" AND eventType = ");
-                if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCLUSION) {
-                  queryBuilder.append(CalendarConstants.EXCLUSION);
+                if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
+                  queryBuilder.append(CalendarConstants.EXCEPTION);
                 } else {
                   queryBuilder.append(CalendarConstants.OPENING_DAY);
                 }

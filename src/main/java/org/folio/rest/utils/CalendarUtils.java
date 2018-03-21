@@ -18,7 +18,7 @@ public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
-  private static final String TIME_PATTERN = "HH:mm:ss.SSS";
+  private static final String TIME_PATTERN = "HH:mm:ss.SSSX";
   public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(TIME_PATTERN);
 
   public static DayOfWeek dayOfDate(Date inputDate) {
@@ -61,8 +61,8 @@ public class CalendarUtils {
 
     List<Event> events = new ArrayList<>();
     String eventType = CalendarConstants.OPENING_DAY;
-    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
-      eventType = CalendarConstants.EXCLUSION;
+    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCEPTION) {
+      eventType = CalendarConstants.EXCEPTION;
     }
 
     boolean allDay = true;
