@@ -103,6 +103,106 @@ public class CalendarIT {
   }
 
   @Test
+  public void testAddNewDescriptionWithCheckingInputs(TestContext context) {
+    int startHour1 = 8;
+    int startMinute1 = 00;
+    int endHour1 = 9;
+    int endMinute1 = 00;
+
+    int startHour2 = 7;
+    int startMinute2 = 30;
+    int endHour2 = 8;
+    int endMinute2 = 30;
+
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+
+    List<OpeningHour> openingHourList = new ArrayList<>();
+    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour1, startMinute1))
+      .withEndTime(getParsedTimeForHourAndMinute(endHour1, endMinute1)));
+    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour2, startMinute2))
+      .withEndTime(getParsedTimeForHourAndMinute(endHour2, endMinute2)));
+
+    List<OpeningDay> openingDays = new ArrayList<>();
+    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(false);
+    monday.setOpeningHour(openingHourList);
+    openingDays.add(monday);
+
+    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.failed()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+//  @Test
+//  public void testUpdateNewDescriptionWithCheckingInputs(TestContext context) {
+//    int startHour1 = 8;
+//    int startMinute1 = 00;
+//    int endHour1 = 9;
+//    int endMinute1 = 00;
+//
+//    int startHour2 = 9;
+//    int startMinute2 = 30;
+//    int endHour2 = 10;
+//    int endMinute2 = 30;
+//
+//    Async async = context.async();
+//    Future<String> startFuture;
+//    Future<String> f1 = Future.future();
+//    Calendar startDate = Calendar.getInstance();
+//    startDate.set(2017, Calendar.JULY, 11, 0, 0, 0);
+//    Calendar endDate = Calendar.getInstance();
+//    endDate.set(2017, Calendar.JULY, 31, 23, 59, 59);
+//
+//    List<OpeningHour> openingHourList = new ArrayList<>();
+//    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour1, startMinute1))
+//      .withEndTime(getParsedTimeForHourAndMinute(endHour1, endMinute1)));
+//    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour2, startMinute2))
+//      .withEndTime(getParsedTimeForHourAndMinute(endHour2, endMinute2)));
+//
+//    List<OpeningDay> openingDays = new ArrayList<>();
+//    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(false);
+//    monday.setOpeningHour(openingHourList);
+//    openingDays.add(monday);
+//
+//    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+//    startFuture = f1.compose(v -> {
+//      Future<String> f = Future.future();
+//      listDescriptions(f1.result()).setHandler(f.completer());
+//      return f;
+//    }).compose(v -> {
+//      Future<String> f = Future.future();
+//      updateDescription(f1.result()).setHandler(f.completer());
+//      return f;
+//    });
+//
+//    startFuture.setHandler(res -> {
+//      if (res.succeeded()) {
+//        async.complete();
+//      } else {
+//        res.cause().printStackTrace();
+//        context.fail(res.cause());
+//      }
+//    });
+//  }
+
+  @Test
   public void testUpdateDescription(TestContext context) {
     Async async = context.async();
     Future<String> startFuture;
