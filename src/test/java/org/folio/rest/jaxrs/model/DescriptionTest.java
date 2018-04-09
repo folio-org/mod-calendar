@@ -21,7 +21,6 @@ public class DescriptionTest {
       .withDescriptionType(description.getDescriptionType())
       .withStartDate(description.getStartDate())
       .withEndDate(description.getEndDate())
-      .withTwelveHour(description.getTwelveHour())
       .withOpeningDays(description.getOpeningDays())
       .withCreationDate(description.getCreationDate())
       .withCreatedBy(description.getCreatedBy());
@@ -31,7 +30,6 @@ public class DescriptionTest {
     assertEquals(description.getDescriptionType(), otherDescription.getDescriptionType());
     assertEquals(description.getStartDate(), otherDescription.getStartDate());
     assertEquals(description.getEndDate(), otherDescription.getEndDate());
-    assertEquals(description.getTwelveHour(), otherDescription.getTwelveHour());
     assertEquals(description.getOpeningDays(), otherDescription.getOpeningDays());
     assertEquals(description.getCreationDate(), otherDescription.getCreationDate());
     assertEquals(description.getCreatedBy(), otherDescription.getCreatedBy());
@@ -79,7 +77,6 @@ public class DescriptionTest {
     description.setDescriptionType(Description.DescriptionType.OPENING_DAY);
     description.setStartDate(new Date());
     description.setEndDate(new Date());
-    description.setTwelveHour(Boolean.FALSE);
     description.setOpeningDays(openingDays);
     description.setCreationDate(new Date());
     description.setCreatedBy(UUID.randomUUID().toString());
