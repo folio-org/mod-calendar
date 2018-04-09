@@ -86,8 +86,8 @@ public class DescriptionTest {
 
   private OpeningDay createOpeningDay() {
     OpeningHour openingHour = new OpeningHour();
-    openingHour.setStartTime(CalendarUtils.TIME_FORMAT.format(new Date()));
-    openingHour.setEndTime(CalendarUtils.TIME_FORMAT.format(new Date()));
+    openingHour.setStartTime(CalendarUtils.TIME_FORMATTER.print(new Date().getTime()));
+    openingHour.setEndTime(CalendarUtils.TIME_FORMATTER.print(new Date().getTime()));
     OpeningDay openingDay = new OpeningDay();
     openingDay.setDay(OpeningDay.Day.MONDAY);
     openingDay.getOpeningHour().add(openingHour);

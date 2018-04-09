@@ -18,7 +18,8 @@ public class EventTest {
       .withOpen(event.getOpen())
       .withStartDate(event.getStartDate())
       .withEndDate(event.getEndDate())
-      .withEventType(event.getEventType());
+      .withEventType(event.getEventType())
+      .withActive(event.getActive());
 
     assertEquals(event.getId(), otherEvent.getId());
     assertEquals(event.getAllDay(), otherEvent.getAllDay());
@@ -26,6 +27,7 @@ public class EventTest {
     assertEquals(event.getStartDate(), otherEvent.getStartDate());
     assertEquals(event.getEndDate(), otherEvent.getEndDate());
     assertEquals(event.getEventType(), otherEvent.getEventType());
+    assertEquals(event.getActive(), otherEvent.getActive());
 
   }
 
@@ -48,6 +50,7 @@ public class EventTest {
     event.setStartDate(new Date());
     event.setEndDate(new Date());
     event.setEventType(UUID.randomUUID().toString());
+    event.setActive(true);
     return event;
   }
 

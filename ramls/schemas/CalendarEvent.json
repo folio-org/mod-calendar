@@ -25,6 +25,9 @@
     },
     "open": {
       "type": "boolean"
+    },
+    "active": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false,

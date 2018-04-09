@@ -12,15 +12,21 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
+import org.folio.rest.utils.CalendarConstants;
 import org.folio.rest.utils.CalendarUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 
 import java.util.*;
+
+import static org.folio.rest.utils.CalendarConstants.EVENT;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -80,12 +86,12 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.JANUARY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.JANUARY, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.JANUARY, 7, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
@@ -110,19 +116,23 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.FEBRUARY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.FEBRUARY, 28, 23, 59, 59);
+    endDate.set(2017, Calendar.FEBRUARY, 7, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      updateDescription(f1.result()).setHandler(f.completer());
+      Calendar newStartDate = Calendar.getInstance();
+      startDate.set(2017, Calendar.MARCH, 8, 12, 0, 0);
+      Calendar newEndDate = Calendar.getInstance();
+      endDate.set(2017, Calendar.MARCH, 14, 18, 0, 0);
+      updateDescription(f1.result(), newStartDate, newEndDate).setHandler(f.completer());
       return f;
     });
 
@@ -144,12 +154,12 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.MARCH, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.MARCH, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.MARCH, 7, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
@@ -189,7 +199,7 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.APRIL, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.APRIL, 30, 23, 59, 59);
+    endDate.set(2017, Calendar.APRIL, 7, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
@@ -206,14 +216,14 @@ public class CalendarIT {
     OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
     openingDays.add(sunday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      listEvents(f1.result(), 30).setHandler(f.completer());
+      listEvents(f1.result(), 7).setHandler(f.completer());
       return f;
     });
 
@@ -240,7 +250,7 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.MAY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.MAY, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.MAY, 7, 23, 59, 59);
     List<OpeningHour> openingHourList = new ArrayList<>();
     openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour, startMinute))
       .withEndTime(getParsedTimeForHourAndMinute(endHour, endMinute)));
@@ -265,14 +275,14 @@ public class CalendarIT {
     OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
     openingDays.add(sunday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      listEvents(f1.result(), 31).setHandler(f.completer());
+      listEvents(f1.result(), 7).setHandler(f.completer());
       return f;
     });
 
@@ -294,19 +304,19 @@ public class CalendarIT {
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.JUNE, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.JUNE, 30, 23, 59, 59);
+    endDate.set(2017, Calendar.JUNE, 7, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      postDescription(startDate, endDate, openingDays).setHandler(handler -> {
+      postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(handler -> {
         if (handler.failed() && "Failed to add description. Conflict".equals(handler.cause().getMessage())) {
           System.out.println("Does not allow to add overlapping periods.");
           f.complete();
@@ -338,7 +348,7 @@ public class CalendarIT {
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
 
-    postDescription(startDate, endDate, openingDays).setHandler(res -> {
+    postDescription(startDate, endDate, openingDays, Description.DescriptionType.OPENING_DAY).setHandler(res -> {
       if (res.succeeded()) {
         context.fail("Saving invalid interval should have failed.");
       } else {
@@ -348,10 +358,73 @@ public class CalendarIT {
     });
   }
 
-  private Future<String> postDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
+  @Test
+  public void testExceptions(TestContext context) {
+    try {
+      Async async = context.async();
+      Calendar startDate = Calendar.getInstance();
+      startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+      Calendar endDate = Calendar.getInstance();
+      endDate.set(2017, Calendar.JULY, 7, 23, 59, 59);
+      List<OpeningDay> openingDays = new ArrayList<>();
+      OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
+      openingDays.add(monday);
+      OpeningDay tuesday = new OpeningDay().withDay(OpeningDay.Day.TUESDAY).withOpen(true).withAllDay(true);
+      openingDays.add(tuesday);
+      OpeningDay wednesday = new OpeningDay().withDay(OpeningDay.Day.WEDNESDAY).withOpen(true).withAllDay(true);
+      openingDays.add(wednesday);
+      OpeningDay thursday = new OpeningDay().withDay(OpeningDay.Day.THURSDAY).withOpen(true).withAllDay(true);
+      openingDays.add(thursday);
+      OpeningDay friday = new OpeningDay().withDay(OpeningDay.Day.FRIDAY).withOpen(true).withAllDay(true);
+      openingDays.add(friday);
+      OpeningDay saturday = new OpeningDay().withDay(OpeningDay.Day.SATURDAY).withOpen(true).withAllDay(true);
+      openingDays.add(saturday);
+      OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
+      openingDays.add(sunday);
+
+      postDescription(startDate, endDate, openingDays, Description.DescriptionType.EXCEPTION).setHandler(res -> {
+        if (res.succeeded()) {
+          try {
+            PostgresClient postgresClient = PostgresClient.getInstance(Vertx.vertx().getOrCreateContext().owner(), TENANT);
+            StringBuilder queryBuilder = new StringBuilder();
+            endDate.add(Calendar.DAY_OF_MONTH, 1);
+            queryBuilder.append("startDate >= ")
+              .append(CalendarUtils.getUTCDateformat().print(startDate.getTime().getTime()))
+              .append(" AND endDate <= ")
+              .append(CalendarUtils.getUTCDateformat().print(endDate.getTime().getTime()))
+              .append(" AND eventType = ")
+              .append(CalendarConstants.EXCEPTION);
+            CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+            CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
+            postgresClient.get(EVENT, Event.class, cql, true,
+              replyOfGetEventsByDate -> {
+                if (replyOfGetEventsByDate.succeeded()) {
+                  if (!replyOfGetEventsByDate.result().getResults().isEmpty()) {
+                    System.out.println("result size: " + replyOfGetEventsByDate.result().getResults().size());
+                  }
+                }
+                async.complete();
+              }
+            );
+          } catch (Exception exc) {
+            context.fail(exc);
+          }
+        } else {
+          res.cause().printStackTrace();
+          context.fail("Failed to check exceptions.");
+        }
+      });
+
+
+    } catch (Exception exc) {
+
+    }
+  }
+
+  private Future<String> postDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays, Description.DescriptionType type) {
     System.out.println("Creating a new description\n");
     Future<String> future = Future.future();
-    Description eventDescription = generateDescription(startDate, endDate, openingDays);
+    Description eventDescription = generateDescription(startDate, endDate, openingDays, type);
     HttpClient client = vertx.createHttpClient();
     client.post(port, HOST, "/calendar/eventdescriptions", res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
@@ -415,7 +488,7 @@ public class CalendarIT {
     return future;
   }
 
-  private Future<String> updateDescription(String descriptionId) {
+  private Future<String> updateDescription(String descriptionId, Calendar startDate, Calendar endDate) {
 
     System.out.println("Updating a description\n");
     Future<String> future = Future.future();
@@ -436,10 +509,6 @@ public class CalendarIT {
                   Date previousStartDate = mappedDescription.getStartDate();
                   Date previousEndDate = mappedDescription.getEndDate();
                   mappedDescription.setDescription("TEST_DESCRIPTION");
-                  Calendar startDate = Calendar.getInstance();
-                  startDate.set(2017, Calendar.MARCH, 1, 12, 0, 0);
-                  Calendar endDate = Calendar.getInstance();
-                  endDate.set(2017, Calendar.MARCH, 31, 18, 0, 0);
                   mappedDescription.setStartDate(startDate.getTime());
                   mappedDescription.setEndDate(endDate.getTime());
                   HttpClient clientForPut = vertx.createHttpClient();
@@ -578,7 +647,7 @@ public class CalendarIT {
     return future;
   }
 
-  private Description generateDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
+  private Description generateDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays, Description.DescriptionType type) {
 
     return new Description()
       .withId(UUID.randomUUID().toString())
@@ -586,14 +655,15 @@ public class CalendarIT {
       .withDescriptionType(Description.DescriptionType.OPENING_DAY)
       .withStartDate(startDate.getTime())
       .withEndDate(endDate.getTime())
-      .withOpeningDays(openingDays);
+      .withOpeningDays(openingDays)
+      .withDescriptionType(type);
   }
 
   private String getParsedTimeForHourAndMinute(int hour, int minute) {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.HOUR_OF_DAY, hour);
     cal.set(Calendar.MINUTE, minute);
-    return CalendarUtils.TIME_FORMAT.format(cal.getTime());
+    return CalendarUtils.TIME_FORMATTER.print(cal.getTimeInMillis());
   }
 
 }
