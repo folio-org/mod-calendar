@@ -149,11 +149,9 @@ public class CalendarAPI implements CalendarResource {
                                 {
                                   Future future;
                                   if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
-                                    future = changeStatusForEvents(postgresClient, description, Boolean.FALSE);
+                                    future = deactivateEvents(postgresClient, description);
                                   } else {
-                                    // TODO
-                                    future = Future.future();
-                                    future.complete();
+                                    future = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                                   }
                                   future.setHandler(subHandler -> {
                                     asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(createdDescription)));
@@ -210,7 +208,51 @@ public class CalendarAPI implements CalendarResource {
     });
   }
 
-  private Future changeStatusForEvents(PostgresClient postgresClient, Description eventDescription, Boolean newStatus) {
+  private static Future<Void> updateEventStatusByException(PostgresClient postgresClient, Description eventDescription, Boolean status) {
+    Future<Void> future = Future.future();
+    try {
+      Criterion cr = new Criterion();
+      Criteria crit = new Criteria();
+      crit.addField("'startDate'");
+      crit.setOperation(Criteria.OP_GREATER_THAN_EQ);
+      crit.setValue(CalendarUtils.getUTCDateformat().print(eventDescription.getStartDate().getTime()));
+
+      Criteria otherCrit = new Criteria();
+      otherCrit.addField("'endDate'");
+      otherCrit.setOperation(Criteria.OP_LESS_THAN_EQ);
+      otherCrit.setValue(CalendarUtils.getUTCDateformat().print(eventDescription.getEndDate().getTime()));
+
+      cr.addCriterion(crit, Criteria.OP_AND, otherCrit, Criteria.OP_AND);
+      Criteria eventTypeCrit = new Criteria();
+      eventTypeCrit.addField("'eventType'");
+      eventTypeCrit.setOperation(Criteria.OP_EQUAL);
+      eventTypeCrit.setValue(CalendarConstants.OPENING_DAY);
+      cr.addCriterion(eventTypeCrit);
+
+      try {
+        UpdateSection us = new UpdateSection();
+        us.addField("active");
+        us.setValue(status);
+
+        postgresClient.update(EVENT, us, cr, true, handler -> {
+          if (handler.succeeded()) {
+            System.out.println("Successfully updated events!");
+            future.complete();
+          } else {
+            future.fail("Failed to update events.");
+          }
+        });
+      } catch (Exception exc) {
+        future.fail("Failed to update events.");
+      }
+    } catch (Exception exc) {
+      future.fail("Failed to update events.");
+    }
+    return future;
+  }
+
+
+  private Future deactivateEvents(PostgresClient postgresClient, Description eventDescription) {
     Future future = Future.future();
     try {
       StringBuilder queryBuilder = new StringBuilder();
@@ -256,7 +298,7 @@ public class CalendarAPI implements CalendarResource {
                 try {
                   UpdateSection us = new UpdateSection();
                   us.addField("active");
-                  us.setValue(newStatus);
+                  us.setValue(Boolean.FALSE);
 
                   postgresClient.update(EVENT, us, cr, true, handler -> {
                     if (handler.succeeded()) {
@@ -303,11 +345,23 @@ public class CalendarAPI implements CalendarResource {
                 } else {
                   Future<Void> deleteEventsFuture = deleteEventsByDescriptionId(postgresClient, eventDescriptionId);
                   deleteEventsFuture.setHandler(handler -> {
-                    if (handler.succeeded()) {
-                      deleteEventDescription(postgresClient, eventDescriptionId).setHandler(future.completer());
+                    if (handler.succeeded()
+                      && replyOfGetDescriptionById.result() != null
+                      && replyOfGetDescriptionById.result().getResults() != null
+                      && !replyOfGetDescriptionById.result().getResults().isEmpty()
+                      && replyOfGetDescriptionById.result().getResults().get(0) instanceof Description) {
+                      Future<Void> updateOpeningEvents = updateEventStatusByException(postgresClient, (Description) replyOfGetDescriptionById.result().getResults().get(0), Boolean.TRUE);
+                      updateOpeningEvents.setHandler(subHandler -> {
+                        if (subHandler.succeeded()) {
+                          deleteEventDescription(postgresClient, eventDescriptionId).setHandler(future.completer());
+                        } else {
+                          future.fail("Failed to update opening events.");
+                        }
+                      });
                     } else {
                       future.fail("Failed to delete events.");
                     }
+
                   });
                 }
               } else {
@@ -374,11 +428,9 @@ public class CalendarAPI implements CalendarResource {
                                   } else {
                                     Future subFuture;
                                     if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
-                                      subFuture = changeStatusForEvents(postgresClient, description, Boolean.FALSE);
+                                      subFuture = deactivateEvents(postgresClient, description);
                                     } else {
-                                      // TODO
-                                      subFuture = Future.future();
-                                      subFuture.complete();
+                                      subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                                     }
                                     subFuture.setHandler(subHandler -> {
                                       asyncResultHandler.handle(
