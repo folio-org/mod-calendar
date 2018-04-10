@@ -24,7 +24,6 @@ import java.util.*;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
-
   private static final String TENANT_HEADER_KEY = "X-Okapi-Tenant";
   private static final String TOKEN_HEADER_KEY = "x-okapi-token";
   private static final String CONTENT_TYPE_HEADER_KEY = "Content-Type";
@@ -33,22 +32,18 @@ public class CalendarIT {
   private static final String HOST = "localhost";
   private static final String JSON_CONTENT_TYPE_HEADER_VALUE = "application/json";
   private static final String ACCEPT_HEADER_KEY = "Accept";
-
   private static int port;
   private static Vertx vertx;
 
   @BeforeClass
   public static void setup(TestContext context) throws Exception {
     vertx = Vertx.vertx();
-
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
-
     DeploymentOptions options = new DeploymentOptions()
       .setConfig(new JsonObject().put("http.port", port)
         .put(HttpClientMock2.MOCK_MODE, "true"));
-
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
         tenantClient.post(null, res2 -> {
@@ -58,7 +53,6 @@ public class CalendarIT {
         context.fail(e);
       }
     });
-
   }
 
   @AfterClass
@@ -84,14 +78,12 @@ public class CalendarIT {
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -108,99 +100,115 @@ public class CalendarIT {
     int startMinute1 = 00;
     int endHour1 = 9;
     int endMinute1 = 00;
-
-    int startHour2 = 7;
+    int startHour2 = 9;
     int startMinute2 = 30;
-    int endHour2 = 8;
+    int endHour2 = 10;
     int endMinute2 = 30;
-
-    Async async = context.async();
-    Future<String> startFuture;
-    Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+    DescriptionCheckWithInputs(true, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+  }
 
+  @Test
+  public void testAddNewDescriptionWithCheckingInputsFailEndsBeforeStarts(TestContext context) {
+    int startHour1 = 8;
+    int startMinute1 = 00;
+    int endHour1 = 7;
+    int endMinute1 = 00;
+    int startHour2 = 9;
+    int startMinute2 = 30;
+    int endHour2 = 10;
+    int endMinute2 = 30;
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+  }
+
+  @Test
+  public void testAddNewDescriptionWithCheckingInputsFailOverlappingTime1(TestContext context) {
+    int startHour1 = 8;
+    int startMinute1 = 00;
+    int endHour1 = 9;
+    int endMinute1 = 00;
+    int startHour2 = 8;
+    int startMinute2 = 30;
+    int endHour2 = 10;
+    int endMinute2 = 30;
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+  }
+  @Test
+  public void testAddNewDescriptionWithCheckingInputsFailOverlappingTime2(TestContext context) {
+    int startHour1 = 8;
+    int startMinute1 = 00;
+    int endHour1 = 9;
+    int endMinute1 = 00;
+    int startHour2 = 7;
+    int startMinute2 = 30;
+    int endHour2 = 8;
+    int endMinute2 = 30;
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+  }
+  @Test
+  public void testAddNewDescriptionWithCheckingInputsFailOverlappingTime3(TestContext context) {
+    int startHour1 = 8;
+    int startMinute1 = 00;
+    int endHour1 = 9;
+    int endMinute1 = 00;
+    int startHour2 = 7;
+    int startMinute2 = 30;
+    int endHour2 = 10;
+    int endMinute2 = 30;
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
+    Calendar endDate = Calendar.getInstance();
+    endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
+    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+  }
+
+  private void DescriptionCheckWithInputs(boolean isAcceptableTime, TestContext context, Calendar startDate, Calendar endDate, int startHour1, int startMinute1, int endHour1, int endMinute1, int startHour2, int startMinute2, int endHour2, int endMinute2) {
+    Async async = context.async();
     List<OpeningHour> openingHourList = new ArrayList<>();
-    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour1, startMinute1))
-      .withEndTime(getParsedTimeForHourAndMinute(endHour1, endMinute1)));
-    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour2, startMinute2))
-      .withEndTime(getParsedTimeForHourAndMinute(endHour2, endMinute2)));
-
+    openingHourList.add(new OpeningHour().withStartTime(startHour1+":"+startMinute1+":00.000Z")
+      .withEndTime(endHour1+":"+endMinute1+":00.000Z"));
+    openingHourList.add(new OpeningHour().withStartTime(startHour2+":"+startMinute2+":00.000Z")
+      .withEndTime(endHour2+":"+endMinute2+":00.000Z"));
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(false);
     monday.setOpeningHour(openingHourList);
     openingDays.add(monday);
-
-    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
-    startFuture = f1.compose(v -> {
-      Future<String> f = Future.future();
-      listDescriptions(f1.result()).setHandler(f.completer());
-      return f;
-    });
-
-    startFuture.setHandler(res -> {
-      if (res.failed()) {
-        async.complete();
-      } else {
-        res.cause().printStackTrace();
-        context.fail(res.cause());
-      }
-    });
+    if(isAcceptableTime) {
+      postDescription(startDate, endDate, openingDays).setHandler(result -> {
+        if (result.succeeded()) {
+          async.complete();
+        } else {
+          result.cause().printStackTrace();
+          context.fail();
+        }
+      });
+    } else {
+      postDescription(startDate, endDate, openingDays).setHandler(result -> {
+        if (result.succeeded()) {
+          result.cause().printStackTrace();
+          context.fail("Saving invalid interval should have fail");
+        } else {
+          async.complete();
+        }
+      });
+    }
   }
 
-//  @Test
-//  public void testUpdateNewDescriptionWithCheckingInputs(TestContext context) {
-//    int startHour1 = 8;
-//    int startMinute1 = 00;
-//    int endHour1 = 9;
-//    int endMinute1 = 00;
-//
-//    int startHour2 = 9;
-//    int startMinute2 = 30;
-//    int endHour2 = 10;
-//    int endMinute2 = 30;
-//
-//    Async async = context.async();
-//    Future<String> startFuture;
-//    Future<String> f1 = Future.future();
-//    Calendar startDate = Calendar.getInstance();
-//    startDate.set(2017, Calendar.JULY, 11, 0, 0, 0);
-//    Calendar endDate = Calendar.getInstance();
-//    endDate.set(2017, Calendar.JULY, 31, 23, 59, 59);
-//
-//    List<OpeningHour> openingHourList = new ArrayList<>();
-//    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour1, startMinute1))
-//      .withEndTime(getParsedTimeForHourAndMinute(endHour1, endMinute1)));
-//    openingHourList.add(new OpeningHour().withStartTime(getParsedTimeForHourAndMinute(startHour2, startMinute2))
-//      .withEndTime(getParsedTimeForHourAndMinute(endHour2, endMinute2)));
-//
-//    List<OpeningDay> openingDays = new ArrayList<>();
-//    OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(false);
-//    monday.setOpeningHour(openingHourList);
-//    openingDays.add(monday);
-//
-//    postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
-//    startFuture = f1.compose(v -> {
-//      Future<String> f = Future.future();
-//      listDescriptions(f1.result()).setHandler(f.completer());
-//      return f;
-//    }).compose(v -> {
-//      Future<String> f = Future.future();
-//      updateDescription(f1.result()).setHandler(f.completer());
-//      return f;
-//    });
-//
-//    startFuture.setHandler(res -> {
-//      if (res.succeeded()) {
-//        async.complete();
-//      } else {
-//        res.cause().printStackTrace();
-//        context.fail(res.cause());
-//      }
-//    });
-//  }
 
   @Test
   public void testUpdateDescription(TestContext context) {
@@ -214,7 +222,6 @@ public class CalendarIT {
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -225,7 +232,6 @@ public class CalendarIT {
       updateDescription(f1.result()).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -242,13 +248,12 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
     Calendar startDate = Calendar.getInstance();
-    startDate.set(2017, Calendar.MARCH, 1, 0, 0, 0);
+    startDate.set(2017, Calendar.AUGUST, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
-    endDate.set(2017, Calendar.MARCH, 31, 23, 59, 59);
+    endDate.set(2017, Calendar.AUGUST, 31, 23, 59, 59);
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -270,7 +275,6 @@ public class CalendarIT {
       });
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -305,7 +309,6 @@ public class CalendarIT {
     openingDays.add(saturday);
     OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
     openingDays.add(sunday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -316,7 +319,6 @@ public class CalendarIT {
       listEvents(f1.result(), 30).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -333,7 +335,6 @@ public class CalendarIT {
     int startMinute = 30;
     int endHour = 18;
     int endMinute = 40;
-
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
@@ -364,7 +365,6 @@ public class CalendarIT {
     openingDays.add(saturday);
     OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
     openingDays.add(sunday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -375,7 +375,6 @@ public class CalendarIT {
       listEvents(f1.result(), 31).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -398,7 +397,6 @@ public class CalendarIT {
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
-
     postDescription(startDate, endDate, openingDays).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -416,7 +414,6 @@ public class CalendarIT {
       });
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -437,7 +434,6 @@ public class CalendarIT {
     List<OpeningDay> openingDays = new ArrayList<>();
     OpeningDay monday = new OpeningDay().withDay(OpeningDay.Day.MONDAY).withOpen(true).withAllDay(true);
     openingDays.add(monday);
-
     postDescription(startDate, endDate, openingDays).setHandler(res -> {
       if (res.succeeded()) {
         context.fail("Saving invalid interval should have failed.");
@@ -476,7 +472,6 @@ public class CalendarIT {
   }
 
   private Future<String> listDescriptions(String descriptionId) {
-
     System.out.println("Retrieving a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
@@ -516,7 +511,6 @@ public class CalendarIT {
   }
 
   private Future<String> updateDescription(String descriptionId) {
-
     System.out.println("Updating a description\n");
     Future<String> future = Future.future();
     HttpClient client = vertx.createHttpClient();
@@ -617,7 +611,6 @@ public class CalendarIT {
   }
 
   private Future<String> deleteDescription(String descriptionId) {
-
     System.out.println("Deleting a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
@@ -639,7 +632,6 @@ public class CalendarIT {
   }
 
   private Future<String> listEvents(String descriptionId, int numberOfExpectedEvents) {
-
     System.out.println("Retrieving events for a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
@@ -679,7 +671,6 @@ public class CalendarIT {
   }
 
   private Description generateDescription(Calendar startDate, Calendar endDate, List<OpeningDay> openingDays) {
-
     return new Description()
       .withId(UUID.randomUUID().toString())
       .withDescription(UUID.randomUUID().toString())
@@ -695,5 +686,4 @@ public class CalendarIT {
     cal.set(Calendar.MINUTE, minute);
     return CalendarUtils.TIME_FORMAT.format(cal.getTime());
   }
-
 }

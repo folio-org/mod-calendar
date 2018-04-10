@@ -18,7 +18,7 @@ public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
-  private static final String TIME_PATTERN = "HH:mm:ss.SSS";
+  private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(TIME_PATTERN);
 
   public static DayOfWeek dayOfDate(Date inputDate) {

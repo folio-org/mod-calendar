@@ -9,15 +9,15 @@ import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.CalendarConstants;
 import org.folio.rest.utils.CalendarUtils;
+import org.joda.time.Interval;
+import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 
 import javax.ws.rs.core.Response;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.folio.rest.tools.ClientGenerator.OKAPI_HEADER_TENANT;
 import static org.folio.rest.utils.CalendarConstants.*;
@@ -93,9 +93,9 @@ public class CalendarAPI implements CalendarResource {
     }
     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     vertxContext.runOnContext(v -> {
-      Future checkFuture = checkDescriptionInput(description);
+      Future<Void> checkFuture = checkDescriptionInput(description);
       checkFuture.setHandler(checkResultHandler -> {
-        if (checkFuture.succeeded()) {
+        if (checkResultHandler.succeeded()) {
           try {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("startDate >= ").append(format.format(description.getStartDate()))
@@ -235,9 +235,9 @@ public class CalendarAPI implements CalendarResource {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClientForEventDelete = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     vertxContext.runOnContext(v -> {
-      Future checkFuture = checkDescriptionInput(description);
+      Future<Void> checkFuture = checkDescriptionInput(description);
       checkFuture.setHandler(checkResultHandler -> {
-        if (!checkFuture.failed()) {
+        if (checkResultHandler.succeeded()) {
           Future<Void> future = deleteEventsByDescriptionId(postgresClientForEventDelete, eventDescriptionId);
           future.setHandler(resultHandler -> {
             if (future.succeeded() && future.isComplete()) {
@@ -329,57 +329,44 @@ public class CalendarAPI implements CalendarResource {
     });
   }
 
-  private static Future checkDescriptionInput(Description description) {
+
+  private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
+  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+
+  private static Future<Void> checkDescriptionInput(Description description) {
     Future future = Future.future();
     for (OpeningDay openingDay : description.getOpeningDays()) {
+        List<Interval> intervals = new ArrayList<>();
       if (!openingDay.getOpeningHour().isEmpty()) {
-        List<Date> startDates = new ArrayList<>();
-        List<Date> endDates = new ArrayList<>();
         for (OpeningHour openingHour : openingDay.getOpeningHour()) {
           if (openingHour.getStartTime() != null && openingHour.getEndTime() != null) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss.SSS'Z'");
-            Date from = null;
-            Date to = null;
+            LocalTime from;
+            LocalTime to;
             try {
-              from = dateFormat.parse(openingHour.getStartTime());
-              to = dateFormat.parse(openingHour.getEndTime());
-              startDates.add(from);
-              endDates.add(to);
-            } catch (ParseException e) {
-              SimpleDateFormat dateFormat2 = new SimpleDateFormat("HH:mm:ss.SSS");
-              try {
-                from = dateFormat2.parse(openingHour.getStartTime());
-                to = dateFormat2.parse(openingHour.getEndTime());
-                startDates.add(from);
-                endDates.add(to);
-              } catch (ParseException e1) {
-                future.fail(e1);
-                return future;
-              }
+              from =  TIME_FORMATTER.parseLocalTime(openingHour.getStartTime());
+              to =  TIME_FORMATTER.parseLocalTime(openingHour.getEndTime());
+            } catch (IllegalArgumentException e) {
+              future.fail("The time format is not valid!");
+              return future;
             }
-            if (from.after(to)) {
-              future.fail("Error start time must be before than end time!");
+            try {
+              intervals.add(new Interval(from.toDateTimeToday(), to.toDateTimeToday()));
+            } catch (IllegalArgumentException | IllegalStateException e) {
+              future.fail("The start time must be before the end time!!" + e.getCause());
               return future;
             }
           }
         }
-        if (!startDates.isEmpty()) {
-          for (int index = 0; index < startDates.size(); index++) {
-            for (int index2 = index + 1; index2 < startDates.size(); index2++) {
-              Date from = startDates.get(index);
-              Date to = endDates.get(index);
-              Date from2 = startDates.get(index2);
-              Date to2 = endDates.get(index2);
-              boolean fromto2 = from.after(to2);
-              boolean tofrom2 = to.before(from2);
-              if (!(fromto2 || tofrom2)) {
-                future.fail("Error selected times are overlapping!");
-                return future;
-              }
+      }
+        if (!intervals.isEmpty()) {
+          intervals.sort(new IntervalComparator());
+          for (int i = 0, n = intervals.size(); i < n - 1; i++) {
+            if (intervals.get(i).overlaps(intervals.get(i + 1))) {
+              future.fail("Error selected times are overlapping!");
+              return future;
             }
           }
         }
-      }
     }
     future.complete();
     return future;
