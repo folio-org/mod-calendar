@@ -55,8 +55,7 @@ public class CalendarUtils {
   }
 
   public static DateTimeFormatter getUTCDateformat() {
-    DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-    format.withZoneUTC();
+    DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZoneUTC();
     return format;
   }
 
