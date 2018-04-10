@@ -28,6 +28,7 @@ import static org.folio.rest.utils.CalendarConstants.*;
 public class CalendarAPI implements CalendarResource {
 
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
+  private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
 
   @Override
   public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
@@ -144,9 +145,9 @@ public class CalendarAPI implements CalendarResource {
                                 } else {
                                   future = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                                 }
-                                future.setHandler(subHandler -> {
-                                  asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(createdDescription)));
-                                });
+                                future.setHandler(subHandler ->
+                                  asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(createdDescription)))
+                                );
                               }
                             );
                           } else {
@@ -266,14 +267,14 @@ public class CalendarAPI implements CalendarResource {
             log.debug("Successfully updated events!");
             future.complete();
           } else {
-            future.fail("Failed to update events.");
+            future.fail(FAILED_TO_UPDATE_EVENTS);
           }
         });
       } catch (Exception exc) {
-        future.fail("Failed to update events.");
+        future.fail(FAILED_TO_UPDATE_EVENTS);
       }
     } catch (Exception exc) {
-      future.fail("Failed to update events.");
+      future.fail(FAILED_TO_UPDATE_EVENTS);
     }
     return future;
   }
@@ -331,20 +332,20 @@ public class CalendarAPI implements CalendarResource {
                     log.debug("Successfully updated events!");
                     future.complete();
                   } else {
-                    future.fail("Failed to update events.");
+                    future.fail(FAILED_TO_UPDATE_EVENTS);
                   }
                 });
               } catch (Exception exc) {
-                future.fail("Failed to update events.");
+                future.fail(FAILED_TO_UPDATE_EVENTS);
               }
             }
           } else {
-            future.fail("Failed to update events.");
+            future.fail(FAILED_TO_UPDATE_EVENTS);
           }
         }
       );
     } catch (Exception exc) {
-      future.fail("Failed to update events.");
+      future.fail(FAILED_TO_UPDATE_EVENTS);
     }
     return future;
   }
@@ -443,10 +444,10 @@ public class CalendarAPI implements CalendarResource {
                                     } else {
                                       subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                                     }
-                                    subFuture.setHandler(subHandler -> {
+                                    subFuture.setHandler(subHandler ->
                                       asyncResultHandler.handle(
-                                        Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
-                                    });
+                                        Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()))
+                                    );
                                   }
                                 });
                               } catch (Exception e) {
