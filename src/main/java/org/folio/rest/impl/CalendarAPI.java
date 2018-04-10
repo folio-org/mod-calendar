@@ -353,13 +353,16 @@ public class CalendarAPI implements CalendarResource {
     Future<Void> future = Future.future();
     try {
       CQLWrapper cql = new CQLWrapper();
-      cql.setQuery("_" + ID_FIELD + "=" + eventDescriptionId);
+      cql.setField(new CQL2PgJSON(EVENT_DESCRIPTION + ".jsonb"));
+      cql.setQuery(ID_FIELD + "==" + eventDescriptionId);
       postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true,
         replyOfGetDescriptionById -> {
           try {
             if (replyOfGetDescriptionById.succeeded()) {
               if (replyOfGetDescriptionById.result().getResults().size() == 0) {
                 future.fail("There is no event description with this id: " + eventDescriptionId);
+              } else if (replyOfGetDescriptionById.result().getResults().size() > 1) {
+                future.fail("Could not find specific event description with id: " + eventDescriptionId);
               } else if (replyOfGetDescriptionById.result() != null
                 && replyOfGetDescriptionById.result().getResults() != null
                 && !replyOfGetDescriptionById.result().getResults().isEmpty()
