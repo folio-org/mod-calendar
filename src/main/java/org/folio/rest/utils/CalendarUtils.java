@@ -23,6 +23,9 @@ public class CalendarUtils {
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
 
+  private CalendarUtils() {
+  }
+
   public static DayOfWeek dayOfDate(Date inputDate) {
     return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
   }
@@ -122,37 +125,7 @@ public class CalendarUtils {
     Map<DayOfWeek, OpeningDay> openingDays = new HashMap<>();
 
     for (OpeningDay openingDay : entity.getOpeningDays()) {
-
-      switch (openingDay.getDay()) {
-        case MONDAY: {
-          openingDays.put(DayOfWeek.MONDAY, openingDay);
-          break;
-        }
-        case TUESDAY: {
-          openingDays.put(DayOfWeek.TUESDAY, openingDay);
-          break;
-        }
-        case WEDNESDAY: {
-          openingDays.put(DayOfWeek.WEDNESDAY, openingDay);
-          break;
-        }
-        case THURSDAY: {
-          openingDays.put(DayOfWeek.THURSDAY, openingDay);
-          break;
-        }
-        case FRIDAY: {
-          openingDays.put(DayOfWeek.FRIDAY, openingDay);
-          break;
-        }
-        case SATURDAY: {
-          openingDays.put(DayOfWeek.SATURDAY, openingDay);
-          break;
-        }
-        case SUNDAY: {
-          openingDays.put(DayOfWeek.SUNDAY, openingDay);
-          break;
-        }
-      }
+      openingDays.put(DayOfWeek.valueOf(openingDay.getDay().toString()), openingDay);
     }
 
     return openingDays;
