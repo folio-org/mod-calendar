@@ -6,8 +6,10 @@ import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
@@ -18,8 +20,8 @@ public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
-  private static final String TIME_PATTERN = "HH:mm:ss.SSS";
-  public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(TIME_PATTERN);
+  private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
+  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
 
   public static DayOfWeek dayOfDate(Date inputDate) {
     return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
@@ -52,6 +54,10 @@ public class CalendarUtils {
     return events;
   }
 
+  public static DateTimeFormatter getUTCDateformat() {
+    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZoneUTC();
+  }
+
   private static List<Event> createEvents(OpeningDay openingDay, Calendar startCal, Description entity, String generatedId) {
     Calendar currentStartDate = Calendar.getInstance();
     currentStartDate.setTimeInMillis(startCal.getTimeInMillis());
@@ -61,8 +67,8 @@ public class CalendarUtils {
 
     List<Event> events = new ArrayList<>();
     String eventType = CalendarConstants.OPENING_DAY;
-    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
-      eventType = CalendarConstants.EXCLUSION;
+    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCEPTION) {
+      eventType = CalendarConstants.EXCEPTION;
     }
 
     boolean allDay = true;
@@ -84,30 +90,27 @@ public class CalendarUtils {
         .withAllDay(allDay)
         .withOpen(open)
         .withStartDate(currentStartDate.getTime())
-        .withEndDate(currentEndDate.getTime()));
+        .withEndDate(currentEndDate.getTime())
+        .withActive(true));
     } else {
       for (OpeningHour opening : openingDay.getOpeningHour()) {
         Calendar cal = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
-        try {
-          cal.setTime(TIME_FORMAT.parse(opening.getStartTime()));
-          cal2.setTime(TIME_FORMAT.parse(opening.getEndTime()));
+        cal.setTimeInMillis(DateTime.parse(opening.getStartTime(), TIME_FORMATTER).getMillis());
+        cal2.setTimeInMillis(DateTime.parse(opening.getEndTime(), TIME_FORMATTER).getMillis());
 
-          currentStartDate.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-          currentStartDate.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-          currentEndDate.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
-          currentEndDate.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
-          events.add(new Event()
-            .withDescriptionId(generatedId)
-            .withEventType(eventType)
-            .withAllDay(allDay)
-            .withOpen(open)
-            .withStartDate(currentStartDate.getTime())
-            .withEndDate(currentEndDate.getTime()));
-
-        } catch (ParseException e) {
-          e.printStackTrace();
-        }
+        currentStartDate.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        currentStartDate.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        currentEndDate.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+        currentEndDate.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+        events.add(new Event()
+          .withDescriptionId(generatedId)
+          .withEventType(eventType)
+          .withAllDay(allDay)
+          .withOpen(open)
+          .withStartDate(currentStartDate.getTime())
+          .withEndDate(currentEndDate.getTime())
+          .withActive(true));
       }
     }
 

@@ -21,7 +21,6 @@ public class DescriptionTest {
       .withDescriptionType(description.getDescriptionType())
       .withStartDate(description.getStartDate())
       .withEndDate(description.getEndDate())
-      .withTwelveHour(description.getTwelveHour())
       .withOpeningDays(description.getOpeningDays())
       .withCreationDate(description.getCreationDate())
       .withCreatedBy(description.getCreatedBy());
@@ -31,7 +30,6 @@ public class DescriptionTest {
     assertEquals(description.getDescriptionType(), otherDescription.getDescriptionType());
     assertEquals(description.getStartDate(), otherDescription.getStartDate());
     assertEquals(description.getEndDate(), otherDescription.getEndDate());
-    assertEquals(description.getTwelveHour(), otherDescription.getTwelveHour());
     assertEquals(description.getOpeningDays(), otherDescription.getOpeningDays());
     assertEquals(description.getCreationDate(), otherDescription.getCreationDate());
     assertEquals(description.getCreatedBy(), otherDescription.getCreatedBy());
@@ -79,7 +77,6 @@ public class DescriptionTest {
     description.setDescriptionType(Description.DescriptionType.OPENING_DAY);
     description.setStartDate(new Date());
     description.setEndDate(new Date());
-    description.setTwelveHour(Boolean.FALSE);
     description.setOpeningDays(openingDays);
     description.setCreationDate(new Date());
     description.setCreatedBy(UUID.randomUUID().toString());
@@ -89,8 +86,8 @@ public class DescriptionTest {
 
   private OpeningDay createOpeningDay() {
     OpeningHour openingHour = new OpeningHour();
-    openingHour.setStartTime(CalendarUtils.TIME_FORMAT.format(new Date()));
-    openingHour.setEndTime(CalendarUtils.TIME_FORMAT.format(new Date()));
+    openingHour.setStartTime(CalendarUtils.TIME_FORMATTER.print(new Date().getTime()));
+    openingHour.setEndTime(CalendarUtils.TIME_FORMATTER.print(new Date().getTime()));
     OpeningDay openingDay = new OpeningDay();
     openingDay.setDay(OpeningDay.Day.MONDAY);
     openingDay.getOpeningHour().add(openingHour);
