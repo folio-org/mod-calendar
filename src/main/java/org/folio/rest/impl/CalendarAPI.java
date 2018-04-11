@@ -121,55 +121,14 @@ public class CalendarAPI implements CalendarResource {
                 PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
                   "Error while listing events.")));
             } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
-              postgresClient.startTx(beginTx -> {
-                try {
-                  postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
-                    if (replyDescriptor.succeeded()) {
-                      List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
-                      if (events.isEmpty()) {
-                        postgresClient.rollbackTx(beginTx, rollbackHandler -> {
-                          asyncResultHandler.handle(Future.succeededFuture(
-                            PostCalendarEventdescriptionsResponse.withPlainBadRequest("No events can be generated in the given interval")));
-                        });
-                      } else {
-                        Description createdDescription = description;
-                        createdDescription.setId(replyDescriptor.result());
-                        Future<Void> batchFuture = saveEventBatch(postgresClient, events);
-                        batchFuture.setHandler(batchSaveResponse -> {
-                          if (batchSaveResponse.succeeded()) {
-                            postgresClient.endTx(beginTx, done ->
-                              {
-                                Future future;
-                                if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
-                                  future = deactivateEvents(postgresClient, description);
-                                } else {
-                                  future = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
-                                }
-                                future.setHandler(subHandler ->
-                                  asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(createdDescription)))
-                                );
-                              }
-                            );
-                          } else {
-                            postgresClient.rollbackTx(beginTx, rollbackHandler -> {
-                              asyncResultHandler.handle(Future.succeededFuture(
-                                PostCalendarEventdescriptionsResponse.withPlainInternalServerError(batchSaveResponse.cause().getMessage())));
-                            });
-                          }
-                        });
-                      }
-
-                    } else {
-                      asyncResultHandler.handle(Future.succeededFuture(
-                        PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                          replyDescriptor.cause().getMessage())));
-                    }
-                  });
-
-                } catch (Exception e) {
+              Future<Description> eventDescriptionSaveResponse = saveEventDescription(postgresClient, description);
+              eventDescriptionSaveResponse.setHandler(saveHandler -> {
+                if (eventDescriptionSaveResponse.succeeded()) {
+                  asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(eventDescriptionSaveResponse.result())));
+                } else {
                   asyncResultHandler.handle(Future.succeededFuture(
                     PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                      e.getMessage())));
+                      eventDescriptionSaveResponse.cause().getMessage())));
                 }
               });
             } else {
@@ -184,6 +143,56 @@ public class CalendarAPI implements CalendarResource {
             e.getMessage())));
       }
     });
+  }
+
+  private Future<Description> saveEventDescription(PostgresClient postgresClient, Description description) {
+    Future<Description> future = Future.future();
+    postgresClient.startTx(beginTx -> {
+      try {
+        postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
+          if (replyDescriptor.succeeded()) {
+            List<Object> events = CalendarUtils.separateEvents(description, replyDescriptor.result());
+            if (events.isEmpty()) {
+              postgresClient.rollbackTx(beginTx, rollbackHandler ->
+                future.fail("No events can be generated in the given interval")
+              );
+            } else {
+              Description createdDescription = description;
+              createdDescription.setId(replyDescriptor.result());
+              Future<Void> batchFuture = saveEventBatch(postgresClient, events);
+              batchFuture.setHandler(batchSaveResponse -> {
+                if (batchSaveResponse.succeeded()) {
+                  postgresClient.endTx(beginTx, done ->
+                    {
+                      Future subFuture;
+                      if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
+                        subFuture = deactivateEvents(postgresClient, description);
+                      } else {
+                        subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
+                      }
+                      subFuture.setHandler(subHandler ->
+                        future.complete(createdDescription)
+                      );
+                    }
+                  );
+                } else {
+                  postgresClient.rollbackTx(beginTx, rollbackHandler ->
+                    future.fail(batchSaveResponse.cause())
+                  );
+                }
+              });
+            }
+
+          } else {
+            future.fail(replyDescriptor.cause());
+          }
+        });
+
+      } catch (Exception e) {
+        future.fail(e);
+      }
+    });
+    return future;
   }
 
   private Future<Void> saveEventBatch(PostgresClient postgresClient, List<Object> events) {
@@ -257,22 +266,18 @@ public class CalendarAPI implements CalendarResource {
       eventTypeCrit.setValue(CalendarConstants.OPENING_DAY);
       cr.addCriterion(eventTypeCrit);
 
-      try {
-        UpdateSection us = new UpdateSection();
-        us.addField("active");
-        us.setValue(status);
+      UpdateSection us = new UpdateSection();
+      us.addField("active");
+      us.setValue(status);
 
-        postgresClient.update(EVENT, us, cr, true, handler -> {
-          if (handler.succeeded()) {
-            log.debug("Successfully updated events!");
-            future.complete();
-          } else {
-            future.fail(FAILED_TO_UPDATE_EVENTS);
-          }
-        });
-      } catch (Exception exc) {
-        future.fail(FAILED_TO_UPDATE_EVENTS);
-      }
+      postgresClient.update(EVENT, us, cr, true, handler -> {
+        if (handler.succeeded()) {
+          log.debug("Successfully updated events!");
+          future.complete();
+        } else {
+          future.fail(FAILED_TO_UPDATE_EVENTS);
+        }
+      });
     } catch (Exception exc) {
       future.fail(FAILED_TO_UPDATE_EVENTS);
     }
@@ -424,50 +429,17 @@ public class CalendarAPI implements CalendarResource {
                           "Error while listing events.")));
                     } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
 
-                      try {
-                        postgresClient.update(EVENT_DESCRIPTION, description, description.getId(), replyDescriptor -> {
-                          if (replyDescriptor.succeeded()) {
-                            List<Object> events = CalendarUtils.separateEvents(description, description.getId());
-                            if (events.isEmpty()) {
-                              asyncResultHandler.handle(Future.succeededFuture(
-                                PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError("Can not add empty event set!")));
-                            } else {
-                              try {
-                                postgresClient.saveBatch(EVENT, events, replyEvent -> {
-                                  if (!replyEvent.succeeded()) {
-                                    asyncResultHandler.handle(Future.succeededFuture(
-                                      PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(replyEvent.cause().getMessage())));
-                                  } else {
-                                    Future subFuture;
-                                    if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
-                                      subFuture = deactivateEvents(postgresClient, description);
-                                    } else {
-                                      subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
-                                    }
-                                    subFuture.setHandler(subHandler ->
-                                      asyncResultHandler.handle(
-                                        Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()))
-                                    );
-                                  }
-                                });
-                              } catch (Exception e) {
-                                asyncResultHandler.handle(Future.succeededFuture(
-                                  PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-                                    e.getMessage())));
-                              }
-                            }
-
-                          } else {
-                            asyncResultHandler.handle(Future.succeededFuture(
-                              PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-                                replyDescriptor.cause().getMessage())));
-                          }
-                        });
-                      } catch (Exception e) {
-                        asyncResultHandler.handle(Future.succeededFuture(
-                          PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-                            e.getMessage())));
-                      }
+                      Future<Void> updateFuture = updateEventDescription(postgresClient, description);
+                      updateFuture.setHandler(updateFutureResponse -> {
+                        if (updateFuture.failed()) {
+                          asyncResultHandler.handle(Future.succeededFuture(
+                            PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                              updateFutureResponse.cause().getMessage())));
+                        } else {
+                          asyncResultHandler.handle(
+                            Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
+                        }
+                      });
                     } else {
                       asyncResultHandler.handle(Future.succeededFuture(
                         PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
@@ -491,6 +463,43 @@ public class CalendarAPI implements CalendarResource {
       });
     });
 
+  }
+
+  private Future<Void> updateEventDescription(PostgresClient postgresClient, Description description) {
+    Future<Void> future = Future.future();
+    try {
+      postgresClient.update(EVENT_DESCRIPTION, description, description.getId(), replyDescriptor -> {
+        if (replyDescriptor.succeeded()) {
+          List<Object> events = CalendarUtils.separateEvents(description, description.getId());
+          if (events.isEmpty()) {
+            future.fail("Can not add empty event set!");
+          } else {
+            Future<Void> batchSaveFuture = saveEventBatch(postgresClient, events);
+            batchSaveFuture.setHandler(batchSaveHandler -> {
+              if (!batchSaveHandler.succeeded()) {
+                future.fail(batchSaveHandler.cause());
+              } else {
+                Future subFuture;
+                if (DescriptionType.OPENING_DAY == description.getDescriptionType()) {
+                  subFuture = deactivateEvents(postgresClient, description);
+                } else {
+                  subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
+                }
+                subFuture.setHandler(subHandler ->
+                  future.complete()
+                );
+              }
+            });
+          }
+
+        } else {
+          future.fail(replyDescriptor.cause());
+        }
+      });
+    } catch (Exception e) {
+      future.fail(e);
+    }
+    return future;
   }
 
   private static Future<Void> deleteEventsByDescriptionId(PostgresClient postgresClient, String eventDescriptionId) {
