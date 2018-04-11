@@ -103,17 +103,8 @@ public class CalendarAPI implements CalendarResource {
 
     vertxContext.runOnContext(v -> {
       try {
-        StringBuilder queryBuilder = new StringBuilder();
-        queryBuilder.append("startDate >= ").append(CalendarUtils.getUTCDateformat().print(description.getStartDate().getTime()))
-          .append(" AND endDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(description).getTimeInMillis()))
-          .append(" AND eventType = ");
-        if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
-          queryBuilder.append(CalendarConstants.EXCEPTION);
-        } else {
-          queryBuilder.append(CalendarConstants.OPENING_DAY);
-        }
         CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
-        CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
+        CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
         postgresClient.get(EVENT, Event.class, cql, true,
           replyOfGetEventsByDate -> {
             if (replyOfGetEventsByDate.failed()) {
@@ -123,12 +114,12 @@ public class CalendarAPI implements CalendarResource {
             } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
               Future<Description> eventDescriptionSaveResponse = saveEventDescription(postgresClient, description);
               eventDescriptionSaveResponse.setHandler(saveHandler -> {
-                if (eventDescriptionSaveResponse.succeeded()) {
+                if (saveHandler.succeeded()) {
                   asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(eventDescriptionSaveResponse.result())));
                 } else {
                   asyncResultHandler.handle(Future.succeededFuture(
                     PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
-                      eventDescriptionSaveResponse.cause().getMessage())));
+                      saveHandler.cause().getMessage())));
                 }
               });
             } else {
@@ -143,6 +134,22 @@ public class CalendarAPI implements CalendarResource {
             e.getMessage())));
       }
     });
+  }
+
+  private String buildQueryForExistingEventsByDescription(Description description, String descriptionId) {
+    StringBuilder queryBuilder = new StringBuilder();
+    queryBuilder.append("startDate >= ").append(CalendarUtils.getUTCDateformat().print(description.getStartDate().getTime()))
+      .append(" AND endDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(description).getTimeInMillis()))
+      .append(" AND eventType = ");
+    if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
+      queryBuilder.append(CalendarConstants.EXCEPTION);
+    } else {
+      queryBuilder.append(CalendarConstants.OPENING_DAY);
+    }
+    if (descriptionId != null) {
+      queryBuilder.append(" AND descriptionId <> ").append(descriptionId);
+    }
+    return queryBuilder.toString();
   }
 
   private Future<Description> saveEventDescription(PostgresClient postgresClient, Description description) {
@@ -404,23 +411,13 @@ public class CalendarAPI implements CalendarResource {
       Future<Void> future = deleteEventsByDescriptionId(postgresClientForEventDelete, eventDescriptionId);
 
       future.setHandler(resultHandler -> {
-        if (resultHandler.succeeded() && future.isComplete()) {
+        if (resultHandler.succeeded()) {
           try {
             PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
             vertxContext.runOnContext(vc -> {
               try {
-                StringBuilder queryBuilder = new StringBuilder();
-                queryBuilder.append("startDate >= ").append(CalendarUtils.getUTCDateformat().print(description.getStartDate().getTime()))
-                  .append(" AND endDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(description).getTimeInMillis()))
-                  .append(" AND descriptionId <> ").append(description.getId())
-                  .append(" AND eventType = ");
-                if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
-                  queryBuilder.append(CalendarConstants.EXCEPTION);
-                } else {
-                  queryBuilder.append(CalendarConstants.OPENING_DAY);
-                }
                 CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
-                CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
+                CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, description.getId()));
                 postgresClient.get(EVENT, Event.class, cql, true,
                   replyOfGetEventsByDate -> {
                     if (replyOfGetEventsByDate.failed()) {
@@ -431,7 +428,7 @@ public class CalendarAPI implements CalendarResource {
 
                       Future<Void> updateFuture = updateEventDescription(postgresClient, description);
                       updateFuture.setHandler(updateFutureResponse -> {
-                        if (updateFuture.failed()) {
+                        if (updateFutureResponse.failed()) {
                           asyncResultHandler.handle(Future.succeededFuture(
                             PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
                               updateFutureResponse.cause().getMessage())));
@@ -454,11 +451,11 @@ public class CalendarAPI implements CalendarResource {
             });
           } catch (Exception e) {
             asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
-              .withPlainInternalServerError(String.valueOf(future.result()))));
+              .withPlainInternalServerError(String.valueOf(resultHandler.result()))));
           }
         } else {
           asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
-            .withPlainInternalServerError(future.cause().getMessage())));
+            .withPlainInternalServerError(resultHandler.cause().getMessage())));
         }
       });
     });
