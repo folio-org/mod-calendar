@@ -29,6 +29,7 @@ public class CalendarAPI implements CalendarResource {
 
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
   private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
+  private static final String JSONB_POSTFIX = ".jsonb";
 
   @Override
   public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
@@ -37,7 +38,7 @@ public class CalendarAPI implements CalendarResource {
       try {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("open=").append(true).append(" AND active=").append(true);
-        CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+        CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
         postgresClient.get(EVENT, Event.class, cql, true, true,
           resultOfSelect -> {
@@ -103,7 +104,7 @@ public class CalendarAPI implements CalendarResource {
 
     vertxContext.runOnContext(v -> {
       try {
-        CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+        CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
         postgresClient.get(EVENT, Event.class, cql, true,
           replyOfGetEventsByDate -> {
@@ -300,7 +301,7 @@ public class CalendarAPI implements CalendarResource {
         .append("startDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(eventDescription).getTimeInMillis()))
         .append(" AND endDate >= ").append(CalendarUtils.getUTCDateformat().print(eventDescription.getStartDate().getTime()))
         .append(" AND descriptionType = ").append(DescriptionType.EXCEPTION);
-      CQL2PgJSON descriptionCql2pgJson = new CQL2PgJSON(EVENT_DESCRIPTION + ".jsonb");
+      CQL2PgJSON descriptionCql2pgJson = new CQL2PgJSON(EVENT_DESCRIPTION + JSONB_POSTFIX);
       CQLWrapper descriptionCql = new CQLWrapper(descriptionCql2pgJson, queryBuilder.toString());
       postgresClient.get(EVENT_DESCRIPTION, Description.class, descriptionCql, true,
         replyOfGetEventDescriptionsByDate -> {
@@ -366,13 +367,13 @@ public class CalendarAPI implements CalendarResource {
     Future<Void> future = Future.future();
     try {
       CQLWrapper cql = new CQLWrapper();
-      cql.setField(new CQL2PgJSON(EVENT_DESCRIPTION + ".jsonb"));
+      cql.setField(new CQL2PgJSON(EVENT_DESCRIPTION + JSONB_POSTFIX));
       cql.setQuery(ID_FIELD + "==" + eventDescriptionId);
       postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true,
         replyOfGetDescriptionById -> {
           try {
             if (replyOfGetDescriptionById.succeeded()) {
-              if (replyOfGetDescriptionById.result().getResults().size() == 0) {
+              if (replyOfGetDescriptionById.result().getResults().isEmpty()) {
                 future.fail("There is no event description with this id: " + eventDescriptionId);
               } else if (replyOfGetDescriptionById.result().getResults().size() > 1) {
                 future.fail("Could not find specific event description with id: " + eventDescriptionId);
@@ -416,7 +417,7 @@ public class CalendarAPI implements CalendarResource {
             PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
             vertxContext.runOnContext(vc -> {
               try {
-                CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+                CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
                 CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, description.getId()));
                 postgresClient.get(EVENT, Event.class, cql, true,
                   replyOfGetEventsByDate -> {
@@ -504,7 +505,7 @@ public class CalendarAPI implements CalendarResource {
     try {
       StringBuilder queryBuilder = new StringBuilder();
       queryBuilder.append(DESCRIPTION_ID_FIELD).append("=").append(eventDescriptionId);
-      CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + ".jsonb");
+      CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
       CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
       postgresClient.get(EVENT, Event.class, cql, true,
         replyGetEventId -> {
