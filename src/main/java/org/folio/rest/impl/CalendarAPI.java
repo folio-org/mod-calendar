@@ -141,13 +141,13 @@ public class CalendarAPI implements CalendarResource {
                   "Intervals can not overlap")));
             }
           });
-      } catch (Exception e) {
-        asyncResultHandler.handle(Future.succeededFuture(
-        PostCalendarEventdescriptionsResponse.withPlainBadRequest(e.getMessage())));
       } catch (CalendarIntervalException e) {
         log.warn(e.getMessage());
         asyncResultHandler.handle(Future.succeededFuture(
           PostCalendarEventdescriptionsResponse.withPlainBadRequest(e.getMessage())));
+      } catch (Exception e) {
+        asyncResultHandler.handle(Future.succeededFuture(
+        PostCalendarEventdescriptionsResponse.withPlainBadRequest(e.getMessage())));
       }
     });
   }
@@ -460,14 +460,14 @@ public class CalendarAPI implements CalendarResource {
                             "Intervals can not overlap!")));
                       }
                     });
-                } catch (Exception e) {
-                  asyncResultHandler.handle(Future.succeededFuture(
-                    PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-                      e.getMessage())));
                 } catch (CalendarIntervalException e) {
                 log.warn(e.getMessage());
                 asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
                   .withPlainInternalServerError(String.valueOf(e.getMessage()))));
+                } catch (Exception e) {
+                  asyncResultHandler.handle(Future.succeededFuture(
+                    PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
+                      e.getMessage())));
               }
             });
           } catch (Exception e) {
