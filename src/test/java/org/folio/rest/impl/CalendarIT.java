@@ -14,6 +14,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.CalendarUtils;
@@ -45,6 +46,15 @@ public class CalendarIT {
   public static void setup(TestContext context) {
     vertx = Vertx.vertx();
 
+    try {
+      PostgresClient.setIsEmbedded(true);
+      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+    } catch (Exception e) {
+      e.printStackTrace();
+      context.fail(e);
+      return;
+    }
+
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
@@ -71,6 +81,7 @@ public class CalendarIT {
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
     tenantClient.delete(res2 -> {
       vertx.close(context.asyncAssertSuccess(res -> {
+        PostgresClient.stopEmbeddedPostgres();
         async.complete();
       }));
     });
