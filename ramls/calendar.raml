@@ -1,15 +1,13 @@
 #%RAML 0.8
-title: Login
+title: Calendar
 version: v1
-baseUri: https://github.com/qultoltd/mod-calendar
+baseUri: https://github.com/folio-org/mod-calendar
 
 documentation:
   - title: mod-calendar API
     content: This module provides a backend for the calendar functionalities
 
 schemas:
-  - Calendar.json: !include schemas/Calendar.json
-  - CalendarCollection.json: !include schemas/CalendarCollection.json
   - CalendarEvent.json: !include schemas/CalendarEvent.json
   - CalendarEventCollection: !include schemas/CalendarEventCollection.json
   - CalendarEventDescription.json: !include schemas/CalendarEventDescription.json
@@ -20,6 +18,19 @@ schemas:
 /calendar:
   /events:
     get:
+      queryParameters:
+        from:
+          displayName: From
+          type: string
+          description: Start date of listing events
+          example: 2017-01-01
+          required: false
+        to:
+          displayName: To
+          type: string
+          description: End date of listing events
+          example: 2017-01-31
+          required: false
       description: List events for the calendar view
       responses:
         200:

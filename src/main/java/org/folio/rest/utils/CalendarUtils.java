@@ -6,20 +6,28 @@ import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
-
-import static java.util.Calendar.DAY_OF_MONTH;
 
 public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
-  public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(TIME_PATTERN);
+  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+
+  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
+
+  public static final DateTimeFormatter BASIC_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+  private CalendarUtils() {
+  }
 
   public static DayOfWeek dayOfDate(Date inputDate) {
     return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
@@ -46,7 +54,7 @@ public class CalendarUtils {
       List<Event> event = createEvents(openingDay, startCal, entity, generatedId);
       events.addAll(event);
 
-      startCal.add(DAY_OF_MONTH, 1);
+      startCal.add(Calendar.DAY_OF_MONTH, 1);
     }
 
     return events;
@@ -61,8 +69,8 @@ public class CalendarUtils {
 
     List<Event> events = new ArrayList<>();
     String eventType = CalendarConstants.OPENING_DAY;
-    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCLUSION) {
-      eventType = CalendarConstants.EXCLUSION;
+    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCEPTION) {
+      eventType = CalendarConstants.EXCEPTION;
     }
 
     boolean allDay = true;
@@ -84,30 +92,27 @@ public class CalendarUtils {
         .withAllDay(allDay)
         .withOpen(open)
         .withStartDate(currentStartDate.getTime())
-        .withEndDate(currentEndDate.getTime()));
+        .withEndDate(currentEndDate.getTime())
+        .withActive(true));
     } else {
       for (OpeningHour opening : openingDay.getOpeningHour()) {
         Calendar cal = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
-        try {
-          cal.setTime(TIME_FORMAT.parse(opening.getStartTime()));
-          cal2.setTime(TIME_FORMAT.parse(opening.getEndTime()));
+        cal.setTimeInMillis(DateTime.parse(opening.getStartTime(), TIME_FORMATTER).getMillis());
+        cal2.setTimeInMillis(DateTime.parse(opening.getEndTime(), TIME_FORMATTER).getMillis());
 
-          currentStartDate.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-          currentStartDate.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-          currentEndDate.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
-          currentEndDate.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
-          events.add(new Event()
-            .withDescriptionId(generatedId)
-            .withEventType(eventType)
-            .withAllDay(allDay)
-            .withOpen(open)
-            .withStartDate(currentStartDate.getTime())
-            .withEndDate(currentEndDate.getTime()));
-
-        } catch (ParseException e) {
-          e.printStackTrace();
-        }
+        currentStartDate.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        currentStartDate.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        currentEndDate.set(Calendar.HOUR_OF_DAY, cal2.get(Calendar.HOUR_OF_DAY));
+        currentEndDate.set(Calendar.MINUTE, cal2.get(Calendar.MINUTE));
+        events.add(new Event()
+          .withDescriptionId(generatedId)
+          .withEventType(eventType)
+          .withAllDay(allDay)
+          .withOpen(open)
+          .withStartDate(currentStartDate.getTime())
+          .withEndDate(currentEndDate.getTime())
+          .withActive(true));
       }
     }
 
@@ -119,37 +124,7 @@ public class CalendarUtils {
     Map<DayOfWeek, OpeningDay> openingDays = new HashMap<>();
 
     for (OpeningDay openingDay : entity.getOpeningDays()) {
-
-      switch (openingDay.getDay()) {
-        case MONDAY: {
-          openingDays.put(DayOfWeek.MONDAY, openingDay);
-          break;
-        }
-        case TUESDAY: {
-          openingDays.put(DayOfWeek.TUESDAY, openingDay);
-          break;
-        }
-        case WEDNESDAY: {
-          openingDays.put(DayOfWeek.WEDNESDAY, openingDay);
-          break;
-        }
-        case THURSDAY: {
-          openingDays.put(DayOfWeek.THURSDAY, openingDay);
-          break;
-        }
-        case FRIDAY: {
-          openingDays.put(DayOfWeek.FRIDAY, openingDay);
-          break;
-        }
-        case SATURDAY: {
-          openingDays.put(DayOfWeek.SATURDAY, openingDay);
-          break;
-        }
-        case SUNDAY: {
-          openingDays.put(DayOfWeek.SUNDAY, openingDay);
-          break;
-        }
-      }
+      openingDays.put(DayOfWeek.valueOf(openingDay.getDay().toString()), openingDay);
     }
 
     return openingDays;

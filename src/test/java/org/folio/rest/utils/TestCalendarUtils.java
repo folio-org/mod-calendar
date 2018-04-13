@@ -82,8 +82,8 @@ public class TestCalendarUtils {
     startDate.set(1970, 0, 1, START_HOUR, START_MINUTE, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(1970, 0, 1, END_HOUR, END_MINUTE, 59);
-    String startTime = CalendarUtils.TIME_FORMAT.format(startDate.getTime());
-    String endTime = CalendarUtils.TIME_FORMAT.format(endDate.getTime());
+    String startTime = CalendarUtils.TIME_FORMATTER.print(startDate.getTimeInMillis());
+    String endTime = CalendarUtils.TIME_FORMATTER.print(endDate.getTimeInMillis());
     openingHour.setStartTime(startTime);
     openingHour.setEndTime(endTime);
     OpeningDay openingDay = new OpeningDay();

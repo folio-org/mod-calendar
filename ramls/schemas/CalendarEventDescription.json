@@ -13,7 +13,7 @@
       "type": "string",
       "enum": [
         "OPENING_DAY",
-        "EXCLUSION"
+        "EXCEPTION"
       ]
     },
     "startDate": {
@@ -23,9 +23,6 @@
     "endDate": {
       "type": "string",
       "format": "date-time"
-    },
-    "twelveHour": {
-      "type": "boolean"
     },
     "openingDays": {
       "type": "array",
