@@ -121,7 +121,7 @@ public class CalendarUtils {
 
   private static Map<DayOfWeek, OpeningDay> getOpeningDays(Description entity) {
 
-    Map<DayOfWeek, OpeningDay> openingDays = new HashMap<>();
+    EnumMap openingDays = new EnumMap(DayOfWeek.class);
 
     for (OpeningDay openingDay : entity.getOpeningDays()) {
       openingDays.put(DayOfWeek.valueOf(openingDay.getDay().toString()), openingDay);
