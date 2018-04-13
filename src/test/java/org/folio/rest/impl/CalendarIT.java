@@ -14,6 +14,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.CalendarUtils;
@@ -42,8 +43,17 @@ public class CalendarIT {
   private static Vertx vertx;
 
   @BeforeClass
-  public static void setup(TestContext context) throws Exception {
+  public static void setup(TestContext context) {
     vertx = Vertx.vertx();
+
+    try {
+      PostgresClient.setIsEmbedded(true);
+      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+    } catch (Exception e) {
+      e.printStackTrace();
+      context.fail(e);
+      return;
+    }
 
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
@@ -71,6 +81,7 @@ public class CalendarIT {
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
     tenantClient.delete(res2 -> {
       vertx.close(context.asyncAssertSuccess(res -> {
+        PostgresClient.stopEmbeddedPostgres();
         async.complete();
       }));
     });
@@ -116,11 +127,7 @@ public class CalendarIT {
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      Calendar newStartDate = Calendar.getInstance();
-      newStartDate.set(2017, Calendar.MARCH, 8, 0, 0, 0);
-      Calendar newEndDate = Calendar.getInstance();
-      newEndDate.set(2017, Calendar.MARCH, 14, 0, 0, 0);
-      updateDescription(f1.result(), newStartDate, newEndDate).setHandler(f.completer());
+      updateDescription(f1.result(), 2017, Calendar.MARCH, 8, 7).setHandler(f.completer());
       return f;
     });
 
@@ -191,7 +198,7 @@ public class CalendarIT {
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      listEvents(f1.result(), numberOfDays).setHandler(f.completer());
+      checkEventCountForDescription(f1.result(), numberOfDays).setHandler(f.completer());
       return f;
     });
 
@@ -203,6 +210,74 @@ public class CalendarIT {
         context.fail(res.cause());
       }
     });
+  }
+
+  @Test
+  public void testListEventsWithRestrictedDateInterval(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+
+    int numberOfDays = 7;
+
+    Description description = generateDescription(2017, Calendar.APRIL, 8, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
+
+    postDescription(description).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      Description otherDescription = generateDescription(2017, Calendar.APRIL, 15, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
+      postDescription(otherDescription).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  private Future<String> checkEventCountForInterval(Date startDate, Date endDate, int numberOfExpectedEvents) {
+
+    log.info("Retrieving events within an interval\n");
+    Future future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.get(port, HOST, "/calendar/events"
+      + "?from=" + CalendarUtils.BASIC_DATE_FORMATTER.print(startDate.getTime())
+      + "&to=" + CalendarUtils.BASIC_DATE_FORMATTER.print(endDate.getTime()), res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(buf -> {
+          CalendarEventCollection eventListObject = buf.toJsonObject().mapTo(CalendarEventCollection.class);
+          if (eventListObject.getTotalRecords() > 0) {
+            List<Event> eventList = eventListObject.getEvents();
+            if (eventList.size() == numberOfExpectedEvents) {
+              future.complete("Event count matches.");
+            } else {
+              future.fail("Event count does not match.");
+            }
+          } else {
+            future.fail("Can not find event objects.");
+          }
+        });
+      } else {
+        future.fail("Bad response: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
+    return future;
   }
 
   @Test
@@ -249,7 +324,7 @@ public class CalendarIT {
       return f;
     }).compose(v -> {
       Future<String> f = Future.future();
-      listEvents(f1.result(), numberOfDays).setHandler(f.completer());
+      checkEventCountForDescription(f1.result(), numberOfDays).setHandler(f.completer());
       return f;
     });
 
@@ -418,7 +493,10 @@ public class CalendarIT {
     return future;
   }
 
-  private Future<String> updateDescription(String descriptionId, Calendar startDate, Calendar endDate) {
+  private Future<String> updateDescription(String descriptionId, int startYear, int month, int day, int numberOfDays) {
+
+    Calendar startDate = createStartDate(startYear, month, day);
+    Calendar endDate = createEndDate(startDate, numberOfDays);
 
     log.info("Updating a description\n");
     Future<String> future = Future.future();
@@ -537,7 +615,7 @@ public class CalendarIT {
     return future;
   }
 
-  private Future<String> listEvents(String descriptionId, int numberOfExpectedEvents) {
+  private Future<String> checkEventCountForDescription(String descriptionId, int numberOfExpectedEvents) {
 
     log.info("Retrieving events for a description\n");
     Future future = Future.future();
@@ -579,17 +657,8 @@ public class CalendarIT {
 
   private Description generateDescription(int startYear, int month, int day, int numberOfDays, List<OpeningDay> openingDays, Description.DescriptionType type) {
 
-    Calendar startDate = Calendar.getInstance();
-    startDate.set(startYear, month, day, 0, 0, 0);
-    Calendar endDate = Calendar.getInstance();
-    endDate.setTime(startDate.getTime());
-    int daysToAdd = 0;
-    if (numberOfDays > 0) {
-      daysToAdd = numberOfDays - 1;
-    } else if (numberOfDays < 0) {
-      daysToAdd = numberOfDays + 1;
-    }
-    endDate.add(Calendar.DAY_OF_YEAR, daysToAdd);
+    Calendar startDate = createStartDate(startYear, month, day);
+    Calendar endDate = createEndDate(startDate, numberOfDays);
 
     return new Description()
       .withId(UUID.randomUUID().toString())
@@ -606,6 +675,25 @@ public class CalendarIT {
     cal.set(Calendar.HOUR_OF_DAY, hour);
     cal.set(Calendar.MINUTE, minute);
     return CalendarUtils.TIME_FORMATTER.print(cal.getTimeInMillis());
+  }
+
+  private Calendar createStartDate(int startYear, int month, int day) {
+    Calendar startDate = Calendar.getInstance();
+    startDate.set(startYear, month, day, 0, 0, 0);
+    return startDate;
+  }
+
+  private Calendar createEndDate(Calendar startDate, int numberOfDays) {
+    Calendar endDate = Calendar.getInstance();
+    endDate.setTime(startDate.getTime());
+    int daysToAdd = 0;
+    if (numberOfDays > 0) {
+      daysToAdd = numberOfDays - 1;
+    } else if (numberOfDays < 0) {
+      daysToAdd = numberOfDays + 1;
+    }
+    endDate.add(Calendar.DAY_OF_YEAR, daysToAdd);
+    return endDate;
   }
 
   private List<OpeningDay> generateBasicOpeningDays() {

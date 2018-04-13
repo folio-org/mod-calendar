@@ -32,12 +32,19 @@ public class CalendarAPI implements CalendarResource {
   private static final String JSONB_POSTFIX = ".jsonb";
 
   @Override
-  public void getCalendarEvents(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void getCalendarEvents(String from, String to, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     vertxContext.runOnContext(v -> {
       try {
         StringBuilder queryBuilder = new StringBuilder();
         queryBuilder.append("open=").append(true).append(" AND active=").append(true);
+
+        if (from != null) {
+          queryBuilder.append(" AND startDate >= ").append(CalendarUtils.DATE_FORMATTER.print(CalendarUtils.BASIC_DATE_FORMATTER.parseDateTime(from)));
+        }
+        if (to != null) {
+          queryBuilder.append(" AND endDate <= ").append(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(CalendarUtils.BASIC_DATE_FORMATTER.parseDateTime(to).toDate())));
+        }
         CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
         postgresClient.get(EVENT, Event.class, cql, true, true,
@@ -139,8 +146,8 @@ public class CalendarAPI implements CalendarResource {
 
   private String buildQueryForExistingEventsByDescription(Description description, String descriptionId) {
     StringBuilder queryBuilder = new StringBuilder();
-    queryBuilder.append("startDate >= ").append(CalendarUtils.getUTCDateformat().print(description.getStartDate().getTime()))
-      .append(" AND endDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(description).getTimeInMillis()))
+    queryBuilder.append("startDate >= ").append(CalendarUtils.DATE_FORMATTER.print(description.getStartDate().getTime()))
+      .append(" AND endDate <= ").append(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(description.getEndDate())))
       .append(" AND eventType = ");
     if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
       queryBuilder.append(CalendarConstants.EXCEPTION);
@@ -260,12 +267,12 @@ public class CalendarAPI implements CalendarResource {
       Criteria crit = new Criteria();
       crit.addField("'startDate'");
       crit.setOperation(Criteria.OP_GREATER_THAN_EQ);
-      crit.setValue(CalendarUtils.getUTCDateformat().print(eventDescription.getStartDate().getTime()));
+      crit.setValue(CalendarUtils.DATE_FORMATTER.print(eventDescription.getStartDate().getTime()));
 
       Criteria otherCrit = new Criteria();
       otherCrit.addField("'endDate'");
       otherCrit.setOperation(Criteria.OP_LESS_THAN_EQ);
-      otherCrit.setValue(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(eventDescription).getTimeInMillis()));
+      otherCrit.setValue(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(eventDescription.getEndDate())));
 
       cr.addCriterion(crit, Criteria.OP_AND, otherCrit, Criteria.OP_AND);
       Criteria eventTypeCrit = new Criteria();
@@ -298,8 +305,8 @@ public class CalendarAPI implements CalendarResource {
     try {
       StringBuilder queryBuilder = new StringBuilder();
       queryBuilder
-        .append("startDate <= ").append(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(eventDescription).getTimeInMillis()))
-        .append(" AND endDate >= ").append(CalendarUtils.getUTCDateformat().print(eventDescription.getStartDate().getTime()))
+        .append("startDate <= ").append(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(eventDescription.getEndDate())))
+        .append(" AND endDate >= ").append(CalendarUtils.DATE_FORMATTER.print(eventDescription.getStartDate().getTime()))
         .append(" AND descriptionType = ").append(DescriptionType.EXCEPTION);
       CQL2PgJSON descriptionCql2pgJson = new CQL2PgJSON(EVENT_DESCRIPTION + JSONB_POSTFIX);
       CQLWrapper descriptionCql = new CQLWrapper(descriptionCql2pgJson, queryBuilder.toString());
@@ -317,12 +324,12 @@ public class CalendarAPI implements CalendarResource {
                   Criteria crit = new Criteria();
                   crit.addField("'startDate'");
                   crit.setOperation(Criteria.OP_GREATER_THAN_EQ);
-                  crit.setValue(CalendarUtils.getUTCDateformat().print(currDescription.getStartDate().getTime()));
+                  crit.setValue(CalendarUtils.DATE_FORMATTER.print(currDescription.getStartDate().getTime()));
 
                   Criteria otherCrit = new Criteria();
                   otherCrit.addField("'endDate'");
                   otherCrit.setOperation(Criteria.OP_LESS_THAN_EQ);
-                  otherCrit.setValue(CalendarUtils.getUTCDateformat().print(calculateEndOfTheDay(currDescription).getTimeInMillis()));
+                  otherCrit.setValue(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(currDescription.getEndDate())));
 
                   if (i < replyOfGetEventDescriptionsByDate.result().getResults().size() - 1) {
                     cr.addCriterion(crit, Criteria.OP_AND, otherCrit, Criteria.OP_OR);
@@ -578,12 +585,12 @@ public class CalendarAPI implements CalendarResource {
     return PostgresClient.getInstance(vertxContext.owner(), tenantId);
   }
 
-  private static Calendar calculateEndOfTheDay(Description eventDescription) {
+  private static long calculateEndOfTheDay(Date date) {
     Calendar endDate = Calendar.getInstance();
-    endDate.setTime(eventDescription.getEndDate());
+    endDate.setTime(date);
     endDate.add(Calendar.HOUR_OF_DAY, 23);
     endDate.add(Calendar.MINUTE, 59);
     endDate.add(Calendar.SECOND, 59);
-    return endDate;
+    return endDate.getTimeInMillis();
   }
 }

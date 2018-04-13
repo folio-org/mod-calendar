@@ -14,14 +14,17 @@ import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
 
-import static java.util.Calendar.DAY_OF_MONTH;
-
 public class CalendarUtils {
 
   public static final String DAY_PATTERN = "EEEE";
 
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+
+  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
+
+  public static final DateTimeFormatter BASIC_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
 
   private CalendarUtils() {
   }
@@ -51,14 +54,10 @@ public class CalendarUtils {
       List<Event> event = createEvents(openingDay, startCal, entity, generatedId);
       events.addAll(event);
 
-      startCal.add(DAY_OF_MONTH, 1);
+      startCal.add(Calendar.DAY_OF_MONTH, 1);
     }
 
     return events;
-  }
-
-  public static DateTimeFormatter getUTCDateformat() {
-    return DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZoneUTC();
   }
 
   private static List<Event> createEvents(OpeningDay openingDay, Calendar startCal, Description entity, String generatedId) {

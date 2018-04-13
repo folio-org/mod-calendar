@@ -18,6 +18,19 @@ schemas:
 /calendar:
   /events:
     get:
+      queryParameters:
+        from:
+          displayName: From
+          type: string
+          description: Start date of listing events
+          example: 2017-01-01
+          required: false
+        to:
+          displayName: To
+          type: string
+          description: End date of listing events
+          example: 2017-01-31
+          required: false
       description: List events for the calendar view
       responses:
         200:
