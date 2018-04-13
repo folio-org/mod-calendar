@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.*;
+import java.util.Calendar;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -108,7 +109,7 @@ public class CalendarIT {
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
-    DescriptionCheckWithInputs(true, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+    descriptionCheckWithInputs(true, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
   }
 
   @Test
@@ -125,7 +126,7 @@ public class CalendarIT {
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
-    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+    descriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
   }
 
   @Test
@@ -142,7 +143,7 @@ public class CalendarIT {
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
-    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+    descriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
   }
   @Test
   public void testAddNewDescriptionWithCheckingInputsFailOverlappingTime2(TestContext context) {
@@ -158,7 +159,7 @@ public class CalendarIT {
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
-    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+    descriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
   }
   @Test
   public void testAddNewDescriptionWithCheckingInputsFailOverlappingTime3(TestContext context) {
@@ -174,10 +175,10 @@ public class CalendarIT {
     startDate.set(2017, Calendar.JULY, 1, 0, 0, 0);
     Calendar endDate = Calendar.getInstance();
     endDate.set(2017, Calendar.JULY, 10, 23, 59, 59);
-    DescriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
+    descriptionCheckWithInputs(false, context, startDate, endDate, startHour1, startMinute1, endHour1, endMinute1, startHour2, startMinute2, endHour2, endMinute2);
   }
 
-  private void DescriptionCheckWithInputs(boolean isAcceptableTime, TestContext context, Calendar startDate, Calendar endDate, int startHour1, int startMinute1, int endHour1, int endMinute1, int startHour2, int startMinute2, int endHour2, int endMinute2) {
+  private void descriptionCheckWithInputs(boolean isAcceptableTime, TestContext context, Calendar startDate, Calendar endDate, int startHour1, int startMinute1, int endHour1, int endMinute1, int startHour2, int startMinute2, int endHour2, int endMinute2) {
     Async async = context.async();
     List<OpeningHour> openingHourList = new ArrayList<>();
     openingHourList.add(new OpeningHour().withStartTime(startHour1+":"+startMinute1+":00.000Z")

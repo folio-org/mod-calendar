@@ -13,3 +13,4 @@ public class IntervalComparator implements Comparator<Interval> {
     return x.getStart().compareTo(y.getStart());
   }
 }
+
