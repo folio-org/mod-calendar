@@ -24,10 +24,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.*;
+import java.util.Calendar;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
-
   private static final String TENANT_HEADER_KEY = "X-Okapi-Tenant";
   private static final String TOKEN_HEADER_KEY = "x-okapi-token";
   private static final String CONTENT_TYPE_HEADER_KEY = "Content-Type";
@@ -58,11 +58,9 @@ public class CalendarIT {
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
-
     DeploymentOptions options = new DeploymentOptions()
       .setConfig(new JsonObject().put("http.port", port)
         .put(HttpClientMock2.MOCK_MODE, "true"));
-
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
         tenantClient.post(null, res2 -> {
@@ -72,7 +70,6 @@ public class CalendarIT {
         context.fail(e);
       }
     });
-
   }
 
   @AfterClass
@@ -101,7 +98,6 @@ public class CalendarIT {
       listDescriptions(f1.result()).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -112,7 +108,7 @@ public class CalendarIT {
     });
   }
 
-  @Test
+   @Test
   public void testUpdateDescription(TestContext context) {
     Async async = context.async();
     Future<String> startFuture;
@@ -130,7 +126,6 @@ public class CalendarIT {
       updateDescription(f1.result(), 2017, Calendar.MARCH, 8, 7).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -170,7 +165,6 @@ public class CalendarIT {
       });
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -201,7 +195,6 @@ public class CalendarIT {
       checkEventCountForDescription(f1.result(), numberOfDays).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -287,7 +280,6 @@ public class CalendarIT {
     int startMinute = 30;
     int endHour = 18;
     int endMinute = 40;
-
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
@@ -328,7 +320,6 @@ public class CalendarIT {
       checkEventCountForDescription(f1.result(), numberOfDays).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -364,7 +355,6 @@ public class CalendarIT {
       });
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -766,5 +756,4 @@ public class CalendarIT {
     openingDays.add(sunday);
     return openingDays;
   }
-
 }
