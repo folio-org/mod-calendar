@@ -249,9 +249,10 @@ public class CalendarIT {
     log.info("Retrieving events within an interval\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.get(port, HOST, "/calendar/events"
+    String requestUrl = "/calendar/events"
       + "?from=" + CalendarUtils.BASIC_DATE_FORMATTER.print(startDate.getTime())
-      + "&to=" + CalendarUtils.BASIC_DATE_FORMATTER.print(endDate.getTime()), res -> {
+      + "&to=" + CalendarUtils.BASIC_DATE_FORMATTER.print(endDate.getTime());
+    client.get(port, HOST, requestUrl, res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         res.bodyHandler(buf -> {
           CalendarEventCollection eventListObject = buf.toJsonObject().mapTo(CalendarEventCollection.class);
@@ -396,7 +397,9 @@ public class CalendarIT {
     Future<String> startFuture;
     Future<String> f1 = Future.future();
 
-    Description description = generateDescription(2017, Calendar.AUGUST, 1, 7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
+    int numberOfDays = 7;
+
+    Description description = generateDescription(2017, Calendar.AUGUST, 1, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
 
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
@@ -414,6 +417,52 @@ public class CalendarIT {
           f.fail("Failed to add exception.");
         }
       });
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
+      return f;
+    });
+
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testAddNewExceptionAndDescription(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+
+    int numberOfDays = 7;
+    Description description = generateDescription(2017, Calendar.AUGUST, 8, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.EXCEPTION);
+
+    postDescription(description).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listDescriptions(f1.result()).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      description.setDescriptionType(Description.DescriptionType.OPENING_DAY);
+      postDescription(description).setHandler(handler -> {
+        if (handler.succeeded()) {
+          log.info("Successfully added opening day.");
+          f.complete(handler.result());
+        } else {
+          f.fail("Failed to add opening day.");
+        }
+      });
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
       return f;
     });
 
@@ -674,11 +723,14 @@ public class CalendarIT {
     Calendar cal = Calendar.getInstance();
     cal.set(Calendar.HOUR_OF_DAY, hour);
     cal.set(Calendar.MINUTE, minute);
+    cal.set(Calendar.SECOND, 0);
+    cal.set(Calendar.MILLISECOND, 0);
     return CalendarUtils.TIME_FORMATTER.print(cal.getTimeInMillis());
   }
 
   private Calendar createStartDate(int startYear, int month, int day) {
     Calendar startDate = Calendar.getInstance();
+    startDate.clear();
     startDate.set(startYear, month, day, 0, 0, 0);
     return startDate;
   }
