@@ -116,7 +116,6 @@ public class CalendarAPI implements CalendarResource {
     vertxContext.runOnContext(v -> {
       try {
         checkDescriptionInput(description);
-      try {
         CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
         postgresClient.get(EVENT, Event.class, cql, true,
@@ -145,7 +144,6 @@ public class CalendarAPI implements CalendarResource {
       } catch (Exception e) {
         asyncResultHandler.handle(Future.succeededFuture(
         PostCalendarEventdescriptionsResponse.withPlainBadRequest(e.getMessage())));
-      }
       } catch (CalendarIntervalException e) {
         log.warn(e.getMessage());
         asyncResultHandler.handle(Future.succeededFuture(
@@ -436,7 +434,6 @@ public class CalendarAPI implements CalendarResource {
             vertxContext.runOnContext(vc -> {
               try {
                 checkDescriptionInput(description);
-                try {
                   CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
                   CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, description.getId()));
                   postgresClient.get(EVENT, Event.class, cql, true,
@@ -467,8 +464,7 @@ public class CalendarAPI implements CalendarResource {
                   asyncResultHandler.handle(Future.succeededFuture(
                     PutCalendarEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
                       e.getMessage())));
-                }
-              } catch (CalendarIntervalException e) {
+                } catch (CalendarIntervalException e) {
                 log.warn(e.getMessage());
                 asyncResultHandler.handle(Future.succeededFuture(PutCalendarEventdescriptionsByEventDescriptionIdResponse
                   .withPlainInternalServerError(String.valueOf(e.getMessage()))));

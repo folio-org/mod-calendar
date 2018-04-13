@@ -1,8 +1,6 @@
 package org.folio.rest.impl;
 
 import org.joda.time.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,7 +9,8 @@ import java.util.List;
  */
 public class IntervalValidation {
 
-  private static final Logger log = LoggerFactory.getLogger(IntervalValidation.class);
+  private IntervalValidation() {
+  }
 
   public  static void  validate(List<Interval> intervals) throws CalendarIntervalException {
     intervals.sort(new IntervalComparator());
