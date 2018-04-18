@@ -69,7 +69,7 @@ public class TestCalendarUtils {
       assertEquals(generatedId, event.getDescriptionId());
       assertEquals(Boolean.TRUE, event.getOpen());
       assertEquals(Boolean.FALSE, event.getAllDay());
-      assertEquals(CalendarConstants.OPENING_DAY, event.getEventType());
+      assertEquals(Description.DescriptionType.OPENING_DAY.toString(), event.getEventType());
 
       assertFalse(startDate.after(openingStart));
       assertFalse(endDate.before(openingEnd));

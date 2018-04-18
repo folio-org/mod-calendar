@@ -2,7 +2,6 @@ package org.folio.rest.utils;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.Description.DescriptionType;
 import org.folio.rest.jaxrs.model.Event;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
@@ -68,10 +67,7 @@ public class CalendarUtils {
     currentEndDate.setTimeInMillis(startCal.getTimeInMillis());
 
     List<Event> events = new ArrayList<>();
-    String eventType = CalendarConstants.OPENING_DAY;
-    if (entity.getDescriptionType() != null && entity.getDescriptionType() == DescriptionType.EXCEPTION) {
-      eventType = CalendarConstants.EXCEPTION;
-    }
+    String eventType = entity.getDescriptionType().toString();
 
     boolean allDay = true;
     boolean open = false;
