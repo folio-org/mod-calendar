@@ -6,6 +6,9 @@
     "id": {
       "type": "string"
     },
+    "calendarId": {
+      "type": "string"
+    },
     "description": {
       "type": "string"
     },
@@ -42,6 +45,7 @@
   "additionalProperties": false,
   "required": [
     "id",
+    "calendarId",
     "startDate",
     "endDate"
   ]

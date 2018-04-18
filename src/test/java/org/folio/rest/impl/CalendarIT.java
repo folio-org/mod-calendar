@@ -14,7 +14,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
-import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.CalendarUtils;
@@ -24,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.*;
-import java.util.Calendar;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -36,25 +34,23 @@ public class CalendarIT {
   private static final String HOST = "localhost";
   private static final String JSON_CONTENT_TYPE_HEADER_VALUE = "application/json";
   private static final String ACCEPT_HEADER_KEY = "Accept";
-
+  private static final String CALENDAR_ID = "41615ab0-5d20-4c53-80fd-ddc630840b57";
   private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
-
   private static int port;
   private static Vertx vertx;
+  private static ModCalendarJson modCalendarJson = new ModCalendarJson().withId(CALENDAR_ID).withName("test Calendar");
 
   @BeforeClass
   public static void setup(TestContext context) {
     vertx = Vertx.vertx();
-
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-    } catch (Exception e) {
-      e.printStackTrace();
-      context.fail(e);
-      return;
-    }
-
+//    try {
+//      PostgresClient.setIsEmbedded(true);
+//      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      context.fail(e);
+//      return;
+//    }
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
@@ -78,7 +74,7 @@ public class CalendarIT {
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
     tenantClient.delete(res2 -> {
       vertx.close(context.asyncAssertSuccess(res -> {
-        PostgresClient.stopEmbeddedPostgres();
+//        PostgresClient.stopEmbeddedPostgres();
         async.complete();
       }));
     });
@@ -89,9 +85,7 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     Description description = generateDescription(2017, Calendar.JANUARY, 1, 7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -113,9 +107,7 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     Description description = generateDescription(2017, Calendar.FEBRUARY, 1, 7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -141,9 +133,7 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     Description description = generateDescription(2017, Calendar.MARCH, 1, 7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -180,11 +170,8 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     int numberOfDays = 7;
-
     Description description = generateDescription(2017, Calendar.APRIL, 1, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -210,11 +197,8 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     int numberOfDays = 7;
-
     Description description = generateDescription(2017, Calendar.APRIL, 8, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -226,7 +210,6 @@ public class CalendarIT {
       checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -238,11 +221,10 @@ public class CalendarIT {
   }
 
   private Future<String> checkEventCountForInterval(Date startDate, Date endDate, int numberOfExpectedEvents) {
-
     log.info("Retrieving events within an interval\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    String requestUrl = "/calendar/events"
+    String requestUrl = "/calendar/calendars/" + modCalendarJson.getId() + "/events"
       + "?from=" + CalendarUtils.BASIC_DATE_FORMATTER.print(startDate.getTime())
       + "&to=" + CalendarUtils.BASIC_DATE_FORMATTER.print(endDate.getTime());
     client.get(port, HOST, requestUrl, res -> {
@@ -306,10 +288,8 @@ public class CalendarIT {
     openingDays.add(saturday);
     OpeningDay sunday = new OpeningDay().withDay(OpeningDay.Day.SUNDAY).withOpen(true).withAllDay(true);
     openingDays.add(sunday);
-
     int numberOfDays = 7;
     Description description = generateDescription(2017, Calendar.MAY, 1, numberOfDays, openingDays, Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -335,9 +315,7 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     Description description = generateDescription(2017, Calendar.JUNE, 1, 7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -368,9 +346,7 @@ public class CalendarIT {
   @Test
   public void testAddNewDescriptionWithoutEvents(TestContext context) {
     Async async = context.async();
-
     Description description = generateDescription(2017, Calendar.FEBRUARY, 1, -7, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(res -> {
       if (res.succeeded()) {
         context.fail("Saving invalid interval should have failed.");
@@ -386,11 +362,8 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     int numberOfDays = 7;
-
     Description description = generateDescription(2017, Calendar.AUGUST, 1, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.OPENING_DAY);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -413,7 +386,6 @@ public class CalendarIT {
       checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -429,10 +401,8 @@ public class CalendarIT {
     Async async = context.async();
     Future<String> startFuture;
     Future<String> f1 = Future.future();
-
     int numberOfDays = 7;
     Description description = generateDescription(2017, Calendar.AUGUST, 8, numberOfDays, generateBasicOpeningDays(), Description.DescriptionType.EXCEPTION);
-
     postDescription(description).setHandler(f1.completer());
     startFuture = f1.compose(v -> {
       Future<String> f = Future.future();
@@ -455,7 +425,6 @@ public class CalendarIT {
       checkEventCountForInterval(description.getStartDate(), description.getEndDate(), numberOfDays).setHandler(f.completer());
       return f;
     });
-
     startFuture.setHandler(res -> {
       if (res.succeeded()) {
         async.complete();
@@ -470,7 +439,7 @@ public class CalendarIT {
     log.info("Creating a new description\n");
     Future<String> future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.post(port, HOST, "/calendar/eventdescriptions", res -> {
+    client.post(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions", res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         res.bodyHandler(handler -> {
           log.info("Response body: " + handler.toJsonObject().toString());
@@ -493,11 +462,10 @@ public class CalendarIT {
   }
 
   private Future<String> listDescriptions(String descriptionId) {
-
     log.info("Retrieving a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.get(port, HOST, "/calendar/eventdescriptions", res -> {
+    client.get(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions", res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         res.bodyHandler(buf -> {
           JsonObject descriptionListObject = buf.toJsonObject();
@@ -533,14 +501,12 @@ public class CalendarIT {
   }
 
   private Future<String> updateDescription(String descriptionId, int startYear, int month, int day, int numberOfDays) {
-
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
-
     log.info("Updating a description\n");
     Future<String> future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.get(port, HOST, "/calendar/eventdescriptions", res -> {
+    client.get(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions", res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         res.bodyHandler(buf -> {
           JsonObject descriptionObject = buf.toJsonObject();
@@ -558,11 +524,12 @@ public class CalendarIT {
                   mappedDescription.setDescription("TEST_DESCRIPTION");
                   mappedDescription.setStartDate(startDate.getTime());
                   mappedDescription.setEndDate(endDate.getTime());
+                  mappedDescription.setCalendarId(modCalendarJson.getId());
                   HttpClient clientForPut = vertx.createHttpClient();
-                  clientForPut.put(port, HOST, "/calendar/eventdescriptions/" + descriptionId, updateResponse -> {
+                  clientForPut.put(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions/" + descriptionId, updateResponse -> {
                     if (res.statusCode() >= 200 && res.statusCode() < 300) {
                       HttpClient clientForGet = vertx.createHttpClient();
-                      clientForGet.get(port, HOST, "/calendar/eventdescriptions", listResponse -> {
+                      clientForGet.get(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions", listResponse -> {
                         if (listResponse.statusCode() >= 200 && listResponse.statusCode() < 300) {
                           listResponse.bodyHandler(buffer -> {
                             JsonObject updatedDescriptionObject = buffer.toJsonObject();
@@ -633,11 +600,10 @@ public class CalendarIT {
   }
 
   private Future<String> deleteDescription(String descriptionId) {
-
     log.info("Deleting a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.delete(port, HOST, "/calendar/eventdescriptions/" + descriptionId, res -> {
+    client.delete(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/eventdescriptions/" + descriptionId, res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         future.complete();
       } else {
@@ -655,11 +621,10 @@ public class CalendarIT {
   }
 
   private Future<String> checkEventCountForDescription(String descriptionId, int numberOfExpectedEvents) {
-
     log.info("Retrieving events for a description\n");
     Future future = Future.future();
     HttpClient client = vertx.createHttpClient();
-    client.get(port, HOST, "/calendar/events", res -> {
+    client.get(port, HOST, "/calendar/calendars/" + modCalendarJson.getId() + "/events", res -> {
       if (res.statusCode() >= 200 && res.statusCode() < 300) {
         res.bodyHandler(buf -> {
           CalendarEventCollection eventListObject = buf.toJsonObject().mapTo(CalendarEventCollection.class);
@@ -695,10 +660,8 @@ public class CalendarIT {
   }
 
   private Description generateDescription(int startYear, int month, int day, int numberOfDays, List<OpeningDay> openingDays, Description.DescriptionType type) {
-
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
-
     return new Description()
       .withId(UUID.randomUUID().toString())
       .withDescription(UUID.randomUUID().toString())
@@ -706,7 +669,8 @@ public class CalendarIT {
       .withStartDate(startDate.getTime())
       .withEndDate(endDate.getTime())
       .withOpeningDays(openingDays)
-      .withDescriptionType(type);
+      .withDescriptionType(type)
+      .withCalendarId(modCalendarJson.getId());
   }
 
   private String getParsedTimeForHourAndMinute(int hour, int minute) {
