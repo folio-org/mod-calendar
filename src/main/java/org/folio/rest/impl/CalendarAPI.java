@@ -12,7 +12,6 @@ import org.folio.rest.persist.Criteria.UpdateSection;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.cql.CQLWrapper;
 import org.folio.rest.tools.utils.TenantTool;
-import org.folio.rest.utils.CalendarConstants;
 import org.folio.rest.utils.CalendarUtils;
 import org.joda.time.Interval;
 import org.joda.time.LocalTime;
@@ -151,12 +150,7 @@ public class CalendarAPI implements CalendarResource {
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append("startDate >= ").append(CalendarUtils.DATE_FORMATTER.print(description.getStartDate().getTime()))
       .append(" AND endDate <= ").append(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(description.getEndDate())))
-      .append(" AND eventType = ");
-    if (description.getDescriptionType() != null && description.getDescriptionType() == DescriptionType.EXCEPTION) {
-      queryBuilder.append(CalendarConstants.EXCEPTION);
-    } else {
-      queryBuilder.append(CalendarConstants.OPENING_DAY);
-    }
+      .append(" AND eventType = ").append(description.getDescriptionType().toString());
     if (descriptionId != null) {
       queryBuilder.append(" AND descriptionId <> ").append(descriptionId);
     }
@@ -279,7 +273,7 @@ public class CalendarAPI implements CalendarResource {
       Criteria eventTypeCrit = new Criteria();
       eventTypeCrit.addField("'eventType'");
       eventTypeCrit.setOperation(Criteria.OP_EQUAL);
-      eventTypeCrit.setValue(CalendarConstants.OPENING_DAY);
+      eventTypeCrit.setValue(DescriptionType.OPENING_DAY.toString());
       cr.addCriterion(eventTypeCrit);
 
       UpdateSection us = new UpdateSection();
@@ -367,7 +361,7 @@ public class CalendarAPI implements CalendarResource {
     Criteria eventTypeCrit = new Criteria();
     eventTypeCrit.addField("'eventType'");
     eventTypeCrit.setOperation(Criteria.OP_EQUAL);
-    eventTypeCrit.setValue(CalendarConstants.OPENING_DAY);
+    eventTypeCrit.setValue(DescriptionType.OPENING_DAY.toString());
     cr.addCriterion(eventTypeCrit);
 
     return cr;
