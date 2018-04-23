@@ -14,6 +14,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.folio.rest.utils.CalendarUtils;
@@ -43,14 +44,14 @@ public class CalendarIT {
   @BeforeClass
   public static void setup(TestContext context) {
     vertx = Vertx.vertx();
-//    try {
-//      PostgresClient.setIsEmbedded(true);
-//      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//      context.fail(e);
-//      return;
-//    }
+    try {
+      PostgresClient.setIsEmbedded(true);
+      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
+    } catch (Exception e) {
+      e.printStackTrace();
+      context.fail(e);
+      return;
+    }
     Async async = context.async();
     port = NetworkUtils.nextFreePort();
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
@@ -74,11 +75,98 @@ public class CalendarIT {
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
     tenantClient.delete(res2 -> {
       vertx.close(context.asyncAssertSuccess(res -> {
-//        PostgresClient.stopEmbeddedPostgres();
+        PostgresClient.stopEmbeddedPostgres();
         async.complete();
       }));
     });
   }
+
+  @Test
+  public void testAddNewCalendar(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    ModCalendarJson modCalendarJson = new ModCalendarJson().withName("Test calendar");
+    postModCalendarJson(modCalendarJson).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listCalendars().setHandler(f.completer());
+      return f;
+    });
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testDeleteCalendar(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    ModCalendarJson modCalendarJson = new ModCalendarJson().withName("Test calendar");
+    postModCalendarJson(modCalendarJson).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listCalendars().setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      deleteCalendar(v).setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      listCalendars(v).setHandler(handler -> {
+        if (handler.failed() && "Can not find modcalendarjson object.".equals(handler.cause().getMessage())) {
+          log.info("Delete was successful.");
+          f.complete();
+        } else {
+          f.fail("Failed to delete calendar.");
+        }
+      });
+      return f;
+    });
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+  @Test
+  public void testUpdateCalendar(TestContext context) {
+    Async async = context.async();
+    Future<String> startFuture;
+    Future<String> f1 = Future.future();
+    ModCalendarJson modCalendarJson = new ModCalendarJson().withName("Test calendar");
+    postModCalendarJson(modCalendarJson).setHandler(f1.completer());
+    startFuture = f1.compose(v -> {
+      Future<String> f = Future.future();
+      listCalendars().setHandler(f.completer());
+      return f;
+    }).compose(v -> {
+      Future<String> f = Future.future();
+      updateCalendar(v, "New Test Calendar Name").setHandler(f.completer());
+      return f;
+    });
+    startFuture.setHandler(res -> {
+      if (res.succeeded()) {
+        async.complete();
+      } else {
+        res.cause().printStackTrace();
+        context.fail(res.cause());
+      }
+    });
+  }
+
+
 
   @Test
   public void testAddNewDescription(TestContext context) {
@@ -435,6 +523,32 @@ public class CalendarIT {
     });
   }
 
+  private Future<String> postModCalendarJson(ModCalendarJson modCalendarJson) {
+    log.info("Creating a new Calendar\n");
+    Future<String> future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.post(port, HOST, "/calendar/calendars", res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(handler -> {
+          log.info("Response body: " + handler.toJsonObject().toString());
+          ModCalendarJson modCalendarJsonResponse = handler.toJsonObject().mapTo(ModCalendarJson.class);
+          future.complete(modCalendarJsonResponse.getId());
+        });
+      } else {
+        future.fail("Failed to add description. " + res.statusMessage());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(TOKEN_HEADER_KEY, TOKEN)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end(JsonObject.mapFrom(modCalendarJson).encode());
+    return future;
+  }
+
   private Future<String> postDescription(Description description) {
     log.info("Creating a new description\n");
     Future<String> future = Future.future();
@@ -458,6 +572,74 @@ public class CalendarIT {
         future.fail(e);
       })
       .end(JsonObject.mapFrom(description).encode());
+    return future;
+  }
+
+  private Future<String> listCalendars() {
+    log.info("Retrieving a calendars\n");
+    Future future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.get(port, HOST, "/calendar/calendars/", res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(buf -> {
+          JsonObject calendarListObject = buf.toJsonObject();
+          JsonArray calendarList = calendarListObject.getJsonArray("calendars");
+          for (Object object : calendarList) {
+            if (object instanceof JsonObject) {
+              log.info(calendarList.toString());
+              future.complete(((JsonObject) object).mapTo(ModCalendarJson.class).getId());
+            } else {
+              future.fail("Can not parse modcalendarjson object.");
+            }
+          }
+          future.fail("Can not find modcalendarjson object.");
+        });
+      } else {
+        future.fail("Bad response: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
+    return future;
+  }
+
+  private Future<String> listCalendars(String calendarId) {
+    log.info("Retrieving a calendars\n");
+    Future future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.get(port, HOST, "/calendar/calendars/", res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(buf -> {
+          JsonObject calendarListObject = buf.toJsonObject();
+          JsonArray calendarList = calendarListObject.getJsonArray("calendars");
+          for (Object object : calendarList) {
+            if (object instanceof JsonObject) {
+              if (((JsonObject) object).mapTo(ModCalendarJson.class).getId() == calendarId) {
+                log.info(calendarList.toString());
+                future.complete(calendarId);
+              }
+            } else {
+              future.fail("Can not parse modcalendarjson object.");
+            }
+          }
+          future.fail("Can not find modcalendarjson object.");
+        });
+      } else {
+        future.fail("Bad response: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
     return future;
   }
 
@@ -499,6 +681,85 @@ public class CalendarIT {
       .end();
     return future;
   }
+
+  private Future<String> updateCalendar(String calendarId, String name) {
+    log.info("Updating a calendar\n");
+    Future<String> future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.get(port, HOST, "/calendar/calendars/", res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        res.bodyHandler(buf -> {
+          JsonArray calendarList = buf.toJsonObject().getJsonArray("calendars");
+          if (calendarList.isEmpty()) {
+            future.fail("Can not find calendar object.");
+          }
+          for (Object object : calendarList) {
+            if (object instanceof JsonObject) {
+              ModCalendarJson mappedModCalendar = ((JsonObject) object).mapTo(ModCalendarJson.class);
+              if (calendarId.equals(mappedModCalendar.getId())) {
+                mappedModCalendar.setName(name);
+                HttpClient clientForPut = vertx.createHttpClient();
+                clientForPut.put(port, HOST, "/calendar/calendars/" + calendarId, updateResponse -> {
+                  if (updateResponse.statusCode() >= 200 && updateResponse.statusCode() < 300) {
+                    HttpClient clientForGet = vertx.createHttpClient();
+                    clientForGet.get(port, HOST, "/calendar/calendars/", listResponse -> {
+                      if (listResponse.statusCode() >= 200 && listResponse.statusCode() < 300) {
+                        listResponse.bodyHandler(buffer -> {
+                          JsonArray updatedCalendarList = buffer.toJsonObject().getJsonArray("calendars");
+                          for (Object updatedObject : updatedCalendarList) {
+                            if (updatedObject instanceof JsonObject) {
+                              ModCalendarJson mappedUpdatedCalendar = ((JsonObject) updatedObject).mapTo(ModCalendarJson.class);
+                              if (calendarId.equals(mappedUpdatedCalendar.getId())) {
+                                if (mappedUpdatedCalendar.getName().equals(mappedModCalendar.getName())) {
+                                  future.complete(calendarId);
+                                } else {
+                                  future.fail("Failed to update event description.");
+                                }
+                              }
+                            }
+                          }
+                        });
+                      } else {
+                        future.fail("Could not find event description.");
+                      }
+                    })
+                      .putHeader(TENANT_HEADER_KEY, TENANT)
+                      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+                      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+                      .exceptionHandler(e -> {
+                        future.fail(e);
+                      })
+                      .end();
+                  } else {
+                    future.fail("Failed to update description");
+                  }
+                })
+                  .putHeader(TENANT_HEADER_KEY, TENANT)
+                  .putHeader(TOKEN_HEADER_KEY, TOKEN)
+                  .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+                  .putHeader(ACCEPT_HEADER_KEY, "text/plain")
+                  .exceptionHandler(e -> {
+                    future.fail(e);
+                  })
+                  .end(JsonObject.mapFrom(mappedModCalendar).encode());
+              }
+            }
+          }
+        });
+      } else {
+        future.fail("Bad response: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
+    return future;
+  }
+
 
   private Future<String> updateDescription(String descriptionId, int startYear, int month, int day, int numberOfDays) {
     Calendar startDate = createStartDate(startYear, month, day);
@@ -592,6 +853,56 @@ public class CalendarIT {
       .putHeader(TENANT_HEADER_KEY, TENANT)
       .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
       .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .exceptionHandler(e -> {
+        future.fail(e);
+      })
+      .end();
+    return future;
+  }
+
+  private Future<String> deleteCalendar(String calendarId) {
+    log.info("Deleting a calendar\n");
+    Future future = Future.future();
+    HttpClient client = vertx.createHttpClient();
+    client.delete(port, HOST, "/calendar/calendars/" + calendarId, res -> {
+      if (res.statusCode() >= 200 && res.statusCode() < 300) {
+        HttpClient clientForGet = vertx.createHttpClient();
+        clientForGet.get(port, HOST, "/calendar/calendars/", listResponse -> {
+          if (listResponse.statusCode() >= 200 && listResponse.statusCode() < 300) {
+            listResponse.bodyHandler(buffer -> {
+              JsonArray updatedCalendarList = buffer.toJsonObject().getJsonArray("calendars");
+              if (updatedCalendarList.size() > 0) {
+                for (Object updatedObject : updatedCalendarList) {
+                  if (updatedObject instanceof JsonObject) {
+                    ModCalendarJson mappedUpdatedCalendar = ((JsonObject) updatedObject).mapTo(ModCalendarJson.class);
+                    if (calendarId.equals(mappedUpdatedCalendar.getId())) {
+                      future.fail("Failed to update event description.");
+                    }
+                  }
+                }
+                future.complete(calendarId);
+              } else {
+                future.complete(calendarId);
+              }
+            });
+          } else {
+            future.fail("Could not find event description.");
+          }
+        })
+          .putHeader(TENANT_HEADER_KEY, TENANT)
+          .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+          .putHeader(ACCEPT_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+          .exceptionHandler(e -> {
+            future.fail(e);
+          })
+          .end();
+      } else {
+        future.fail("Failed to delete description with status: " + res.statusCode());
+      }
+    })
+      .putHeader(TENANT_HEADER_KEY, TENANT)
+      .putHeader(CONTENT_TYPE_HEADER_KEY, JSON_CONTENT_TYPE_HEADER_VALUE)
+      .putHeader(ACCEPT_HEADER_KEY, "text/plain")
       .exceptionHandler(e -> {
         future.fail(e);
       })

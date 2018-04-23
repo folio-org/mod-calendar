@@ -65,7 +65,14 @@ public class CalendarAPI implements CalendarResource {
         postgresClient.get(CALENDAR, ModCalendarJson.class, criterion, true, false, resultOfSelect -> {
           if (resultOfSelect.succeeded()) {
             ModCalendarCollection modCalendarCollection = new ModCalendarCollection();
-            modCalendarCollection.setCalendars((List<ModCalendarJson>) resultOfSelect.result().getResults());
+            List<ModCalendarJson> modCalendarJsons = new ArrayList<>();
+            for (Object object : resultOfSelect.result().getResults()) {
+              if (!(object instanceof ModCalendarJson)) {
+                continue;
+              }
+              modCalendarJsons.add((ModCalendarJson) object);
+            }
+            modCalendarCollection.setCalendars(modCalendarJsons);
             asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withJsonOK(modCalendarCollection)));
           } else {
             asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withPlainInternalServerError(resultOfSelect.cause().getMessage())));
@@ -85,17 +92,23 @@ public class CalendarAPI implements CalendarResource {
     Criterion criterion1 = new Criterion(new Criteria().addField("'calendarId'").setJSONB(true).setOperation("=").setValue("'" + modCalendarId + "'"));
     vertxContext.runOnContext(a -> {
       try {
-        postgresClient.delete(EVENT_DESCRIPTION, criterion1, result -> {
-          if (result.succeeded()) {
-            postgresClient.delete(CALENDAR, criterion, result2 -> {
-              if (result2.succeeded()) {
-                asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
+        postgresClient.delete(EVENT, criterion1, event -> {
+          if (event.succeeded()) {
+            postgresClient.delete(EVENT_DESCRIPTION, criterion1, result -> {
+              if (result.succeeded()) {
+                postgresClient.delete(CALENDAR, criterion, result2 -> {
+                  if (result2.succeeded()) {
+                    asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
+                  } else {
+                    asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(result.cause().getMessage())));
+                  }
+                });
               } else {
                 asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(result.cause().getMessage())));
               }
             });
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(result.cause().getMessage())));
+            asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(event.cause().getMessage())));
           }
         });
       } catch (Exception e) {
@@ -146,7 +159,14 @@ public class CalendarAPI implements CalendarResource {
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
               CalendarEventCollection calendarEventCollection = new CalendarEventCollection();
-              calendarEventCollection.setEvents((List<Event>) resultOfSelect.result().getResults());
+              List<Event> events = new ArrayList<>();
+              for (Object o : resultOfSelect.result().getResults()) {
+                if (!(o instanceof Event)) {
+                  continue;
+                }
+                events.add((Event) o);
+              }
+              calendarEventCollection.setEvents(events);
               calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
               asyncResultHandler
                 .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventsResponse.withJsonOK(calendarEventCollection)));
@@ -174,7 +194,13 @@ public class CalendarAPI implements CalendarResource {
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
               CalendarEventDescriptionCollection calendarEventCollection = new CalendarEventDescriptionCollection();
-              calendarEventCollection.setDescriptions((List<Description>) resultOfSelect.result().getResults());
+              List<Description> descriptions = new ArrayList<>();
+              for (Object o : resultOfSelect.result().getResults()) {
+                if (o instanceof Description) {
+                  descriptions.add((Description) o);
+                }
+              }
+              calendarEventCollection.setDescriptions(descriptions);
               calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
               asyncResultHandler
                 .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withJsonOK(calendarEventCollection)));
@@ -329,7 +355,6 @@ public class CalendarAPI implements CalendarResource {
     });
   }
 
-
   private String buildQueryForExistingEventsByDescription(Description description, String descriptionId) {
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append("calendarId =").append(description.getCalendarId());
@@ -354,8 +379,9 @@ public class CalendarAPI implements CalendarResource {
                 future.fail("No events can be generated in the given interval.")
               );
             } else {
-              Description createdDescription = description;
-              createdDescription.setId(replyDescriptor.result());
+//              Description createdDescription = description;
+//              createdDescription.setId(replyDescriptor.result());
+              description.setId(replyDescriptor.result());
               Future<Void> batchFuture = saveEventBatch(postgresClient, events);
               batchFuture.setHandler(batchSaveResponse -> {
                 if (batchSaveResponse.succeeded()) {
@@ -368,7 +394,8 @@ public class CalendarAPI implements CalendarResource {
                         subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                       }
                       subFuture.setHandler(subHandler ->
-                        future.complete(createdDescription)
+                          future.complete(description)
+//                        future.complete(createdDescription)
                       );
                     }
                   );
@@ -487,19 +514,16 @@ public class CalendarAPI implements CalendarResource {
 
   private Criterion buildCriterionForEventUpdate(List<?> results) {
     Criterion cr = new Criterion();
-
     for (int i = 0; i < results.size(); i++) {
       Description currDescription = (Description) results.get(i);
       Criteria crit = new Criteria();
       crit.addField("'startDate'");
       crit.setOperation(Criteria.OP_GREATER_THAN_EQ);
       crit.setValue(CalendarUtils.DATE_FORMATTER.print(currDescription.getStartDate().getTime()));
-
       Criteria otherCrit = new Criteria();
       otherCrit.addField("'endDate'");
       otherCrit.setOperation(Criteria.OP_LESS_THAN_EQ);
       otherCrit.setValue(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(currDescription.getEndDate())));
-
       if (i < results.size() - 1) {
         cr.addCriterion(crit, Criteria.OP_AND, otherCrit, Criteria.OP_OR);
       } else {
@@ -511,7 +535,6 @@ public class CalendarAPI implements CalendarResource {
     eventTypeCrit.setOperation(Criteria.OP_EQUAL);
     eventTypeCrit.setValue(DescriptionType.OPENING_DAY.toString());
     cr.addCriterion(eventTypeCrit);
-
     return cr;
   }
 

@@ -45,6 +45,7 @@
   "additionalProperties": false,
   "required": [
     "id",
+    "descriptionType",
     "calendarId",
     "startDate",
     "endDate"
