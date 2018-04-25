@@ -104,17 +104,13 @@ public class CalendarAPI implements CalendarResource {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     Criterion updateCalendarCriterion = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("->>").setOperation("=").setValue("'" + modCalendarId + "'"));
-    vertxContext.runOnContext(v -> {
-      postgresClient.startTx(beginTx -> {
-        postgresClient.update(CALENDAR, entity, updateCalendarCriterion, true, replyHandler -> {
-          if (replyHandler.succeeded()) {
-            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdResponse.withJsonNoContent(entity))));
-          } else {
-            postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainBadRequest(replyHandler.cause().getMessage()))));
-          }
-        });
-      });
-    });
+    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> postgresClient.update(CALENDAR, entity, updateCalendarCriterion, true, replyHandler -> {
+      if (replyHandler.succeeded()) {
+        postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdResponse.withJsonNoContent(entity))));
+      } else {
+        postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainBadRequest(replyHandler.cause().getMessage()))));
+      }
+    })));
   }
 
   @Override
