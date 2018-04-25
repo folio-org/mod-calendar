@@ -36,23 +36,15 @@ public class CalendarAPI implements CalendarResource {
   public void postCalendarCalendars(ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    vertxContext.runOnContext(v -> postgresClient.startTx(beginTx -> {
-      try {
-        postgresClient.save(beginTx, CALENDAR, entity, reply -> {
-          if (reply.succeeded()) {
-            postgresClient.endTx(beginTx, done -> {
-              asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsResponse.withJsonCreated(entity)));
-            });
-          } else {
-            asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsResponse.withPlainInternalServerError(reply.cause().getMessage())));
-          }
-        });
-      } catch (Exception e) {
-        asyncResultHandler.handle(Future.succeededFuture(
-          PostCalendarCalendarsResponse.withPlainInternalServerError(
-            e.getMessage())));
-      }
-    }));
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx -> postgresClient.save(beginTx, CALENDAR, entity, reply -> {
+        if (reply.succeeded()) {
+          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsResponse.withJsonCreated(entity))));
+        } else {
+          postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsResponse.withPlainInternalServerError(reply.cause().getMessage()))));
+        }
+      }))
+    );
   }
 
   @Override
@@ -60,82 +52,68 @@ public class CalendarAPI implements CalendarResource {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     Criterion criterion = new Criterion(new Criteria().setJSONB(true));
-    vertxContext.runOnContext(a -> {
-      try {
+    vertxContext.runOnContext(a ->
+      postgresClient.startTx(beginTx ->
         postgresClient.get(CALENDAR, ModCalendarJson.class, criterion, true, false, resultOfSelect -> {
           if (resultOfSelect.succeeded()) {
             ModCalendarCollection modCalendarCollection = new ModCalendarCollection();
             List<ModCalendarJson> modCalendarJsons = new ArrayList<>();
             for (Object object : resultOfSelect.result().getResults()) {
-              if (!(object instanceof ModCalendarJson)) {
-                continue;
+              if (object instanceof ModCalendarJson) {
+                modCalendarJsons.add((ModCalendarJson) object);
               }
-              modCalendarJsons.add((ModCalendarJson) object);
             }
             modCalendarCollection.setCalendars(modCalendarJsons);
-            asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withJsonOK(modCalendarCollection)));
+            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withJsonOK(modCalendarCollection))));
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withPlainInternalServerError(resultOfSelect.cause().getMessage())));
+            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withPlainInternalServerError(resultOfSelect.cause().getMessage()))));
           }
-        });
-      } catch (Exception e) {
-        asyncResultHandler.handle(Future.succeededFuture(GetCalendarCalendarsResponse.withPlainInternalServerError(e.getMessage())));
-      }
-    });
+        })));
   }
 
   @Override
   public void deleteCalendarCalendarsByModCalendarId(String modCalendarId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criterion criterion = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("=").setValue("'" + modCalendarId + "'"));
-    Criterion criterion1 = new Criterion(new Criteria().addField("'calendarId'").setJSONB(true).setOperation("=").setValue("'" + modCalendarId + "'"));
-    vertxContext.runOnContext(a -> {
-      try {
-        postgresClient.delete(EVENT, criterion1, event -> {
-          if (event.succeeded()) {
-            postgresClient.delete(EVENT_DESCRIPTION, criterion1, result -> {
-              if (result.succeeded()) {
-                postgresClient.delete(CALENDAR, criterion, result2 -> {
-                  if (result2.succeeded()) {
-                    asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withNoContent()));
-                  } else {
-                    asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(result.cause().getMessage())));
-                  }
-                });
+    Criterion criterionForCalendar = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("=").setValue("'" + modCalendarId + "'"));
+    Criterion criterionForEventDescriptions = new Criterion(new Criteria().addField("'calendarId'").setJSONB(true).setOperation("=").setValue("'" + modCalendarId + "'"));
+    vertxContext.runOnContext(a -> postgresClient.startTx(beginTx -> postgresClient.delete(EVENT, criterionForEventDescriptions, eventDeleteResult -> {
+      if (eventDeleteResult.succeeded()) {
+        postgresClient.delete(EVENT_DESCRIPTION, criterionForEventDescriptions, descriptionDeleteResult -> {
+          if (descriptionDeleteResult.succeeded()) {
+            postgresClient.delete(CALENDAR, criterionForCalendar, calendarDeleteResult -> {
+              if (calendarDeleteResult.succeeded()) {
+                postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withNoContent()))
+                );
               } else {
-                asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(result.cause().getMessage())));
+                postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(descriptionDeleteResult.cause().getMessage()))));
               }
             });
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(event.cause().getMessage())));
+            postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(descriptionDeleteResult.cause().getMessage()))));
           }
         });
-      } catch (Exception e) {
-        asyncResultHandler.handle(Future.succeededFuture(
-          DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-            e.getMessage())));
+      } else {
+        postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(eventDeleteResult.cause().getMessage()))));
       }
-    });
+    })));
   }
 
   @Override
   public void putCalendarCalendarsByModCalendarId(String modCalendarId, ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criterion criterion = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("->>").setOperation("=").setValue("'" + modCalendarId + "'"));
+    Criterion updateCalendarCriterion = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("->>").setOperation("=").setValue("'" + modCalendarId + "'"));
     vertxContext.runOnContext(v -> {
-      try {
-        postgresClient.update(CALENDAR, entity, criterion, true, replyHandler -> {
+      postgresClient.startTx(beginTx -> {
+        postgresClient.update(CALENDAR, entity, updateCalendarCriterion, true, replyHandler -> {
           if (replyHandler.succeeded()) {
-            asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdResponse.withJsonNoContent(entity)));
+            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdResponse.withJsonNoContent(entity))));
           } else {
-            asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainBadRequest(replyHandler.cause().getMessage())));
+            postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainBadRequest(replyHandler.cause().getMessage()))));
           }
         });
-      } catch (Exception e) {
-        asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdResponse.withPlainInternalServerError(e.getMessage())));
-      }
+      });
     });
   }
 
@@ -155,27 +133,27 @@ public class CalendarAPI implements CalendarResource {
         }
         CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, queryBuilder.toString());
-        postgresClient.get(EVENT, Event.class, cql, true, true,
+        postgresClient.startTx(beginTx -> postgresClient.get(EVENT, Event.class, cql, true, true,
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
               CalendarEventCollection calendarEventCollection = new CalendarEventCollection();
               List<Event> events = new ArrayList<>();
               for (Object o : resultOfSelect.result().getResults()) {
-                if (!(o instanceof Event)) {
-                  continue;
+                if (o instanceof Event) {
+                  events.add((Event) o);
                 }
-                events.add((Event) o);
               }
               calendarEventCollection.setEvents(events);
               calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
-              asyncResultHandler
-                .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventsResponse.withJsonOK(calendarEventCollection)));
+              postgresClient.endTx(beginTx, done -> asyncResultHandler
+                .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventsResponse.withJsonOK(calendarEventCollection))));
             } else {
-              asyncResultHandler.handle(Future.succeededFuture(
+              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                 GetCalendarCalendarsByModCalendarIdEventsResponse.withPlainInternalServerError(
-                  resultOfSelect.cause().getMessage())));
+                  resultOfSelect.cause().getMessage())))
+              );
             }
-          });
+          }));
       } catch (Exception e) {
         asyncResultHandler.handle(Future.succeededFuture(
           GetCalendarCalendarsByModCalendarIdEventsResponse.withPlainInternalServerError(
@@ -190,7 +168,7 @@ public class CalendarAPI implements CalendarResource {
     vertxContext.runOnContext(v -> {
       try {
         CQLWrapper cql = new CQLWrapper();
-        postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true, true,
+        postgresClient.startTx(beginTx -> postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true, true,
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
               CalendarEventDescriptionCollection calendarEventCollection = new CalendarEventDescriptionCollection();
@@ -202,14 +180,14 @@ public class CalendarAPI implements CalendarResource {
               }
               calendarEventCollection.setDescriptions(descriptions);
               calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
-              asyncResultHandler
-                .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withJsonOK(calendarEventCollection)));
+              postgresClient.endTx(beginTx, done -> asyncResultHandler
+                .handle(Future.succeededFuture(GetCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withJsonOK(calendarEventCollection))));
             } else {
-              asyncResultHandler.handle(Future.succeededFuture(
+              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                 GetCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withPlainInternalServerError(
-                  resultOfSelect.cause().getMessage())));
+                  resultOfSelect.cause().getMessage()))));
             }
-          });
+          }));
       } catch (Exception e) {
         asyncResultHandler.handle(Future.succeededFuture(
           GetCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withPlainInternalServerError(
@@ -229,29 +207,29 @@ public class CalendarAPI implements CalendarResource {
         checkDescriptionInput(description);
         CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
         CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
-        postgresClient.get(EVENT, Event.class, cql, true,
+        postgresClient.startTx(beginTx -> postgresClient.get(EVENT, Event.class, cql, true,
           replyOfGetEventsByDate -> {
             if (replyOfGetEventsByDate.failed()) {
-              asyncResultHandler.handle(Future.succeededFuture(
+              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                 PostCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withPlainInternalServerError(
-                  "Error while listing events.")));
+                  "Error while listing events."))));
             } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
               Future<Description> eventDescriptionSaveResponse = saveEventDescription(postgresClient, description);
               eventDescriptionSaveResponse.setHandler(saveHandler -> {
                 if (saveHandler.succeeded()) {
-                  asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withJsonCreated(eventDescriptionSaveResponse.result())));
+                  postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withJsonCreated(eventDescriptionSaveResponse.result()))));
                 } else {
-                  asyncResultHandler.handle(Future.succeededFuture(
+                  postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                     PostCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withPlainInternalServerError(
-                      saveHandler.cause().getMessage())));
+                      saveHandler.cause().getMessage()))));
                 }
               });
             } else {
-              asyncResultHandler.handle(Future.succeededFuture(
+              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                 PostCalendarCalendarsByModCalendarIdEventdescriptionsResponse.withPlainConflict(
-                  "Intervals can not overlap")));
+                  "Intervals can not overlap"))));
             }
-          });
+          }));
       } catch (CalendarIntervalException e) {
         log.warn(e.getMessage());
         asyncResultHandler.handle(Future.succeededFuture(
@@ -310,12 +288,12 @@ public class CalendarAPI implements CalendarResource {
                 checkDescriptionInput(description);
                 CQL2PgJSON cql2pgJson = new CQL2PgJSON(EVENT + JSONB_POSTFIX);
                 CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, description.getId()));
-                postgresClient.get(EVENT, Event.class, cql, true,
+                postgresClient.startTx(beginTx -> postgresClient.get(EVENT, Event.class, cql, true,
                   replyOfGetEventsByDate -> {
                     if (replyOfGetEventsByDate.failed()) {
-                      asyncResultHandler.handle(Future.succeededFuture(
+                      postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
                         PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
-                          "Error while listing events.")));
+                          "Error while listing events."))));
                     } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
                       updateEventDescription(postgresClient, description).setHandler(updateFutureResponse -> {
                         if (updateFutureResponse.failed()) {
@@ -332,7 +310,7 @@ public class CalendarAPI implements CalendarResource {
                         PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse.withPlainInternalServerError(
                           "Intervals can not overlap!")));
                     }
-                  });
+                  }));
               } catch (CalendarIntervalException e) {
                 log.warn(e.getMessage());
                 asyncResultHandler.handle(Future.succeededFuture(PutCalendarCalendarsByModCalendarIdEventdescriptionsByEventDescriptionIdResponse
@@ -379,8 +357,6 @@ public class CalendarAPI implements CalendarResource {
                 future.fail("No events can be generated in the given interval.")
               );
             } else {
-//              Description createdDescription = description;
-//              createdDescription.setId(replyDescriptor.result());
               description.setId(replyDescriptor.result());
               Future<Void> batchFuture = saveEventBatch(postgresClient, events);
               batchFuture.setHandler(batchSaveResponse -> {
@@ -394,8 +370,7 @@ public class CalendarAPI implements CalendarResource {
                         subFuture = updateEventStatusByException(postgresClient, description, Boolean.FALSE);
                       }
                       subFuture.setHandler(subHandler ->
-                          future.complete(description)
-//                        future.complete(createdDescription)
+                        future.complete(description)
                       );
                     }
                   );
@@ -407,7 +382,9 @@ public class CalendarAPI implements CalendarResource {
               });
             }
           } else {
-            future.fail(replyDescriptor.cause());
+            postgresClient.endTx(beginTx, done -> {
+              future.fail(replyDescriptor.cause());
+            });
           }
         });
       } catch (Exception e) {
@@ -657,14 +634,13 @@ public class CalendarAPI implements CalendarResource {
           } else {
             List<Future> deleteFutureResults = new ArrayList<>();
             for (Object eventObj : replyGetEventId.result().getResults()) {
-              if (!(eventObj instanceof Event)) {
-                continue;
+              if (eventObj instanceof Event) {
+                Event event = (Event) eventObj;
+                String eventId = event.getId();
+                Future deleteFuture = Future.future();
+                deleteObject(postgresClient, eventId, EVENT).setHandler(deleteFuture.completer());
+                deleteFutureResults.add(deleteFuture);
               }
-              Event event = (Event) eventObj;
-              String eventId = event.getId();
-              Future deleteFuture = Future.future();
-              deleteObject(postgresClient, eventId, EVENT).setHandler(deleteFuture.completer());
-              deleteFutureResults.add(deleteFuture);
             }
             CompositeFuture.all(deleteFutureResults).setHandler(ar -> {
               if (ar.succeeded()) {
