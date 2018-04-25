@@ -8,40 +8,16 @@
       "handlers": [
         {
           "methods": [
-            "POST", "GET"
-          ],
-          "pathPattern": "/calendar/calendars",
-          "permissionsRequired": [
-            "calendar.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "DELETE",
-            "PUT"
-          ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}",
-          "permissionsRequired": [
-            "calendar.collection.add",
-            "calendar.collection.remove"
-          ]
-
-        },
-        {
-          "methods": [
             "GET"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}/events",
-          "permissionsRequired": [
-            "calendar.collection.get"
-          ]
+          "pathPattern": "/calendar/events"
         },
         {
           "methods": [
             "GET",
             "POST"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}/eventdescriptions",
+          "pathPattern": "/calendar/eventdescriptions",
           "permissionsRequired": [
             "calendar.collection.add",
             "calendar.collection.get"
@@ -51,7 +27,7 @@
           "methods": [
             "DELETE"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}/eventdescriptions/{eventDescriptionId}",
+          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
           "permissionsRequired": [
             "calendar.collection.remove"
           ]
@@ -60,7 +36,7 @@
           "methods": [
             "PUT"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}/eventdescriptions/{eventDescriptionId}",
+          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
           "permissionsRequired": [
             "calendar.collection.add"
           ]

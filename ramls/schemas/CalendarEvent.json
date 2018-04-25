@@ -6,9 +6,6 @@
     "id": {
       "type": "string"
     },
-    "calendarId": {
-      "type": "string"
-    },
     "descriptionId": {
       "type": "string"
     },
@@ -36,7 +33,6 @@
   "additionalProperties": false,
   "required": [
     "id",
-    "calendarId",
     "descriptionId",
     "eventType",
     "startDate",

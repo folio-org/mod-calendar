@@ -8,8 +8,6 @@ documentation:
     content: This module provides a backend for the calendar functionalities
 
 schemas:
-  - ModCalendar.json: !include schemas/ModCalendar.json
-  - ModCalendarCollection: !include schemas/ModCalendarCollection.json
   - CalendarEvent.json: !include schemas/CalendarEvent.json
   - CalendarEventCollection: !include schemas/CalendarEventCollection.json
   - CalendarEventDescription.json: !include schemas/CalendarEventDescription.json
@@ -18,48 +16,80 @@ schemas:
   - OpeningHour.json: !include schemas/OpeningHour.json
 
 /calendar:
-  /calendars:
-    post:
-      body:
-        application/json:
-          schema: ModCalendar.json
-      description: Saves the new modCalendar
-      responses:
-        201:
-          description: Returns the created mod calendar
-          body:
-            application/json:
-              schema: ModCalendar.json
-        400:
-          description: "Bad request"
-          body:
-            text/plain:
-              example: "Calendar cant be generated"
-        500:
-          description: "Internal server error"
-          body:
-            text/plain:
-              example: "Internal server error"
+  /events:
     get:
-      description: List calendars for view
+      queryParameters:
+        from:
+          displayName: From
+          type: string
+          description: Start date of listing events
+          example: 2017-01-01
+          required: false
+        to:
+          displayName: To
+          type: string
+          description: End date of listing events
+          example: 2017-01-31
+          required: false
+      description: List events for the calendar view
       responses:
         200:
           body:
             application/json:
-              schema: ModCalendarCollection
+              schema: CalendarEventCollection
         500:
           description: "Internal server error"
           body:
             text/plain:
               example: "Internal server error"
-    /{modCalendarId}:
+  /eventdescriptions:
+    get:
+      description: List event intervals
+      responses:
+        200:
+          body:
+            application/json:
+              schema: CalendarEventDescriptionCollection
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+    post:
+      body:
+        application/json:
+          schema: CalendarEventDescription.json
+      description: Saves the calendar event description and generates the calendar events
+      responses:
+        201:
+          description: Returns the created event description
+          body:
+            application/json:
+              schema: CalendarEventDescription.json
+        400:
+          description: "Bad request"
+          body:
+            text/plain:
+              example: "No events can be generated in the given interval"
+        409:
+          description: "There is already a description in the given interval"
+          body:
+            text/plain:
+              example: "Intervals can not overlap"
+        500:
+          description: "Internal server error"
+          body:
+            text/plain:
+              example: "Internal server error"
+
+    /{eventDescriptionId}:
       delete:
-        description: Delete ModCalendar by Id
+        description: Delete EventDescription by Id
         responses:
           204:
-           description: "Calendar deleted successfully"
+           description: "EventDescription deleted successfully"
           404:
-            description: "Calendar with a given ID not found"
+            description: "EventDescription with a given ID not found"
             body:
               text/plain:
                 example: |
@@ -75,144 +105,29 @@ schemas:
             body:
               text/plain:
                 example: "Internal server error, contact administrator"
+
       put:
-        description: update Calendar by id
+        description: Modify EventDescription
         body:
           application/json:
-              schema: ModCalendar.json
+              schema: CalendarEventDescription.json
         responses:
           204:
-            description: "Calendar successfully updated"
-            body:
-              application/json:
-                schema: ModCalendar.json
+            description: "EventDescription successfully updated"
           404:
-            description: "Calendar with a given ID not found"
+            description: "EventDescription with a given ID not found"
             body:
               text/plain:
                 example: |
-                  "Calendar not found"
+                  "EventDescription not found"
           400:
             description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             body:
               text/plain:
                 example: |
-                  "unable to update calendar"
+                  "unable to update event"
           500:
             description: "Internal server error, e.g. due to misconfiguration"
             body:
               text/plain:
                 example: "internal server error, contact administrator"
-      /events:
-        get:
-          queryParameters:
-            from:
-              displayName: From
-              type: string
-              description: Start date of listing events
-              example: 2017-01-01
-              required: false
-            to:
-              displayName: To
-              type: string
-              description: End date of listing events
-              example: 2017-01-31
-              required: false
-          description: List events for the calendar view
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: CalendarEventCollection
-            500:
-              description: "Internal server error"
-              body:
-                text/plain:
-                  example: "Internal server error"
-      /eventdescriptions:
-        get:
-          description: List event intervals
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: CalendarEventDescriptionCollection
-            500:
-              description: "Internal server error"
-              body:
-                text/plain:
-                  example: "Internal server error"
-        post:
-          body:
-            application/json:
-              schema: CalendarEventDescription.json
-          description: Saves the calendar event description and generates the calendar events
-          responses:
-            201:
-              description: Returns the created event description
-              body:
-                application/json:
-                  schema: CalendarEventDescription.json
-            400:
-              description: "Bad request"
-              body:
-                text/plain:
-                  example: "No events can be generated in the given interval"
-            409:
-              description: "There is already a description in the given interval"
-              body:
-                text/plain:
-                  example: "Intervals can not overlap"
-            500:
-              description: "Internal server error"
-              body:
-                text/plain:
-                  example: "Internal server error"
-        /{eventDescriptionId}:
-          delete:
-            description: Delete EventDescription by Id
-            responses:
-              204:
-               description: "EventDescription deleted successfully"
-              404:
-                description: "EventDescription with a given ID not found"
-                body:
-                  text/plain:
-                    example: |
-                      "<<resourcePathName|!singularize>> not found"
-              400:
-                description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-                body:
-                  text/plain:
-                    example: |
-                      "unable to delete <<resourcePathName|!singularize>> -- constraint violation"
-              500:
-                description: "Internal server error, e.g. due to misconfiguration"
-                body:
-                  text/plain:
-                    example: "Internal server error, contact administrator"
-          put:
-            description: Modify EventDescription
-            body:
-              application/json:
-                  schema: CalendarEventDescription.json
-            responses:
-              204:
-                description: "EventDescription successfully updated"
-              404:
-                description: "EventDescription with a given ID not found"
-                body:
-                  text/plain:
-                    example: |
-                      "EventDescription not found"
-              400:
-                description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-                body:
-                  text/plain:
-                    example: |
-                      "unable to update event"
-              500:
-                description: "Internal server error, e.g. due to misconfiguration"
-                body:
-                  text/plain:
-                    example: "internal server error, contact administrator"
