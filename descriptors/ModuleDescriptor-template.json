@@ -10,20 +10,31 @@
           "methods": [
             "POST", "GET"
           ],
-          "pathPattern": "/calendar/calendars"
+          "pathPattern": "/calendar/calendars",
+          "permissionsRequired": [
+            "calendar.collection.get"
+          ]
         },
         {
           "methods": [
             "DELETE",
             "PUT"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}"
+          "pathPattern": "/calendar/calendars/{modCalendarId}",
+          "permissionsRequired": [
+            "calendar.collection.add",
+            "calendar.collection.remove"
+          ]
+
         },
         {
           "methods": [
             "GET"
           ],
-          "pathPattern": "/calendar/calendars/{modCalendarId}/events"
+          "pathPattern": "/calendar/calendars/{modCalendarId}/events",
+          "permissionsRequired": [
+            "calendar.collection.get"
+          ]
         },
         {
           "methods": [
