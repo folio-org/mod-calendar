@@ -1,23 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Calendar event description",
+  "title": "Opening period",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     },
-    "calendarId": {
+    "name": {
       "type": "string"
     },
-    "description": {
+    "servicePointId": {
       "type": "string"
     },
-    "descriptionType": {
-      "type": "string",
-      "enum": [
-        "OPENING_DAY",
-        "EXCEPTION"
-      ]
+    "isException": {
+      "type": "boolean"
     },
     "startDate": {
       "type": "string",
@@ -44,10 +40,6 @@
   },
   "additionalProperties": false,
   "required": [
-    "id",
-    "descriptionType",
-    "calendarId",
-    "startDate",
-    "endDate"
+    "startDate"
   ]
 }

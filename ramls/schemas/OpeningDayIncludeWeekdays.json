@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Opening day include weekdays",
+  "type": "object",
+  "properties": {
+    "weekdays": {
+      "type": "object",
+      "$ref": "Weekdays.json"
+    },
+    "openingDay": {
+      "type": "object",
+      "$ref": "OpeningDay.json"
+    }
+  },
+  "additionalProperties": false
+}
