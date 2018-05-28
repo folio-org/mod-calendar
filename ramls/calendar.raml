@@ -39,7 +39,7 @@ schemas:
               application/json:
                 schema: OpeningPeriodCollection
           404:
-            description: "Not found"
+            description: "Not found. There is no service point with the given ID"
           500:
             description: "Internal server error"
       post:
@@ -62,9 +62,9 @@ schemas:
           description: Delete Opening period by Id
           responses:
             204:
-             description: "Opening period deleted successfully"
+             description: "Opening period was deleted successfully"
             404:
-              description: "Opening period with a given ID not found"
+              description: "Opening period or service point with the given ID is not found"
             400:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
@@ -76,12 +76,12 @@ schemas:
                 schema: OpeningPeriod.json
           responses:
             204:
-              description: "Calendar successfully updated"
+              description: "Opening period successfully updated"
               body:
                 application/json:
                   schema: OpeningPeriod.json
             404:
-              description: "Calendar with a given ID not found"
+              description: "Opening period or service point with the given ID is not found"
             400:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
@@ -95,42 +95,34 @@ schemas:
               description: date, start date
               example: 2017-05-24
               required: true
-            isDays:
-              displayName: isDays
-              type: boolean
-              description: Is it days
+            unit:
+              displayName: unit
+              type: string
+              enum:
+                - day
+                - hour
+              description: "Calculate in days or hours. Default: day."
               required: false
-            loanDays:
-              displayName: loanDays
+            amount:
+              displayName: amount
               type: integer
-              description: number of loan days, to calculate due date. Can't use with loanHours parameter together.
+              description: number of loan days or hours (based on unit), to calculate due date.
               example: 11
               required: false
-            includeClosedDays:
-              displayName: includeClosedDays
+            includeClosed:
+              displayName: includeClosed
               type: boolean
-              description: included or excluded the closed days. Default value is false. Parameter is ignored if loanDays undefined.
-              required: false
-            loanHours:
-              displayName: loanHours
-              type: integer
-              description: number of loan hours, to calculate due date. Can't use with loanDays parameter together.
-              example: 60
-              required: false
-            includeClosedHours:
-              displayName: includeClosedHours
-              type: boolean
-              description: included or excluded the closed hours. Default value is false. Parameter is ignored if loanHours undefined.
-              required: false
-          description: "This get responses three openings, these are the requested day, and it's next and previous dates openings.
-          It's for asking a specified day opening and it responses the nearest opening days.
-          Or for deciding that, the loan can be overnight or not.
-          And for count the due day with given hour or day with the option to count the closed time."
+              description: include or exclude the closed days or hours (based on unit) in calculation. Default value is false.
+          description: "This endpoint helps to calculate due date. The response contains three openings: the requested day,
+          next and previous dates openings which are closest to the requested day. Calculation can based on days or hours
+          to calculate overnight loans."
           responses:
             200:
               body:
                 application/json:
                   schema: Opening.json
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             404:
               description: "Not found"
             500:
@@ -151,21 +143,23 @@ schemas:
               example: 2017-05-24
               required: true
             unit:
-              displayName: isDays
+              displayName: unit
               type: string
               enum:
                 - day
                 - hours
-              description: Calculating days or hours.
+              description: "Calculate in days or hours. Default: day."
               required: false
-          description: This endpoint responses the number of opening day/hour between a time intervall.
+          description: "This endpoint helps to calculate penalty. Responses the number of opening days or hours (based on unit) between a time interval
+          both taking into consideration the only the regular and the exceptional opening."
           responses:
             200:
               body:
                 application/json:
                   schema: Duration.json
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             404:
               description: "Not found"
             500:
               description: "Internal server error"
-
