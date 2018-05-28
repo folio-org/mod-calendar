@@ -1,19 +1,16 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-
 public class CalendarAPI {
-  //public class CalendarAPI implements CalendarResource {
+  private CalendarAPI() {
+  }
+/*
+
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
 
   private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
   private static final String JSONB_POSTFIX = ".jsonb";
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
-/*
   @Override
   public void postCalendarCalendars(ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));

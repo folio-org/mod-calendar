@@ -1,12 +1,4 @@
 package org.folio.rest.utils;
-/*
-import org.apache.commons.lang3.BooleanUtils;
-import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.Event;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
-import org.joda.time.DateTime;
-*/
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -35,7 +27,8 @@ public class CalendarUtils {
     return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
   }
 
- /* public static List<Object> separateEvents(Description entity, String generatedId) {
+ /*
+    public static List<Object> separateEvents(Description entity, String generatedId) {
     List<Object> events = new ArrayList<>();
 
     Calendar startCal = Calendar.getInstance();
