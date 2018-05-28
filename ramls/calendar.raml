@@ -8,126 +8,158 @@ documentation:
     content: This module provides a backend for the calendar functionalities
 
 schemas:
-  - CalendarEvent.json: !include schemas/CalendarEvent.json
-  - CalendarEventCollection: !include schemas/CalendarEventCollection.json
-  - CalendarEventDescription.json: !include schemas/CalendarEventDescription.json
-  - CalendarEventDescriptionCollection: !include schemas/CalendarEventDescriptionCollection.json
-  - OpeningDay.json: !include schemas/OpeningDay.json
+  - OpeningPeriod.json: !include schemas/OpeningPeriod.json
+  - OpeningPeriodCollection: !include schemas/OpeningPeriodCollection.json
+  - OpeningDay.json: !include schemas/OpeningDayIncludeWeekdays.json
   - OpeningHour.json: !include schemas/OpeningHour.json
+  - Duration.json: !include schemas/Duration.json
+  - Opening.json: !include schemas/Opening.json
+  - Weekdays.json: !include schemas/Weekdays.json
+  - OpeningDayWithDate.json: !include schemas/OpeningDayWithDate.json
 
 /calendar:
-  /events:
-    get:
-      queryParameters:
-        from:
-          displayName: From
-          type: string
-          description: Start date of listing events
-          example: 2017-01-01
-          required: false
-        to:
-          displayName: To
-          type: string
-          description: End date of listing events
-          example: 2017-01-31
-          required: false
-      description: List events for the calendar view
-      responses:
-        200:
-          body:
-            application/json:
-              schema: CalendarEventCollection
-        500:
-          description: "Internal server error"
-          body:
-            text/plain:
-              example: "Internal server error"
-  /eventdescriptions:
-    get:
-      description: List event intervals
-      responses:
-        200:
-          body:
-            application/json:
-              schema: CalendarEventDescriptionCollection
-        500:
-          description: "Internal server error"
-          body:
-            text/plain:
-              example: "Internal server error"
-    post:
-      body:
-        application/json:
-          schema: CalendarEventDescription.json
-      description: Saves the calendar event description and generates the calendar events
-      responses:
-        201:
-          description: Returns the created event description
-          body:
-            application/json:
-              schema: CalendarEventDescription.json
-        400:
-          description: "Bad request"
-          body:
-            text/plain:
-              example: "No events can be generated in the given interval"
-        409:
-          description: "There is already a description in the given interval"
-          body:
-            text/plain:
-              example: "Intervals can not overlap"
-        500:
-          description: "Internal server error"
-          body:
-            text/plain:
-              example: "Internal server error"
-
-    /{eventDescriptionId}:
-      delete:
-        description: Delete EventDescription by Id
+  /openingperiod:
+    /{servicepointId}:
+      get:
+        queryParameters:
+          withPeriods:
+            displayName: withPeriods
+            type: boolean
+            description: Include time periods in response. Default false.
+            required: false
+          withExceptions:
+            displayName: withExceptions
+            type: boolean
+            description: Include exceptions in response. Default false.
+            required: false
+        description: List opening periods. The default response is the period names and it's dates.
         responses:
-          204:
-           description: "EventDescription deleted successfully"
+          200:
+            body:
+              application/json:
+                schema: OpeningPeriodCollection
           404:
-            description: "EventDescription with a given ID not found"
-            body:
-              text/plain:
-                example: |
-                  "<<resourcePathName|!singularize>> not found"
-          400:
-            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            body:
-              text/plain:
-                example: |
-                  "unable to delete <<resourcePathName|!singularize>> -- constraint violation"
+            description: "Not found. There is no service point with the given ID"
           500:
-            description: "Internal server error, e.g. due to misconfiguration"
-            body:
-              text/plain:
-                example: "Internal server error, contact administrator"
-
-      put:
-        description: Modify EventDescription
+            description: "Internal server error"
+      post:
         body:
           application/json:
-              schema: CalendarEventDescription.json
+            schema: OpeningPeriod.json
+        description: Saves the new OpeningPeriod
         responses:
-          204:
-            description: "EventDescription successfully updated"
-          404:
-            description: "EventDescription with a given ID not found"
+          201:
+            description: Returns with the created OpeningPeriod
             body:
-              text/plain:
-                example: |
-                  "EventDescription not found"
+              application/json:
+                schema: OpeningPeriod.json
           400:
-            description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            body:
-              text/plain:
-                example: |
-                  "unable to update event"
+            description: "Bad request"
           500:
-            description: "Internal server error, e.g. due to misconfiguration"
-            body:
-              text/plain:
-                example: "internal server error, contact administrator"
+            description: "Internal server error"
+      /openingperiod/{openingPeriodId}:
+        delete:
+          description: Delete Opening period by Id
+          responses:
+            204:
+             description: "Opening period was deleted successfully"
+            404:
+              description: "Opening period or service point with the given ID is not found"
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            500:
+              description: "Internal server error, e.g. due to misconfiguration"
+        put:
+          description: update Opening period by id
+          body:
+            application/json:
+                schema: OpeningPeriod.json
+          responses:
+            204:
+              description: "Opening period successfully updated"
+              body:
+                application/json:
+                  schema: OpeningPeriod.json
+            404:
+              description: "Opening period or service point with the given ID is not found"
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            500:
+              description: "Internal server error, e.g. due to misconfiguration"
+      /calculateopening:
+        get:
+          queryParameters:
+            date:
+              displayName: date
+              type: string
+              description: date, start date
+              example: 2017-05-24
+              required: true
+            unit:
+              displayName: unit
+              type: string
+              enum:
+                - day
+                - hour
+              description: "Calculate in days or hours. Default: day."
+              required: false
+            amount:
+              displayName: amount
+              type: integer
+              description: number of loan days or hours (based on unit), to calculate due date.
+              example: 11
+              required: false
+            includeClosed:
+              displayName: includeClosed
+              type: boolean
+              description: include or exclude the closed days or hours (based on unit) in calculation. Default value is false.
+          description: "This endpoint helps to calculate due date. The response contains three openings: the requested day,
+          next and previous dates openings which are closest to the requested day. Calculation can based on days or hours
+          to calculate overnight loans."
+          responses:
+            200:
+              body:
+                application/json:
+                  schema: Opening.json
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            404:
+              description: "Not found"
+            500:
+              description: "Internal server error"
+      /calculateopeningduration:
+        get:
+          queryParameters:
+            startTime:
+              displayName: date
+              type: string
+              description: date, start date
+              example: 2017-05-24
+              required: false
+            endTime:
+              displayName: date
+              type: string
+              description: date, start date
+              example: 2017-05-24
+              required: true
+            unit:
+              displayName: unit
+              type: string
+              enum:
+                - day
+                - hours
+              description: "Calculate in days or hours. Default: day."
+              required: false
+          description: "This endpoint helps to calculate penalty. Responses the number of opening days or hours (based on unit) between a time interval
+          both taking into consideration the only the regular and the exceptional opening."
+          responses:
+            200:
+              body:
+                application/json:
+                  schema: Duration.json
+            400:
+              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
+            404:
+              description: "Not found"
+            500:
+              description: "Internal server error"

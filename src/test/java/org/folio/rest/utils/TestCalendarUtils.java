@@ -1,15 +1,14 @@
 package org.folio.rest.utils;
+//import org.folio.rest.jaxrs.model.Description;
+//import org.folio.rest.jaxrs.model.Event;
 
-import org.folio.rest.jaxrs.model.Description;
-import org.folio.rest.jaxrs.model.Event;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
 import org.junit.Test;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+//import org.folio.rest.jaxrs.model.OpeningHour;
 
 public class TestCalendarUtils {
   private static final int START_HOUR = 8;
@@ -24,7 +23,7 @@ public class TestCalendarUtils {
     DayOfWeek dayOfDate = CalendarUtils.dayOfDate(date);
     assertEquals(DayOfWeek.THURSDAY, dayOfDate);
   }
-
+/*
   @Test
   public void testSeparateEvents() {
 
@@ -94,4 +93,5 @@ public class TestCalendarUtils {
 
     return openingDay;
   }
+  */
 }

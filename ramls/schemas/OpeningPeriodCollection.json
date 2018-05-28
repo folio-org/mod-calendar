@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Calendar event description",
+  "title": "Opening period collection",
   "type": "object",
   "properties": {
-    "descriptions": {
+    "openingPeriods": {
       "type": "array",
-      "id": "descriptions",
+      "id": "OpeningPeriods",
       "items": {
         "type": "object",
-        "$ref": "CalendarEventDescription.json"
+        "$ref": "OpeningPeriod.json"
       }
     },
     "totalRecords": {
@@ -17,7 +17,7 @@
   },
   "additionalProperties": false,
   "required": [
-    "descriptions",
+    "openingPeriods",
     "totalRecords"
   ]
 }

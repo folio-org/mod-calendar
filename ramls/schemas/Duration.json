@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Duration",
+  "type": "object",
+  "properties": {
+    "duration": {
+      "type": "integer"
+    },
+    "durationWithExceptions": {
+      "type": "integer"
+    }
+  },
+  "additionalProperties": false
+}
