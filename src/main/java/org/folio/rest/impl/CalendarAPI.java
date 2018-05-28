@@ -1,37 +1,18 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.*;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.folio.rest.jaxrs.model.*;
-import org.folio.rest.jaxrs.model.Description.DescriptionType;
-import org.folio.rest.jaxrs.resource.CalendarResource;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.Criteria.UpdateSection;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.cql.CQLWrapper;
-import org.folio.rest.tools.utils.TenantTool;
-import org.folio.rest.utils.CalendarUtils;
-import org.joda.time.Interval;
-import org.joda.time.LocalTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.z3950.zing.cql.cql2pgjson.CQL2PgJSON;
 
-import javax.ws.rs.core.Response;
-import java.util.*;
-
-import static org.folio.rest.tools.ClientGenerator.OKAPI_HEADER_TENANT;
-import static org.folio.rest.utils.CalendarConstants.*;
-
-public class CalendarAPI implements CalendarResource {
+public class CalendarAPI {
+  //public class CalendarAPI implements CalendarResource {
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
   private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
   private static final String JSONB_POSTFIX = ".jsonb";
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
-
+/*
   @Override
   public void postCalendarCalendars(ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -689,4 +670,5 @@ public class CalendarAPI implements CalendarResource {
     endDate.add(Calendar.SECOND, 59);
     return endDate.getTimeInMillis();
   }
+*/
 }

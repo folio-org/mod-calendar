@@ -1,14 +1,7 @@
 package org.folio.rest.jaxrs.model;
 
-import org.junit.Test;
-
-import java.util.Date;
-import java.util.UUID;
-
-import static org.junit.Assert.assertEquals;
-
 public class EventTest {
-
+/*
   @Test
   public void testEventCreation() {
     Event event = createEvent();
@@ -62,5 +55,5 @@ public class EventTest {
 
     return calendarEventCollection;
   }
-
+*/
 }
