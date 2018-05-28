@@ -95,6 +95,7 @@ public class CalendarAPI {
     })));
   }
 
+
   @Override
   public void getCalendarEvents(String from, String to, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
