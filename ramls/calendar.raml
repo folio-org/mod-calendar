@@ -18,7 +18,7 @@ schemas:
   - OpeningDayWithDate.json: !include schemas/OpeningDayWithDate.json
 
 /calendar:
-  /openingperiod:
+  /openings:
     /{servicepointId}:
       get:
         queryParameters:
@@ -57,7 +57,7 @@ schemas:
             description: "Bad request"
           500:
             description: "Internal server error"
-      /openingperiod/{openingPeriodId}:
+      /hours/{openingPeriodId}:
         delete:
           description: Delete Opening period by Id
           responses:
