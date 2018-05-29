@@ -19,7 +19,36 @@ schemas:
 
 /calendar:
   /openings:
-    /{servicepointId}:
+    get:
+      queryParameters:
+        servicePointId:
+          displayName: servicePointId
+          type: string
+          description: Filter for service point. In case of parameter absence all service point will be included in response.
+          required: false
+        startDate:
+          displayName: startDate
+          type: date
+          description: Filter for start date.
+          example: 2018-05-01
+          required: false
+        endDate:
+          displayName: endDate
+          type: date
+          description: Filter for end date.
+          example: 2018-05-31
+          required: false
+      description: "List real opening periods including exceptions for custom date range. Mainly used by calendar display."
+      responses:
+        200:
+          body:
+            application/json:
+              schema: OpeningPeriodCollection
+        404:
+          description: "Not found. There is no service point with the given ID"
+        500:
+          description: "Internal server error"
+    /{servicePointId}:
       get:
         queryParameters:
           withPeriods:
@@ -31,6 +60,11 @@ schemas:
             displayName: withExceptions
             type: boolean
             description: Include exceptions in response. Default false.
+            required: false
+          showPast:
+            displayName: showPast
+            type: boolean
+            description: Include past openings in response. Default false.
             required: false
         description: List opening periods. The default response is the period names and it's dates.
         responses:
@@ -58,6 +92,17 @@ schemas:
           500:
             description: "Internal server error"
       /hours/{openingId}:
+        get:
+          description: List opening hours for given openingId.
+          responses:
+            200:
+              body:
+                application/json:
+                  schema: OpeningPeriod.json
+            404:
+              description: "Not found. There is no service point with the given ID"
+            500:
+              description: "Internal server error"
         delete:
           description: Delete Opening period by Id
           responses:
@@ -91,7 +136,7 @@ schemas:
           queryParameters:
             date:
               displayName: date
-              type: string
+              type: date
               description: date, start date
               example: 2017-05-24
               required: true
@@ -112,10 +157,11 @@ schemas:
             includeClosed:
               displayName: includeClosed
               type: boolean
-              description: include or exclude the closed days or hours (based on unit) in calculation. Default value is false.
+              description: include or exclude the closed days or hours (based on unit) in calculation. Default value is true.
           description: "This endpoint helps to calculate due date. The response contains three openings: the requested day,
           next and previous dates openings which are closest to the requested day. Calculation can based on days or hours
-          to calculate overnight loans."
+          to calculate overnight loans.
+          In case of existing amount parameter the requested day will be calculated: date + amount * unit otherwise it returns the date itself"
           responses:
             200:
               body:
@@ -132,13 +178,13 @@ schemas:
           queryParameters:
             startTime:
               displayName: date
-              type: string
+              type: date
               description: date, start date
               example: 2017-05-24
               required: false
             endTime:
               displayName: date
-              type: string
+              type: date
               description: date, start date
               example: 2017-05-24
               required: true
