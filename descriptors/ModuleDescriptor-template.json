@@ -10,14 +10,14 @@
           "methods": [
             "GET"
           ],
-          "pathPattern": "/calendar/events"
+          "pathPattern": "/calendar/openings"
         },
         {
           "methods": [
             "GET",
             "POST"
           ],
-          "pathPattern": "/calendar/eventdescriptions",
+          "pathPattern": "/calendar/openings/{servicePointId}",
           "permissionsRequired": [
             "calendar.collection.add",
             "calendar.collection.get"
@@ -25,20 +25,33 @@
         },
         {
           "methods": [
-            "DELETE"
+            "GET",
+            "DELETE",
+            "PUT"
           ],
-          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
+          "pathPattern": "/calendar/openings/{servicePointId}/hours/{openingId}",
           "permissionsRequired": [
+            "calendar.collection.get",
+            "calendar.collection.update",
             "calendar.collection.remove"
           ]
         },
         {
           "methods": [
-            "PUT"
+            "GET"
           ],
-          "pathPattern": "/calendar/eventdescriptions/{eventDescriptionId}",
+          "pathPattern": "/calendar/openings/{servicePointId}/calculateopening",
           "permissionsRequired": [
-            "calendar.collection.add"
+            "calendar.collection.get"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/calendar/openings/{servicePointId}/calculateopeningduration",
+          "permissionsRequired": [
+            "calendar.collection.get"
           ]
         }
       ]
