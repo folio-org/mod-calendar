@@ -1,15 +1,18 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Opening period",
+  "title": "Opening Hours",
   "type": "object",
   "properties": {
     "id": {
       "type": "string"
     },
-    "servicePointId": {
+    "calendarId": {
       "type": "string"
     },
-    "name": {
+    "descriptionId": {
+      "type": "string"
+    },
+    "eventType": {
       "type": "string"
     },
     "startDate": {
@@ -20,23 +23,23 @@
       "type": "string",
       "format": "date-time"
     },
-    "openingDays": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "$ref": "OpeningDay.json"
-      }
+    "allDay": {
+      "type": "boolean"
     },
-    "creationDate": {
-      "type": "string",
-      "format": "date-time"
+    "open": {
+      "type": "boolean"
     },
-    "createdBy": {
-      "type": "string"
+    "active": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false,
   "required": [
-    "startDate"
+    "id",
+    "calendarId",
+    "descriptionId",
+    "eventType",
+    "startDate",
+    "endDate"
   ]
 }
