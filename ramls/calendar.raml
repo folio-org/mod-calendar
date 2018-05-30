@@ -38,7 +38,7 @@ schemas:
           description: Filter for end date.
           example: 2018-05-31
           required: false
-      description: "List real opening periods including exceptions for custom date range. Mainly used by calendar display."
+      description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display."
       responses:
         200:
           body:
@@ -51,10 +51,10 @@ schemas:
     /{servicePointId}:
       get:
         queryParameters:
-          withPeriods:
-            displayName: withPeriods
+          withOpeningHours:
+            displayName: withOpeningHours
             type: boolean
-            description: Include time periods in response. Default false.
+            description: Include regular library hours in response. Default false.
             required: false
           withExceptions:
             displayName: withExceptions
@@ -66,7 +66,7 @@ schemas:
             type: boolean
             description: Include past openings in response. Default false.
             required: false
-        description: List opening periods. The default response is the period names and it's dates.
+        description: List regular library hours period. The default response contains the period names and it's dates.
         responses:
           200:
             body:
@@ -80,7 +80,7 @@ schemas:
         body:
           application/json:
             schema: OpeningPeriod.json
-        description: Saves the new OpeningPeriod
+        description: Saves the new regular library opening
         responses:
           201:
             description: Returns with the created OpeningPeriod
@@ -107,26 +107,26 @@ schemas:
           description: Delete Opening period by Id
           responses:
             204:
-             description: "Opening period was deleted successfully"
+             description: "Regular library hours period was deleted successfully"
             404:
-              description: "Opening period or service point with the given ID is not found"
+              description: "Regular library hours period or service point with the given ID is not found"
             400:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
               description: "Internal server error, e.g. due to misconfiguration"
         put:
-          description: update Opening period by id
+          description: update regular library hours period by id
           body:
             application/json:
                 schema: OpeningPeriod.json
           responses:
             204:
-              description: "Opening period successfully updated"
+              description: "Regular library hours period successfully updated"
               body:
                 application/json:
                   schema: OpeningPeriod.json
             404:
-              description: "Opening period or service point with the given ID is not found"
+              description: "Regular library hours period or service point with the given ID is not found"
             400:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
