@@ -8,7 +8,7 @@
       "id": "OpeningHoursRecords",
       "items": {
         "type": "object",
-        "$ref": "OpeningHoursCollection.json"
+        "$ref": "OpeningHours.json"
       }
     },
     "totalRecords": {

@@ -3,12 +3,12 @@
   "title": "Opening hours",
   "type": "object",
   "properties": {
-    "date": {
-      "type": "date-time"
-    },
     "openingDay": {
       "type": "object",
       "$ref": "OpeningDay.json"
+    },
+    "date": {
+      "type": "date-time"
     }
   },
   "additionalProperties": false

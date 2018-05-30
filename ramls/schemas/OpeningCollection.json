@@ -1,14 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Opening period collection",
+  "title": "Opening collection",
   "type": "object",
   "properties": {
     "openingPeriods": {
       "type": "array",
-      "id": "OpeningPeriods",
+      "id": "Openings",
       "items": {
         "type": "object",
-        "$ref": "OpeningPeriod.json"
+        "$ref": "Opening.json"
       }
     },
     "totalRecords": {
@@ -17,7 +17,7 @@
   },
   "additionalProperties": false,
   "required": [
-    "openingPeriods",
+    "openings",
     "totalRecords"
   ]
 }
