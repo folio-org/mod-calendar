@@ -2,7 +2,7 @@
   "scripts": [],
   "tables": [
     {
-      "tableName": "event_description",
+      "tableName": "openings",
       "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,
@@ -10,7 +10,7 @@
       "populateJsonWithId": true
     },
     {
-      "tableName": "event",
+      "tableName": "regular_hours",
       "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,
@@ -18,7 +18,23 @@
       "populateJsonWithId": true
     },
     {
-      "tableName": "calendar",
+      "tableName": "exceptions",
+      "pkColumnName": "_id",
+      "withMetadata": true,
+      "withAuditing": true,
+      "generateId": true,
+      "populateJsonWithId": true
+    },
+    {
+      "tableName": "exceptional_hours",
+      "pkColumnName": "_id",
+      "withMetadata": true,
+      "withAuditing": true,
+      "generateId": true,
+      "populateJsonWithId": true
+    },
+    {
+      "tableName": "actual_opening_hours",
       "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,

@@ -1,20 +1,42 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Given Opening",
+  "title": "Opening",
   "type": "object",
   "properties": {
-    "dayOpeningWithDate": {
-      "type": "object",
-      "$ref": "OpeningDayWithDate.json"
+    "id": {
+      "type": "string"
     },
-    "nextDayOpening": {
-      "type": "object",
-      "$ref": "OpeningDayWithDate.json"
+    "servicePointId": {
+      "type": "string"
     },
-    "previousDayOpening": {
-      "type": "object",
-      "$ref": "OpeningDayWithDate.json"
+    "name": {
+      "type": "string"
+    },
+    "startDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "endDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "openingDays": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "$ref": "OpeningDay.json"
+      }
+    },
+    "creationDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string"
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "required": [
+    "startDate"
+  ]
 }
