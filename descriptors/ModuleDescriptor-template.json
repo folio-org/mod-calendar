@@ -15,12 +15,31 @@
         {
           "methods": [
             "GET",
-            "POST"
+            "POST",
+            "PUT",
+            "DELETE"
           ],
-          "pathPattern": "/calendar/openings/{servicePointId}",
+          "pathPattern": "/calendar/openings/{servicePointId}/regular",
           "permissionsRequired": [
             "calendar.collection.add",
-            "calendar.collection.get"
+            "calendar.collection.get",
+            "calendar.collection.update",
+            "calendar.collection.remove"
+          ]
+        },
+        {
+          "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE"
+          ],
+          "pathPattern": "/calendar/openings/{servicePointId}/exceptional",
+          "permissionsRequired": [
+            "calendar.collection.add",
+            "calendar.collection.get",
+            "calendar.collection.update",
+            "calendar.collection.remove"
           ]
         },
         {
@@ -29,7 +48,20 @@
             "DELETE",
             "PUT"
           ],
-          "pathPattern": "/calendar/openings/{servicePointId}/hours/{openingId}",
+          "pathPattern": "/calendar/openings/{servicePointId}/regular/{openingId}",
+          "permissionsRequired": [
+            "calendar.collection.get",
+            "calendar.collection.update",
+            "calendar.collection.remove"
+          ]
+        },
+        {
+          "methods": [
+            "GET",
+            "DELETE",
+            "PUT"
+          ],
+          "pathPattern": "/calendar/openings/{servicePointId}/exceptional/{openingId}",
           "permissionsRequired": [
             "calendar.collection.get",
             "calendar.collection.update",
