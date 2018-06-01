@@ -8,7 +8,8 @@
       "$ref": "OpeningDay.json"
     },
     "date": {
-      "type": "date-time"
+      "type": "string",
+      "format": "date-time"
     }
   },
   "additionalProperties": false
