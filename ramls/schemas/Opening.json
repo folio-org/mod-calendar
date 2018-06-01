@@ -24,15 +24,8 @@
       "type": "array",
       "items": {
         "type": "object",
-        "$ref": "OpeningDay.json"
+        "$ref": "OpeningDayIncludeWeekdays.json"
       }
-    },
-    "creationDate": {
-      "type": "string",
-      "format": "date-time"
-    },
-    "createdBy": {
-      "type": "string"
     }
   },
   "additionalProperties": false,

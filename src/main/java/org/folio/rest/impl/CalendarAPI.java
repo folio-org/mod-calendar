@@ -1,16 +1,159 @@
 package org.folio.rest.impl;
 
+/*
+import io.vertx.core.*;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.OpeningPeriod_;
+import org.folio.rest.jaxrs.resource.CalendarResource;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.utils.TenantTool;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.core.Response;
+import java.util.*;
+
+import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
+
+*/
 public class CalendarAPI {
   private CalendarAPI() {
   }
-/*
 
+/*
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
 
   private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
   private static final String JSONB_POSTFIX = ".jsonb";
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+
+  @Override
+  public void getCalendarOpenings(String servicePointId, Date startDate, Date endDate, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdRegular(String servicePointId, Boolean withOpeningHours, Boolean withExceptions, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void postCalendarOpeningsByServicePointIdRegular(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+    entity.setStartDate(new Date());
+    entity.setEndDate(new Date());
+    entity.setId("0");
+    entity.setName("teszt");
+    entity.setServicePointId("1");
+
+    OpeningDay_ openingDay = new OpeningDay_();
+    openingDay.
+    openingDay.setOpen(true);
+
+
+    List<OpeningHour> openingHours = new ArrayList<>();
+    OpeningHour openingHour = new OpeningHour();
+    openingHour.setStartTime("08:00");
+    openingHour.setEndTime("17:00");
+    openingHours.add(openingHour);
+
+    List<OpeningDay_> openingDays = new ArrayList<>();
+    openingDays.add(openingDay);
+    entity.setOpeningDays(openingDays);
+
+    OpeningsTable openingsTable = new OpeningsTable(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate());
+    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
+    CQL2PgJSON cql2pgJson = new CQL2PgJSON(OPENINGS + JSONB_POSTFIX);
+    CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
+
+
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx -> postgresClient.save(beginTx, OPENINGS, openingsTable, reply -> {
+        if (reply.succeeded()) {
+          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withJsonCreated(entity))));
+        } else {
+          postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+        }
+      })));
+  }
+
+  @Override
+  public void deleteCalendarOpeningsByServicePointIdRegular(String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void putCalendarOpeningsByServicePointIdRegular(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdRegularByOpeningId(String openingId, String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void deleteCalendarOpeningsByServicePointIdRegularByOpeningId(String openingId, String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void putCalendarOpeningsByServicePointIdRegularByOpeningId(String openingId, String servicePointId, OpeningPeriod entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdExceptional(String servicePointId, Boolean withOpeningHours, Boolean withExceptions, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void postCalendarOpeningsByServicePointIdExceptional(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void deleteCalendarOpeningsByServicePointIdExceptional(String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void putCalendarOpeningsByServicePointIdExceptional(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdExceptionalByOpeningId(String openingId, String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void deleteCalendarOpeningsByServicePointIdExceptionalByOpeningId(String openingId, String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void putCalendarOpeningsByServicePointIdExceptionalByOpeningId(String openingId, String servicePointId, OpeningPeriod entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdCalculateopening(String servicePointId, Date date, Unit unit, Integer amount, Boolean includeClosed, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+  @Override
+  public void getCalendarOpeningsByServicePointIdCalculateopeningduration(String servicePointId, Date startTime, Date endTime, Unit unit, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+
+  }
+
+
+
+
+
   @Override
   public void postCalendarCalendars(ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -24,7 +167,6 @@ public class CalendarAPI {
         }
       }))
     );
-  }
 
   @Override
   public void getCalendarCalendars(Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
@@ -663,6 +805,9 @@ public class CalendarAPI {
     return future;
   }
 
+
+
+
   private static PostgresClient getPostgresClient(Map<String, String> okapiHeaders, Context vertxContext) {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     return PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -676,5 +821,5 @@ public class CalendarAPI {
     endDate.add(Calendar.SECOND, 59);
     return endDate.getTimeInMillis();
   }
-*/
+  */
 }
