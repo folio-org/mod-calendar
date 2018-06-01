@@ -1,5 +1,6 @@
 package org.folio.rest.impl;
 
+/*
 import io.vertx.core.*;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.OpeningPeriod_;
@@ -16,12 +17,12 @@ import java.util.*;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 
-
-public class CalendarAPI implements CalendarResource {
+*/
+public class CalendarAPI {
   private CalendarAPI() {
   }
 
-
+/*
   private static final Logger log = LoggerFactory.getLogger(CalendarAPI.class);
 
   private static final String FAILED_TO_UPDATE_EVENTS = "Failed to update events.";
@@ -42,41 +43,41 @@ public class CalendarAPI implements CalendarResource {
   @Override
   public void postCalendarOpeningsByServicePointIdRegular(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
 
-//    entity.setStartDate(new Date());
-//    entity.setEndDate(new Date());
-//    entity.setId("0");
-//    entity.setName("teszt");
-//    entity.setServicePointId("1");
-//
-//    OpeningDay_ openingDay = new OpeningDay_();
-////    openingDay.
-////    openingDay.setOpen(true);
-//
-//
-//    List<OpeningHour> openingHours = new ArrayList<>();
-//    OpeningHour openingHour = new OpeningHour();
-//    openingHour.setStartTime("08:00");
-//    openingHour.setEndTime("17:00");
-//    openingHours.add(openingHour);
-//
-//    List<OpeningDay_> openingDays = new ArrayList<>();
-//    openingDays.add(openingDay);
-//    entity.setOpeningDays(openingDays);
-//
-//    OpeningsTable openingsTable = new OpeningsTable(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate());
-//    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-////    CQL2PgJSON cql2pgJson = new CQL2PgJSON(OPENINGS + JSONB_POSTFIX);
-////    CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
-//
-//
-//    vertxContext.runOnContext(v ->
-//      postgresClient.startTx(beginTx -> postgresClient.save(beginTx, OPENINGS, openingsTable, reply -> {
-//        if (reply.succeeded()) {
-//          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withJsonCreated(entity))));
-//        } else {
-//          postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
-//        }
-//      })));
+    entity.setStartDate(new Date());
+    entity.setEndDate(new Date());
+    entity.setId("0");
+    entity.setName("teszt");
+    entity.setServicePointId("1");
+
+    OpeningDay_ openingDay = new OpeningDay_();
+    openingDay.
+    openingDay.setOpen(true);
+
+
+    List<OpeningHour> openingHours = new ArrayList<>();
+    OpeningHour openingHour = new OpeningHour();
+    openingHour.setStartTime("08:00");
+    openingHour.setEndTime("17:00");
+    openingHours.add(openingHour);
+
+    List<OpeningDay_> openingDays = new ArrayList<>();
+    openingDays.add(openingDay);
+    entity.setOpeningDays(openingDays);
+
+    OpeningsTable openingsTable = new OpeningsTable(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate());
+    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
+    CQL2PgJSON cql2pgJson = new CQL2PgJSON(OPENINGS + JSONB_POSTFIX);
+    CQLWrapper cql = new CQLWrapper(cql2pgJson, buildQueryForExistingEventsByDescription(description, null));
+
+
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx -> postgresClient.save(beginTx, OPENINGS, openingsTable, reply -> {
+        if (reply.succeeded()) {
+          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withJsonCreated(entity))));
+        } else {
+          postgresClient.rollbackTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(PostCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+        }
+      })));
   }
 
   @Override
@@ -151,7 +152,7 @@ public class CalendarAPI implements CalendarResource {
 
 
 
-/*
+
 
   @Override
   public void postCalendarCalendars(ModCalendarJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
@@ -805,7 +806,7 @@ public class CalendarAPI implements CalendarResource {
   }
 
 
-*/
+
 
   private static PostgresClient getPostgresClient(Map<String, String> okapiHeaders, Context vertxContext) {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -820,4 +821,5 @@ public class CalendarAPI implements CalendarResource {
     endDate.add(Calendar.SECOND, 59);
     return endDate.getTimeInMillis();
   }
+  */
 }
