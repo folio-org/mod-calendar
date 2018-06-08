@@ -1,15 +1,15 @@
-package org.folio.rest.utils;
+package org.folio.rest.beans;
 
 import java.util.Date;
 
-public class OpeningsTable {
+public class Openings {
   private String id;
   private String servicePointId;
   private String name;
   private Date startDate;
   private Date endDate;
 
-  public OpeningsTable(String id, String servicePointId, String name, Date startDate, Date endDate) {
+  public Openings(String id, String servicePointId, String name, Date startDate, Date endDate) {
     this.id = id;
     this.servicePointId = servicePointId;
     this.name = name;
