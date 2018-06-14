@@ -108,23 +108,6 @@ schemas:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
               description: "Internal server error, e.g. due to misconfiguration"
-        put:
-          description: Update Opening period by Id
-          body:
-            application/json:
-                schema: Opening.json
-          responses:
-            204:
-              description: "Regular library hours period successfully updated"
-              body:
-                application/json:
-                  schema: Opening.json
-            404:
-              description: "Regular library hours period or service point with the given ID is not found"
-            400:
-              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            500:
-              description: "Internal server error, e.g. due to misconfiguration"
 
         /{openingId}:
           get:
@@ -150,18 +133,18 @@ schemas:
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
-            description: Update regular library hours period by id
+            description: Update regular library opening by openingId
             body:
               application/json:
-                  schema: OpeningHours.json
+                  schema: Opening.json
             responses:
               204:
-                description: "Regular library hours period successfully updated"
+                description: "Regular library opening successfully updated"
                 body:
                   application/json:
-                    schema: OpeningHours.json
+                    schema: Opening.json
               404:
-                description: "Regular library hours period or service point with the given ID is not found"
+                description: "Regular library opening id or service point with the given ID is not found"
               400:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:
@@ -221,27 +204,9 @@ schemas:
               description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
             500:
               description: "Internal server error, e.g. due to misconfiguration"
-        put:
-          description: Update Opening period by Id
-          body:
-            application/json:
-                schema: Opening.json
-          responses:
-            204:
-              description: "Exceptional library hours period successfully updated"
-              body:
-                application/json:
-                  schema: Opening.json
-            404:
-              description: "Exceptional library hours period or service point with the given ID is not found"
-            400:
-              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            500:
-              description: "Internal server error, e.g. due to misconfiguration"
-
         /{openingId}:
           get:
-            description: List opening hours for given openingId.
+            description: List Exceptional hours for given openingId.
             responses:
               200:
                 body:
@@ -263,18 +228,18 @@ schemas:
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
-            description: Update exceptional library hours period by id
+            description: Update exceptional exceptional library opening by openingId
             body:
               application/json:
-                  schema: OpeningHours.json
+                  schema: Opening.json
             responses:
               204:
-                description: "Exceptional library hours period successfully updated"
+                description: "Exceptional exceptional library opening successfully updated"
                 body:
                   application/json:
-                    schema: OpeningHours.json
+                    schema: Opening.json
               404:
-                description: "Exceptional library hours period or service point with the given ID is not found"
+                description: "Exceptional  exceptional library opening id or service point with the given ID is not found"
               400:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:

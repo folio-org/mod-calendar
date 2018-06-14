@@ -29,7 +29,7 @@ public class CalendarUtils {
   }
 
 
-  public static List<Object> separateEvents(OpeningPeriod_ entity, String generatedId) {
+  public static List<Object> separateEvents(OpeningPeriod_ entity) {
     List<Object> actualOpeningHours = new ArrayList<>();
 
     Calendar startDay = Calendar.getInstance();
@@ -48,7 +48,7 @@ public class CalendarUtils {
       DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
       OpeningDay_ openingDay = openingDays.get(dayOfWeek);
       if (openingDay != null) {
-        List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, generatedId);
+        List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId());
         actualOpeningHours.addAll(event);
       }
       startDay.add(Calendar.DAY_OF_MONTH, 1);
