@@ -1,13 +1,26 @@
 package org.folio.rest.beans;
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.Date;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({ "id", "servicePointId", "name", "startDate", "endDate" })
 public class Openings {
+
+  @JsonProperty("id")
   private String id;
+  @JsonProperty("servicePointId")
   private String servicePointId;
+  @JsonProperty("name")
   private String name;
+  @JsonProperty("startDate")
   private Date startDate;
+  @JsonProperty("endDate")
   private Date endDate;
+
+  public Openings() {
+  }
 
   public Openings(String id, String servicePointId, String name, Date startDate, Date endDate) {
     this.id = id;

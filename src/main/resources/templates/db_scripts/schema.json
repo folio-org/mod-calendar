@@ -7,7 +7,7 @@
       "withMetadata": true,
       "withAuditing": true,
       "generateId": true,
-      "populateJsonWithId": true
+      "populateJsonWithId": false
     },
     {
       "tableName": "regular_hours",
@@ -23,7 +23,7 @@
       "withMetadata": true,
       "withAuditing": true,
       "generateId": true,
-      "populateJsonWithId": true
+      "populateJsonWithId": false
     },
     {
       "tableName": "exceptional_hours",

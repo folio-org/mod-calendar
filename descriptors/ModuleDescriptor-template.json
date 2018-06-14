@@ -16,7 +16,6 @@
           "methods": [
             "GET",
             "POST",
-            "PUT",
             "DELETE"
           ],
           "pathPattern": "/calendar/openings/{servicePointId}/regular",
@@ -31,7 +30,6 @@
           "methods": [
             "GET",
             "POST",
-            "PUT",
             "DELETE"
           ],
           "pathPattern": "/calendar/openings/{servicePointId}/exceptional",
