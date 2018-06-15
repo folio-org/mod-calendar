@@ -65,24 +65,6 @@
             "calendar.collection.update",
             "calendar.collection.remove"
           ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/calculateopening",
-          "permissionsRequired": [
-            "calendar.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/calculateopeningduration",
-          "permissionsRequired": [
-            "calendar.collection.get"
-          ]
         }
       ]
     },{

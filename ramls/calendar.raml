@@ -42,6 +42,14 @@ schemas:
           description: Filter for end date.
           example: 2018-05-31
           required: false
+        unit:
+          displayName: unit
+          type: string
+          enum:
+            - day
+            - hours
+          description: "Calculate in days or hours. Default: day."
+          required: false
       description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display."
       responses:
         200:
@@ -244,82 +252,3 @@ schemas:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
-
-      /calculateopening:
-        get:
-          queryParameters:
-            date:
-              displayName: date
-              type: date
-              description: date, start date
-              example: 2017-05-24
-              required: true
-            unit:
-              displayName: unit
-              type: string
-              enum:
-                - day
-                - hour
-              description: "Calculate in days or hours. Default: day."
-              required: false
-            amount:
-              displayName: amount
-              type: integer
-              description: number of loan days or hours (based on unit), to calculate due date.
-              example: 11
-              required: false
-            includeClosed:
-              displayName: includeClosed
-              type: boolean
-              description: include or exclude the closed days or hours (based on unit) in calculation. Default value is true.
-          description: "This endpoint helps to calculate due date. The response contains three openings: the requested day,
-          next and previous dates openings which are closest to the requested day. Calculation can based on days or hours
-          to calculate overnight loans.
-          In case of existing amount parameter the requested day will be calculated: date + amount * unit otherwise it returns the date itself"
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: SpecificDayOpening.json
-            400:
-              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            404:
-              description: "Not found"
-            500:
-              description: "Internal server error"
-      /calculateopeningduration:
-        get:
-          queryParameters:
-            startTime:
-              displayName: date
-              type: date
-              description: date, start date
-              example: 2017-05-24
-              required: false
-            endTime:
-              displayName: date
-              type: date
-              description: date, start date
-              example: 2017-05-24
-              required: true
-            unit:
-              displayName: unit
-              type: string
-              enum:
-                - day
-                - hours
-              description: "Calculate in days or hours. Default: day."
-              required: false
-          description: "This endpoint helps to calculate penalty. Responses the number of opening days or hours (based on unit) between a time interval
-          both taking into consideration the only the regular and the exceptional opening."
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: Duration.json
-            400:
-              description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-            404:
-              description: "Not found"
-            500:
-              description: "Internal server error"
