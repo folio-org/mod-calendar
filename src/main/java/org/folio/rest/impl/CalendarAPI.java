@@ -2,17 +2,20 @@ package org.folio.rest.impl;
 
 import io.vertx.core.*;
 import org.folio.rest.beans.Openings;
-import org.folio.rest.beans.RegularHoursTable;
+import org.folio.rest.beans.RegularHours;
 import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.jaxrs.resource.CalendarResource;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.CalendarUtils;
 
 import javax.ws.rs.core.Response;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.utils.CalendarConstants.*;
@@ -32,8 +35,8 @@ public class CalendarAPI implements CalendarResource {
       postgresClient.startTx(beginTx ->
         postgresClient.save(beginTx, OPENINGS, openingsTable, replyOfSavingOpenings -> {
           if (replyOfSavingOpenings.succeeded()) {
-            RegularHoursTable regularHoursTable = new RegularHoursTable(replyOfSavingOpenings.result(), openingsTable.getId(), entity.getOpeningDays());
-            postgresClient.save(REGULAR_HOURS, regularHoursTable, replyOfSavingRegularHours -> {
+            RegularHours regularHours = new RegularHours(replyOfSavingOpenings.result(), openingsTable.getId(), entity.getOpeningDays());
+            postgresClient.save(REGULAR_HOURS, regularHours, replyOfSavingRegularHours -> {
               if (replyOfSavingRegularHours.succeeded()) {
                 saveActualOpeningHours(entity, asyncResultHandler, postgresClient, beginTx);
               } else {
@@ -63,7 +66,7 @@ public class CalendarAPI implements CalendarResource {
   public void deleteCalendarOpeningsByServicePointIdRegularByOpeningId(String openingId, String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
 
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField("'openingId'").setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
     Criterion criterionForOpenings = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
 
     vertxContext.runOnContext(v ->
@@ -101,15 +104,15 @@ public class CalendarAPI implements CalendarResource {
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate());
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
 
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField("'openingId'").setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
     Criterion criterionForOpenings = new Criterion(new Criteria().addField("'id'").setJSONB(true).setOperation("=").setValue("'" + openingId + "'"));
 
     vertxContext.runOnContext(v ->
       postgresClient.startTx(beginTx ->
         postgresClient.update(OPENINGS, openingsTable, criterionForOpenings, true, replyOfSavingOpenings -> {
           if (replyOfSavingOpenings.succeeded()) {
-            RegularHoursTable regularHoursTable = new RegularHoursTable(openingId, openingsTable.getId(), entity.getOpeningDays());
-            postgresClient.update(REGULAR_HOURS, regularHoursTable, criterionForOpeningHours, true, replyOfSavingRegularHours -> {
+            RegularHours regularHours = new RegularHours(openingId, openingsTable.getId(), entity.getOpeningDays());
+            postgresClient.update(REGULAR_HOURS, regularHours, criterionForOpeningHours, true, replyOfSavingRegularHours -> {
               if (replyOfSavingRegularHours.succeeded()) {
                 putActualOpeningHours(entity, criterionForOpeningHours, asyncResultHandler, postgresClient, beginTx);
               } else {
@@ -142,8 +145,76 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
-  public void getCalendarOpeningsByServicePointIdRegular(String servicePointId, Boolean withOpeningHours, Boolean withExceptions, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    //not yet implemented
+  public void getCalendarOpeningsByServicePointIdRegular(String servicePointId, Boolean withOpeningDays, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+    OpeningCollection openingCollection = new OpeningCollection();
+    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'"));
+
+    vertxContext.runOnContext(a ->
+      postgresClient.startTx(beginTx ->
+        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
+          if (resultOfSelectOpenings.succeeded()) {
+            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+            List<Future> futures = getRegularHours(asyncResultHandler, openingCollection, postgresClient, beginTx);
+            CompositeFuture.all(futures).setHandler(event -> {
+              if (event.succeeded()) {
+                postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withJsonOK(openingCollection))));
+              } else {
+                postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+              }
+            });
+          } else {
+            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+          }
+        })));
+  }
+
+  private void addOpeningPeriodsToCollection(OpeningCollection openingCollection, AsyncResult<Results> resultOfSelectOpenings) {
+    openingCollection.setTotalRecords(resultOfSelectOpenings.result().getResults().size());
+    for (Object object : resultOfSelectOpenings.result().getResults()) {
+      if (object instanceof Openings) {
+        Openings openings = (Openings) object;
+        OpeningPeriod_ openingPeriod = new OpeningPeriod_();
+        openingPeriod.setStartDate(openings.getStartDate());
+        openingPeriod.setEndDate(openings.getEndDate());
+        openingPeriod.setName(openings.getName());
+        openingPeriod.setServicePointId(openings.getServicePointId());
+        openingPeriod.setId(openings.getId());
+        openingCollection.getOpeningPeriods().add(openingPeriod);
+      }
+    }
+  }
+
+  private List<Future> getRegularHours(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
+    List<Future> futures = new ArrayList<>();
+    for (OpeningPeriod_ openingPeriod : openingCollection.getOpeningPeriods()) {
+      Criterion criterionForRegularHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation("=").setValue("'" + openingPeriod.getId() + "'"));
+      Future<Void> future = Future.future();
+      futures.add(future);
+      postgresClient.get(REGULAR_HOURS, RegularHours.class, criterionForRegularHours, true, false, resultOfSelectRegularHours -> {
+        if (resultOfSelectRegularHours.succeeded()) {
+          try {
+            List<RegularHours> regularHoursList = (List<RegularHours>) resultOfSelectRegularHours.result().getResults();
+            for (RegularHours regularHours : regularHoursList) {
+              regularHours.setOpeningDays(regularHours.getOpeningDays());
+              Map<String, OpeningPeriod_> openingPeriods = openingCollection.getOpeningPeriods().stream()
+                .collect(Collectors.toMap(OpeningPeriod_::getId, Function.identity()));
+              openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(regularHours.getOpeningDays());
+              future.complete();
+            }
+          } catch (ClassCastException ex) {
+            future.fail(resultOfSelectRegularHours.cause());
+            postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+          }
+        } else {
+          future.fail(resultOfSelectRegularHours.cause());
+          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+        }
+      });
+    }
+
+    return futures;
   }
 
 
@@ -160,12 +231,12 @@ public class CalendarAPI implements CalendarResource {
 
 
   @Override
-  public void getCalendarOpeningsByServicePointIdExceptional(String servicePointId, Boolean withOpeningHours, Boolean withExceptions, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void getCalendarOpeningsByServicePointIdExceptional(String servicePointId, Boolean withOpeningDays, Boolean showPast, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     //not yet implemented
   }
 
   @Override
-  public void postCalendarOpeningsByServicePointIdExceptional(String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void postCalendarOpeningsByServicePointIdExceptional(String servicePointId, OpeningExceptionJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     //not yet implemented
   }
 
@@ -185,7 +256,7 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
-  public void putCalendarOpeningsByServicePointIdExceptionalByOpeningId(String openingId, String servicePointId, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void putCalendarOpeningsByServicePointIdExceptionalByOpeningId(String openingId, String servicePointId, OpeningExceptionJson entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     //not yet implemented
   }
 

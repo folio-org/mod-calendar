@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Opening day",
+  "type": "object",
+  "properties": {
+    "openingHour": {
+      "type": "object",
+      "$ref": "OpeningHour.json"
+    },
+    "allDay": {
+      "type": "boolean"
+    },
+    "open": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
