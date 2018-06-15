@@ -9,8 +9,10 @@ documentation:
 
 schemas:
   - Opening.json: !include schemas/Opening.json
+  - OpeningException.json: !include schemas/OpeningException.json
   - OpeningCollection: !include schemas/OpeningCollection.json
   - OpeningDay.json: !include schemas/OpeningDay.json
+  - OpeningExceptionDay.json: !include schemas/OpeningExceptionDay.json
   - OpeningDayIncludeWeekdays.json: !include schemas/OpeningDayIncludeWeekdays.json
   - OpeningHour.json: !include schemas/OpeningHour.json
   - Duration.json: !include schemas/Duration.json
@@ -65,15 +67,10 @@ schemas:
       /regular:
         get:
           queryParameters:
-            withOpeningHours:
-              displayName: withOpeningHours
+            withOpeningDays:
+              displayName: withOpeningDays
               type: boolean
               description: Include regular library hours in response. Default false.
-              required: false
-            withExceptions:
-              displayName: withExceptions
-              type: boolean
-              description: Include exceptions in response. Default false.
               required: false
             showPast:
               displayName: showPast
@@ -161,15 +158,10 @@ schemas:
       /exceptional:
         get:
           queryParameters:
-            withOpeningHours:
-              displayName: withOpeningHours
+            withOpeningDays:
+              displayName: withOpeningDays
               type: boolean
               description: Include exceptional library hours in response. Default false.
-              required: false
-            withExceptions:
-              displayName: withExceptions
-              type: boolean
-              description: Include exceptions in response. Default false.
               required: false
             showPast:
               displayName: showPast
@@ -181,7 +173,7 @@ schemas:
             200:
               body:
                 application/json:
-                  schema: OpeningCollection
+                  schema: OpeningException.json
             404:
               description: "Not found. There is no service point with the given ID"
             500:
@@ -189,14 +181,14 @@ schemas:
         post:
           body:
             application/json:
-              schema: Opening.json
+              schema: OpeningException.json
           description: Saves the new exceptional library opening
           responses:
             201:
               description: Returns with the created OpeningPeriod
               body:
                 application/json:
-                  schema: Opening.json
+                  schema: OpeningException.json
             400:
               description: "Bad request"
             500:
@@ -219,7 +211,7 @@ schemas:
               200:
                 body:
                   application/json:
-                    schema: OpeningHoursCollection
+                    schema: OpeningException.json
               404:
                 description: "Not found. There is no service point with the given ID"
               500:
@@ -239,13 +231,13 @@ schemas:
             description: Update exceptional exceptional library opening by openingId
             body:
               application/json:
-                  schema: Opening.json
+                  schema: OpeningException.json
             responses:
               204:
                 description: "Exceptional exceptional library opening successfully updated"
                 body:
                   application/json:
-                    schema: Opening.json
+                    schema: OpeningException.json
               404:
                 description: "Exceptional  exceptional library opening id or service point with the given ID is not found"
               400:
