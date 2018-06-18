@@ -3,12 +3,18 @@
   "title": "Opening collection",
   "type": "object",
   "properties": {
-    "openingPeriods": {
-      "type": "array",
-      "id": "Openings",
-      "items": {
-        "type": "object",
-        "$ref": "Opening.json"
+    "servicePoints": {
+      "servicePointId": {
+        "type": "string",
+        "example": "10"
+      },
+      "openingPeriods": {
+        "type": "array",
+        "id": "Openings",
+        "items": {
+          "type": "object",
+          "$ref": "OpeningHours.json"
+        }
       }
     },
     "totalRecords": {

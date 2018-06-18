@@ -15,13 +15,15 @@ schemas:
   - OpeningExceptionDay.json: !include schemas/OpeningExceptionDay.json
   - OpeningDayIncludeWeekdays.json: !include schemas/OpeningDayIncludeWeekdays.json
   - OpeningHour.json: !include schemas/OpeningHour.json
-  - Duration.json: !include schemas/Duration.json
   - SpecificDayOpening.json: !include schemas/SpecificDayOpening.json
   - Weekdays.json: !include schemas/Weekdays.json
   - OpeningDayWithDate.json: !include schemas/OpeningDayWithDate.json
   - OpeningHours.json: !include schemas/OpeningHours.json
   - OpeningHoursCollection: !include schemas/OpeningHoursCollection.json
 
+traits:
+  - pageable: !include traits/pageable.raml
+  - orderable: !include traits/orderable.raml
 
 /calendar:
   /openings:
@@ -44,13 +46,11 @@ schemas:
           description: Filter for end date.
           example: 2018-05-31
           required: false
-        unit:
-          displayName: unit
-          type: string
-          enum:
-            - day
-            - hours
-          description: "Calculate in days or hours. Default: day."
+        excludeExceptions:
+          displayName: showPast
+          type: boolean
+          description: In case of true exceptional openings will be ignored in the response.
+          In other words the regular opening hours will be returned. Default false.
           required: false
       description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display."
       responses:
