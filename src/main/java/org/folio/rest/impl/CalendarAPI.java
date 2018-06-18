@@ -11,6 +11,7 @@ import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.CalendarUtils;
+import org.joda.time.DateTime;
 
 import javax.ws.rs.core.Response;
 import java.util.*;
@@ -149,25 +150,49 @@ public class CalendarAPI implements CalendarResource {
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'"));
+    Criterion criterionForOpeningHours = assembleCriterion(servicePointId, showPast);
 
     vertxContext.runOnContext(a ->
       postgresClient.startTx(beginTx ->
         postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
           if (resultOfSelectOpenings.succeeded()) {
             addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            List<Future> futures = getRegularHours(asyncResultHandler, openingCollection, postgresClient, beginTx);
-            CompositeFuture.all(futures).setHandler(event -> {
-              if (event.succeeded()) {
-                postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withJsonOK(openingCollection))));
-              } else {
-                postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
-              }
-            });
+            if (withOpeningDays) {
+              getOpeningDaysFuture(asyncResultHandler, openingCollection, postgresClient, beginTx);
+            } else {
+              postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withJsonOK(openingCollection))));
+            }
           } else {
             postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
           }
         })));
+  }
+
+  private void getOpeningDaysFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
+    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, postgresClient, beginTx);
+    CompositeFuture.all(futures).setHandler(querys -> {
+      if (querys.succeeded()) {
+        postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withJsonOK(openingCollection))));
+      } else {
+        postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarOpeningsByServicePointIdRegularResponse.withInternalServerError())));
+      }
+    });
+  }
+
+  private Criterion assembleCriterion(String servicePointId, Boolean showPast) {
+    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'");
+    Criteria critShowPast = new Criteria();
+    critShowPast.addField(END_DATE);
+    critShowPast.setOperation(Criteria.OP_GREATER_THAN_EQ);
+    critShowPast.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime()));
+
+    Criterion criterionForOpeningHours = new Criterion();
+    if (!showPast) {
+      criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND, critShowPast);
+    } else {
+      criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND);
+    }
+    return criterionForOpeningHours;
   }
 
   private void addOpeningPeriodsToCollection(OpeningCollection openingCollection, AsyncResult<Results> resultOfSelectOpenings) {
@@ -186,7 +211,7 @@ public class CalendarAPI implements CalendarResource {
     }
   }
 
-  private List<Future> getRegularHours(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
+  private List<Future> getOpeningDays(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Future> futures = new ArrayList<>();
     for (OpeningPeriod_ openingPeriod : openingCollection.getOpeningPeriods()) {
       Criterion criterionForRegularHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation("=").setValue("'" + openingPeriod.getId() + "'"));

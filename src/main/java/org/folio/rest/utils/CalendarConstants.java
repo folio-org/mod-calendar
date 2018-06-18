@@ -13,6 +13,8 @@ public final class CalendarConstants {
   public static final String DESCRIPTION_ID_FIELD = "descriptionId";
   public static final String OPENING_ID = "'openingId'";
   public static final String SERVICE_POINT_ID = "'servicePointId'";
+  public static final String END_DATE = "'endDate'";
+  public static final String START_DATE = "'startDate'";
 
   private CalendarConstants() {
   }
