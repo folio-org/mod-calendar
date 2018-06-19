@@ -291,6 +291,11 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
+  public void getCalendarOpeningsByServicePointIdCalculateopeningduration(String servicePointId, Date startTime, Date endTime, Unit unit, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+    //not yet implemented
+  }
+
+  @Override
   public void deleteCalendarOpeningsByServicePointIdRegular(String servicePointId, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     //not yet implemented
   }
