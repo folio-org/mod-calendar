@@ -22,8 +22,8 @@ schemas:
   - OpeningHoursCollection: !include schemas/OpeningHoursCollection.json
 
 traits:
-  - pageable: !include traits/pageable.raml
-  - orderable: !include traits/orderable.raml
+  - pageable: !include raml/traits/pageable.raml
+  - orderable: !include raml/traits/orderable.raml
 
 /calendar:
   /openings:
@@ -47,7 +47,7 @@ traits:
           example: 2018-05-31
           required: false
         excludeExceptions:
-          displayName: showPast
+          displayName: excludeExceptions
           type: boolean
           description: In case of true exceptional openings will be ignored in the response.
           In other words the regular opening hours will be returned. Default false.
