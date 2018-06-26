@@ -1,0 +1,61 @@
+{
+  "openingPeriods": [
+    {
+      "id": "ha9927e8-5f79-498e-94ea-8b5b474795c8",
+      "servicePointId": "1",
+      "name": "test2",
+      "startDate": "2018-05-01T00:00:00.000+0000",
+      "endDate": "2018-06-01T00:00:00.000+0000",
+      "openingDays": [
+        {
+          "weekdays": {
+            "day": "THURSDAY"
+          },
+          "openingDay": {
+            "openingHour": [
+              {
+                "startTime": "08:00",
+                "endTime": "12:00"
+              },
+              {
+                "startTime": "13:00",
+                "endTime": "17:00"
+              }
+            ],
+            "allDay": false,
+            "open": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "fa9927e8-5f79-498e-94ea-8b5b474795c8",
+      "servicePointId": "1",
+      "name": "test3",
+      "startDate": "2018-06-01T00:00:00.000+0000",
+      "endDate": "2018-08-01T00:00:00.000+0000",
+      "openingDays": [
+        {
+          "weekdays": {
+            "day": "MONDAY"
+          },
+          "openingDay": {
+            "openingHour": [
+              {
+                "startTime": "05:00",
+                "endTime": "11:00"
+              },
+              {
+                "startTime": "14:00",
+                "endTime": "18:00"
+              }
+            ],
+            "allDay": false,
+            "open": true
+          }
+        }
+      ]
+    }
+  ],
+  "totalRecords": 2
+}
