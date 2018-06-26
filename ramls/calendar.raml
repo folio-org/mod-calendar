@@ -21,6 +21,18 @@ schemas:
   - OpeningDayWithDate.json: !include schemas/OpeningDayWithDate.json
   - OpeningHours.json: !include schemas/OpeningHours.json
   - OpeningHoursCollection: !include schemas/OpeningHoursCollection.json
+  - raml-util/schemas/metadata.schema: !include raml-util/schemas/metadata.schema
+
+traits:
+  - secured: !include raml-util/traits/auth.raml
+  - language: !include raml-util/traits/language.raml
+  - pageable: !include raml-util/traits/pageable.raml
+  - searchable: !include raml-util/traits/searchable.raml
+  - validate: !include raml-util/traits/validation.raml
+
+resourceTypes:
+  - collection: !include raml-util/rtypes/collection.raml
+  - collection-item: !include raml-util/rtypes/item-collection.raml
 
 
 /calendar:
@@ -57,6 +69,12 @@ schemas:
 
     /{servicePointId}:
       /regular:
+        type:
+          collection:
+            exampleCollection: !include examples/opening_collection_get.json
+            schemaCollection: OpeningCollection
+            schemaItem: Opening.json
+            exampleItem: !include examples/opening_get.json
         get:
           queryParameters:
             withOpeningDays:
@@ -107,13 +125,17 @@ schemas:
               description: "Internal server error, e.g. due to misconfiguration"
 
         /{openingId}:
+          type:
+            collection-item:
+              exampleItem: !include examples/opening_get.json
+              schema: Opening.json
           get:
             description: List opening hours for given openingId.
             responses:
               200:
                 body:
                   application/json:
-                    schema: OpeningHoursCollection
+                    schema: Opening.json
               404:
                 description: "Not found. There is no service point with the given ID"
               500:
