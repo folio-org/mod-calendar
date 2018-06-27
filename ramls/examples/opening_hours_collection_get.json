@@ -1,0 +1,257 @@
+{
+  "openingPeriods": [
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "08:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-05-03T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "08:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-05-10T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "08:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-05-17T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "08:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-05-24T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "08:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-05-31T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-06-04T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-06-11T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-06-18T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-06-25T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-07-02T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-07-09T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-07-16T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-07-23T00:00:00.000+0000"
+    },
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "05:00",
+            "endTime": "11:00"
+          },
+          {
+            "startTime": "14:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true,
+        "exceptional": false
+      },
+      "date": "2018-07-30T00:00:00.000+0000"
+    }
+  ],
+  "totalRecords": 14
+}

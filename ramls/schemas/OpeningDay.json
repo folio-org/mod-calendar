@@ -15,6 +15,9 @@
     },
     "open": {
       "type": "boolean"
+    },
+    "exceptional": {
+      "type": "boolean"
     }
   },
   "additionalProperties": false

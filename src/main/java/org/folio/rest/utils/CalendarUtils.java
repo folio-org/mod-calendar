@@ -16,8 +16,10 @@ public class CalendarUtils {
 
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
-  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
+  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z";
+  private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN);
+  public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT);
   public static final DateTimeFormatter BASIC_DATE_FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
   public static final String DAY_PATTERN = "EEEE";
 
