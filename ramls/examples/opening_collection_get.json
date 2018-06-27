@@ -4,8 +4,8 @@
       "id": "ha9927e8-5f79-498e-94ea-8b5b474795c8",
       "servicePointId": "1",
       "name": "test2",
-      "startDate": "2018-05-01T00:00:00.000+0000",
-      "endDate": "2018-06-01T00:00:00.000+0000",
+      "startDate": "2018-05-01T00:00:00.000+00:00",
+      "endDate": "2018-06-01T00:00:00.000+00:00",
       "openingDays": [
         {
           "weekdays": {
@@ -32,8 +32,8 @@
       "id": "fa9927e8-5f79-498e-94ea-8b5b474795c8",
       "servicePointId": "1",
       "name": "test3",
-      "startDate": "2018-06-01T00:00:00.000+0000",
-      "endDate": "2018-08-01T00:00:00.000+0000",
+      "startDate": "2018-06-01T00:00:00.000+00:00",
+      "endDate": "2018-08-01T00:00:00.000+00:00",
       "openingDays": [
         {
           "weekdays": {
