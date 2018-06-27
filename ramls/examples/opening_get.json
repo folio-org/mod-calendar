@@ -21,7 +21,8 @@
           }
         ],
         "allDay": false,
-        "open": true
+        "open": true,
+        "exceptional": false
       }
     }
   ]

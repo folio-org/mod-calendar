@@ -10,34 +10,31 @@
           "methods": [
             "GET"
           ],
-          "pathPattern": "/calendar/openings"
-        },
-        {
-          "methods": [
-            "GET",
-            "POST",
-            "DELETE"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/regular",
+          "pathPattern": "/calendar/openings",
           "permissionsRequired": [
-            "calendar.collection.add",
-            "calendar.collection.get",
-            "calendar.collection.update",
-            "calendar.collection.remove"
+            "calendar.collection.get"
           ]
         },
         {
           "methods": [
             "GET",
-            "POST",
-            "DELETE"
+            "POST"
+          ],
+          "pathPattern": "/calendar/openings/{servicePointId}/regular",
+          "permissionsRequired": [
+            "calendar.collection.add",
+            "calendar.collection.get"
+          ]
+        },
+        {
+          "methods": [
+            "GET",
+            "POST"
           ],
           "pathPattern": "/calendar/openings/{servicePointId}/exceptional",
           "permissionsRequired": [
             "calendar.collection.add",
-            "calendar.collection.get",
-            "calendar.collection.update",
-            "calendar.collection.remove"
+            "calendar.collection.get"
           ]
         },
         {
@@ -64,24 +61,6 @@
             "calendar.collection.get",
             "calendar.collection.update",
             "calendar.collection.remove"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/calculateopening",
-          "permissionsRequired": [
-            "calendar.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/calculateopeningduration",
-          "permissionsRequired": [
-            "calendar.collection.get"
           ]
         }
       ]
