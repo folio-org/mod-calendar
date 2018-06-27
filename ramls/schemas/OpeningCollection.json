@@ -17,7 +17,7 @@
   },
   "additionalProperties": false,
   "required": [
-    "openings",
+    "openingPeriods",
     "totalRecords"
   ]
 }
