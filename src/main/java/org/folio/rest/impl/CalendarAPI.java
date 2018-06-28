@@ -211,7 +211,7 @@ public class CalendarAPI implements CalendarResource {
 
   @Validate
   @Override
-  public void getCalendarOpeningsByServicePointIdRegular(String servicePointId, Boolean withOpeningDays, Boolean showPast, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void getCalendarOpeningsByServicePointIdRegular(String servicePointId, boolean withOpeningDays, boolean showPast, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -281,7 +281,7 @@ public class CalendarAPI implements CalendarResource {
     }
   }
 
-  private Criterion assembleCriterionByServicePointId(String servicePointId, Boolean showPast) {
+  private Criterion assembleCriterionByServicePointId(String servicePointId, boolean showPast) {
     Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'");
     Criteria critShowPast = new Criteria();
     critShowPast.addField(END_DATE);
@@ -438,7 +438,7 @@ public class CalendarAPI implements CalendarResource {
 
   @Validate
   @Override
-  public void getCalendarOpeningsByServicePointIdExceptional(String servicePointId, Boolean withOpeningDays, Boolean showPast, String language, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void getCalendarOpeningsByServicePointIdExceptional(String servicePointId, boolean withOpeningDays, boolean showPast, String language, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     //not yet implemented
   }
 
