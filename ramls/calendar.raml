@@ -34,16 +34,15 @@ traits:
 resourceTypes:
   - collection: !include raml-util/rtypes/collection.raml
   - collection-item: !include raml-util/rtypes/item-collection.raml
-
+  - get-only: !include raml-util/rtypes/get-only.raml
 
 /calendar:
   /openings:
     type:
-      collection:
+      get-only:
         exampleCollection: !include examples/opening_hours_collection_get.json
-        schemaCollection: OpeningHoursCollection
-        schemaItem: OpeningHours.json
-        exampleItem: !include examples/opening_hours_get.json
+        schema: OpeningHoursCollection
+
     get:
       is: [pageable]
       queryParameters:

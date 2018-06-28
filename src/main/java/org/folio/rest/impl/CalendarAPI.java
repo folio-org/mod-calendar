@@ -177,12 +177,6 @@ public class CalendarAPI implements CalendarResource {
   }
 
   @Override
-  public void postCalendarOpenings(String lang, OpeningPeriod entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    //not yet implemented
-  }
-
-
-  @Override
   public void getCalendarOpeningsByServicePointIdRegularByOpeningId(String openingId, String servicePointId, String language, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
