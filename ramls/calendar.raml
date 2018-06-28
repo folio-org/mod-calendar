@@ -53,16 +53,18 @@ resourceTypes:
         startDate:
           displayName: startDate
           type: string
-          description: Filter for start date.
-          example: 2018-05-01
+          description: Filter for start date (ISO 8601 date format). The parameter is inclusive.
+          example: "2018-05-01"
           required: false
         endDate:
           displayName: endDate
           type: string
-          description: Filter for end date.
-          example: 2018-05-31
+          description: Filter for end date (ISO 8601 date format). The parameter is inclusive.
+          example: "2018-05-31"
           required: false
-      description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display"
+      description: "List actual opening hours including exceptions for custom date range.
+                    Mainly used by calendar display and provides opening information for loan rules.
+                    The response contains only the openings closed times are not included."
       responses:
         200:
           body:
@@ -86,13 +88,15 @@ resourceTypes:
             withOpeningDays:
               displayName: withOpeningDays
               type: boolean
-              description: Include regular opening days in response. Default false.
+              description: "Include regular opening days in response."
               required: false
+              default: false
             showPast:
               displayName: showPast
               type: boolean
-              description: Include past openings in response. Default false.
+              description: "Include past openings in response."
               required: false
+              default: false
           description: List regular library hours period. The default response contains the period names and its dates.
           responses:
             200:
@@ -108,10 +112,10 @@ resourceTypes:
           body:
             application/json:
               schema: Opening.json
-          description: Saves the new regular library opening
+          description: "Saves the new regular library opening"
           responses:
             201:
-              description: Returns with the created OpeningPeriod
+              description: "Returns with the created OpeningPeriod"
               body:
                 application/json:
                   schema: Opening.json
@@ -126,14 +130,14 @@ resourceTypes:
               exampleItem: !include examples/opening_get.json
               schema: Opening.json
           get:
-            description: List opening hours for given openingId.
+            description: "List opening hours for given openingId."
             responses:
               200:
                 body:
                   application/json:
                     schema: Opening.json
               404:
-                description: "Not found. There is no service point with the given ID"
+                description: "Regular library hours period or service point with the given ID is not found"
               500:
                 description: "Internal server error"
           delete:
@@ -149,7 +153,7 @@ resourceTypes:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
             is: [validate]
-            description: Update regular library opening by openingId
+            description: "Update regular library opening by openingId"
             body:
               application/json:
                   schema: Opening.json
@@ -178,14 +182,16 @@ resourceTypes:
             withOpeningDays:
               displayName: withOpeningDays
               type: boolean
-              description: Include exceptional opening days in response. Default false.
+              description: "Include exceptional opening days in response."
+              default: false
               required: false
             showPast:
               displayName: showPast
               type: boolean
-              description: Include past openings in response. Default false.
+              description: "Include past openings in response."
+              default: false
               required: false
-          description: List exceptional library hours period. The default response contains the period names and its dates.
+          description: "List exceptional library hours period. The default response contains the period names and its dates."
           responses:
             200:
               body:
@@ -200,10 +206,10 @@ resourceTypes:
           body:
             application/json:
               schema: Opening.json
-          description: Saves the new exceptional library opening
+          description: "Saves the new exceptional library opening"
           responses:
             201:
-              description: Returns with the created OpeningPeriod
+              description: "Returns with the created OpeningPeriod"
               body:
                 application/json:
                   schema: Opening.json
@@ -218,18 +224,18 @@ resourceTypes:
               exampleItem: !include examples/opening_get.json
               schema: Opening.json
           get:
-            description: List Exceptional hours for given openingId.
+            description: "List Exceptional hours for given openingId."
             responses:
               200:
                 body:
                   application/json:
                     schema: Opening.json
               404:
-                description: "Not found. There is no service point with the given ID"
+                description: "Exceptional library hours period or service point with the given ID is not found"
               500:
                 description: "Internal server error"
           delete:
-            description: Delete Opening hours by Id
+            description: "Delete Opening hours by Id"
             responses:
               204:
                description: "Exceptional library hours period was deleted successfully"
@@ -241,7 +247,7 @@ resourceTypes:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
             is: [validate]
-            description: Update exceptional library opening by openingId
+            description: "Update exceptional library opening by openingId"
             body:
               application/json:
                   schema: Opening.json
