@@ -28,7 +28,6 @@ traits:
   - secured: !include raml-util/traits/auth.raml
   - language: !include raml-util/traits/language.raml
   - pageable: !include raml-util/traits/pageable.raml
-  - searchable: !include raml-util/traits/searchable.raml
   - validate: !include raml-util/traits/validation.raml
 
 resourceTypes:
@@ -63,7 +62,7 @@ resourceTypes:
           description: Filter for end date.
           example: 2018-05-31
           required: false
-      description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display."
+      description: "List actual opening hours including exceptions for custom date range. Mainly used by calendar display"
       responses:
         200:
           body:
@@ -105,6 +104,7 @@ resourceTypes:
             500:
               description: "Internal server error"
         post:
+          is: [validate]
           body:
             application/json:
               schema: Opening.json
@@ -148,6 +148,7 @@ resourceTypes:
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
+            is: [validate]
             description: Update regular library opening by openingId
             body:
               application/json:
@@ -195,6 +196,7 @@ resourceTypes:
             500:
               description: "Internal server error"
         post:
+          is: [validate]
           body:
             application/json:
               schema: Opening.json
@@ -238,6 +240,7 @@ resourceTypes:
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
+            is: [validate]
             description: Update exceptional library opening by openingId
             body:
               application/json:

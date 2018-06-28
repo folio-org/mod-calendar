@@ -1,40 +1,11 @@
 {
   "openingPeriods": [
     {
-      "id": "ha9927e8-5f79-498e-94ea-8b5b474795c8",
-      "servicePointId": "1",
-      "name": "test2",
-      "startDate": "2018-05-01T00:00:00.000+00:00",
-      "endDate": "2018-06-01T00:00:00.000+00:00",
-      "openingDays": [
-        {
-          "weekdays": {
-            "day": "THURSDAY"
-          },
-          "openingDay": {
-            "openingHour": [
-              {
-                "startTime": "08:00",
-                "endTime": "12:00"
-              },
-              {
-                "startTime": "13:00",
-                "endTime": "17:00"
-              }
-            ],
-            "allDay": false,
-            "open": true,
-            "exceptional": false
-          }
-        }
-      ]
-    },
-    {
       "id": "fa9927e8-5f79-498e-94ea-8b5b474795c8",
       "servicePointId": "1",
-      "name": "test3",
-      "startDate": "2018-06-01T00:00:00.000+00:00",
-      "endDate": "2018-08-01T00:00:00.000+00:00",
+      "name": "test1",
+      "startDate": "2018-06-01T00:00:00.000+0000",
+      "endDate": "2018-08-01T00:00:00.000+0000",
       "openingDays": [
         {
           "weekdays": {
@@ -52,7 +23,37 @@
               }
             ],
             "allDay": false,
-            "open": true
+            "open": true,
+            "exceptional": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "ha9927e8-5f79-498e-94ea-8b5b474795c8",
+      "servicePointId": "1",
+      "name": "test2",
+      "startDate": "2018-09-01T00:00:00.000+0000",
+      "endDate": "2018-10-01T00:00:00.000+0000",
+      "openingDays": [
+        {
+          "weekdays": {
+            "day": "THURSDAY"
+          },
+          "openingDay": {
+            "openingHour": [
+              {
+                "startTime": "09:00",
+                "endTime": "12:00"
+              },
+              {
+                "startTime": "13:00",
+                "endTime": "17:00"
+              }
+            ],
+            "allDay": false,
+            "open": true,
+            "exceptional": false
           }
         }
       ]
