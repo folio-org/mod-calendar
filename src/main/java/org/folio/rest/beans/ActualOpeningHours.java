@@ -15,6 +15,7 @@ public class ActualOpeningHours implements Serializable {
   private Boolean exceptional;
 
   public ActualOpeningHours() {
+    //stub
   }
 
   public String getId() {
