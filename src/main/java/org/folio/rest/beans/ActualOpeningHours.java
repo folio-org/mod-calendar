@@ -17,17 +17,6 @@ public class ActualOpeningHours implements Serializable {
   public ActualOpeningHours() {
   }
 
-  public ActualOpeningHours(String id, String openingId, Date actualDay, String startTime, String endTime, Boolean allDay, Boolean open, Boolean exceptional) {
-    this.id = id;
-    this.openingId = openingId;
-    this.actualDay = actualDay;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.allDay = allDay;
-    this.open = open;
-    this.exceptional = exceptional;
-  }
-
   public String getId() {
     return id;
   }
