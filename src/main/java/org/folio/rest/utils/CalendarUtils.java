@@ -13,11 +13,12 @@ import java.util.*;
 public class CalendarUtils {
 
 
-
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT);
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
   public static final String DAY_PATTERN = "EEEE";
 
   private CalendarUtils() {
@@ -28,7 +29,7 @@ public class CalendarUtils {
   }
 
 
-  public static List<Object> separateEvents(OpeningPeriod_ entity) {
+  public static List<Object> separateEvents(OpeningPeriod_ entity, boolean isExceptional) {
     List<Object> actualOpeningHours = new ArrayList<>();
 
     Calendar startDay = Calendar.getInstance();
@@ -41,17 +42,26 @@ public class CalendarUtils {
     endDay.set(Calendar.SECOND, 0);
     endDay.set(Calendar.MILLISECOND, 1);
 
-    Map<DayOfWeek, OpeningDay_> openingDays = getOpeningDays(entity);
-
-    while (startDay.before(endDay)) {
-      DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
-      OpeningDay_ openingDay = openingDays.get(dayOfWeek);
-      if (openingDay != null) {
-        List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId());
+    if (isExceptional) {
+      while (startDay.before(endDay)) {
+        List<ActualOpeningHours> event = createEvents(entity.getOpeningDays().get(0).getOpeningDay(), startDay, entity.getId(), isExceptional);
         actualOpeningHours.addAll(event);
+        startDay.add(Calendar.DAY_OF_MONTH, 1);
       }
-      startDay.add(Calendar.DAY_OF_MONTH, 1);
+    } else {
+      Map<DayOfWeek, OpeningDay_> openingDays = getOpeningDays(entity);
+
+      while (startDay.before(endDay)) {
+        DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
+        OpeningDay_ openingDay = openingDays.get(dayOfWeek);
+        if (openingDay != null) {
+          List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId(), isExceptional);
+          actualOpeningHours.addAll(event);
+        }
+        startDay.add(Calendar.DAY_OF_MONTH, 1);
+      }
     }
+
 
     return actualOpeningHours;
   }
@@ -67,7 +77,7 @@ public class CalendarUtils {
     return openingDays;
   }
 
-  private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId) {
+  private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
     Calendar currentStartDate = Calendar.getInstance();
     currentStartDate.setTimeInMillis(actualDay.getTimeInMillis());
 
@@ -98,6 +108,8 @@ public class CalendarUtils {
         actualOpeningHour.setEndTime("23:59");
         actualOpeningHour.setOpen(open);
         actualOpeningHour.setAllDay(allDay);
+        actualOpeningHour.setExceptional(isExceptional);
+
         actualOpeningHours.add(actualOpeningHour);
       } else {
         for (OpeningHour openingHour : openingDay.getOpeningHour()) {
@@ -109,11 +121,16 @@ public class CalendarUtils {
           actualOpeningHour.setEndTime(openingHour.getEndTime());
           actualOpeningHour.setOpen(open);
           actualOpeningHour.setAllDay(allDay);
+          actualOpeningHour.setExceptional(isExceptional);
           actualOpeningHours.add(actualOpeningHour);
         }
       }
     }
 
     return actualOpeningHours;
+  }
+
+  public static Date getDateWithoutHoursAndMinutes(Date date){
+  return date;
   }
 }
