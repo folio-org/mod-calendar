@@ -12,18 +12,10 @@ public class ActualOpeningHours implements Serializable {
   private String endTime;
   private Boolean allDay;
   private Boolean open;
+  private Boolean exceptional;
 
   public ActualOpeningHours() {
-  }
-
-  public ActualOpeningHours(String id, String openingId, Date actualDay, String startTime, String endTime, Boolean allDay, Boolean open) {
-    this.id = id;
-    this.openingId = openingId;
-    this.actualDay = actualDay;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.allDay = allDay;
-    this.open = open;
+    //stub
   }
 
   public String getId() {
@@ -80,5 +72,13 @@ public class ActualOpeningHours implements Serializable {
 
   public void setOpen(Boolean open) {
     this.open = open;
+  }
+
+  public Boolean getExceptional() {
+    return exceptional;
+  }
+
+  public void setExceptional(Boolean exceptional) {
+    this.exceptional = exceptional;
   }
 }

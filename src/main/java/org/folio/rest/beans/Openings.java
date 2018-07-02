@@ -18,16 +18,19 @@ public class Openings {
   private Date startDate;
   @JsonProperty("endDate")
   private Date endDate;
+  @JsonProperty("exceptional")
+  private Boolean exceptional;
 
   public Openings() {
   }
 
-  public Openings(String id, String servicePointId, String name, Date startDate, Date endDate) {
+  public Openings(String id, String servicePointId, String name, Date startDate, Date endDate, Boolean exceptional) {
     this.id = id;
     this.servicePointId = servicePointId;
     this.name = name;
     this.startDate = startDate;
     this.endDate = endDate;
+    this.exceptional = exceptional;
   }
 
   public String getId() {
@@ -69,4 +72,13 @@ public class Openings {
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
   }
+
+  public Boolean getExceptional() {
+    return exceptional;
+  }
+
+  public void setExceptional(Boolean exceptional) {
+    this.exceptional = exceptional;
+  }
+
 }

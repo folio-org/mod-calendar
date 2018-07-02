@@ -36,7 +36,7 @@ resourceTypes:
   - get-only: !include raml-util/rtypes/get-only.raml
 
 /calendar:
-  /openings:
+  /periods:
     type:
       get-only:
         exampleCollection: !include examples/opening_hours_collection_get.json
@@ -76,7 +76,7 @@ resourceTypes:
           description: "Internal server error"
 
     /{servicePointId}:
-      /regular:
+      /period:
         type:
           collection:
             exampleCollection: !include examples/opening_collection_get.json
@@ -88,7 +88,7 @@ resourceTypes:
             withOpeningDays:
               displayName: withOpeningDays
               type: boolean
-              description: "Include regular opening days in response."
+              description: "Include opening days in response."
               required: false
               default: false
             showPast:
@@ -97,7 +97,13 @@ resourceTypes:
               description: "Include past openings in response."
               required: false
               default: false
-          description: List regular library hours period. The default response contains the period names and its dates.
+            showExceptional:
+              displayName: showExceptional
+              type: boolean
+              description: Filter for exceptional library hours periods.
+              required: false
+              default: false
+          description: List library hours period. The default response contains the period names and its dates.
           responses:
             200:
               body:
@@ -112,10 +118,10 @@ resourceTypes:
           body:
             application/json:
               schema: Opening.json
-          description: "Saves the new regular library opening"
+          description: "Saves the new library period"
           responses:
             201:
-              description: "Returns with the created OpeningPeriod"
+              description: "Returns with the created period"
               body:
                 application/json:
                   schema: Opening.json
@@ -124,141 +130,47 @@ resourceTypes:
             500:
               description: "Internal server error"
 
-        /{openingId}:
+        /{periodId}:
           type:
             collection-item:
               exampleItem: !include examples/opening_get.json
               schema: Opening.json
           get:
-            description: "List opening hours for given openingId."
+            description: "List opening hours for given periodId."
             responses:
               200:
                 body:
                   application/json:
                     schema: Opening.json
               404:
-                description: "Regular library hours period or service point with the given ID is not found"
+                description: "Library hours period or service point with the given ID is not found"
               500:
                 description: "Internal server error"
           delete:
             description: Delete Opening hours by Id
             responses:
               204:
-               description: "Regular library hours period was deleted successfully"
+               description: "Library hours period was deleted successfully"
               404:
-                description: "Regular library hours period or service point with the given ID is not found"
+                description: "Library hours period or service point with the given ID is not found"
               400:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:
                 description: "Internal server error, e.g. due to misconfiguration"
           put:
             is: [validate]
-            description: "Update regular library opening by openingId"
+            description: "Update library period by periodId"
             body:
               application/json:
                   schema: Opening.json
             responses:
               204:
-                description: "Regular library opening successfully updated"
+                description: "Library period successfully updated"
                 body:
                   application/json:
                     schema: Opening.json
               404:
-                description: "Regular library opening id or service point with the given ID is not found"
-              400:
-                description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-              500:
-                description: "Internal server error, e.g. due to misconfiguration"
-
-      /exceptional:
-        type:
-          collection:
-            exampleCollection: !include examples/opening_collection_get.json
-            schemaCollection: OpeningCollection
-            schemaItem: Opening.json
-            exampleItem: !include examples/opening_get.json
-        get:
-          queryParameters:
-            withOpeningDays:
-              displayName: withOpeningDays
-              type: boolean
-              description: "Include exceptional opening days in response."
-              default: false
-              required: false
-            showPast:
-              displayName: showPast
-              type: boolean
-              description: "Include past openings in response."
-              default: false
-              required: false
-          description: "List exceptional library hours period. The default response contains the period names and its dates."
-          responses:
-            200:
-              body:
-                application/json:
-                  schema: OpeningCollection
-            404:
-              description: "Not found. There is no service point with the given ID"
-            500:
-              description: "Internal server error"
-        post:
-          is: [validate]
-          body:
-            application/json:
-              schema: Opening.json
-          description: "Saves the new exceptional library opening"
-          responses:
-            201:
-              description: "Returns with the created OpeningPeriod"
-              body:
-                application/json:
-                  schema: Opening.json
-            400:
-              description: "Bad request"
-            500:
-              description: "Internal server error"
-
-        /{openingId}:
-          type:
-            collection-item:
-              exampleItem: !include examples/opening_get.json
-              schema: Opening.json
-          get:
-            description: "List Exceptional hours for given openingId."
-            responses:
-              200:
-                body:
-                  application/json:
-                    schema: Opening.json
-              404:
-                description: "Exceptional library hours period or service point with the given ID is not found"
-              500:
-                description: "Internal server error"
-          delete:
-            description: "Delete Opening hours by Id"
-            responses:
-              204:
-               description: "Exceptional library hours period was deleted successfully"
-              404:
-                description: "Exceptional library hours period or service point with the given ID is not found"
-              400:
-                description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
-              500:
-                description: "Internal server error, e.g. due to misconfiguration"
-          put:
-            is: [validate]
-            description: "Update exceptional library opening by openingId"
-            body:
-              application/json:
-                  schema: Opening.json
-            responses:
-              204:
-                description: "Exceptional library opening successfully updated"
-                body:
-                  application/json:
-                    schema: Opening.json
-              404:
-                description: "Exceptional library opening id or service point with the given ID is not found"
+                description: "Library period id or service point with the given ID is not found"
               400:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:

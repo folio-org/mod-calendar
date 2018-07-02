@@ -10,7 +10,7 @@
           "methods": [
             "GET"
           ],
-          "pathPattern": "/calendar/openings",
+          "pathPattern": "/calendar/periods",
           "permissionsRequired": [
             "calendar.collection.get"
           ]
@@ -20,18 +20,7 @@
             "GET",
             "POST"
           ],
-          "pathPattern": "/calendar/openings/{servicePointId}/regular",
-          "permissionsRequired": [
-            "calendar.collection.add",
-            "calendar.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "GET",
-            "POST"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/exceptional",
+          "pathPattern": "/calendar/periods/{servicePointId}/period",
           "permissionsRequired": [
             "calendar.collection.add",
             "calendar.collection.get"
@@ -43,20 +32,7 @@
             "DELETE",
             "PUT"
           ],
-          "pathPattern": "/calendar/openings/{servicePointId}/regular/{openingId}",
-          "permissionsRequired": [
-            "calendar.collection.get",
-            "calendar.collection.update",
-            "calendar.collection.remove"
-          ]
-        },
-        {
-          "methods": [
-            "GET",
-            "DELETE",
-            "PUT"
-          ],
-          "pathPattern": "/calendar/openings/{servicePointId}/exceptional/{openingId}",
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
           "permissionsRequired": [
             "calendar.collection.get",
             "calendar.collection.update",
