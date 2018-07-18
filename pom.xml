@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>mod-calendar</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
   <name>Calendar module</name>
 
   <licenses>
@@ -151,7 +151,7 @@
     <url>https://github.com/qultoltd/mod-calendar</url>
     <connection>scm:git:git://github.com:qultoltd/mod-calendar.git</connection>
     <developerConnection>scm:git:git@github.com:qultoltd/mod-calendar.git</developerConnection>
-    <tag>v1.0.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <build>
