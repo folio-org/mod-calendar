@@ -62,6 +62,18 @@ resourceTypes:
           description: Filter for end date (ISO 8601 date format). The parameter is inclusive.
           example: "2018-05-31"
           required: false
+        includeClosedDays:
+          displayName: includeClosedDays
+          type: boolean
+          description: In case of true all days will have value even if it is closing time or not
+          required: false
+          default: true
+        actualOpening:
+          displayName: actualOpening
+          type: boolean
+          description: In case of true exceptional openings are overriding regular opening and in this case regular opening is not included in the response
+          required: false
+          default: true
       description: "List actual opening hours including exceptions for custom date range.
                     Mainly used by calendar display and provides opening information for loan rules.
                     The response contains only the openings closed times are not included."
