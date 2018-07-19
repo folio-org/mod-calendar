@@ -1,6 +1,8 @@
 package org.folio.rest.impl;
 
 import io.vertx.core.*;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.*;
 import org.folio.rest.jaxrs.model.*;
@@ -27,6 +29,7 @@ import static org.folio.rest.utils.CalendarConstants.*;
 public class CalendarAPI implements CalendarResource {
 
   private final Messages messages = Messages.getInstance();
+  private final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
 
   public CalendarAPI() {
     //stub
@@ -194,22 +197,30 @@ public class CalendarAPI implements CalendarResource {
   public void getCalendarPeriods(String servicePointId, String startDate, String endDate, boolean includeClosedDays, boolean actualOpenings, int offset, int limit, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     OpeningCollection openingCollection = new OpeningCollection();
     CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(servicePointId, startDate, endDate, offset, limit, lang);
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-    Criterion criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
-    vertxContext.runOnContext(a ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
-          if (resultOfSelectOpenings.succeeded()) {
-            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
-          } else {
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })));
+    try {
+      vertxContext.runOnContext(a -> {
 
+        String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+        PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+        Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
+        Criterion criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
+
+        postgresClient.startTx(beginTx ->
+          postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
+            if (resultOfSelectOpenings.succeeded()) {
+              addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+              getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
+            } else {
+              postgresClient.endTx(beginTx, done ->
+                asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+            }
+          }));
+      });
+    } catch (Exception ex){
+      logger.error(ex.getCause());
+      asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainBadRequest(
+      ex.getLocalizedMessage())));
+    }
   }
 
 
