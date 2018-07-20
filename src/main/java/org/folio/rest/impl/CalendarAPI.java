@@ -198,6 +198,7 @@ public class CalendarAPI implements CalendarResource {
     OpeningCollection openingCollection = new OpeningCollection();
     CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(servicePointId, startDate, endDate, offset, limit, lang);
     try {
+      logger.info("getCalendarPeriods...");
       vertxContext.runOnContext(a -> {
 
         String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -217,16 +218,15 @@ public class CalendarAPI implements CalendarResource {
           }));
       });
     } catch (Exception ex){
-      logger.error(ex.getCause());
+      logger.error("error: {}", ex.getCause());
       asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainBadRequest(
       ex.getLocalizedMessage())));
     }
   }
 
-
-  @Validate
   @Override
   public void getCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+    logger.info("getCalendarPeriodsByServicePointIdPeriodByPeriodId...");
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -250,6 +250,7 @@ public class CalendarAPI implements CalendarResource {
   @Validate
   @Override
   public void getCalendarPeriodsByServicePointIdPeriod(String servicePointId, boolean withOpeningDays, boolean showPast, boolean exceptional, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+    logger.info("getCalendarPeriodsByServicePointIdPeriod...");
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
