@@ -2,13 +2,16 @@ package org.folio.rest.utils;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.beans.CalendarOpeningsRequestParameters;
 import org.folio.rest.jaxrs.model.*;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class CalendarUtils {
 
@@ -17,7 +20,7 @@ public class CalendarUtils {
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
   private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
-  public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT);
+  public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
   public static final String DAY_PATTERN = "EEEE";
 
@@ -128,6 +131,59 @@ public class CalendarUtils {
     }
 
     return actualOpeningHours;
+  }
+
+  public static void addClosedDaysToOpenings(List<OpeningPeriod> openingPeriods, CalendarOpeningsRequestParameters calendarOpeningsRequestParameters) {
+    String startDate = calendarOpeningsRequestParameters.getStartDate();
+    String endDate = calendarOpeningsRequestParameters.getEndDate();
+    openingPeriods.sort(Comparator.comparing(OpeningPeriod::getDate));
+    if (startDate == null) {
+      Calendar calendar = Calendar.getInstance();
+      if(openingPeriods.stream().findFirst().isPresent()) {
+        calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+        startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
+      }
+    }
+    if (endDate == null) {
+      long count = openingPeriods.stream().count();
+      Stream<OpeningPeriod> stream = openingPeriods.stream();
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+      endDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
+    }
+
+    Calendar startDay = Calendar.getInstance();
+    startDay.setTimeInMillis(DateTime.parse(startDate, DATE_FORMATTER_SHORT).getMillis());
+    startDay.set(Calendar.SECOND, 0);
+    startDay.set(Calendar.MILLISECOND, 0);
+
+    Calendar endDay = Calendar.getInstance();
+    endDay.setTimeInMillis(DateTime.parse(endDate, DATE_FORMATTER_SHORT).getMillis());
+    endDay.set(Calendar.SECOND, 0);
+    endDay.set(Calendar.MILLISECOND, 1);
+
+
+    while (startDay.before(endDay)) {
+      OpeningPeriod openingPeriod = new OpeningPeriod();
+      openingPeriod.setDate(startDay.getTime());
+      if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(openingPeriod.getDate()))) {
+        startDay.add(Calendar.DAY_OF_MONTH, 1);
+      } else {
+        OpeningDay openingDay = new OpeningDay();
+        openingDay.setOpen(false);
+        openingDay.setAllDay(true);
+        openingDay.setExceptional(false);
+        List<OpeningHour> openingHours = new ArrayList<>();
+        OpeningHour openingHour = new OpeningHour();
+        openingHour.setStartTime("00:00");
+        openingHour.setEndTime("23:59");
+        openingHours.add(openingHour);
+        openingDay.setOpeningHour(openingHours);
+        openingPeriod.setOpeningDay(openingDay);
+        openingPeriods.add(openingPeriod);
+        startDay.add(Calendar.DAY_OF_MONTH, 1);
+      }
+    }
   }
 
   public static Date getDateWithoutHoursAndMinutes(Date date){
