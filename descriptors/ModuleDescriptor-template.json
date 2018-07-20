@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "calendar",
-      "version": "1.0",
+      "version": "1.0.0",
       "handlers": [
         {
           "methods": [
@@ -46,9 +46,7 @@
       "interfaceType": "system",
       "handlers": [
         {
-          "methods": [
-            "POST"
-          ],
+          "methods" : [ "POST", "DELETE" ],
           "pathPattern": "/_/tenant"
         }
       ]
@@ -78,7 +76,7 @@
     {
       "permissionName": "calendar.collection.all",
       "displayName": "Calendar permissions",
-      "description": "",
+      "description": "All permission for mod-calendar module",
       "subPermissions": [
         "calendar.collection.get",
         "calendar.collection.add",

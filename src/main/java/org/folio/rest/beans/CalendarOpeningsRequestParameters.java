@@ -7,17 +7,20 @@ public class CalendarOpeningsRequestParameters {
   int offset;
   int limit;
   String lang;
+  boolean includeClosedDays;
+  boolean actualOpenings;
 
   public CalendarOpeningsRequestParameters() {
   }
 
-  public CalendarOpeningsRequestParameters(String servicePointId, String startDate, String endDate, int offset, int limit, String lang) {
-    this.servicePointId = servicePointId;
+  public CalendarOpeningsRequestParameters(String startDate, String endDate, int offset, int limit, String lang, boolean includeClosedDays, boolean actualOpenings) {
     this.startDate = startDate;
     this.endDate = endDate;
     this.offset = offset;
     this.limit = limit;
     this.lang = lang;
+    this.includeClosedDays = includeClosedDays;
+    this.actualOpenings = actualOpenings;
   }
 
   public String getServicePointId() {
@@ -67,4 +70,21 @@ public class CalendarOpeningsRequestParameters {
   public void setLang(String lang) {
     this.lang = lang;
   }
+
+  public boolean isIncludeClosedDays() {
+    return includeClosedDays;
+  }
+
+  public void setIncludeClosedDays(boolean includeClosedDays) {
+    this.includeClosedDays = includeClosedDays;
+  }
+
+  public boolean isActualOpenings() {
+    return actualOpenings;
+  }
+
+  public void setActualOpenings(boolean actualOpenings) {
+    this.actualOpenings = actualOpenings;
+  }
+
 }
