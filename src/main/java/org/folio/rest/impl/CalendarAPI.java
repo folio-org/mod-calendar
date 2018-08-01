@@ -87,15 +87,20 @@ public class CalendarAPI implements CalendarResource {
 
   private void saveActualOpeningHours(OpeningPeriod_ entity, String lang, boolean isExceptional, Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
-    postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
-      if (replyOfSavingActualOpeningHours.succeeded()) {
-        postgresClient.endTx(beginTx, done ->
-          asyncResultHandler.handle(Future.succeededFuture(PostCalendarPeriodsByServicePointIdPeriodResponse.withJsonCreated(lang, entity))));
-      } else {
-        postgresClient.rollbackTx(beginTx, done ->
-          asyncResultHandler.handle(Future.succeededFuture(PostCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-      }
-    });
+    if(actualOpeningHours.size() > 0) {
+      postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
+        if (replyOfSavingActualOpeningHours.succeeded()) {
+          postgresClient.endTx(beginTx, done ->
+            asyncResultHandler.handle(Future.succeededFuture(PostCalendarPeriodsByServicePointIdPeriodResponse.withJsonCreated(lang, entity))));
+        } else {
+          postgresClient.rollbackTx(beginTx, done ->
+            asyncResultHandler.handle(Future.succeededFuture(PostCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+        }
+      });
+    } else {
+      postgresClient.endTx(beginTx, done ->
+        asyncResultHandler.handle(Future.succeededFuture(PostCalendarPeriodsByServicePointIdPeriodResponse.withJsonCreated(lang, entity))));
+    }
   }
 
   @Validate

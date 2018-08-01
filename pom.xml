@@ -25,9 +25,9 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <folio.domain-models-runtime.version>19.2.0</folio.domain-models-runtime.version>
+    <folio.domain-models-runtime.version>19.3.0</folio.domain-models-runtime.version>
 
-    <vertx.version>3.4.1</vertx.version>
+    <vertx.version>3.5.1</vertx.version>
     <jackson.version>2.7.4</jackson.version>
 
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>

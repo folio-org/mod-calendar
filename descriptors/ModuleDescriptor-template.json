@@ -85,5 +85,12 @@
       ],
       "visible": true
     }
-  ]
+  ],
+  "launchDescriptor": {
+    "dockerImage": "mod-calendar:1.0.1-SNAPSHOT",
+    "dockerArgs": {
+      "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
+    },
+    "dockerPull" : false
+  }
 }
