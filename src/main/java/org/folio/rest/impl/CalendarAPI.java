@@ -87,7 +87,7 @@ public class CalendarAPI implements CalendarResource {
 
   private void saveActualOpeningHours(OpeningPeriod_ entity, String lang, boolean isExceptional, Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
-    if(actualOpeningHours.size() > 0) {
+    if(!actualOpeningHours.isEmpty()) {
       postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
         if (replyOfSavingActualOpeningHours.succeeded()) {
           postgresClient.endTx(beginTx, done ->
@@ -207,8 +207,14 @@ public class CalendarAPI implements CalendarResource {
 
         String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
         PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-        Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-        Criterion criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
+        Criteria critServicePoint;
+        Criterion criterionForServicePoint;
+        if(servicePointId != null){
+          critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
+          criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
+        } else {
+          criterionForServicePoint = new Criterion();
+        }
 
         postgresClient.startTx(beginTx ->
           postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
@@ -297,7 +303,7 @@ public class CalendarAPI implements CalendarResource {
     List<Future> futures = getOpeningDaysByDate(asyncResultHandler, openingHoursCollection, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
     CompositeFuture.all(futures).setHandler(querys -> {
       if (querys.succeeded()) {
-        if (calendarOpeningsRequestParameters.isIncludeClosedDays()) {
+        if (calendarOpeningsRequestParameters.isIncludeClosedDays() && !openingHoursCollection.getOpeningPeriods().isEmpty()) {
           CalendarUtils.addClosedDaysToOpenings(openingHoursCollection.getOpeningPeriods(), calendarOpeningsRequestParameters);
         }
         openingHoursCollection.setTotalRecords(openingHoursCollection.getOpeningPeriods().size());
@@ -497,9 +503,18 @@ public class CalendarAPI implements CalendarResource {
 
     openingPeriod.setDate(actualOpeningHour.getActualDay());
 
-    if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(actualOpeningHour.getActualDay()))) {
-      OpeningPeriod previousOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).findFirst().orElse(openingPeriod);
-      previousOpeningPeriod.getOpeningDay().getOpeningHour().add(openingHour);
+    if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(actualOpeningHour.getActualDay()))){
+      OpeningPeriod previousOtherOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
+        filter(o -> o.getOpeningDay().getExceptional().equals(!actualOpeningHour.getExceptional())).findFirst().orElse(openingPeriod);
+
+      OpeningPeriod previousOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
+        filter(o -> o.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())).findFirst().orElse(previousOtherOpeningPeriod);
+
+      if(previousOpeningPeriod.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())){
+        previousOpeningPeriod.getOpeningDay().getOpeningHour().add(openingHour);
+      } else {
+        openingPeriods.add(openingPeriod);
+      }
     } else {
       openingPeriods.add(openingPeriod);
     }

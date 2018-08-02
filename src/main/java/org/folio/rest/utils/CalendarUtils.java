@@ -97,12 +97,7 @@ public class CalendarUtils {
     List<ActualOpeningHours> actualOpeningHours = new ArrayList<>();
 
     if (openingDay != null) {
-      if (openingDay.getAllDay() || BooleanUtils.isFalse(openingDay.getOpen())) {
-        currentStartDate.set(Calendar.HOUR_OF_DAY, 0);
-        currentStartDate.set(Calendar.MINUTE, 0);
-        currentEndDate.set(Calendar.HOUR_OF_DAY, 23);
-        currentEndDate.set(Calendar.MINUTE, 59);
-
+      if (openingDay.getAllDay()) {
         ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
         actualOpeningHour.setId(generatedId);
         actualOpeningHour.setOpeningId(generatedId);
@@ -112,7 +107,6 @@ public class CalendarUtils {
         actualOpeningHour.setOpen(open);
         actualOpeningHour.setAllDay(allDay);
         actualOpeningHour.setExceptional(isExceptional);
-
         actualOpeningHours.add(actualOpeningHour);
       } else {
         for (OpeningHour openingHour : openingDay.getOpeningHour()) {
@@ -139,16 +133,18 @@ public class CalendarUtils {
     openingPeriods.sort(Comparator.comparing(OpeningPeriod::getDate));
     if (startDate == null) {
       Calendar calendar = Calendar.getInstance();
-      if(openingPeriods.stream().findFirst().isPresent()) {
+      if (openingPeriods.stream().findFirst().isPresent()) {
         calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningPeriod()).getDate().getTime());
-        startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
       }
+      startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
     if (endDate == null) {
       long count = openingPeriods.stream().count();
       Stream<OpeningPeriod> stream = openingPeriods.stream();
       Calendar calendar = Calendar.getInstance();
-      calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+      if (!openingPeriods.isEmpty()) {
+        calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+      }
       endDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
 
@@ -186,7 +182,7 @@ public class CalendarUtils {
     }
   }
 
-  public static Date getDateWithoutHoursAndMinutes(Date date){
-  return date;
+  public static Date getDateWithoutHoursAndMinutes(Date date) {
+    return date;
   }
 }
