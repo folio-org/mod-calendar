@@ -87,7 +87,7 @@ public class CalendarAPI implements CalendarResource {
 
   private void saveActualOpeningHours(OpeningPeriod_ entity, String lang, boolean isExceptional, Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
-    if(!actualOpeningHours.isEmpty()) {
+    if (!actualOpeningHours.isEmpty()) {
       postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
         if (replyOfSavingActualOpeningHours.succeeded()) {
           postgresClient.endTx(beginTx, done ->
@@ -209,7 +209,7 @@ public class CalendarAPI implements CalendarResource {
         PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
         Criteria critServicePoint;
         Criterion criterionForServicePoint;
-        if(servicePointId != null){
+        if (servicePointId != null) {
           critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
           criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
         } else {
@@ -306,8 +306,11 @@ public class CalendarAPI implements CalendarResource {
         if (calendarOpeningsRequestParameters.isIncludeClosedDays() && !openingHoursCollection.getOpeningPeriods().isEmpty()) {
           CalendarUtils.addClosedDaysToOpenings(openingHoursCollection.getOpeningPeriods(), calendarOpeningsRequestParameters);
         }
+        openingHoursCollection.getOpeningPeriods().sort(Comparator.comparing(OpeningPeriod::getDate).thenComparing(o -> !o.getOpeningDay().getExceptional()));
+        if (calendarOpeningsRequestParameters.isActualOpenings()) {
+          overrideOpeningPeriodsByExceptionalPeriods(openingHoursCollection);
+        }
         openingHoursCollection.setTotalRecords(openingHoursCollection.getOpeningPeriods().size());
-        openingHoursCollection.getOpeningPeriods().sort(Comparator.comparing(OpeningPeriod::getDate));
         openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().skip(calendarOpeningsRequestParameters.getOffset()).limit(calendarOpeningsRequestParameters.getLimit()).collect(Collectors.toList()));
         postgresClient.endTx(beginTx, done ->
           asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withJsonOK(openingHoursCollection))));
@@ -316,6 +319,21 @@ public class CalendarAPI implements CalendarResource {
           asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(calendarOpeningsRequestParameters.getLang(), MessageConsts.InternalServerError)))));
       }
     });
+  }
+
+  private void overrideOpeningPeriodsByExceptionalPeriods(OpeningHoursCollection openingHoursCollection) {
+    openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().reduce(new ArrayList<>(), (List<OpeningPeriod> accumulator, OpeningPeriod openingPeriod) ->
+    {
+      if (accumulator.stream().noneMatch(op ->
+        op.getDate().equals(openingPeriod.getDate())
+          && !op.getOpeningDay().getExceptional().equals(openingPeriod.getOpeningDay().getExceptional()))) {
+        accumulator.add(openingPeriod);
+      }
+      return accumulator;
+    }, (acc1, acc2) -> {
+      acc1.addAll(acc2);
+      return acc1;
+    }));
   }
 
   private void getOpeningDaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
@@ -502,15 +520,12 @@ public class CalendarAPI implements CalendarResource {
     openingPeriod.setOpeningDay(openingDay);
 
     openingPeriod.setDate(actualOpeningHour.getActualDay());
-
-    if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(actualOpeningHour.getActualDay()))){
-      OpeningPeriod previousOtherOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
-        filter(o -> o.getOpeningDay().getExceptional().equals(!actualOpeningHour.getExceptional())).findFirst().orElse(openingPeriod);
-
+    openingPeriods.sort(Comparator.comparing(OpeningPeriod::getDate));
+    if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(actualOpeningHour.getActualDay()))) {
       OpeningPeriod previousOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
-        filter(o -> o.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())).findFirst().orElse(previousOtherOpeningPeriod);
-
-      if(previousOpeningPeriod.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())){
+        filter(o -> o.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())).findFirst()
+        .orElse(getElsePreviousOpeningPeriod(openingPeriods, actualOpeningHour, openingPeriod, !actualOpeningHour.getExceptional()));
+      if (previousOpeningPeriod.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())) {
         previousOpeningPeriod.getOpeningDay().getOpeningHour().add(openingHour);
       } else {
         openingPeriods.add(openingPeriod);
@@ -519,6 +534,11 @@ public class CalendarAPI implements CalendarResource {
       openingPeriods.add(openingPeriod);
     }
     openingHoursCollection.setOpeningPeriods(openingPeriods);
+  }
+
+  private OpeningPeriod getElsePreviousOpeningPeriod(List<OpeningPeriod> openingPeriods, ActualOpeningHours actualOpeningHour, OpeningPeriod openingPeriod, boolean isExceptional) {
+    return openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
+      filter(o -> o.getOpeningDay().getExceptional().equals(isExceptional)).findFirst().orElse(openingPeriod);
   }
 
   private static PostgresClient getPostgresClient(Map<String, String> okapiHeaders, Context vertxContext) {
