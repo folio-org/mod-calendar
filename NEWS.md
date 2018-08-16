@@ -1,4 +1,4 @@
-## 1.0.1
+## 1.0.2
 * MODCAL-1 Added exceptional opening day management
 * MODCAL-5 Added filtering for events by date
 * MODCAL-6 Use event types instead of constants
@@ -11,3 +11,4 @@
 * MODCAL-13 includeClosedDays queryparam implemented
 * MODCAL-14 release 1.0.0
 * MODCAL-15 Vagrant box bug - vertx version increased
+* MODCAL-13 actualOpening queryparam implemented
