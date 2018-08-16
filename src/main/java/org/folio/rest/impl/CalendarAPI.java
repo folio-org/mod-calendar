@@ -3,6 +3,7 @@ package org.folio.rest.impl;
 import io.vertx.core.*;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import joptsimple.internal.Strings;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.*;
 import org.folio.rest.jaxrs.model.*;
@@ -43,6 +44,12 @@ public class CalendarAPI implements CalendarResource {
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     Criterion criterionForId = assembleCriterionForCheckingOverlap(entity.getId(), servicePointId, entity.getStartDate(), entity.getEndDate(), isExceptional);
+    if(entity.getOpeningDays().isEmpty() || Strings.isNullOrEmpty(entity.getServicePointId()) ||
+      Strings.isNullOrEmpty(entity.getName()) || Strings.isNullOrEmpty(entity.getId())){
+      asyncResultHandler.handle(Future.succeededFuture(
+        PostCalendarPeriodsByServicePointIdPeriodResponse.withPlainBadRequest(
+          "Not valid json object. Missing field(s)...")));
+    }
     vertxContext.runOnContext(v ->
       postgresClient.startTx(beginTx ->
 
