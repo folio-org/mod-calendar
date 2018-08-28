@@ -132,11 +132,11 @@
     vertxContext.runOnContext(v -> {
       try {
         CQLWrapper cql = new CQLWrapper();
-        postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true, true,
+        postgresClient.get(EVENT_DESCRIPTION, OpeningDay_.class, cql, true, true,
           resultOfSelect -> {
             if (resultOfSelect.succeeded()) {
               CalendarEventDescriptionCollection calendarEventCollection = new CalendarEventDescriptionCollection();
-              calendarEventCollection.setDescriptions((List<Description>) resultOfSelect.result().getResults());
+              calendarEventCollection.setDescriptions((List<OpeningDay_>) resultOfSelect.result().getResults());
               calendarEventCollection.setTotalRecords(resultOfSelect.result().getResultInfo().getTotalRecords());
               asyncResultHandler
                 .handle(Future.succeededFuture(GetCalendarEventdescriptionsResponse.withJsonOK(calendarEventCollection)));
@@ -155,7 +155,7 @@
   }
 
   @Override
-  public void postCalendarEventdescriptions(Description description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void postCalendarEventdescriptions(OpeningDay_ description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
 
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     if (description.getCreationDate() == null) {
@@ -174,7 +174,7 @@
                 PostCalendarEventdescriptionsResponse.withPlainInternalServerError(
                   "Error while listing events.")));
             } else if (replyOfGetEventsByDate.result().getResults().isEmpty()) {
-              Future<Description> eventDescriptionSaveResponse = saveEventDescription(postgresClient, description);
+              Future<OpeningDay_> eventDescriptionSaveResponse = saveEventDescription(postgresClient, description);
               eventDescriptionSaveResponse.setHandler(saveHandler -> {
                 if (saveHandler.succeeded()) {
                   asyncResultHandler.handle(Future.succeededFuture(PostCalendarEventdescriptionsResponse.withJsonCreated(eventDescriptionSaveResponse.result())));
@@ -201,7 +201,7 @@
     });
   }
 
-  private String buildQueryForExistingEventsByDescription(Description description, String descriptionId) {
+  private String buildQueryForExistingEventsByDescription(OpeningDay_ description, String descriptionId) {
     StringBuilder queryBuilder = new StringBuilder();
     queryBuilder.append("startDate >= ").append(CalendarUtils.DATE_FORMATTER.print(description.getStartDate().getTime()))
       .append(" AND endDate <= ").append(CalendarUtils.DATE_FORMATTER.print(calculateEndOfTheDay(description.getEndDate())))
@@ -212,8 +212,8 @@
     return queryBuilder.toString();
   }
 
-  private Future<Description> saveEventDescription(PostgresClient postgresClient, Description description) {
-    Future<Description> future = Future.future();
+  private Future<OpeningDay_> saveEventDescription(PostgresClient postgresClient, OpeningDay_ description) {
+    Future<OpeningDay_> future = Future.future();
     postgresClient.startTx(beginTx -> {
       try {
         postgresClient.save(beginTx, EVENT_DESCRIPTION, description, replyDescriptor -> {
@@ -224,7 +224,7 @@
                 future.fail("No events can be generated in the given interval.")
               );
             } else {
-              Description createdDescription = description;
+              OpeningDay_ createdDescription = description;
               createdDescription.setId(replyDescriptor.result());
               Future<Void> batchFuture = saveEventBatch(postgresClient, events);
               batchFuture.setHandler(batchSaveResponse -> {
@@ -310,7 +310,7 @@
     });
   }
 
-  private static Future<Void> updateEventStatusByException(PostgresClient postgresClient, Description eventDescription, Boolean status) {
+  private static Future<Void> updateEventStatusByException(PostgresClient postgresClient, OpeningDay_ eventDescription, Boolean status) {
     Future<Void> future = Future.future();
     try {
       Criterion cr = new Criterion();
@@ -349,7 +349,7 @@
     return future;
   }
 
-  private Future deactivateEvents(PostgresClient postgresClient, Description eventDescription) {
+  private Future deactivateEvents(PostgresClient postgresClient, OpeningDay_ eventDescription) {
     Future future = Future.future();
     try {
       StringBuilder queryBuilder = new StringBuilder();
@@ -359,7 +359,7 @@
         .append(" AND descriptionType = ").append(DescriptionType.EXCEPTION);
       CQL2PgJSON descriptionCql2pgJson = new CQL2PgJSON(EVENT_DESCRIPTION + JSONB_POSTFIX);
       CQLWrapper descriptionCql = new CQLWrapper(descriptionCql2pgJson, queryBuilder.toString());
-      postgresClient.get(EVENT_DESCRIPTION, Description.class, descriptionCql, true,
+      postgresClient.get(EVENT_DESCRIPTION, OpeningDay_.class, descriptionCql, true,
         replyOfGetEventDescriptionsByDate -> {
           if (replyOfGetEventDescriptionsByDate.succeeded()) {
             if (replyOfGetEventDescriptionsByDate.result().getResults() == null || replyOfGetEventDescriptionsByDate.result().getResults().isEmpty()) {
@@ -396,7 +396,7 @@
     Criterion cr = new Criterion();
 
     for (int i = 0; i < results.size(); i++) {
-      Description currDescription = (Description) results.get(i);
+      OpeningDay_ currDescription = (OpeningDay_) results.get(i);
       Criteria crit = new Criteria();
       crit.addField("'startDate'");
       crit.setOperation(Criteria.OP_GREATER_THAN_EQ);
@@ -428,7 +428,7 @@
       CQLWrapper cql = new CQLWrapper();
       cql.setField(new CQL2PgJSON(EVENT_DESCRIPTION + JSONB_POSTFIX));
       cql.setQuery(ID_FIELD + "==" + eventDescriptionId);
-      postgresClient.get(EVENT_DESCRIPTION, Description.class, cql, true,
+      postgresClient.get(EVENT_DESCRIPTION, OpeningDay_.class, cql, true,
         replyOfGetDescriptionById -> {
           try {
             if (replyOfGetDescriptionById.succeeded()) {
@@ -439,8 +439,8 @@
               } else if (replyOfGetDescriptionById.result() != null
                 && replyOfGetDescriptionById.result().getResults() != null
                 && !replyOfGetDescriptionById.result().getResults().isEmpty()
-                && replyOfGetDescriptionById.result().getResults().get(0) instanceof Description) {
-                Future<Void> updateOpeningEvents = updateEventStatusByException(postgresClient, (Description) replyOfGetDescriptionById.result().getResults().get(0), Boolean.TRUE);
+                && replyOfGetDescriptionById.result().getResults().get(0) instanceof OpeningDay_) {
+                Future<Void> updateOpeningEvents = updateEventStatusByException(postgresClient, (OpeningDay_) replyOfGetDescriptionById.result().getResults().get(0), Boolean.TRUE);
                 updateOpeningEvents.setHandler(subHandler -> {
                   if (subHandler.succeeded()) {
                     future.complete();
@@ -465,7 +465,7 @@
   }
 
   @Override
-  public void putCalendarEventdescriptionsByEventDescriptionId(String eventDescriptionId, Description description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void putCalendarEventdescriptionsByEventDescriptionId(String eventDescriptionId, OpeningDay_ description, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     PostgresClient postgresClientForEventDelete = getPostgresClient(okapiHeaders, vertxContext);
     vertxContext.runOnContext(v -> {
 
@@ -529,7 +529,7 @@
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
 
-  private static void checkDescriptionInput(Description description) throws CalendarIntervalException {
+  private static void checkDescriptionInput(OpeningDay_ description) throws CalendarIntervalException {
     for (OpeningDay openingDay : description.getOpeningDays()) {
       List<Interval> intervals = openingHoursToList(openingDay);
       IntervalValidation.validate(intervals);
@@ -558,7 +558,7 @@
     return intervals;
   }
 
-  private Future<Void> updateEventDescription(PostgresClient postgresClient, Description description) {
+  private Future<Void> updateEventDescription(PostgresClient postgresClient, OpeningDay_ description) {
     Future<Void> future = Future.future();
     try {
       postgresClient.update(EVENT_DESCRIPTION, description, description.getId(), replyDescriptor -> {

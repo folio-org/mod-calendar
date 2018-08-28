@@ -1,5 +1,5 @@
 package org.folio.rest.utils;
-//import org.folio.rest.jaxrs.model.Description;
+//import org.folio.rest.jaxrs.model.OpeningDay_;
 //import org.folio.rest.jaxrs.model.Event;
 
 import org.junit.Test;
@@ -37,10 +37,10 @@ public class TestCalendarUtils {
       openingDays.add(createOpeningDay(day));
     }
 
-    Description description = new Description()
+    OpeningDay_ description = new OpeningDay_()
       .withId(UUID.randomUUID().toString())
       .withDescription(UUID.randomUUID().toString())
-      .withDescriptionType(Description.DescriptionType.OPENING_DAY)
+      .withDescriptionType(OpeningDay_.DescriptionType.OPENING_DAY)
       .withStartDate(startDate.getTime())
       .withEndDate(endDate.getTime())
       .withOpeningDays(openingDays);
@@ -68,7 +68,7 @@ public class TestCalendarUtils {
       assertEquals(generatedId, event.getDescriptionId());
       assertEquals(Boolean.TRUE, event.getOpen());
       assertEquals(Boolean.FALSE, event.getAllDay());
-      assertEquals(Description.DescriptionType.OPENING_DAY.toString(), event.getEventType());
+      assertEquals(OpeningDay_.DescriptionType.OPENING_DAY.toString(), event.getEventType());
 
       assertFalse(startDate.after(openingStart));
       assertFalse(endDate.before(openingEnd));
