@@ -12,8 +12,8 @@ public class DescriptionTest {
 /*
   @Test
   public void testDescriptionCreation() {
-    Description description = createDescription();
-    Description otherDescription = new Description()
+    OpeningDay_ description = createDescription();
+    OpeningDay_ otherDescription = new OpeningDay_()
       .withId(description.getId())
       .withDescription(description.getDescription())
       .withDescriptionType(description.getDescriptionType())
@@ -37,7 +37,7 @@ public class DescriptionTest {
   @Test
   public void testDescriptionCollectionCreation() {
     CalendarEventDescriptionCollection collection = new CalendarEventDescriptionCollection();
-    List<Description> descriptions = new ArrayList<>();
+    List<OpeningDay_> descriptions = new ArrayList<>();
     descriptions.add(createDescription());
     collection.setDescriptions(descriptions);
     collection.setTotalRecords(descriptions.size());
@@ -66,13 +66,13 @@ public class DescriptionTest {
     assertEquals(openingDay.getOpen(), otherOpeningDay.getOpen());
   }
 
-  private Description createDescription() {
-    Description description = new Description();
+  private OpeningDay_ createDescription() {
+    OpeningDay_ description = new OpeningDay_();
     List<OpeningDay> openingDays = new ArrayList<>();
     openingDays.add(createOpeningDay());
     description.setId(UUID.randomUUID().toString());
     description.setDescription(UUID.randomUUID().toString());
-    description.setDescriptionType(Description.DescriptionType.OPENING_DAY);
+    description.setDescriptionType(OpeningDay_.DescriptionType.OPENING_DAY);
     description.setStartDate(new Date());
     description.setEndDate(new Date());
     description.setOpeningDays(openingDays);
