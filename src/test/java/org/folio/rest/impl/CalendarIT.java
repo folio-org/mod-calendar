@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -38,7 +39,6 @@ public class CalendarIT {
   private static final String TOKEN = "test";
   private static final String HOST = "localhost";
   private static final Header JSON_CONTENT_TYPE_HEADER = new Header("Content-Type", "application/json");
-
   private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
 
   private static int port;
@@ -66,12 +66,12 @@ public class CalendarIT {
 
     TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
-        try {
-          tenantClient.post(null, res2 -> async.complete());
-        } catch (Exception e) {
-          context.fail(e);
-        }
-      });
+      try {
+        tenantClient.post(null, res2 -> async.complete());
+      } catch (Exception e) {
+        context.fail(e);
+      }
+    });
 
     RestAssured.port = port;
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
@@ -105,8 +105,7 @@ public class CalendarIT {
   }
 
   @Test
-  public void checkEndpointTests() {
-
+  public void checkEndpointsTest() {
 
     given()
       .get("/calendar/periods/non_exist")
@@ -126,7 +125,7 @@ public class CalendarIT {
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/1/period")
+      .get("/calendar/periods/" + UUID.randomUUID().toString() + "/period")
       .then()
       .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningCollection.json"))
       .statusCode(200);
@@ -135,7 +134,7 @@ public class CalendarIT {
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/1/period/uuid")
+      .get("/calendar/periods/" + UUID.randomUUID().toString() + "/period/uuid")
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("uuid"))
@@ -143,27 +142,18 @@ public class CalendarIT {
   }
 
   @Test
-  public void testAddNewPeriod(TestContext context) {
+  public void addNewPeriodTest() {
     String uuid = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, "1", generateBasicOpeningDays(), uuid);
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
 
     given()
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .header(JSON_CONTENT_TYPE_HEADER)
-      .body(opening)
-      .post("/calendar/periods/1/period")
-      .then()
-      .contentType(ContentType.JSON)
-      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
-      .statusCode(201);
-
-    given()
-      .header(TENANT_HEADER)
-      .header(TOKEN_HEADER)
-      .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/1/period/" + uuid)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
@@ -172,9 +162,143 @@ public class CalendarIT {
   }
 
   @Test
-  public void testIntervalOverlapPeriod(TestContext context) {
+  public void addNewPeriodWithoutServicePoint() {
     String uuid = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, "2", generateBasicOpeningDays(), uuid);
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    opening.setServicePointId(null);
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .header(JSON_CONTENT_TYPE_HEADER)
+      .body(opening)
+      .post("/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Not valid json object. Missing field(s)..."))
+      .statusCode(400);
+  }
+
+  @Test
+  public void getPeriodsWithServicePointIdTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods?servicePointId=" + servicePointUUID + "&includeClosedDays=false")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningHoursCollection.json"))
+      .body("totalRecords", equalTo(2))
+      .statusCode(200);
+  }
+
+  @Test
+
+  public void getPeriodsWithIncludedDateRange() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods?startDate=2018-06-01&endDate=2018-10-30&servicePointId=" + servicePointUUID + "&includeClosedDays=false")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningHoursCollection.json"))
+      .body("totalRecords", equalTo(2))
+      .statusCode(200);
+  }
+
+  public void getPeriodsWithExcludedDateRange() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods?startDate=2020-06-01&endDate=2020-10-30&servicePointId=" + servicePointUUID + "&includeClosedDays=false")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningHoursCollection.json"))
+      .body("totalRecords", equalTo(0))
+      .statusCode(200);
+  }
+
+  private void postPeriod(String servicePointUUID, OpeningPeriod_ opening) {
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .header(JSON_CONTENT_TYPE_HEADER)
+      .body(opening)
+      .post("/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
+      .statusCode(201);
+  }
+
+  @Test
+  public void getPeriodWithOpeningDaysTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2018, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid + "?withOpeningDays=true&showpast=true")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
+      .body("id", equalTo(uuid))
+      .statusCode(200);
+  }
+
+  @Test
+  public void getPeriodsExceptionalTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods/" + servicePointUUID + "/period?withOpeningDays=true&showPast=true&showExceptional=true")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningCollection.json"))
+      .body("totalRecords", greaterThan(0))
+      .statusCode(200);
+  }
+
+  @Test
+  public void deletePeriodTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
 
     given()
       .header(TENANT_HEADER)
@@ -182,17 +306,33 @@ public class CalendarIT {
       .header(OKAPI_URL_HEADER)
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)
-      .post("/calendar/periods/2/period")
+      .delete("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
-      .contentType(ContentType.JSON)
-      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
-      .statusCode(201);
+      .statusCode(204);
 
     given()
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/2/period/" + uuid)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .body(equalTo(uuid))
+      .statusCode(404);
+  }
+
+  @Test
+  public void overlappingPeriodsTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, false, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
@@ -205,7 +345,7 @@ public class CalendarIT {
       .header(OKAPI_URL_HEADER)
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)
-      .post("/calendar/periods/2/period")
+      .post("/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
@@ -213,27 +353,18 @@ public class CalendarIT {
   }
 
   @Test
-  public void tesPutPeriod(TestContext context) {
+  public void putPeriodTest() {
     String uuid = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, "3", generateBasicOpeningDays(), uuid);
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+
+    postPeriod(servicePointUUID, opening);
 
     given()
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .header(JSON_CONTENT_TYPE_HEADER)
-      .body(opening)
-      .post("/calendar/periods/3/period")
-      .then()
-      .contentType(ContentType.JSON)
-      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
-      .statusCode(201);
-
-    given()
-      .header(TENANT_HEADER)
-      .header(TOKEN_HEADER)
-      .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/3/period/" + uuid)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
@@ -248,7 +379,7 @@ public class CalendarIT {
       .header(OKAPI_URL_HEADER)
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)
-      .put("/calendar/periods/3/period/" + uuid)
+      .put("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .statusCode(204);
 
@@ -256,7 +387,7 @@ public class CalendarIT {
       .header(TENANT_HEADER)
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
-      .get("/calendar/periods/3/period/" + uuid)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
@@ -265,8 +396,8 @@ public class CalendarIT {
       .statusCode(200);
   }
 
-  private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, List<OpeningDay_> openingDays, String uuid) {
-
+  private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+    List<OpeningDay_> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
     OpeningPeriod_ openingPeriod = new OpeningPeriod_();
@@ -277,13 +408,20 @@ public class CalendarIT {
     openingPeriod.setName("test");
 
     OpeningDay_ opening = new OpeningDay_();
-    opening.setWeekdays(new Weekdays().withDay(Weekdays.Day.MONDAY));
-    OpeningDay openingDay = new OpeningDay().withAllDay(true).withOpen(true).withExceptional(false);
+    OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
     List<OpeningHour> openingHours = new ArrayList<>();
-    OpeningHour openingHour = new OpeningHour();
-    openingHour.setStartTime("10:00");
-    openingHour.setEndTime("12:00");
-    openingHours.add(openingHour);
+    if (!isExceptional) {
+      opening.setWeekdays(new Weekdays().withDay(Weekdays.Day.MONDAY));
+      OpeningHour openingHour = new OpeningHour();
+      openingHour.setStartTime("08:00");
+      openingHour.setEndTime("12:00");
+      openingHours.add(openingHour);
+      openingHour.setStartTime("13:00");
+      openingHour.setEndTime("17:00");
+      openingHours.add(openingHour);
+    } else {
+      openingDay.setAllDay(true);
+    }
     openingDay.setOpeningHour(openingHours);
     opening.setOpeningDay(openingDay);
 
@@ -319,18 +457,5 @@ public class CalendarIT {
     }
     endDate.add(Calendar.DAY_OF_YEAR, daysToAdd);
     return endDate;
-  }
-
-  private List<OpeningDay_> generateBasicOpeningDays() {
-    List<OpeningDay_> openingDays = new ArrayList<>();
-    OpeningDay_ monday = new OpeningDay_();
-    monday.setWeekdays(new Weekdays().withDay(Weekdays.Day.MONDAY));
-    monday.setOpeningDay(new OpeningDay().withAllDay(true).withOpen(true).withExceptional(false));
-    openingDays.add(monday);
-    OpeningDay_ tuesday = new OpeningDay_();
-    tuesday.setWeekdays(new Weekdays().withDay(Weekdays.Day.TUESDAY));
-    tuesday.setOpeningDay(new OpeningDay().withAllDay(false).withOpen(true).withExceptional(false));
-    openingDays.add(tuesday);
-    return openingDays;
   }
 }

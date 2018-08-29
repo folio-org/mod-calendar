@@ -32,10 +32,6 @@ public class RegularHours {
     return openingId;
   }
 
-  public void setOpeningId(String openingId) {
-    this.openingId = openingId;
-  }
-
   public List<OpeningDay_> getOpeningDays() {
     return openingDays;
   }

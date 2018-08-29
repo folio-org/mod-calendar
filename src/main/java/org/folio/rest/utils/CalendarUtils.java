@@ -47,7 +47,7 @@ public class CalendarUtils {
 
     if (isExceptional) {
       while (startDay.before(endDay)) {
-        List<ActualOpeningHours> event = createEvents(entity.getOpeningDays().get(0).getOpeningDay(), startDay, entity.getId(), isExceptional);
+        List<ActualOpeningHours> event = createEvents(entity.getOpeningDays().get(0).getOpeningDay(), startDay, entity.getId(), true);
         actualOpeningHours.addAll(event);
         startDay.add(Calendar.DAY_OF_MONTH, 1);
       }
@@ -58,7 +58,7 @@ public class CalendarUtils {
         DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
         OpeningDay_ openingDay = openingDays.get(dayOfWeek);
         if (openingDay != null) {
-          List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId(), isExceptional);
+          List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId(), false);
           actualOpeningHours.addAll(event);
         }
         startDay.add(Calendar.DAY_OF_MONTH, 1);

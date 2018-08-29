@@ -529,16 +529,16 @@
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
 
-  private static void checkDescriptionInput(OpeningDay_ description) throws CalendarIntervalException {
-    for (OpeningDay openingDay : description.getOpeningDays()) {
+  private static void checkDescriptionInput(OpeningPeriod_ openingPeriod) throws CalendarIntervalException {
+    for (OpeningDay_ openingDay : openingPeriod.getOpeningDays()) {
       List<Interval> intervals = openingHoursToList(openingDay);
       IntervalValidation.validate(intervals);
     }
   }
 
-  private static List<Interval> openingHoursToList(OpeningDay openingDay) throws CalendarIntervalException {
+  private static List<Interval> openingHoursToList(OpeningDay_ openingDay) throws CalendarIntervalException {
     List<Interval> intervals = new ArrayList<>();
-    for (OpeningHour openingHour : openingDay.getOpeningHour()) {
+    for (OpeningHour openingHour : openingDay.getOpeningDay().getOpeningHour()) {
       if (openingHour.getStartTime() != null && openingHour.getEndTime() != null) {
         LocalTime from;
         LocalTime to;
