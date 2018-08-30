@@ -44,8 +44,8 @@ public class CalendarAPI implements CalendarResource {
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     Criterion criterionForId = assembleCriterionForCheckingOverlap(entity.getId(), servicePointId, entity.getStartDate(), entity.getEndDate(), isExceptional);
-    if(entity.getOpeningDays().isEmpty() || Strings.isNullOrEmpty(entity.getServicePointId()) ||
-      Strings.isNullOrEmpty(entity.getName()) || Strings.isNullOrEmpty(entity.getId())){
+    if (entity.getOpeningDays().isEmpty() || Strings.isNullOrEmpty(entity.getServicePointId()) ||
+      Strings.isNullOrEmpty(entity.getName()) || Strings.isNullOrEmpty(entity.getId())) {
       asyncResultHandler.handle(Future.succeededFuture(
         PostCalendarPeriodsByServicePointIdPeriodResponse.withPlainBadRequest(
           "Not valid json object. Missing field(s)...")));
@@ -208,36 +208,31 @@ public class CalendarAPI implements CalendarResource {
   public void getCalendarPeriods(String servicePointId, String startDate, String endDate, boolean includeClosedDays, boolean actualOpenings, int offset, int limit, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
     OpeningCollection openingCollection = new OpeningCollection();
     CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
-    try {
-      vertxContext.runOnContext(a -> {
 
-        String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-        PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-        Criteria critServicePoint;
-        Criterion criterionForServicePoint;
-        if (servicePointId != null) {
-          critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-          criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
-        } else {
-          criterionForServicePoint = new Criterion();
-        }
+    vertxContext.runOnContext(a -> {
 
-        postgresClient.startTx(beginTx ->
-          postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
-            if (resultOfSelectOpenings.succeeded()) {
-              addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-              getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
-            } else {
-              postgresClient.endTx(beginTx, done ->
-                asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-            }
-          }));
-      });
-    } catch (Exception ex) {
-      logger.error("error: {}", ex.getCause());
-      asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainBadRequest(
-        ex.getLocalizedMessage())));
-    }
+      String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+      PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+      Criteria critServicePoint;
+      Criterion criterionForServicePoint;
+      if (servicePointId != null) {
+        critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
+        criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
+      } else {
+        criterionForServicePoint = new Criterion();
+      }
+
+      postgresClient.startTx(beginTx ->
+        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
+          if (resultOfSelectOpenings.succeeded()) {
+            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+            getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
+          } else {
+            postgresClient.endTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        }));
+    });
   }
 
   @Override
