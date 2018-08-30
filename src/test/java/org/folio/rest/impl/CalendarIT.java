@@ -44,11 +44,6 @@ public class CalendarIT {
   private static int port;
   private static Vertx vertx;
 
-//  @Test
-//  public void avoidAnnoyingErrorMessageWhenRunningCleanInstall() {
-//    assertTrue(true);
-//  }
-
   @Rule
   public Timeout rule = Timeout.seconds(10);
 
@@ -141,11 +136,32 @@ public class CalendarIT {
       .statusCode(404);
   }
 
+
   @Test
   public void addNewPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
     OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    postPeriod(servicePointUUID, opening);
+
+    given()
+      .header(TENANT_HEADER)
+      .header(TOKEN_HEADER)
+      .header(OKAPI_URL_HEADER)
+      .get("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
+      .body("id", equalTo(uuid))
+      .statusCode(200);
+  }
+
+  @Test
+  public void addInvalidPeriodTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 0, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
