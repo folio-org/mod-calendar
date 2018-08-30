@@ -119,8 +119,8 @@ public class CalendarIT {
       .assertThat().body(equalTo("uuid"))
       .statusCode(404);
   }
-  
-  @Test
+
+  //@Test
   public void postgresClientFailureTest(TestContext context) {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
