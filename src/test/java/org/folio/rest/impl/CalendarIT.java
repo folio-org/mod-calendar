@@ -88,11 +88,8 @@ public class CalendarIT {
 
   @AfterClass
   public static void teardown(TestContext context) {
-    Async async = context.async();
-    vertx.close(context.asyncAssertSuccess(res -> {
-      PostgresClient.stopEmbeddedPostgres();
-      async.complete();
-    }));
+    PostgresClient.stopEmbeddedPostgres();
+    vertx.close(context.asyncAssertSuccess());
   }
 
   @Test
@@ -118,62 +115,6 @@ public class CalendarIT {
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("uuid"))
       .statusCode(404);
-  }
-
-  //@Test
-  public void postgresClientFailureTest(TestContext context) {
-    String uuid = UUID.randomUUID().toString();
-    String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
-
-    String sql = "ALTER TABLE test_mod_calendar.openings RENAME TO openings_temp;" +
-      "ALTER TABLE test_mod_calendar.regular_hours RENAME TO regular_hours_temp;" +
-      "ALTER TABLE test_mod_calendar.actual_opening_hours RENAME TO actual_opening_hours_temp;";
-
-    executeSql(context, sql);
-
-    postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Error while listing events."))
-      .statusCode(500);
-
-    putFailure(servicePointUUID, opening);
-
-    sql = "ALTER TABLE test_mod_calendar.openings_temp RENAME TO openings;" +
-      "ALTER TABLE test_mod_calendar.regular_hours_temp RENAME TO regular_hours;";
-
-    executeSql(context, sql);
-
-    putFailure(servicePointUUID, opening);
-
-    sql = "ALTER TABLE test_mod_calendar.openings RENAME TO openings_temp;" +
-      "ALTER TABLE test_mod_calendar.regular_hours RENAME TO regular_hours_temp;";
-    executeSql(context, sql);
-
-    deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    sql = "ALTER TABLE test_mod_calendar.openings_temp RENAME TO openings;" +
-      "ALTER TABLE test_mod_calendar.regular_hours_temp RENAME TO regular_hours;" +
-      "ALTER TABLE test_mod_calendar.actual_opening_hours_temp RENAME TO actual_opening_hours;";
-    executeSql(context, sql);
   }
 
   private static Future executeSql(TestContext context, String sql) {
@@ -395,6 +336,46 @@ public class CalendarIT {
       .body("id", equalTo(uuid))
       .body("name", equalTo("PUT_TEST"))
       .statusCode(200);
+  }
+
+  @Test
+  public void postgresClientFailureTest(TestContext context) {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    String sql = "DROP ROLE if exists test_mod_calendar_temp; CREATE ROLE test_mod_calendar_temp; REASSIGN OWNED BY test_mod_calendar TO test_mod_calendar_temp;";
+
+    executeSql(context, sql);
+    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .statusCode(500);
+
+    putFailure(servicePointUUID, opening);
+
+    deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .statusCode(500);
+
+    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .contentType(ContentType.TEXT)
+      .statusCode(500);
+
+    getWithHeaderAndBody("/calendar/periods")
+      .then()
+      .contentType(ContentType.TEXT)
+      .statusCode(500);
+
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .statusCode(500);
+
+    sql = "REASSIGN OWNED BY test_mod_calendar_temp TO test_mod_calendar;";
+
+    executeSql(context, sql);
   }
 
   private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {

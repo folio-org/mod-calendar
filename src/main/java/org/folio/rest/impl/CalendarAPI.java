@@ -1,8 +1,6 @@
 package org.folio.rest.impl;
 
 import io.vertx.core.*;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import joptsimple.internal.Strings;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.*;
@@ -31,7 +29,6 @@ import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 public class CalendarAPI implements CalendarResource {
 
   private final Messages messages = Messages.getInstance();
-  private final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
 
   public CalendarAPI() {
     //stub
