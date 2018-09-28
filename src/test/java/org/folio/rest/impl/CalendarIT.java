@@ -12,6 +12,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import org.awaitility.Awaitility;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
@@ -22,14 +23,18 @@ import org.folio.rest.utils.CalendarUtils;
 import org.junit.*;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
+import org.awaitility.Awaitility.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThat;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -346,6 +351,8 @@ public class CalendarIT {
 
     executeSql(context, sql);
     OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    Awaitility.await().atLeast(100, MILLISECONDS).until(() -> opening.getId() != null);
 
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
