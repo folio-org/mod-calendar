@@ -2,13 +2,16 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening hours",
   "type": "object",
+  "description": "Decription of an opening of for a specific date.",
   "properties": {
     "openingDay": {
+      "description": "Decription of opening",
       "type": "object",
       "$ref": "OpeningDay.json"
     },
     "date": {
       "type": "string",
+      "description": "Datge when the openingDay is valid",
       "format": "date-time"
     }
   },
