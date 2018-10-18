@@ -2,9 +2,11 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening collection",
   "type": "object",
+  "description" : "List of opening periods",
   "properties": {
     "openingPeriods": {
       "type": "array",
+      "description" : "Opening period",
       "id": "Openings",
       "items": {
         "type": "object",
