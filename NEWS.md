@@ -1,3 +1,6 @@
+## 1.0.3
+* MODCAL-19 - Fix security vulnerability reported in jackson-databind
+* MODCAL-20 - Fix missing description fields in RAML JSON schemas
 ## 1.0.2
 * MODCAL-1 Added exceptional opening day management
 * MODCAL-5 Added filtering for events by date
