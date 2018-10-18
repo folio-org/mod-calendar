@@ -2,14 +2,18 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening day include weekdays",
   "type": "object",
+  "description": "Decription of an opening of for a specific week day.",
   "properties": {
     "weekdays": {
       "type": "object",
-      "$ref": "Weekdays.json"
+      "$ref": "Weekdays.json",
+      "description": "Day of week"
     },
     "openingDay": {
       "type": "object",
-      "$ref": "OpeningDay.json"
+      "$ref": "OpeningDay.json",
+      "description": "Decription of an opening of the week day."
+
     }
   },
   "additionalProperties": false

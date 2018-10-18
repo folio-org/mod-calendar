@@ -2,26 +2,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening",
   "type": "object",
+  "description": "Decriptor an opening period.",
   "properties": {
     "id": {
-      "type": "string"
+      "type": "string",
+      "description": "Period's internal id."
     },
     "servicePointId": {
-      "type": "string"
+      "type": "string",
+      "description": "Service point ID."
     },
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "Name of the period"
     },
     "startDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Start date of the period."
     },
     "endDate": {
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "End date of the period."
     },
     "openingDays": {
       "type": "array",
+      "description": "List opening hours within the period.",
       "items": {
         "type": "object",
         "$ref": "OpeningDayIncludeWeekdays.json"
