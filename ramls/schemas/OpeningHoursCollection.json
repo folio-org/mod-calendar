@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening hours collection",
   "type": "object",
+  "description": "List actual opening hours",
   "properties": {
     "openingPeriods": {
       "type": "array",
