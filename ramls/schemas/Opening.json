@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening",
   "type": "object",
-  "description": "Decriptor an opening period.",
+  "description": "Descriptor an opening period.",
   "properties": {
     "id": {
       "type": "string",

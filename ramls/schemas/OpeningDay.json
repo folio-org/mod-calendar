@@ -2,11 +2,11 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening day",
   "type": "object",
-  "description": "Decription of an opening of a week day.",
+  "description": "Description of an opening of a week day.",
   "properties": {
     "openingHour": {
       "type": "array",
-      "description": "List of opening and closing time pairs within a dey",
+      "description": "List of opening and closing time pairs within a day",
       "items": {
         "type": "object",
         "$ref": "OpeningHour.json"
@@ -14,7 +14,7 @@
     },
     "allDay": {
       "type": "boolean",
-      "description": "True if service point is open all the tay."
+      "description": "True if service point is open all the day."
     },
     "open": {
       "type": "boolean",
@@ -22,7 +22,7 @@
     },
     "exceptional": {
       "type": "boolean",
-      "description": "True if openning is exceptional. False if opening is regular."
+      "description": "True if opening is exceptional. False if opening is regular."
     }
   },
   "additionalProperties": false

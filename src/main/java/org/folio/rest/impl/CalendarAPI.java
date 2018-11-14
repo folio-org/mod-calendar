@@ -36,7 +36,7 @@ public class CalendarAPI implements CalendarResource {
 
   @Validate
   @Override
-  public void postCalendarPeriodsByServicePointIdPeriod(String servicePointId, String lang, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
+  public void postCalendarPeriodsByServicePointIdPeriod(String servicePointId, String lang, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
     boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
@@ -70,6 +70,145 @@ public class CalendarAPI implements CalendarResource {
 
   }
 
+  @Validate
+  @Override
+  public void deleteCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
+
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx ->
+        postgresClient.delete(beginTx, ACTUAL_OPENING_HOURS, criterionForOpeningHours, replyOfDeletingActualOpeningHours -> {
+          if (replyOfDeletingActualOpeningHours.succeeded()) {
+            postgresClient.delete(beginTx, REGULAR_HOURS, criterionForOpeningHours, replyOfDeletingRegularHours -> {
+              if (replyOfDeletingRegularHours.succeeded()) {
+                deleteOpenings(asyncResultHandler, postgresClient, criterionForOpenings, lang, beginTx);
+              } else {
+                postgresClient.rollbackTx(beginTx, done ->
+                  asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+              }
+            });
+          } else {
+            postgresClient.rollbackTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        })
+      )
+    );
+  }
+
+  @Validate
+  @Override
+  public void putCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
+    Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
+    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx ->
+        postgresClient.update(OPENINGS, openingsTable, criterionForOpenings, true, replyOfSavingOpenings -> {
+          if (replyOfSavingOpenings.succeeded()) {
+            RegularHours regularHours = new RegularHours(openingId, openingsTable.getId(), entity.getOpeningDays());
+            postgresClient.update(REGULAR_HOURS, regularHours, criterionForOpeningHours, true, replyOfSavingRegularHours -> {
+              if (replyOfSavingRegularHours.succeeded()) {
+                putActualOpeningHours(entity, criterionForOpeningHours, lang, isExceptional, asyncResultHandler, postgresClient, beginTx);
+              } else {
+                postgresClient.rollbackTx(beginTx, done ->
+                  asyncResultHandler.handle(Future.succeededFuture(PutCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+              }
+            });
+          } else {
+            postgresClient.rollbackTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(PutCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        })
+      )
+    );
+  }
+
+  @Validate
+  @Override
+  public void getCalendarPeriods(String servicePointId, String startDate, String endDate, boolean includeClosedDays, boolean actualOpenings, int offset, int limit, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    OpeningCollection openingCollection = new OpeningCollection();
+    CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
+
+    vertxContext.runOnContext(a -> {
+
+      String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+      PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+      Criteria critServicePoint;
+      Criterion criterionForServicePoint;
+      if (servicePointId != null) {
+        critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
+        criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
+      } else {
+        criterionForServicePoint = new Criterion();
+      }
+
+      postgresClient.startTx(beginTx ->
+        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
+          if (resultOfSelectOpenings.succeeded()) {
+            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+            getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
+          } else {
+            postgresClient.endTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        }));
+    });
+  }
+
+  @Override
+  public void getCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    OpeningCollection openingCollection = new OpeningCollection();
+    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
+    Criterion criterionForOpeningHours = new Criterion();
+    criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_AND);
+
+    vertxContext.runOnContext(a ->
+      postgresClient.startTx(beginTx ->
+        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
+          if (resultOfSelectOpenings.succeeded()) {
+            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+            getOpeningDaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, openingId, postgresClient, beginTx);
+          } else {
+            postgresClient.endTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        })));
+  }
+
+  @Validate
+  @Override
+  public void getCalendarPeriodsByServicePointIdPeriod(String servicePointId, boolean withOpeningDays, boolean showPast, boolean exceptional, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+    OpeningCollection openingCollection = new OpeningCollection();
+    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    Criterion criterionForOpeningHours = assembleCriterionByServicePointId(servicePointId, showPast, exceptional);
+
+    vertxContext.runOnContext(a ->
+      postgresClient.startTx(beginTx ->
+        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
+          if (resultOfSelectOpenings.succeeded()) {
+            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+            if (withOpeningDays) {
+              getOpeningDaysByServicePointIdFuture(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
+            } else {
+              postgresClient.endTx(beginTx, done ->
+                asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withJsonOK(openingCollection))));
+            }
+          } else {
+            postgresClient.endTx(beginTx, done ->
+              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          }
+        })));
+  }
 
   private void saveRegularHours(PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams, PostgresClient postgresClient, Handler<AsyncResult<Response>> asyncResultHandler, AsyncResult<Object> beginTx, AsyncResult<String> replyOfSavingOpenings) {
     if (replyOfSavingOpenings.succeeded()) {
@@ -107,36 +246,6 @@ public class CalendarAPI implements CalendarResource {
     }
   }
 
-  @Validate
-  @Override
-  public void deleteCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
-    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
-
-    vertxContext.runOnContext(v ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.delete(beginTx, ACTUAL_OPENING_HOURS, criterionForOpeningHours, replyOfDeletingActualOpeningHours -> {
-          if (replyOfDeletingActualOpeningHours.succeeded()) {
-            postgresClient.delete(beginTx, REGULAR_HOURS, criterionForOpeningHours, replyOfDeletingRegularHours -> {
-              if (replyOfDeletingRegularHours.succeeded()) {
-                deleteOpenings(asyncResultHandler, postgresClient, criterionForOpenings, lang, beginTx);
-              } else {
-                postgresClient.rollbackTx(beginTx, done ->
-                  asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-              }
-            });
-          } else {
-            postgresClient.rollbackTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })
-      )
-    );
-  }
-
-
   private void deleteOpenings(Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, Criterion criterionForOpenings, String lang, AsyncResult<Object> beginTx) {
     postgresClient.delete(beginTx, OPENINGS, criterionForOpenings, replyOfDeletingOpenings -> {
       if (replyOfDeletingOpenings.succeeded()) {
@@ -147,37 +256,6 @@ public class CalendarAPI implements CalendarResource {
           asyncResultHandler.handle(Future.succeededFuture(DeleteCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
       }
     });
-  }
-
-  @Validate
-  @Override
-  public void putCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, OpeningPeriod_ entity, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
-    Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
-    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
-    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
-
-    vertxContext.runOnContext(v ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.update(OPENINGS, openingsTable, criterionForOpenings, true, replyOfSavingOpenings -> {
-          if (replyOfSavingOpenings.succeeded()) {
-            RegularHours regularHours = new RegularHours(openingId, openingsTable.getId(), entity.getOpeningDays());
-            postgresClient.update(REGULAR_HOURS, regularHours, criterionForOpeningHours, true, replyOfSavingRegularHours -> {
-              if (replyOfSavingRegularHours.succeeded()) {
-                putActualOpeningHours(entity, criterionForOpeningHours, lang, isExceptional, asyncResultHandler, postgresClient, beginTx);
-              } else {
-                postgresClient.rollbackTx(beginTx, done ->
-                  asyncResultHandler.handle(Future.succeededFuture(PutCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-              }
-            });
-          } else {
-            postgresClient.rollbackTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(PutCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })
-      )
-    );
   }
 
   private void putActualOpeningHours(OpeningPeriod_ entity, Criterion openingId, String lang, boolean isExceptional, Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
@@ -198,86 +276,6 @@ public class CalendarAPI implements CalendarResource {
           asyncResultHandler.handle(Future.succeededFuture(PutCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
       }
     });
-  }
-
-  @Validate
-  @Override
-  public void getCalendarPeriods(String servicePointId, String startDate, String endDate, boolean includeClosedDays, boolean actualOpenings, int offset, int limit, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    OpeningCollection openingCollection = new OpeningCollection();
-    CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
-
-    vertxContext.runOnContext(a -> {
-
-      String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-      PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-      Criteria critServicePoint;
-      Criterion criterionForServicePoint;
-      if (servicePointId != null) {
-        critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-        criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
-      } else {
-        criterionForServicePoint = new Criterion();
-      }
-
-      postgresClient.startTx(beginTx ->
-        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
-          if (resultOfSelectOpenings.succeeded()) {
-            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
-          } else {
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        }));
-    });
-  }
-
-  @Override
-  public void getCalendarPeriodsByServicePointIdPeriodByPeriodId(String openingId, String servicePointId, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    OpeningCollection openingCollection = new OpeningCollection();
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
-    Criterion criterionForOpeningHours = new Criterion();
-    criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_AND);
-
-    vertxContext.runOnContext(a ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
-          if (resultOfSelectOpenings.succeeded()) {
-            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            getOpeningDaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, openingId, postgresClient, beginTx);
-          } else {
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })));
-  }
-
-  @Validate
-  @Override
-  public void getCalendarPeriodsByServicePointIdPeriod(String servicePointId, boolean withOpeningDays, boolean showPast, boolean exceptional, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) throws Exception {
-    OpeningCollection openingCollection = new OpeningCollection();
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criterion criterionForOpeningHours = assembleCriterionByServicePointId(servicePointId, showPast, exceptional);
-
-    vertxContext.runOnContext(a ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
-          if (resultOfSelectOpenings.succeeded()) {
-            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            if (withOpeningDays) {
-              getOpeningDaysByServicePointIdFuture(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
-            } else {
-              postgresClient.endTx(beginTx, done ->
-                asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withJsonOK(openingCollection))));
-            }
-          } else {
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })));
   }
 
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
@@ -349,7 +347,7 @@ public class CalendarAPI implements CalendarResource {
   }
 
   private Criterion assembleCriterionByServicePointId(String servicePointId, boolean showPast, boolean exceptional) {
-    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'");
+    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
     Criteria critShowPast = new Criteria();
     Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + exceptional + "'");
 
@@ -366,7 +364,6 @@ public class CalendarAPI implements CalendarResource {
     criterionForOpeningHours.addCriterion(critExceptional, Criteria.OP_AND);
     return criterionForOpeningHours;
   }
-
 
   private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
     Criteria critOpeningId = new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
@@ -392,7 +389,6 @@ public class CalendarAPI implements CalendarResource {
     return criterionForOpeningHours;
   }
 
-
   private Criterion assembleCriterionForCheckingOverlap(String openingId, String servicePointId, Date startDate, Date endDate, boolean exceptional) {
     Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
     Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
@@ -400,12 +396,12 @@ public class CalendarAPI implements CalendarResource {
     Criteria critStartDate = new Criteria();
     critStartDate.addField(START_DATE);
     critStartDate.setOperation(Criteria.OP_LESS_THAN_EQ);
-    critStartDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(startDate))));
+    critStartDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(startDate)));
 
     Criteria critEndDate = new Criteria();
     critEndDate.addField(END_DATE);
     critEndDate.setOperation(Criteria.OP_GREATER_THAN_EQ);
-    critEndDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(endDate))));
+    critEndDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(endDate)));
 
     Criterion criterionForOpeningHours = new Criterion();
     criterionForOpeningHours.addCriterion(critExceptional, Criteria.OP_AND);
@@ -498,7 +494,6 @@ public class CalendarAPI implements CalendarResource {
 
     return futures;
   }
-
 
   private void setOpeningPeriods(OpeningHoursCollection openingHoursCollection, List<OpeningPeriod> openingPeriods, ActualOpeningHours actualOpeningHour) {
     OpeningPeriod openingPeriod = new OpeningPeriod();
