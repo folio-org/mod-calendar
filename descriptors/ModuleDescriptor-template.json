@@ -38,6 +38,15 @@
             "calendar.collection.update",
             "calendar.collection.remove"
           ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
+          "permissionsRequired": [
+            "calendar.collection.get"
+          ]
         }
       ]
     },{

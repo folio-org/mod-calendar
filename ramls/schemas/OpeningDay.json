@@ -12,6 +12,10 @@
         "$ref": "OpeningHour.json"
       }
     },
+    "date": {
+      "type": "string",
+      "description": "Date for opening day"
+    },
     "allDay": {
       "type": "boolean",
       "description": "True if service point is open all the day."
