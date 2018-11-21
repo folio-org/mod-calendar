@@ -438,22 +438,15 @@ public class CalendarAPI implements CalendarResource {
 
   private void getOpeningDaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
-    if (!futures.isEmpty()) {
-      CompositeFuture.all(futures).setHandler(querys -> {
-        if (querys.succeeded()) {
-          postgresClient.endTx(beginTx, done ->
-            asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withJsonOK(openingCollection.getOpeningPeriods().get(0)))));
-        } else {
-          postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainNotFound(openingId))));
-        }
-      });
-    } else {
-      postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodByPeriodIdResponse.withPlainNotFound(openingId))));
-    }
+    endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
   }
 
   private void getOpening3DaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Future> futures = get3OpeningDays(asyncResultHandler, openingCollection, lang, loanEndDateTime, postgresClient, beginTx);
+    endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
+  }
+
+  private void endCalculation(Handler<AsyncResult<Response>> asyncResultHandler, List<Future> futures, OpeningCollection openingCollection, String openingId, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     if (!futures.isEmpty()) {
       CompositeFuture.all(futures).setHandler(querys -> {
         if (querys.succeeded()) {
