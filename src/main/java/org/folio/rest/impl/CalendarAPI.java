@@ -655,22 +655,13 @@ public class CalendarAPI implements CalendarResource {
 
   private OpeningDay_ findPrevDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
     OpeningDay_ prev;
-    if (requestedDayIsClosed) {
-      if (i == 0) {
-        prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-      } else if (i == regularHours.getOpeningDays().size() - 1) {
-        prev = regularHours.getOpeningDays().get(0);
-      } else {
-        prev = regularHours.getOpeningDays().get(i - 1);
-      }
+    if (i == 0) {
+      prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
+    } else if (i == regularHours.getOpeningDays().size() - 1) {
+      int index = requestedDayIsClosed ? 0 : i - 1;
+      prev = regularHours.getOpeningDays().get(index);
     } else {
-      if (i == 0) {
-        prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-      } else if (i == regularHours.getOpeningDays().size() - 1) {
-        prev = regularHours.getOpeningDays().get(i - 1);
-      } else {
-        prev = regularHours.getOpeningDays().get(i - 1);
-      }
+      prev = regularHours.getOpeningDays().get(i - 1);
     }
     return prev;
   }
@@ -678,22 +669,12 @@ public class CalendarAPI implements CalendarResource {
   private OpeningDay_ findNextDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
     OpeningDay_ next;
     OpeningDay_ nextDay = regularHours.getOpeningDays().get(i);
-    if (requestedDayIsClosed) {
-      if (i == 0) {
-        next = nextDay;
-      } else if (i == regularHours.getOpeningDays().size() - 1) {
-        next = nextDay;
-      } else {
-        next = nextDay;
-      }
+    if (i == 0) {
+      next = requestedDayIsClosed ? nextDay : regularHours.getOpeningDays().get(i + 1);
+    } else if (i == regularHours.getOpeningDays().size() - 1) {
+      next = requestedDayIsClosed ? nextDay : regularHours.getOpeningDays().get(0);
     } else {
-      if (i == 0) {
-        next = regularHours.getOpeningDays().get(i + 1);
-      } else if (i == regularHours.getOpeningDays().size() - 1) {
-        next = regularHours.getOpeningDays().get(0);
-      } else {
-        next = regularHours.getOpeningDays().get(i + 1);
-      }
+      next = requestedDayIsClosed ? nextDay : regularHours.getOpeningDays().get(i + 1);
     }
     return next;
   }
