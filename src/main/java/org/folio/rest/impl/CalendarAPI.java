@@ -583,23 +583,17 @@ public class CalendarAPI implements CalendarResource {
     String loanEndDayOfWeek = loanEndDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
     //if loan end date is opened by schedule
     List<OpeningDay_> currentPrevNextList = new ArrayList<>();
+    OpeningDay_ next = null;
+    OpeningDay_ prev = null;
     for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
       OpeningDay_ day = regularHours.getOpeningDays().get(i);
-      OpeningDay_ next;
-      OpeningDay_ prev;
       if (day.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeek)) {
         day.getOpeningDay().setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
         // one day in a week open option
         if (regularHours.getOpeningDays().size() == 1) {
           prev = createCopy(day);
-          ZonedDateTime prevDate = loanEndDateTime.minusDays(DayOfWeek.values().length);
-          setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
-          prev.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
-
           next = createCopy(day);
-          ZonedDateTime nextDate = loanEndDateTime.plusDays(DayOfWeek.values().length);
-          setClosedIfOut(nextDate, openingPeriod.getEndDate(), next, false);
-          next.getOpeningDay().setDate(nextDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
+          processOneDaySchedule(prev, next, loanEndDateTime, openingPeriod, false);
         } else {
           if (i == 0) {
             prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
@@ -611,7 +605,6 @@ public class CalendarAPI implements CalendarResource {
             prev = regularHours.getOpeningDays().get(i - 1);
             next = regularHours.getOpeningDays().get(i + 1);
           }
-
           fillPrevAndNextDate(prev.getWeekdays().getDay().toString(),
             next.getWeekdays().getDay().toString(),
             loanEndDateTime, openingPeriod.getStartDate(), openingPeriod.getEndDate(), next, prev);
@@ -625,6 +618,8 @@ public class CalendarAPI implements CalendarResource {
 
     //if loan end date is closed by schedule
     if (CollectionUtils.isEmpty(currentPrevNextList)) {
+      OpeningDay_ nextIfClosed = null;
+      OpeningDay_ prevIfClosed = null;
       // loop through 6 days of week, do not look for closed day again
       for (int j = 1; j < 7; j++) {
         ZonedDateTime loanEndDateTimeNext = loanEndDateTime.plusDays(j);
@@ -636,21 +631,14 @@ public class CalendarAPI implements CalendarResource {
         current.setWeekdays(new Weekdays().withDay(Weekdays.Day.fromValue(loanEndDayOfWeek.toUpperCase())));
         current.setOpeningDay(openingDayClosed);
 
-        OpeningDay_ nextIfClosed = null;
-        OpeningDay_ prevIfClosed = null;
         for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
           OpeningDay_ nextDay = regularHours.getOpeningDays().get(i);
           if (nextDay.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeekNext)) {
             nextDay.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
             if (regularHours.getOpeningDays().size() == 1) {
               prevIfClosed = createCopy(nextDay);
-              ZonedDateTime prevDate = loanEndDateTimeNext.minusDays(7);
-              setClosedIfOut(prevDate, openingPeriod.getStartDate(), prevIfClosed, true);
-              prevIfClosed.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
-
               nextIfClosed = createCopy(nextDay);
-              setClosedIfOut(loanEndDateTimeNext, openingPeriod.getEndDate(), nextIfClosed, false);
-              nextIfClosed.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
+              processOneDaySchedule(prevIfClosed, nextIfClosed, loanEndDateTimeNext, openingPeriod, true);
             } else {
               if (i == 0) {
                 nextIfClosed = nextDay;
@@ -662,7 +650,6 @@ public class CalendarAPI implements CalendarResource {
                 nextIfClosed = nextDay;
                 prevIfClosed = regularHours.getOpeningDays().get(i - 1);
               }
-
               fillPrevAndNextDate(prevIfClosed.getWeekdays().getDay().toString(),
                 nextIfClosed.getWeekdays().getDay().toString(),
                 loanEndDateTimeNext, openingPeriod.getStartDate(), openingPeriod.getEndDate(), nextIfClosed, prevIfClosed);
@@ -680,6 +667,25 @@ public class CalendarAPI implements CalendarResource {
       }
     }
     return currentPrevNextList;
+  }
+
+  private void processOneDaySchedule(OpeningDay_ prev, OpeningDay_ next, ZonedDateTime loanEndDateTime, OpeningPeriod_ openingPeriod, boolean requestedDayIsClosed) {
+    if (requestedDayIsClosed) {
+      ZonedDateTime prevDate = loanEndDateTime.minusDays(7);
+      setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
+      prev.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
+
+      setClosedIfOut(loanEndDateTime, openingPeriod.getEndDate(), next, false);
+      next.getOpeningDay().setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
+    } else {
+      ZonedDateTime prevDate = loanEndDateTime.minusDays(DayOfWeek.values().length);
+      setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
+      prev.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
+
+      ZonedDateTime nextDate = loanEndDateTime.plusDays(DayOfWeek.values().length);
+      setClosedIfOut(nextDate, openingPeriod.getEndDate(), next, false);
+      next.getOpeningDay().setDate(nextDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
+    }
   }
 
   private void setClosedIfOut(ZonedDateTime targetDate, Date dateToCompare, OpeningDay_ openingDay, boolean isAfter) {
