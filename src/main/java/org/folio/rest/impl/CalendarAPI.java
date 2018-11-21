@@ -595,16 +595,8 @@ public class CalendarAPI implements CalendarResource {
           next = createCopy(day);
           processOneDaySchedule(prev, next, loanEndDateTime, openingPeriod, false);
         } else {
-          if (i == 0) {
-            prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-            next = regularHours.getOpeningDays().get(i + 1);
-          } else if (i == regularHours.getOpeningDays().size() - 1) {
-            prev = regularHours.getOpeningDays().get(i - 1);
-            next = regularHours.getOpeningDays().get(0);
-          } else {
-            prev = regularHours.getOpeningDays().get(i - 1);
-            next = regularHours.getOpeningDays().get(i + 1);
-          }
+          prev = findPrevDayInMultipleDaysSchedule(i, regularHours, false);
+          next = findNextDayInMultipleDaysSchedule(i, regularHours, false);
           fillPrevAndNextDate(prev.getWeekdays().getDay().toString(),
             next.getWeekdays().getDay().toString(),
             loanEndDateTime, openingPeriod.getStartDate(), openingPeriod.getEndDate(), next, prev);
@@ -640,16 +632,8 @@ public class CalendarAPI implements CalendarResource {
               nextIfClosed = createCopy(nextDay);
               processOneDaySchedule(prevIfClosed, nextIfClosed, loanEndDateTimeNext, openingPeriod, true);
             } else {
-              if (i == 0) {
-                nextIfClosed = nextDay;
-                prevIfClosed = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-              } else if (i == regularHours.getOpeningDays().size() - 1) {
-                nextIfClosed = nextDay;
-                prevIfClosed = regularHours.getOpeningDays().get(0);
-              } else {
-                nextIfClosed = nextDay;
-                prevIfClosed = regularHours.getOpeningDays().get(i - 1);
-              }
+              prevIfClosed = findPrevDayInMultipleDaysSchedule(i, regularHours, true);
+              nextIfClosed = findNextDayInMultipleDaysSchedule(i, regularHours, true);
               fillPrevAndNextDate(prevIfClosed.getWeekdays().getDay().toString(),
                 nextIfClosed.getWeekdays().getDay().toString(),
                 loanEndDateTimeNext, openingPeriod.getStartDate(), openingPeriod.getEndDate(), nextIfClosed, prevIfClosed);
@@ -667,6 +651,51 @@ public class CalendarAPI implements CalendarResource {
       }
     }
     return currentPrevNextList;
+  }
+
+  private OpeningDay_ findPrevDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
+    OpeningDay_ prev;
+    if (requestedDayIsClosed) {
+      if (i == 0) {
+        prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
+      } else if (i == regularHours.getOpeningDays().size() - 1) {
+        prev = regularHours.getOpeningDays().get(0);
+      } else {
+        prev = regularHours.getOpeningDays().get(i - 1);
+      }
+    } else {
+      if (i == 0) {
+        prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
+      } else if (i == regularHours.getOpeningDays().size() - 1) {
+        prev = regularHours.getOpeningDays().get(i - 1);
+      } else {
+        prev = regularHours.getOpeningDays().get(i - 1);
+      }
+    }
+    return prev;
+  }
+
+  private OpeningDay_ findNextDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
+    OpeningDay_ next;
+    OpeningDay_ nextDay = regularHours.getOpeningDays().get(i);
+    if (requestedDayIsClosed) {
+      if (i == 0) {
+        next = nextDay;
+      } else if (i == regularHours.getOpeningDays().size() - 1) {
+        next = nextDay;
+      } else {
+        next = nextDay;
+      }
+    } else {
+      if (i == 0) {
+        next = regularHours.getOpeningDays().get(i + 1);
+      } else if (i == regularHours.getOpeningDays().size() - 1) {
+        next = regularHours.getOpeningDays().get(0);
+      } else {
+        next = regularHours.getOpeningDays().get(i + 1);
+      }
+    }
+    return next;
   }
 
   private void processOneDaySchedule(OpeningDay_ prev, OpeningDay_ next, ZonedDateTime loanEndDateTime, OpeningPeriod_ openingPeriod, boolean requestedDayIsClosed) {
