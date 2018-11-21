@@ -385,7 +385,7 @@ public class CalendarAPI implements CalendarResource {
   }
 
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
-    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
+    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, null, postgresClient, beginTx);
 
     CompositeFuture.all(futures).setHandler(querys -> {
       if (querys.succeeded()) {
@@ -437,12 +437,12 @@ public class CalendarAPI implements CalendarResource {
   }
 
   private void getOpeningDaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
-    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
+    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, null, postgresClient, beginTx);
     endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
   }
 
   private void getOpening3DaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
-    List<Future> futures = get3OpeningDays(asyncResultHandler, openingCollection, lang, loanEndDateTime, postgresClient, beginTx);
+    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, loanEndDateTime, postgresClient, beginTx);
     endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
   }
 
@@ -544,7 +544,7 @@ public class CalendarAPI implements CalendarResource {
     }
   }
 
-  private List<Future> getOpeningDays(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
+  private List<Future> getOpeningDays(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
     List<Future> futures = new ArrayList<>();
     for (OpeningPeriod_ openingPeriod : openingCollection.getOpeningPeriods()) {
       Criterion criterionForRegularHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingPeriod.getId() + "'"));
@@ -558,7 +558,8 @@ public class CalendarAPI implements CalendarResource {
             for (RegularHours regularHours : regularHoursList) {
               Map<String, OpeningPeriod_> openingPeriods = openingCollection.getOpeningPeriods().stream()
                 .collect(Collectors.toMap(OpeningPeriod_::getId, Function.identity()));
-              openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(regularHours.getOpeningDays());
+              List<OpeningDay_> openingDays = loanEndDateTime != null ? processCalculation(loanEndDateTime, regularHours, openingPeriod) : regularHours.getOpeningDays();
+              openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(openingDays);
             }
 
             future.complete();
@@ -578,138 +579,107 @@ public class CalendarAPI implements CalendarResource {
     return futures;
   }
 
-  private List<Future> get3OpeningDays(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<Object> beginTx) {
-    List<Future> futures = new ArrayList<>();
-    for (OpeningPeriod_ openingPeriod : openingCollection.getOpeningPeriods()) {
-      Criterion criterionForRegularHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingPeriod.getId() + "'"));
-      Future<Void> future = Future.future();
-      futures.add(future);
-      postgresClient.get(REGULAR_HOURS, RegularHours.class, criterionForRegularHours, true, false, resultOfSelectRegularHours -> {
-        if (resultOfSelectRegularHours.succeeded()) {
-          try {
-            List<RegularHours> regularHoursList = (List<RegularHours>) resultOfSelectRegularHours.result().getResults();
+  private List<OpeningDay_> processCalculation(ZonedDateTime loanEndDateTime, RegularHours regularHours, OpeningPeriod_ openingPeriod) {
+    String loanEndDayOfWeek = loanEndDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
+    //if loan end date is opened by schedule
+    List<OpeningDay_> currentPrevNextList = new ArrayList<>();
+    for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
+      OpeningDay_ day = regularHours.getOpeningDays().get(i);
+      OpeningDay_ next;
+      OpeningDay_ prev;
+      if (day.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeek)) {
+        day.getOpeningDay().setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
+        // one day in a week open option
+        if (regularHours.getOpeningDays().size() == 1) {
+          prev = createCopy(day);
+          ZonedDateTime prevDate = loanEndDateTime.minusDays(DayOfWeek.values().length);
+          setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
+          prev.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
 
-            for (RegularHours regularHours : regularHoursList) {
-              Map<String, OpeningPeriod_> openingPeriods = openingCollection.getOpeningPeriods().stream()
-                .collect(Collectors.toMap(OpeningPeriod_::getId, Function.identity()));
-
-              String loanEndDayOfWeek = loanEndDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
-              //if loan end date is opened by schedule
-              List<OpeningDay_> currentPrevNextList = new ArrayList<>();
-              for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
-                OpeningDay_ day = regularHours.getOpeningDays().get(i);
-                OpeningDay_ next;
-                OpeningDay_ prev;
-                if (day.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeek)) {
-                  day.getOpeningDay().setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
-                  // one day in a week open option
-                  if (regularHours.getOpeningDays().size() == 1) {
-                    prev = createCopy(day);
-                    ZonedDateTime prevDate = loanEndDateTime.minusDays(DayOfWeek.values().length);
-                    setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
-                    prev.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
-
-                    next = createCopy(day);
-                    ZonedDateTime nextDate = loanEndDateTime.plusDays(DayOfWeek.values().length);
-                    setClosedIfOut(nextDate, openingPeriod.getEndDate(), next, false);
-                    next.getOpeningDay().setDate(nextDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
-                  } else {
-                    if (i == 0) {
-                      prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-                      next = regularHours.getOpeningDays().get(i + 1);
-                    } else if (i == regularHours.getOpeningDays().size() - 1) {
-                      prev = regularHours.getOpeningDays().get(i - 1);
-                      next = regularHours.getOpeningDays().get(0);
-                    } else {
-                      prev = regularHours.getOpeningDays().get(i - 1);
-                      next = regularHours.getOpeningDays().get(i + 1);
-                    }
-
-                    fillPrevAndNextDate(prev.getWeekdays().getDay().toString(),
-                      next.getWeekdays().getDay().toString(),
-                      loanEndDateTime, openingPeriod.getStartDate(), openingPeriod.getEndDate(), next, prev);
-                  }
-                  currentPrevNextList.add(prev);
-                  currentPrevNextList.add(day);
-                  currentPrevNextList.add(next);
-                  break;
-                }
-              }
-
-              //if loan end date is closed by schedule
-              if (CollectionUtils.isEmpty(currentPrevNextList)) {
-                // loop through 6 days of week, do not look for closed day again
-                for (int j = 1; j < 7; j++) {
-                  ZonedDateTime loanEndDateTimeNext = loanEndDateTime.plusDays(j);
-                  String loanEndDayOfWeekNext = loanEndDateTimeNext.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
-
-                  OpeningDay_ current = new OpeningDay_();
-                  OpeningDay openingDayClosed = new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false);
-                  openingDayClosed.setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
-                  current.setWeekdays(new Weekdays().withDay(Weekdays.Day.fromValue(loanEndDayOfWeek.toUpperCase())));
-                  current.setOpeningDay(openingDayClosed);
-
-                  OpeningDay_ nextIfClosed = null;
-                  OpeningDay_ prevIfClosed = null;
-                  for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
-                    OpeningDay_ nextDay = regularHours.getOpeningDays().get(i);
-                    if (nextDay.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeekNext)) {
-                      nextDay.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
-                      if (regularHours.getOpeningDays().size() == 1) {
-                        prevIfClosed = createCopy(nextDay);
-                        ZonedDateTime prevDate = loanEndDateTimeNext.minusDays(7);
-                        setClosedIfOut(prevDate, openingPeriod.getStartDate(), prevIfClosed, true);
-                        prevIfClosed.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
-
-                        nextIfClosed = createCopy(nextDay);
-                        setClosedIfOut(loanEndDateTimeNext, openingPeriod.getEndDate(), nextIfClosed, false);
-                        nextIfClosed.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
-                      } else {
-                        if (i == 0) {
-                          nextIfClosed = nextDay;
-                          prevIfClosed = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
-                        } else if (i == regularHours.getOpeningDays().size() - 1) {
-                          nextIfClosed = nextDay;
-                          prevIfClosed = regularHours.getOpeningDays().get(0);
-                        } else {
-                          nextIfClosed = nextDay;
-                          prevIfClosed = regularHours.getOpeningDays().get(i - 1);
-                        }
-
-                        fillPrevAndNextDate(prevIfClosed.getWeekdays().getDay().toString(),
-                          nextIfClosed.getWeekdays().getDay().toString(),
-                          loanEndDateTimeNext, openingPeriod.getStartDate(), openingPeriod.getEndDate(), nextIfClosed, prevIfClosed);
-
-                      }
-                      break;
-                    }
-                  }
-                  if (prevIfClosed != null && nextIfClosed != null) {
-                    currentPrevNextList.add(prevIfClosed);
-                    currentPrevNextList.add(current);
-                    currentPrevNextList.add(nextIfClosed);
-                    break;
-                  }
-                }
-              }
-              openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(currentPrevNextList);
-            }
-
-            future.complete();
-          } catch (ClassCastException ex) {
-            future.fail(resultOfSelectRegularHours.cause());
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
+          next = createCopy(day);
+          ZonedDateTime nextDate = loanEndDateTime.plusDays(DayOfWeek.values().length);
+          setClosedIfOut(nextDate, openingPeriod.getEndDate(), next, false);
+          next.getOpeningDay().setDate(nextDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
         } else {
-          future.fail(resultOfSelectRegularHours.cause());
-          postgresClient.endTx(beginTx, done ->
-            asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsByServicePointIdPeriodResponse.withPlainInternalServerError(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          if (i == 0) {
+            prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
+            next = regularHours.getOpeningDays().get(i + 1);
+          } else if (i == regularHours.getOpeningDays().size() - 1) {
+            prev = regularHours.getOpeningDays().get(i - 1);
+            next = regularHours.getOpeningDays().get(0);
+          } else {
+            prev = regularHours.getOpeningDays().get(i - 1);
+            next = regularHours.getOpeningDays().get(i + 1);
+          }
+
+          fillPrevAndNextDate(prev.getWeekdays().getDay().toString(),
+            next.getWeekdays().getDay().toString(),
+            loanEndDateTime, openingPeriod.getStartDate(), openingPeriod.getEndDate(), next, prev);
         }
-      });
+        currentPrevNextList.add(prev);
+        currentPrevNextList.add(day);
+        currentPrevNextList.add(next);
+        break;
+      }
     }
 
-    return futures;
+    //if loan end date is closed by schedule
+    if (CollectionUtils.isEmpty(currentPrevNextList)) {
+      // loop through 6 days of week, do not look for closed day again
+      for (int j = 1; j < 7; j++) {
+        ZonedDateTime loanEndDateTimeNext = loanEndDateTime.plusDays(j);
+        String loanEndDayOfWeekNext = loanEndDateTimeNext.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
+
+        OpeningDay_ current = new OpeningDay_();
+        OpeningDay openingDayClosed = new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false);
+        openingDayClosed.setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
+        current.setWeekdays(new Weekdays().withDay(Weekdays.Day.fromValue(loanEndDayOfWeek.toUpperCase())));
+        current.setOpeningDay(openingDayClosed);
+
+        OpeningDay_ nextIfClosed = null;
+        OpeningDay_ prevIfClosed = null;
+        for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
+          OpeningDay_ nextDay = regularHours.getOpeningDays().get(i);
+          if (nextDay.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeekNext)) {
+            nextDay.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
+            if (regularHours.getOpeningDays().size() == 1) {
+              prevIfClosed = createCopy(nextDay);
+              ZonedDateTime prevDate = loanEndDateTimeNext.minusDays(7);
+              setClosedIfOut(prevDate, openingPeriod.getStartDate(), prevIfClosed, true);
+              prevIfClosed.getOpeningDay().setDate(prevDate.format(DateTimeFormatter.ISO_OFFSET_DATE));
+
+              nextIfClosed = createCopy(nextDay);
+              setClosedIfOut(loanEndDateTimeNext, openingPeriod.getEndDate(), nextIfClosed, false);
+              nextIfClosed.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
+            } else {
+              if (i == 0) {
+                nextIfClosed = nextDay;
+                prevIfClosed = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
+              } else if (i == regularHours.getOpeningDays().size() - 1) {
+                nextIfClosed = nextDay;
+                prevIfClosed = regularHours.getOpeningDays().get(0);
+              } else {
+                nextIfClosed = nextDay;
+                prevIfClosed = regularHours.getOpeningDays().get(i - 1);
+              }
+
+              fillPrevAndNextDate(prevIfClosed.getWeekdays().getDay().toString(),
+                nextIfClosed.getWeekdays().getDay().toString(),
+                loanEndDateTimeNext, openingPeriod.getStartDate(), openingPeriod.getEndDate(), nextIfClosed, prevIfClosed);
+
+            }
+            break;
+          }
+        }
+        if (prevIfClosed != null && nextIfClosed != null) {
+          currentPrevNextList.add(prevIfClosed);
+          currentPrevNextList.add(current);
+          currentPrevNextList.add(nextIfClosed);
+          break;
+        }
+      }
+    }
+    return currentPrevNextList;
   }
 
   private void setClosedIfOut(ZonedDateTime targetDate, Date dateToCompare, OpeningDay_ openingDay, boolean isAfter) {
