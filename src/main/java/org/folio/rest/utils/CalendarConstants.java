@@ -1,6 +1,7 @@
 package org.folio.rest.utils;
 
 public final class CalendarConstants {
+  public static final String EVENT = "event";
   public static final String OPENINGS = "openings";
   public static final String REGULAR_HOURS = "regular_hours";
   public static final String ACTUAL_OPENING_HOURS = "actual_opening_hours";

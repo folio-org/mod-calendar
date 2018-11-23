@@ -16,14 +16,21 @@ import java.util.stream.Stream;
 public class CalendarUtils {
 
 
-  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern("HH:mm:ss.SSS'Z'");
-  public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern("yyyy-MM-dd").withZoneUTC();
-  public static final String DATE_FORMATTER_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_FORMATTER_PATTERN).withZoneUTC();
-  private static final String DAY_PATTERN = "EEEE";
+  private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
+  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
+  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
+  public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
+  public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
+  public static final String DAY_PATTERN = "EEEE";
 
   private CalendarUtils() {
   }
+
+  public static DayOfWeek dayOfDate(Date inputDate) {
+    return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
+  }
+
 
   public static List<Object> separateEvents(OpeningPeriod_ entity, boolean isExceptional) {
     List<Object> actualOpeningHours = new ArrayList<>();
@@ -64,7 +71,7 @@ public class CalendarUtils {
 
   private static Map<DayOfWeek, OpeningDay_> getOpeningDays(OpeningPeriod_ entity) {
 
-    EnumMap<DayOfWeek, OpeningDay_> openingDays = new EnumMap<>(DayOfWeek.class);
+    EnumMap openingDays = new EnumMap(DayOfWeek.class);
 
     for (OpeningDay_ openingDay : entity.getOpeningDays()) {
       openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
@@ -132,7 +139,7 @@ public class CalendarUtils {
       startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
     if (endDate == null) {
-      long count = openingPeriods.size();
+      long count = openingPeriods.stream().count();
       Stream<OpeningPeriod> stream = openingPeriods.stream();
       Calendar calendar = Calendar.getInstance();
       if (!openingPeriods.isEmpty()) {
@@ -175,7 +182,7 @@ public class CalendarUtils {
     }
   }
 
-  private static DayOfWeek dayOfDate(Date inputDate) {
-    return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
+  public static Date getDateWithoutHoursAndMinutes(Date date) {
+    return date;
   }
 }
