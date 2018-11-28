@@ -32,7 +32,7 @@ public class CalendarUtils {
   }
 
 
-  public static List<Object> separateEvents(OpeningPeriod_ entity, boolean isExceptional) {
+  public static List<Object> separateEvents(OpeningPeriod entity, boolean isExceptional) {
     List<Object> actualOpeningHours = new ArrayList<>();
 
     Calendar startDay = Calendar.getInstance();
@@ -52,11 +52,11 @@ public class CalendarUtils {
         startDay.add(Calendar.DAY_OF_MONTH, 1);
       }
     } else {
-      Map<DayOfWeek, OpeningDay_> openingDays = getOpeningDays(entity);
+      Map<DayOfWeek, OpeningDay> openingDays = getOpeningDays(entity);
 
       while (startDay.before(endDay)) {
         DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
-        OpeningDay_ openingDay = openingDays.get(dayOfWeek);
+        OpeningDay openingDay = openingDays.get(dayOfWeek);
         if (openingDay != null) {
           List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId(), false);
           actualOpeningHours.addAll(event);
@@ -69,18 +69,18 @@ public class CalendarUtils {
     return actualOpeningHours;
   }
 
-  private static Map<DayOfWeek, OpeningDay_> getOpeningDays(OpeningPeriod_ entity) {
+  private static Map<DayOfWeek, OpeningDay> getOpeningDays(OpeningPeriod entity) {
 
     EnumMap openingDays = new EnumMap(DayOfWeek.class);
 
-    for (OpeningDay_ openingDay : entity.getOpeningDays()) {
+    for (OpeningDay openingDay : entity.getOpeningDays()) {
       openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
     }
 
     return openingDays;
   }
 
-  private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
+  private static List<ActualOpeningHours> createEvents(OpeningDay_ openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
     Calendar currentStartDate = Calendar.getInstance();
     currentStartDate.setTimeInMillis(actualDay.getTimeInMillis());
 

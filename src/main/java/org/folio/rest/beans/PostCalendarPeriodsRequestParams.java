@@ -1,14 +1,14 @@
 package org.folio.rest.beans;
 
-import org.folio.rest.jaxrs.model.OpeningPeriod_;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
 
 public class PostCalendarPeriodsRequestParams {
   String lang;
-  OpeningPeriod_ entity;
+  OpeningPeriod entity;
   boolean exceptional;
   Openings openingsTable;
 
-  public PostCalendarPeriodsRequestParams(String lang, OpeningPeriod_ entity, boolean exceptional, Openings openingsTable) {
+  public PostCalendarPeriodsRequestParams(String lang, OpeningPeriod entity, boolean exceptional, Openings openingsTable) {
     this.lang = lang;
     this.entity = entity;
     this.exceptional = exceptional;
@@ -19,7 +19,7 @@ public class PostCalendarPeriodsRequestParams {
     return lang;
   }
 
-  public OpeningPeriod_ getEntity() {
+  public OpeningPeriod getEntity() {
     return entity;
   }
 
