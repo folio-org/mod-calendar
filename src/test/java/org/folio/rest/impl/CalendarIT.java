@@ -12,29 +12,22 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.awaitility.Awaitility;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.*;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.folio.rest.utils.CalendarUtils;
 import org.junit.*;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
-import org.awaitility.Awaitility.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertThat;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -82,9 +75,6 @@ public class CalendarIT {
     try {
       PostgresClient.setIsEmbedded(true);
       PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-      String sql = "drop schema if exists test_mod_calendar cascade;\n"
-        + "drop role if exists test_mod_calendar;\n";
-      executeSql(context, sql);
     } catch (Exception e) {
       log.error("", e);
       context.fail(e);
@@ -120,27 +110,22 @@ public class CalendarIT {
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("uuid"))
       .statusCode(404);
-  }
 
-  private static Future executeSql(TestContext context, String sql) {
-    Async async = context.async();
-    Future future = Future.future();
-    PostgresClient postgresClient = PostgresClient.getInstance(vertx);
-    postgresClient.runSQLFile(sql, false, result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-        future.failed();
-      } else if (!result.result().isEmpty()) {
-        context.fail("runSQLFile failed with: " + result.result().stream().collect(Collectors.joining(" ")));
-        future.failed();
-      } else if (result.succeeded()) {
-        future.complete();
-      }
-      async.complete();
-    });
-    return future;
-  }
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening")
+      .then()
+      .statusCode(400);
 
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=test&unit=day&amount=22")
+      .then()
+      .statusCode(400);
+
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=2018-10-12&unit=day")
+      .then()
+      .statusCode(400);
+
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=2018-10-12&unit=day&amount=-1")
+      .then()
+      .statusCode(400);  }
 
   @Test
   public void addNewPeriodTest() {
@@ -466,64 +451,7 @@ public class CalendarIT {
       .body("openingDays[2].weekdays.day", equalTo("MONDAY"))
       .statusCode(200);
   }
-  @Test
-  public void postgresClientFailureTest(TestContext context) {
-    String uuid = UUID.randomUUID().toString();
-    String servicePointUUID = UUID.randomUUID().toString();
-    String sql = "DROP ROLE if exists test_mod_calendar_temp; CREATE ROLE test_mod_calendar_temp; REASSIGN OWNED BY test_mod_calendar TO test_mod_calendar_temp;";
-
-    executeSql(context, sql);
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
-
-    Awaitility.await().atLeast(100, MILLISECONDS).until(() -> opening.getId() != null);
-
-    postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    putFailure(servicePointUUID, opening);
-
-    deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening")
-      .then()
-      .statusCode(400);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=test&unit=day&amount=22")
-      .then()
-      .statusCode(400);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=2018-10-12&unit=day")
-      .then()
-      .statusCode(400);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/calculateopening?startDate=2018-10-12&unit=day&amount=-1")
-      .then()
-      .statusCode(400);
-
-    sql = "REASSIGN OWNED BY test_mod_calendar_temp TO test_mod_calendar;";
-
-    executeSql(context, sql);
-  }
-
+  
   private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
     List<OpeningDay_> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
@@ -580,15 +508,6 @@ public class CalendarIT {
     openingDays.add(opening);
   }
 
-  private String getParsedTimeForHourAndMinute(int hour, int minute) {
-    Calendar cal = Calendar.getInstance();
-    cal.set(Calendar.HOUR_OF_DAY, hour);
-    cal.set(Calendar.MINUTE, minute);
-    cal.set(Calendar.SECOND, 0);
-    cal.set(Calendar.MILLISECOND, 0);
-    return CalendarUtils.TIME_FORMATTER.print(cal.getTimeInMillis());
-  }
-
   private Calendar createStartDate(int startYear, int month, int day) {
     Calendar startDate = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
     startDate.clear();
@@ -605,12 +524,6 @@ public class CalendarIT {
     }
     endDate.add(Calendar.DAY_OF_YEAR, daysToAdd);
     return endDate;
-  }
-
-  private void putFailure(String servicePointUUID, OpeningPeriod_ opening) {
-    putWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + UUID.randomUUID().toString())
-      .then()
-      .statusCode(500);
   }
 
   private Response getWithHeaderAndBody(String path) {
