@@ -6,11 +6,24 @@
   "properties": {
     "openingPeriods": {
       "type": "array",
-      "id": "OpeningHoursRecords",
       "description" : "Opening sor a specific date",
       "items": {
         "type": "object",
-        "$ref": "OpeningHours.json"
+        "javaType" : "org.folio.rest.jaxrs.model.OpeningHoursPeriod",
+        "description": "Description of an opening of for a specific date.",
+        "properties": {
+          "openingDay": {
+            "description": "Description of opening",
+            "type": "object",
+            "$ref": "OpeningDay.json"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date when the openingDay is valid",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "totalRecords": {
