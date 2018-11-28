@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "calendar",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "handlers": [
         {
           "methods": [
@@ -37,6 +37,15 @@
             "calendar.collection.get",
             "calendar.collection.update",
             "calendar.collection.remove"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
+          "permissionsRequired": [
+            "calendar.collection.get"
           ]
         }
       ]
