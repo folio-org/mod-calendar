@@ -61,7 +61,7 @@ public class CalendarIT {
     Async async = context.async();
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
-        tenantClient.post(null, res2 -> async.complete());
+        tenantClient.postTenant(null, res2 -> async.complete());
       } catch (Exception e) {
         context.fail(e);
       }
@@ -131,7 +131,7 @@ public class CalendarIT {
   public void addNewPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -147,7 +147,7 @@ public class CalendarIT {
   public void addInvalidPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 0, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 0, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -163,7 +163,7 @@ public class CalendarIT {
   public void addNewPeriodWithoutServicePoint() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
     opening.setServicePointId(null);
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
@@ -176,7 +176,7 @@ public class CalendarIT {
   public void getPeriodsWithServicePointIdTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -192,7 +192,7 @@ public class CalendarIT {
   public void getPeriodsWithIncludedDateRange() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -208,7 +208,7 @@ public class CalendarIT {
   public void getPeriodsWithExcludedDateRange() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -220,7 +220,7 @@ public class CalendarIT {
       .statusCode(200);
   }
 
-  private void postPeriod(String servicePointUUID, OpeningPeriod_ opening) {
+  private void postPeriod(String servicePointUUID, OpeningPeriod opening) {
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
@@ -232,7 +232,7 @@ public class CalendarIT {
   public void getPeriodWithOpeningDaysTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2018, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2018, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -248,7 +248,7 @@ public class CalendarIT {
   public void getPeriodsExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
 
     postPeriod(servicePointUUID, opening);
 
@@ -264,7 +264,7 @@ public class CalendarIT {
   public void deletePeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
+    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
 
     deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
@@ -280,7 +280,7 @@ public class CalendarIT {
   public void overlappingPeriodsTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, false, true, false);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, false, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -302,7 +302,7 @@ public class CalendarIT {
   public void putPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
 
     postPeriod(servicePointUUID, opening);
 
@@ -332,7 +332,7 @@ public class CalendarIT {
   public void calculateOpeningsWithSingleOpeningTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescription(2018, Calendar.NOVEMBER, 20, 60, servicePointUUID, uuid, false, true, false);
+    OpeningPeriod opening = generateDescription(2018, Calendar.NOVEMBER, 20, 60, servicePointUUID, uuid, false, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -407,7 +407,7 @@ public class CalendarIT {
   public void calculateOpeningsWithMultipleOpeningsTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod_ opening = generateDescriptionWithMultipleDays(2019, Calendar.MAY, 1, 31, servicePointUUID, uuid, false, true, false);
+    OpeningPeriod opening = generateDescriptionWithMultipleDays(2019, Calendar.MAY, 1, 31, servicePointUUID, uuid, false, true, false);
 
     postPeriod(servicePointUUID, opening);
 
@@ -452,11 +452,11 @@ public class CalendarIT {
       .statusCode(200);
   }
   
-  private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
-    List<OpeningDay_> openingDays = new ArrayList<>();
+  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+    List<OpeningDayWeekDay> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
-    OpeningPeriod_ openingPeriod = new OpeningPeriod_();
+    OpeningPeriod openingPeriod = new OpeningPeriod();
     openingPeriod.setId(uuid);
     openingPeriod.setStartDate(startDate.getTime());
     openingPeriod.setEndDate(endDate.getTime());
@@ -467,11 +467,11 @@ public class CalendarIT {
     return openingPeriod;
   }
 
-  private OpeningPeriod_ generateDescriptionWithMultipleDays(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
-    List<OpeningDay_> openingDays = new ArrayList<>();
+  private OpeningPeriod generateDescriptionWithMultipleDays(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+    List<OpeningDayWeekDay> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
-    OpeningPeriod_ openingPeriod = new OpeningPeriod_();
+    OpeningPeriod openingPeriod = new OpeningPeriod();
     openingPeriod.setId(uuid);
     openingPeriod.setStartDate(startDate.getTime());
     openingPeriod.setEndDate(endDate.getTime());
@@ -486,8 +486,8 @@ public class CalendarIT {
     return openingPeriod;
   }
 
-  private void createAndAddOpeningDay(List<OpeningDay_> openingDays, Weekdays.Day day, boolean isAllDay, boolean isOpen, boolean isExceptional) {
-    OpeningDay_ opening = new OpeningDay_();
+  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+    OpeningDayWeekDay opening = new OpeningDayWeekDay();
     OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
     List<OpeningHour> openingHours = new ArrayList<>();
     if (!isExceptional) {
@@ -531,21 +531,21 @@ public class CalendarIT {
       .get(path);
   }
 
-  private Response postWithHeaderAndBody(OpeningPeriod_ opening, String path) {
+  private Response postWithHeaderAndBody(OpeningPeriod opening, String path) {
     return restGivenWithHeader()
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)
       .post(path);
   }
 
-  private Response putWithHeaderAndBody(OpeningPeriod_ opening, String path) {
+  private Response putWithHeaderAndBody(OpeningPeriod opening, String path) {
     return restGivenWithHeader()
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)
       .put(path);
   }
 
-  private Response deleteWithHeaderAndBody(OpeningPeriod_ opening, String path) {
+  private Response deleteWithHeaderAndBody(OpeningPeriod opening, String path) {
     return restGivenWithHeader()
       .header(JSON_CONTENT_TYPE_HEADER)
       .body(opening)

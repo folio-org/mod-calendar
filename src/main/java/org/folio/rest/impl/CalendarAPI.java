@@ -421,7 +421,8 @@ public class CalendarAPI implements Calendar {
         if (calendarOpeningsRequestParameters.isIncludeClosedDays() && !openingHoursCollection.getOpeningPeriods().isEmpty()) {
           CalendarUtils.addClosedDaysToOpenings(openingHoursCollection.getOpeningPeriods(), calendarOpeningsRequestParameters);
         }
-        openingHoursCollection.getOpeningPeriods().sort(Comparator.comparing(OpeningPeriod::getDate).thenComparing(o -> !o.getOpeningDay().getExceptional()));
+        openingHoursCollection.getOpeningPeriods().sort(Comparator.comparing(OpeningHoursPeriod::getDate).thenComparing(o -> 
+          !o.getOpeningDay().getExceptional()));
         if (calendarOpeningsRequestParameters.isActualOpenings()) {
           overrideOpeningPeriodsByExceptionalPeriods(openingHoursCollection);
         }
@@ -438,7 +439,7 @@ public class CalendarAPI implements Calendar {
   }
 
   private void overrideOpeningPeriodsByExceptionalPeriods(OpeningHoursCollection openingHoursCollection) {
-    openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().reduce(new ArrayList<>(), (List<OpeningPeriod> accumulator, OpeningPeriod openingPeriod) ->
+    openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().reduce(new ArrayList<>(), (List<OpeningHoursPeriod> accumulator, OpeningHoursPeriod openingPeriod) ->
     {
       if (accumulator.stream().noneMatch(op ->
         op.getDate().equals(openingPeriod.getDate())
@@ -586,7 +587,7 @@ public class CalendarAPI implements Calendar {
             for (RegularHours regularHours : regularHoursList) {
               Map<String, OpeningPeriod> openingPeriods = openingCollection.getOpeningPeriods().stream()
                 .collect(Collectors.toMap(OpeningPeriod::getId, Function.identity()));
-              List<OpeningDay> openingDays = loanEndDateTime != null ? processCalculation(loanEndDateTime, regularHours, openingPeriod) : regularHours.getOpeningDays();
+              List<OpeningDayWeekDay> openingDays = loanEndDateTime != null ? processCalculation(loanEndDateTime, regularHours, openingPeriod) : regularHours.getOpeningDays();
               openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(openingDays);
             }
 
@@ -611,14 +612,14 @@ public class CalendarAPI implements Calendar {
     return futures;
   }
 
-  private List<OpeningDay> processCalculation(ZonedDateTime loanEndDateTime, RegularHours regularHours, OpeningPeriod openingPeriod) {
+  private List<OpeningDayWeekDay> processCalculation(ZonedDateTime loanEndDateTime, RegularHours regularHours, OpeningPeriod openingPeriod) {
     String loanEndDayOfWeek = loanEndDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
     //if loan end date is opened by schedule
-    List<OpeningDay> currentPrevNextList = new ArrayList<>();
-    OpeningDay next = null;
-    OpeningDay prev = null;
+    List<OpeningDayWeekDay> currentPrevNextList = new ArrayList<>();
+    OpeningDayWeekDay next = null;
+    OpeningDayWeekDay prev = null;
     for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
-      OpeningDay day = regularHours.getOpeningDays().get(i);
+      OpeningDayWeekDay day = regularHours.getOpeningDays().get(i);
       if (day.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeek)) {
         day.getOpeningDay().setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
         // one day in a week open option
@@ -642,21 +643,21 @@ public class CalendarAPI implements Calendar {
 
     //if loan end date is closed by schedule
     if (CollectionUtils.isEmpty(currentPrevNextList)) {
-      OpeningDay nextIfClosed = null;
-      OpeningDay prevIfClosed = null;
+      OpeningDayWeekDay nextIfClosed = null;
+      OpeningDayWeekDay prevIfClosed = null;
       // loop through 6 days of week, do not look for closed day again
       for (int j = 1; j < 7; j++) {
         ZonedDateTime loanEndDateTimeNext = loanEndDateTime.plusDays(j);
         String loanEndDayOfWeekNext = loanEndDateTimeNext.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault());
 
-        OpeningDay current = new OpeningDay();
-        OpeningDay_ openingDayClosed = new OpeningDay_().withAllDay(false).withOpen(false).withExceptional(false);
+        OpeningDayWeekDay current = new OpeningDayWeekDay();
+        OpeningDay openingDayClosed = new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false);
         openingDayClosed.setDate(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
         current.setWeekdays(new Weekdays().withDay(Weekdays.Day.fromValue(loanEndDayOfWeek.toUpperCase())));
         current.setOpeningDay(openingDayClosed);
 
         for (int i = 0; i < regularHours.getOpeningDays().size(); i++) {
-          OpeningDay nextDay = regularHours.getOpeningDays().get(i);
+          OpeningDayWeekDay nextDay = regularHours.getOpeningDays().get(i);
           if (nextDay.getWeekdays().getDay().toString().equalsIgnoreCase(loanEndDayOfWeekNext)) {
             nextDay.getOpeningDay().setDate(loanEndDateTimeNext.format(DateTimeFormatter.ISO_OFFSET_DATE));
             if (regularHours.getOpeningDays().size() == 1) {
@@ -685,8 +686,8 @@ public class CalendarAPI implements Calendar {
     return currentPrevNextList;
   }
 
-  private OpeningDay findPrevDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
-    OpeningDay prev;
+  private OpeningDayWeekDay findPrevDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
+    OpeningDayWeekDay prev;
     if (i == 0) {
       prev = regularHours.getOpeningDays().get(regularHours.getOpeningDays().size() - 1);
     } else if (i == regularHours.getOpeningDays().size() - 1) {
@@ -698,9 +699,9 @@ public class CalendarAPI implements Calendar {
     return prev;
   }
 
-  private OpeningDay findNextDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
-    OpeningDay next;
-    OpeningDay nextDay = regularHours.getOpeningDays().get(i);
+  private OpeningDayWeekDay findNextDayInMultipleDaysSchedule(int i, RegularHours regularHours, boolean requestedDayIsClosed) {
+    OpeningDayWeekDay next;
+    OpeningDayWeekDay nextDay = regularHours.getOpeningDays().get(i);
     if (i == 0) {
       next = requestedDayIsClosed ? nextDay : regularHours.getOpeningDays().get(i + 1);
     } else if (i == regularHours.getOpeningDays().size() - 1) {
@@ -711,7 +712,7 @@ public class CalendarAPI implements Calendar {
     return next;
   }
 
-  private void processOneDaySchedule(OpeningDay prev, OpeningDay next, ZonedDateTime loanEndDateTime, OpeningPeriod openingPeriod, boolean requestedDayIsClosed) {
+  private void processOneDaySchedule(OpeningDayWeekDay prev, OpeningDayWeekDay next, ZonedDateTime loanEndDateTime, OpeningPeriod openingPeriod, boolean requestedDayIsClosed) {
     if (requestedDayIsClosed) {
       ZonedDateTime prevDate = loanEndDateTime.minusDays(7);
       setClosedIfOut(prevDate, openingPeriod.getStartDate(), prev, true);
@@ -730,25 +731,25 @@ public class CalendarAPI implements Calendar {
     }
   }
 
-  private void setClosedIfOut(ZonedDateTime targetDate, Date dateToCompare, OpeningDay openingDay, boolean isAfter) {
+  private void setClosedIfOut(ZonedDateTime targetDate, Date dateToCompare, OpeningDayWeekDay openingDay, boolean isAfter) {
     if (isAfter) {
       if (!targetDate.isAfter(dateToCompare.toInstant().atZone(ZoneId.of("UTC")))) {
-        openingDay.setOpeningDay(new OpeningDay_().withAllDay(false).withOpen(false).withExceptional(false));
+        openingDay.setOpeningDay(new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false));
       }
     } else {
       if (!targetDate.isBefore(dateToCompare.toInstant().atZone(ZoneId.of("UTC")))) {
-        openingDay.setOpeningDay(new OpeningDay_().withAllDay(false).withOpen(false).withExceptional(false));
+        openingDay.setOpeningDay(new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false));
       }
     }
   }
 
-  private void fillPrevAndNextDate(String prevDayOfWeek, String nextDayOfWeek, ZonedDateTime loanEndDateTime, Date startDate, Date endDate, OpeningDay next, OpeningDay prev) {
+  private void fillPrevAndNextDate(String prevDayOfWeek, String nextDayOfWeek, ZonedDateTime loanEndDateTime, Date startDate, Date endDate, OpeningDayWeekDay next, OpeningDayWeekDay prev) {
     for (int d = 0; d <= DayOfWeek.values().length; d++) {
       ZonedDateTime calculatedDateTime = loanEndDateTime.minusDays(d);
       if (prevDayOfWeek.equalsIgnoreCase(calculatedDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()))) {
         prev.getOpeningDay().setDate(calculatedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
         if (!calculatedDateTime.isAfter(startDate.toInstant().atZone(ZoneId.of("UTC")))) {
-          prev.setOpeningDay(new OpeningDay_().withAllDay(false).withOpen(false).withExceptional(false));
+          prev.setOpeningDay(new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false));
         }
         break;
       }
@@ -758,17 +759,17 @@ public class CalendarAPI implements Calendar {
       if (nextDayOfWeek.equalsIgnoreCase(calculatedDateTime.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.getDefault()))) {
         next.getOpeningDay().setDate(calculatedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE));
         if (!calculatedDateTime.isBefore(endDate.toInstant().atZone(ZoneId.of("UTC")))) {
-          next.setOpeningDay(new OpeningDay_().withAllDay(false).withOpen(false).withExceptional(false));
+          next.setOpeningDay(new OpeningDay().withAllDay(false).withOpen(false).withExceptional(false));
         }
         break;
       }
     }
   }
 
-  private OpeningDay createCopy(OpeningDay sample) {
-    OpeningDay copy = new OpeningDay().withWeekdays(sample.getWeekdays());
+  private OpeningDayWeekDay createCopy(OpeningDayWeekDay sample) {
+    OpeningDayWeekDay copy = new OpeningDayWeekDay().withWeekdays(sample.getWeekdays());
     copy.setOpeningDay(
-      new OpeningDay_()
+      new OpeningDay()
         .withAllDay(sample.getOpeningDay().getAllDay())
         .withExceptional(sample.getOpeningDay().getExceptional())
         .withOpen(sample.getOpeningDay().getOpen())
@@ -779,7 +780,7 @@ public class CalendarAPI implements Calendar {
 
   private List<Future> getOpeningDaysByDate(Handler<AsyncResult<Response>> asyncResultHandler, OpeningHoursCollection openingHoursCollection, OpeningCollection openingCollection, CalendarOpeningsRequestParameters calendarOpeningsRequestParameters, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
     List<Future> futures = new ArrayList<>();
-    List<OpeningPeriod> openingPeriods = new ArrayList<>();
+    List<OpeningHoursPeriod> openingPeriods = new ArrayList<>();
     for (OpeningPeriod openingPeriod_ : openingCollection.getOpeningPeriods()) {
       Criterion criterionForOpeningHours = assembleCriterionByRange(openingPeriod_.getId(), calendarOpeningsRequestParameters.getStartDate(), calendarOpeningsRequestParameters.getEndDate());
       Future<Void> future = Future.future();
@@ -811,12 +812,13 @@ public class CalendarAPI implements Calendar {
   }
 
 
-  private void setOpeningPeriods(OpeningHoursCollection openingHoursCollection, List<OpeningPeriod> openingPeriods, ActualOpeningHours actualOpeningHour) {
-    OpeningPeriod openingPeriod = new OpeningPeriod();
-    OpeningDay_ openingDay = new OpeningDay_();
+  private void setOpeningPeriods(OpeningHoursCollection openingHoursCollection, List<OpeningHoursPeriod> openingPeriods, ActualOpeningHours actualOpeningHour) {
+    OpeningHoursPeriod openingPeriod = new OpeningHoursPeriod();
+    OpeningDay openingDay = new OpeningDay();
     openingDay.setOpen(actualOpeningHour.getOpen());
     openingDay.setAllDay(actualOpeningHour.getAllDay());
     openingDay.setExceptional(actualOpeningHour.getExceptional());
+    
     List<OpeningHour> openingHours = new ArrayList<>();
     OpeningHour openingHour = new OpeningHour();
     openingHour.setStartTime(actualOpeningHour.getStartTime());
@@ -827,9 +829,9 @@ public class CalendarAPI implements Calendar {
     openingPeriod.setOpeningDay(openingDay);
 
     openingPeriod.setDate(actualOpeningHour.getActualDay());
-    openingPeriods.sort(Comparator.comparing(OpeningDayPeriod::getDate));
+    openingPeriods.sort(Comparator.comparing(OpeningHoursPeriod::getDate));
     if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(actualOpeningHour.getActualDay()))) {
-      OpeningPeriod previousOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
+      OpeningHoursPeriod previousOpeningPeriod = openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
         filter(o -> o.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())).findFirst()
         .orElse(getElsePreviousOpeningPeriod(openingPeriods, actualOpeningHour, openingPeriod, !actualOpeningHour.getExceptional()));
       if (previousOpeningPeriod.getOpeningDay().getExceptional().equals(actualOpeningHour.getExceptional())) {
@@ -843,7 +845,7 @@ public class CalendarAPI implements Calendar {
     openingHoursCollection.setOpeningPeriods(openingPeriods);
   }
 
-  private OpeningPeriod getElsePreviousOpeningPeriod(List<OpeningPeriod> openingPeriods, ActualOpeningHours actualOpeningHour, OpeningPeriod openingPeriod, boolean isExceptional) {
+  private OpeningHoursPeriod getElsePreviousOpeningPeriod(List<OpeningHoursPeriod> openingPeriods, ActualOpeningHours actualOpeningHour, OpeningHoursPeriod openingPeriod, boolean isExceptional) {
     return openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
       filter(o -> o.getOpeningDay().getExceptional().equals(isExceptional)).findFirst().orElse(openingPeriod);
   }

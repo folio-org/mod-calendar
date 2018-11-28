@@ -52,11 +52,11 @@ public class CalendarUtils {
         startDay.add(Calendar.DAY_OF_MONTH, 1);
       }
     } else {
-      Map<DayOfWeek, OpeningDay> openingDays = getOpeningDays(entity);
+      Map<DayOfWeek, OpeningDayWeekDay> openingDays = getOpeningDays(entity);
 
       while (startDay.before(endDay)) {
         DayOfWeek dayOfWeek = dayOfDate(startDay.getTime());
-        OpeningDay openingDay = openingDays.get(dayOfWeek);
+        OpeningDayWeekDay openingDay = openingDays.get(dayOfWeek);
         if (openingDay != null) {
           List<ActualOpeningHours> event = createEvents(openingDay.getOpeningDay(), startDay, entity.getId(), false);
           actualOpeningHours.addAll(event);
@@ -69,18 +69,18 @@ public class CalendarUtils {
     return actualOpeningHours;
   }
 
-  private static Map<DayOfWeek, OpeningDay> getOpeningDays(OpeningPeriod entity) {
+  private static Map<DayOfWeek, OpeningDayWeekDay> getOpeningDays(OpeningPeriod entity) {
 
     EnumMap openingDays = new EnumMap(DayOfWeek.class);
 
-    for (OpeningDay openingDay : entity.getOpeningDays()) {
+    for (OpeningDayWeekDay openingDay : entity.getOpeningDays()) {
       openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
     }
 
     return openingDays;
   }
 
-  private static List<ActualOpeningHours> createEvents(OpeningDay_ openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
+  private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
     Calendar currentStartDate = Calendar.getInstance();
     currentStartDate.setTimeInMillis(actualDay.getTimeInMillis());
 
@@ -127,23 +127,23 @@ public class CalendarUtils {
     return actualOpeningHours;
   }
 
-  public static void addClosedDaysToOpenings(List<OpeningPeriod> openingPeriods, CalendarOpeningsRequestParameters calendarOpeningsRequestParameters) {
+  public static void addClosedDaysToOpenings(List<OpeningHoursPeriod> openingPeriods, CalendarOpeningsRequestParameters calendarOpeningsRequestParameters) {
     String startDate = calendarOpeningsRequestParameters.getStartDate();
     String endDate = calendarOpeningsRequestParameters.getEndDate();
-    openingPeriods.sort(Comparator.comparing(OpeningPeriod::getDate));
+    openingPeriods.sort(Comparator.comparing(OpeningHoursPeriod::getDate));
     if (startDate == null) {
       Calendar calendar = Calendar.getInstance();
       if (openingPeriods.stream().findFirst().isPresent()) {
-        calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+        calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
       startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
     if (endDate == null) {
       long count = openingPeriods.stream().count();
-      Stream<OpeningPeriod> stream = openingPeriods.stream();
+      Stream<OpeningHoursPeriod> stream = openingPeriods.stream();
       Calendar calendar = Calendar.getInstance();
       if (!openingPeriods.isEmpty()) {
-        calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningPeriod()).getDate().getTime());
+        calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
       endDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
@@ -160,7 +160,7 @@ public class CalendarUtils {
 
 
     while (startDay.before(endDay)) {
-      OpeningPeriod openingPeriod = new OpeningPeriod();
+      OpeningHoursPeriod openingPeriod = new OpeningHoursPeriod();
       openingPeriod.setDate(startDay.getTime());
       if (openingPeriods.stream().anyMatch(o -> o.getDate().equals(openingPeriod.getDate()))) {
         startDay.add(Calendar.DAY_OF_MONTH, 1);
@@ -169,6 +169,7 @@ public class CalendarUtils {
         openingDay.setOpen(false);
         openingDay.setAllDay(true);
         openingDay.setExceptional(false);
+        
         List<OpeningHour> openingHours = new ArrayList<>();
         OpeningHour openingHour = new OpeningHour();
         openingHour.setStartTime("00:00");
