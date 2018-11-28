@@ -82,9 +82,6 @@ public class CalendarIT {
     try {
       PostgresClient.setIsEmbedded(true);
       PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-      String sql = "drop schema if exists test_mod_calendar cascade;\n"
-        + "drop role if exists test_mod_calendar;\n";
-      executeSql(context, sql);
     } catch (Exception e) {
       log.error("", e);
       context.fail(e);
@@ -341,48 +338,6 @@ public class CalendarIT {
       .body("id", equalTo(uuid))
       .body("name", equalTo("PUT_TEST"))
       .statusCode(200);
-  }
-
-  @Test
-  public void postgresClientFailureTest(TestContext context) {
-    String uuid = UUID.randomUUID().toString();
-    String servicePointUUID = UUID.randomUUID().toString();
-    String sql = "DROP ROLE if exists test_mod_calendar_temp; CREATE ROLE test_mod_calendar_temp; REASSIGN OWNED BY test_mod_calendar TO test_mod_calendar_temp;";
-
-    executeSql(context, sql);
-    OpeningPeriod_ opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
-
-    Awaitility.await().atLeast(100, MILLISECONDS).until(() -> opening.getId() != null);
-
-    postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    putFailure(servicePointUUID, opening);
-
-    deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .statusCode(500);
-
-    sql = "REASSIGN OWNED BY test_mod_calendar_temp TO test_mod_calendar;";
-
-    executeSql(context, sql);
   }
 
   private OpeningPeriod_ generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
