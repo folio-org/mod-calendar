@@ -311,6 +311,7 @@ public class CalendarIT {
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
       .body("id", equalTo(uuid))
+      .body("name", equalTo("test"))
       .statusCode(200);
 
     opening.setName("PUT_TEST");

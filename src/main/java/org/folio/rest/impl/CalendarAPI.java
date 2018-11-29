@@ -40,6 +40,7 @@ public class CalendarAPI implements Calendar {
 
   private final Messages messages = Messages.getInstance();
 
+
   public CalendarAPI() {
     //stub
   }
@@ -373,8 +374,7 @@ public class CalendarAPI implements Calendar {
           if (replyOfSavingActualOpeningHours.succeeded()) {
             postgresClient.endTx(beginTx, done
               -> asyncResultHandler.handle(Future.succeededFuture(
-                PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.
-                  respond204WithApplicationJson(entity))));
+                PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
           } else {
             postgresClient.rollbackTx(beginTx, done
               -> asyncResultHandler.handle(Future.succeededFuture(
