@@ -556,17 +556,14 @@ public class CalendarAPI implements Calendar {
 
   private void addOpeningPeriodsToCollection(OpeningCollection openingCollection, AsyncResult<Results<Openings>> resultOfSelectOpenings) {
     openingCollection.setTotalRecords(resultOfSelectOpenings.result().getResults().size());
-    for (Object object : resultOfSelectOpenings.result().getResults()) {
-      if (object instanceof Openings) {
-        Openings openings = (Openings) object;
-        OpeningPeriod openingPeriod = new OpeningPeriod();
-        openingPeriod.setStartDate(openings.getStartDate());
-        openingPeriod.setEndDate(openings.getEndDate());
-        openingPeriod.setName(openings.getName());
-        openingPeriod.setServicePointId(openings.getServicePointId());
-        openingPeriod.setId(openings.getId());
-        openingCollection.getOpeningPeriods().add(openingPeriod);
-      }
+    for (Openings openings : resultOfSelectOpenings.result().getResults()) {
+      OpeningPeriod openingPeriod = new OpeningPeriod();
+      openingPeriod.setStartDate(openings.getStartDate());
+      openingPeriod.setEndDate(openings.getEndDate());
+      openingPeriod.setName(openings.getName());
+      openingPeriod.setServicePointId(openings.getServicePointId());
+      openingPeriod.setId(openings.getId());
+      openingCollection.getOpeningPeriods().add(openingPeriod);
     }
   }
 
@@ -585,7 +582,7 @@ public class CalendarAPI implements Calendar {
       postgresClient.get(REGULAR_HOURS, RegularHours.class, criterionForRegularHours, true, false, resultOfSelectRegularHours -> {
         if (resultOfSelectRegularHours.succeeded()) {
           try {
-            List<RegularHours> regularHoursList = (List<RegularHours>) resultOfSelectRegularHours.result().getResults();
+            List<RegularHours> regularHoursList =  resultOfSelectRegularHours.result().getResults();
 
             for (RegularHours regularHours : regularHoursList) {
               Map<String, OpeningPeriod> openingPeriods = openingCollection.getOpeningPeriods().stream()
@@ -791,7 +788,7 @@ public class CalendarAPI implements Calendar {
       postgresClient.get(ACTUAL_OPENING_HOURS, ActualOpeningHours.class, criterionForOpeningHours, true, false, resultOfSelectActualOpeningHours -> {
         if (resultOfSelectActualOpeningHours.succeeded()) {
           try {
-            List<ActualOpeningHours> actualOpeningHours = (List<ActualOpeningHours>) resultOfSelectActualOpeningHours.result().getResults();
+            List<ActualOpeningHours> actualOpeningHours = resultOfSelectActualOpeningHours.result().getResults();
             for (ActualOpeningHours actualOpeningHour : actualOpeningHours) {
               setOpeningPeriods(openingHoursCollection, openingPeriods, actualOpeningHour);
             }
