@@ -58,6 +58,7 @@ public class CalendarAPI implements Calendar {
       asyncResultHandler.handle(Future.succeededFuture(
         PostCalendarPeriodsPeriodByServicePointIdResponse.respond400WithTextPlain(
           "Not valid json object. Missing field(s)...")));
+      return;
     }
     vertxContext.runOnContext(v
       -> postgresClient.startTx(beginTx
@@ -253,11 +254,13 @@ public class CalendarAPI implements Calendar {
       asyncResultHandler.handle(Future.succeededFuture(
         GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(
          messages.getMessage(lang, MessageConsts.InvalidParameters))));
+      return;
     }
     if (amount <= 0) {
       asyncResultHandler.handle(Future.succeededFuture(
         GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(
           messages.getMessage(lang, MessageConsts.InvalidParameters))));
+      return;
     }
 
     OpeningCollection openingCollection = new OpeningCollection();
