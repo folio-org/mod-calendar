@@ -120,7 +120,7 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void putCalendarPeriodsPeriodByServicePointIdAndPeriodId(String openingId, String servicePointId, String lang, OpeningPeriod entity,
+  public void putCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId, String openingId, String lang, OpeningPeriod entity,
     Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
 
     boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
