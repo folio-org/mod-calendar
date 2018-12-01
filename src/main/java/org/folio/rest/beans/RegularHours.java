@@ -1,6 +1,6 @@
 package org.folio.rest.beans;
 
-import org.folio.rest.jaxrs.model.OpeningDay_;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 
 import java.util.List;
 
@@ -9,12 +9,12 @@ public class RegularHours {
 
   private String id;
   private String openingId;
-  private List<OpeningDay_> openingDays;
+  private List<OpeningDayWeekDay> openingDays;
 
   public RegularHours() {
   }
 
-  public RegularHours(String id, String openingId, List<OpeningDay_> openingDays) {
+  public RegularHours(String id, String openingId, List<OpeningDayWeekDay> openingDays) {
     this.id = id;
     this.openingId = openingId;
     this.openingDays = openingDays;
@@ -32,11 +32,11 @@ public class RegularHours {
     return openingId;
   }
 
-  public List<OpeningDay_> getOpeningDays() {
+  public List<OpeningDayWeekDay> getOpeningDays() {
     return openingDays;
   }
 
-  public void setOpeningDays(List<OpeningDay_> openingDays) {
+  public void setOpeningDays(List<OpeningDayWeekDay> openingDays) {
     this.openingDays = openingDays;
   }
 }

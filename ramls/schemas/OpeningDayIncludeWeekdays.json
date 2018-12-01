@@ -2,6 +2,7 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Opening day include weekdays",
   "type": "object",
+  "javaType" : "org.folio.rest.jaxrs.model.OpeningDayWeekDay",
   "description": "Description of an opening of for a specific week day.",
   "properties": {
     "weekdays": {
