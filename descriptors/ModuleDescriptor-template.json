@@ -95,8 +95,9 @@
       "visible": true
     }
   ],
+  "requires": [],
   "launchDescriptor": {
-    "dockerImage": "mod-calendar:1.0.3-SNAPSHOT",
+    "dockerImage": "${artifactId}:${version}",
     "dockerArgs": {
       "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
     },
