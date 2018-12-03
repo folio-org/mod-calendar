@@ -1,5 +1,5 @@
-## 1.0.5
-* UICHKOUT-461 - Determine due dates and due times for loans
+## 1.2.0
+* Add endpoint /calendar/periods/{servicePointId}/calculateopening with GET to return open periods for given Service Point
 ## 1.0.3
 * MODCAL-19 - Fix security vulnerability reported in jackson-databind
 * MODCAL-20 - Fix missing description fields in RAML JSON schemas
