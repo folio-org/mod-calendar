@@ -28,7 +28,7 @@
     <folio.domain-models-runtime.version>23.2.1</folio.domain-models-runtime.version>
 
     <vertx.version>3.5.4</vertx.version>
-    <jackson.version>2.8.11</jackson.version>
+    <jackson.version>2.8.11.3</jackson.version>
     <jackson.databind.version>2.8.11.1</jackson.databind.version>
 
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
