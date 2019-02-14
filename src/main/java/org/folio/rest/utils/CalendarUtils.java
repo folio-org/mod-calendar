@@ -14,6 +14,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -22,6 +23,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -30,12 +32,16 @@ public class CalendarUtils {
 
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
-  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
   public static final String DAY_PATTERN = "EEEE";
+
+  static {
+    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+  }
 
   private CalendarUtils() {
   }
@@ -48,12 +54,12 @@ public class CalendarUtils {
   public static List<Object> separateEvents(OpeningPeriod entity, boolean isExceptional) {
     List<Object> actualOpeningHours = new ArrayList<>();
 
-    Calendar startDay = Calendar.getInstance();
+    Calendar startDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     startDay.setTimeInMillis(entity.getStartDate().getTime());
     startDay.set(Calendar.SECOND, 0);
     startDay.set(Calendar.MILLISECOND, 0);
 
-    Calendar endDay = Calendar.getInstance();
+    Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     endDay.setTimeInMillis(entity.getEndDate().getTime());
     endDay.set(Calendar.SECOND, 0);
     endDay.set(Calendar.MILLISECOND, 1);
@@ -94,10 +100,10 @@ public class CalendarUtils {
   }
 
   private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
-    Calendar currentStartDate = Calendar.getInstance();
+    Calendar currentStartDate = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     currentStartDate.setTimeInMillis(actualDay.getTimeInMillis());
 
-    Calendar currentEndDate = Calendar.getInstance();
+    Calendar currentEndDate = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     currentEndDate.setTimeInMillis(actualDay.getTimeInMillis());
 
     boolean allDay = true;
@@ -145,7 +151,7 @@ public class CalendarUtils {
     String endDate = calendarOpeningsRequestParameters.getEndDate();
     openingPeriods.sort(Comparator.comparing(OpeningHoursPeriod::getDate));
     if (startDate == null) {
-      Calendar calendar = Calendar.getInstance();
+      Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
       if (openingPeriods.stream().findFirst().isPresent()) {
         calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
@@ -154,19 +160,19 @@ public class CalendarUtils {
     if (endDate == null) {
       long count = openingPeriods.stream().count();
       Stream<OpeningHoursPeriod> stream = openingPeriods.stream();
-      Calendar calendar = Calendar.getInstance();
+      Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
       if (!openingPeriods.isEmpty()) {
         calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
       endDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
 
-    Calendar startDay = Calendar.getInstance();
+    Calendar startDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     startDay.setTimeInMillis(DateTime.parse(startDate, DATE_FORMATTER_SHORT).getMillis());
     startDay.set(Calendar.SECOND, 0);
     startDay.set(Calendar.MILLISECOND, 0);
 
-    Calendar endDay = Calendar.getInstance();
+    Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     endDay.setTimeInMillis(DateTime.parse(endDate, DATE_FORMATTER_SHORT).getMillis());
     endDay.set(Calendar.SECOND, 0);
     endDay.set(Calendar.MILLISECOND, 1);
