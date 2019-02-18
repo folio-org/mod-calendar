@@ -43,7 +43,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   public Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String tenantId,
                                                                                   String servicePointId,
                                                                                   String requestedDate,
-                                                                                  Day day) {
+                                                                                  SearchDirection searchDirection) {
 
     PostgresClient pgClient = PostgresClient.getInstance(Vertx.vertx(), tenantId);
 
@@ -76,7 +76,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       "AND jsonb->>'actualDay' = (SELECT actual_day FROM closest_open_day)",
 
       PostgresClient.convertToPsqlStandard(tenantId), OPENINGS, ACTUAL_OPENING_HOURS, servicePointId,
-      requestedDate, day.getOrder(), day.getOperator());
+      requestedDate, searchDirection.getOrder(), searchDirection.getOperator());
 
     Future<ResultSet> future = Future.future();
     pgClient.select(query, future.completer());

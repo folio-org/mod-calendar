@@ -16,9 +16,9 @@ public interface ActualOpeningHoursService {
   Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String tenantId,
                                                                            String servicePointId,
                                                                            String date,
-                                                                           Day day);
+                                                                           SearchDirection searchDirection);
 
-  enum Day {
+  enum SearchDirection {
 
     PREVIOUS_DAY(Order.DESC, Criteria.OP_LESS_THAN),
     NEXT_DAY(Order.ASC, Criteria.OP_GREATER_THAN);
@@ -26,7 +26,7 @@ public interface ActualOpeningHoursService {
     private final String order;
     private final String operator;
 
-    Day(String order, String operator) {
+    SearchDirection(String order, String operator) {
       this.order = order;
       this.operator = operator;
     }

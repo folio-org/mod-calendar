@@ -51,8 +51,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
-import static org.folio.rest.service.ActualOpeningHoursService.Day.NEXT_DAY;
-import static org.folio.rest.service.ActualOpeningHoursService.Day.PREVIOUS_DAY;
+import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
+import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
