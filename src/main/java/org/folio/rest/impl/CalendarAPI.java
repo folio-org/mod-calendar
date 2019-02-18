@@ -463,11 +463,6 @@ public class CalendarAPI implements Calendar {
     endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
   }
 
-  private void getOpening3DaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, loanEndDateTime, postgresClient, beginTx);
-    endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
-  }
-
   private void endCalculation(Handler<AsyncResult<Response>> asyncResultHandler, List<Future> futures, OpeningCollection openingCollection, String openingId, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
     if (!futures.isEmpty()) {
       CompositeFuture.all(futures).setHandler(querys -> {
