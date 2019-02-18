@@ -5,6 +5,8 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.SQLConnection;
 import joptsimple.internal.Strings;
 import org.apache.commons.collections4.CollectionUtils;
@@ -69,6 +71,8 @@ import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpen
 
 
 public class CalendarAPI implements Calendar {
+
+  private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
 
   private final Messages messages = Messages.getInstance();
 
@@ -276,32 +280,42 @@ public class CalendarAPI implements Calendar {
   @Override
   public void getCalendarPeriodsCalculateopeningByServicePointId(String servicePointId,
                                                                  String date,
+                                                                 String lang,
                                                                  Map<String, String> okapiHeaders,
                                                                  Handler<AsyncResult<Response>> asyncResultHandler,
                                                                  Context vertxContext) {
 
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
+    vertxContext.runOnContext(v -> {
+      try {
+        String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
 
-    CompositeFuture.all(
-      actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, PREVIOUS_DAY),
-      actualOpeningHoursService.findActualOpeningHoursForGivenDay(tenantId, servicePointId, date),
-      actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, NEXT_DAY)
-    ).setHandler(result -> {
-      List<ActualOpeningHours> prev = result.result().resultAt(0);
-      List<ActualOpeningHours> current = result.result().resultAt(1);
-      List<ActualOpeningHours> next = result.result().resultAt(2);
+        CompositeFuture.all(
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, PREVIOUS_DAY),
+          actualOpeningHoursService.findActualOpeningHoursForGivenDay(tenantId, servicePointId, date),
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, NEXT_DAY)
+        ).setHandler(result -> {
+          List<ActualOpeningHours> prev = result.result().resultAt(0);
+          List<ActualOpeningHours> current = result.result().resultAt(1);
+          List<ActualOpeningHours> next = result.result().resultAt(2);
 
-      List<OpeningDayWeekDay> openingDays = new ArrayList<>();
-      openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(prev));
-      openingDays.add(current.isEmpty() ?
-        getOpeningDayWeekDayForTheEmptyDay(date) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
-      openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(next));
+          List<OpeningDayWeekDay> openingDays = new ArrayList<>();
+          openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(prev));
+          openingDays.add(current.isEmpty() ?
+            getOpeningDayWeekDayForTheEmptyDay(date) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
+          openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(next));
 
-      OpeningPeriod period = new OpeningPeriod();
-      period.setOpeningDays(openingDays);
+          OpeningPeriod period = new OpeningPeriod();
+          period.setOpeningDays(openingDays);
 
-      asyncResultHandler.handle(Future.succeededFuture(
-        GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond200WithApplicationJson(period)));
+          asyncResultHandler.handle(Future.succeededFuture(
+            GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond200WithApplicationJson(period)));
+        });
+      } catch (Exception e) {
+        logger.error(e);
+        asyncResultHandler.handle(Future.succeededFuture(
+          GetCalendarPeriodsCalculateopeningByServicePointIdResponse
+            .respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError))));
+      }
     });
   }
 
