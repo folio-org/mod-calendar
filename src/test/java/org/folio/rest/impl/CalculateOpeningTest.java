@@ -26,6 +26,7 @@ import org.junit.runners.Parameterized;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -46,7 +48,6 @@ import static java.time.Month.FEBRUARY;
 import static java.time.Month.JANUARY;
 import static java.time.Month.MARCH;
 import static java.time.Month.MAY;
-import static org.folio.rest.utils.CalendarUtils.DATE_FORMAT;
 import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,6 +57,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class CalculateOpeningTest {
 
   private static RequestSpecification spec;
+  private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
 
   private static final String TENANT = "test";
   private static final String TOKEN = "test";
@@ -125,6 +127,8 @@ public class CalculateOpeningTest {
 
   @BeforeClass
   public static void setUp() {
+    df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+
     Vertx vertx = Vertx.vertx();
     int port = NetworkUtils.nextFreePort();
 
@@ -238,8 +242,8 @@ public class CalculateOpeningTest {
     period.setOpeningDays(openingDays);
 
     try {
-      period.setStartDate(DATE_FORMAT.parse(mapLocalDateToString(startDate)));
-      period.setEndDate(DATE_FORMAT.parse(mapLocalDateToString(endDate)));
+      period.setStartDate(df.parse(mapLocalDateToString(startDate)));
+      period.setEndDate(df.parse(mapLocalDateToString(endDate)));
     } catch (ParseException e) {
       e.printStackTrace();
     }
@@ -278,7 +282,7 @@ public class CalculateOpeningTest {
   }
 
   private static LocalDate mapStringToLocalDate(String date) throws ParseException {
-    return DATE_FORMAT.parse(date)
+    return df.parse(date)
       .toInstant()
       .atZone(ZoneId.systemDefault())
       .toLocalDate();

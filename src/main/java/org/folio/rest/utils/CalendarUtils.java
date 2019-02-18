@@ -36,12 +36,7 @@ public class CalendarUtils {
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
-  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_PATTERN);
   public static final String DAY_PATTERN = "EEEE";
-
-  static {
-    DATE_FORMAT.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-  }
 
   private CalendarUtils() {
   }
@@ -230,11 +225,14 @@ public class CalendarUtils {
         .withEndTime(o.getEndTime()))
       .collect(Collectors.toList());
 
+    SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+    df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+
     OpeningDay openingDay = new OpeningDay();
     openingDay.setExceptional(exceptional);
     openingDay.setAllDay(allDay);
     openingDay.setOpen(open);
-    openingDay.setDate(date == null ? null : DATE_FORMAT.format(date));
+    openingDay.setDate(date == null ? null : df.format(date));
     openingDay.setOpeningHour(hours);
 
     OpeningDayWeekDay openingDayWeekDay = new OpeningDayWeekDay();
