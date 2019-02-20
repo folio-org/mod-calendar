@@ -284,7 +284,7 @@ public class CalculateOpeningTest {
   private static LocalDate mapStringToLocalDate(String date) throws ParseException {
     return df.parse(date)
       .toInstant()
-      .atZone(ZoneId.systemDefault())
+      .atZone(ZoneOffset.UTC)
       .toLocalDate();
   }
 
