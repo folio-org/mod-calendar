@@ -279,7 +279,7 @@ public class CalendarAPI implements Calendar {
   @Validate
   @Override
   public void getCalendarPeriodsCalculateopeningByServicePointId(String servicePointId,
-                                                                 String date,
+                                                                 String requestedDate,
                                                                  String lang,
                                                                  Map<String, String> okapiHeaders,
                                                                  Handler<AsyncResult<Response>> asyncResultHandler,
@@ -290,9 +290,9 @@ public class CalendarAPI implements Calendar {
         String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
 
         CompositeFuture.all(
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, PREVIOUS_DAY),
-          actualOpeningHoursService.findActualOpeningHoursForGivenDay(tenantId, servicePointId, date),
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, date, NEXT_DAY)
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, requestedDate, PREVIOUS_DAY),
+          actualOpeningHoursService.findActualOpeningHoursForGivenDay(tenantId, servicePointId, requestedDate),
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, requestedDate, NEXT_DAY)
         ).setHandler(result -> {
           List<ActualOpeningHours> prev = result.result().resultAt(0);
           List<ActualOpeningHours> current = result.result().resultAt(1);
@@ -301,7 +301,7 @@ public class CalendarAPI implements Calendar {
           List<OpeningDayWeekDay> openingDays = new ArrayList<>();
           openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(prev));
           openingDays.add(current.isEmpty() ?
-            getOpeningDayWeekDayForTheEmptyDay(date) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
+            getOpeningDayWeekDayForTheEmptyDay(requestedDate) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
           openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(next));
 
           OpeningPeriod period = new OpeningPeriod();
