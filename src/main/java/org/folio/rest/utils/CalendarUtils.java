@@ -42,7 +42,9 @@ public class CalendarUtils {
   }
 
   public static DayOfWeek dayOfDate(Date inputDate) {
-    return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
+    SimpleDateFormat format = new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH);
+    format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+    return DayOfWeek.valueOf(format.format(inputDate).toUpperCase());
   }
 
 
