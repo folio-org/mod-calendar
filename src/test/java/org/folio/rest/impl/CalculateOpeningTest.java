@@ -8,6 +8,8 @@ import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
@@ -55,6 +57,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class CalculateOpeningTest {
 
+  private static final Logger logger = LoggerFactory.getLogger(CalculateOpeningTest.class);
+
   private static RequestSpecification spec;
   private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
 
@@ -62,51 +66,52 @@ public class CalculateOpeningTest {
   private static final String TOKEN = "test";
   private static final String SERVICE_POINT_ID = "acdee43c-9cf5-4f2c-aae0-8a70a2921c1a";
 
+  private String testCaseName;
   private LocalDate requestedDate;
   private LocalDate prevDate;
   private LocalDate currentDate;
   private LocalDate nextDate;
 
   @Parameterized.Parameters
-  public static List<LocalDate[]> dates() {
-    return Arrays.asList(new LocalDate[][]{
-      //in the middle of the period (open day)
+  public static List<Object[]> dates() {
+    return Arrays.asList(new Object[][]{
       {
+        "in the middle of the period (open day)",
         LocalDate.of(2019, Month.MARCH, 15),
         LocalDate.of(2019, Month.MARCH, 14),
         LocalDate.of(2019, Month.MARCH, 15),
         LocalDate.of(2019, Month.MARCH, 18)
       },
-      //in the middle of the period (closed day)
       {
+        "in the middle of the period (closed day)",
         LocalDate.of(2019, Month.MARCH, 16),
         LocalDate.of(2019, Month.MARCH, 15),
         LocalDate.of(2019, Month.MARCH, 16),
         LocalDate.of(2019, Month.MARCH, 18)
       },
-      //at the beginning of the period
       {
+        "at the beginning of the period",
         LocalDate.of(2019, Month.MARCH, 1),
         LocalDate.of(2019, JANUARY, 31),
         LocalDate.of(2019, Month.MARCH, 1),
         LocalDate.of(2019, Month.MARCH, 4)
       },
-      //at the end of the period
       {
+        "at the end of the period",
         LocalDate.of(2019, Month.MARCH, 29),
         LocalDate.of(2019, Month.MARCH, 28),
         LocalDate.of(2019, Month.MARCH, 29),
         LocalDate.of(2019, Month.MAY, 1)
       },
-      //at the beginning of the period with exceptional
       {
+        "at the beginning of the period with exceptional",
         LocalDate.of(2020, Month.MARCH, 2),
         LocalDate.of(2020, Month.FEBRUARY, 15),
         LocalDate.of(2020, Month.MARCH, 2),
         LocalDate.of(2020, Month.MARCH, 3)
       },
-      //at the end of the period with exceptional
       {
+        "at the end of the period with exceptional",
         LocalDate.of(2020, Month.MARCH, 31),
         LocalDate.of(2020, Month.MARCH, 30),
         LocalDate.of(2020, Month.MARCH, 31),
@@ -116,7 +121,12 @@ public class CalculateOpeningTest {
   }
 
 
-  public CalculateOpeningTest(LocalDate requestedDate, LocalDate prevDate, LocalDate currentDate, LocalDate nextDate) {
+  public CalculateOpeningTest(String testCaseName,
+                              LocalDate requestedDate,
+                              LocalDate prevDate,
+                              LocalDate currentDate,
+                              LocalDate nextDate) {
+    this.testCaseName = testCaseName;
     this.requestedDate = requestedDate;
     this.prevDate = prevDate;
     this.currentDate = currentDate;
@@ -167,6 +177,28 @@ public class CalculateOpeningTest {
     PostgresClient.stopEmbeddedPostgres();
   }
 
+  @Test
+  public void testCalculateOpenings() throws ParseException {
+    logger.info(String.format("Running test case `%s`", testCaseName));
+
+    Response response = RestAssured.given()
+      .spec(spec)
+      .when()
+      .get(String.format("/calendar/periods/%s/calculateopening?requestedDate=%s",
+        SERVICE_POINT_ID, mapLocalDateToString(requestedDate, "yyyy-MM-dd")));
+
+    List<OpeningDay> openingDays = new JsonObject(response.asString())
+      .mapTo(OpeningPeriod.class)
+      .getOpeningDays()
+      .stream()
+      .map(OpeningDayWeekDay::getOpeningDay)
+      .collect(Collectors.toList());
+
+    assertThat(mapStringToLocalDate(openingDays.get(0).getDate()), equalTo(prevDate));
+    assertThat(mapStringToLocalDate(openingDays.get(1).getDate()), equalTo(currentDate));
+    assertThat(mapStringToLocalDate(openingDays.get(2).getDate()), equalTo(nextDate));
+  }
+
   private static void populateOpeningPeriods() {
 
     OpeningHour openingHour = new OpeningHour();
@@ -207,27 +239,6 @@ public class CalculateOpeningTest {
       Collections.singletonList(
         buildOpeningDayWeekDay(mapLocalDateToString(
           LocalDate.of(2020, APRIL, 15)), true, true, false, null, openingHours)));
-  }
-
-  @Test
-  public void testCalculateOpenings() throws ParseException {
-
-    Response response = RestAssured.given()
-      .spec(spec)
-      .when()
-      .get(String.format("/calendar/periods/%s/calculateopening?requestedDate=%s",
-        SERVICE_POINT_ID, mapLocalDateToString(requestedDate, "yyyy-MM-dd")));
-
-    List<OpeningDay> openingDays = new JsonObject(response.asString())
-      .mapTo(OpeningPeriod.class)
-      .getOpeningDays()
-      .stream()
-      .map(OpeningDayWeekDay::getOpeningDay)
-      .collect(Collectors.toList());
-
-    assertThat(mapStringToLocalDate(openingDays.get(0).getDate()), equalTo(prevDate));
-    assertThat(mapStringToLocalDate(openingDays.get(1).getDate()), equalTo(currentDate));
-    assertThat(mapStringToLocalDate(openingDays.get(2).getDate()), equalTo(nextDate));
   }
 
   private static void createOpeningPeriod(String name, LocalDate startDate, LocalDate endDate,
