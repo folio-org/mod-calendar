@@ -1,6 +1,6 @@
 #%RAML 1.0
 title: Calendar
-version: v1
+version: v2.0
 baseUri: https://github.com/folio-org/mod-calendar
 
 documentation:
@@ -174,32 +174,17 @@ resourceTypes:
                 description: "Internal server error, e.g. due to misconfiguration"
 
       /calculateopening:
-        is: [language]
         get:
+          is: [language]
           queryParameters:
-            startDate:
-              displayName: startDate
+            requestedDate:
+              displayName: requestedDate
+              description: "requested date"
+              example: "2019-01-31"
               type: string
-              description: "loan start date"
-              example: "2018-11-15"
-              required: true
-            unit:
-              displayName: unit
-              type: string
-              enum: ["day", "hour"]
-              description: "Calculate in days or hours. Default: day."
-              example: day
-              required: false
-            amount:
-              displayName: amount
-              type: integer
-              description: "number of loan days or hours (based on unit), to calculate due date."
-              example: 11
               required: true
           description: "This endpoint helps to calculate due date. The response contains three openings: the requested day,
-          next and previous dates openings which are closest to the requested day. Calculation can based on days or hours
-          to calculate overnight loans.
-          In case of existing amount parameter the requested day will be calculated: date + amount * unit otherwise it returns the date itself"
+                        next and previous dates openings which are closest to the requested day."
           responses:
             200:
               body:

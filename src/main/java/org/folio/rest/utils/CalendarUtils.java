@@ -3,14 +3,28 @@ package org.folio.rest.utils;
 import org.apache.commons.lang.BooleanUtils;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.beans.CalendarOpeningsRequestParameters;
-import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
-import java.util.*;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CalendarUtils {
@@ -18,7 +32,7 @@ public class CalendarUtils {
 
   private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
   public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
-  private static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
@@ -28,19 +42,21 @@ public class CalendarUtils {
   }
 
   public static DayOfWeek dayOfDate(Date inputDate) {
-    return DayOfWeek.valueOf(new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH).format(inputDate).toUpperCase());
+    SimpleDateFormat format = new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH);
+    format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+    return DayOfWeek.valueOf(format.format(inputDate).toUpperCase());
   }
 
 
   public static List<Object> separateEvents(OpeningPeriod entity, boolean isExceptional) {
     List<Object> actualOpeningHours = new ArrayList<>();
 
-    Calendar startDay = Calendar.getInstance();
+    Calendar startDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     startDay.setTimeInMillis(entity.getStartDate().getTime());
     startDay.set(Calendar.SECOND, 0);
     startDay.set(Calendar.MILLISECOND, 0);
 
-    Calendar endDay = Calendar.getInstance();
+    Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     endDay.setTimeInMillis(entity.getEndDate().getTime());
     endDay.set(Calendar.SECOND, 0);
     endDay.set(Calendar.MILLISECOND, 1);
@@ -81,10 +97,10 @@ public class CalendarUtils {
   }
 
   private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
-    Calendar currentStartDate = Calendar.getInstance();
+    Calendar currentStartDate = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     currentStartDate.setTimeInMillis(actualDay.getTimeInMillis());
 
-    Calendar currentEndDate = Calendar.getInstance();
+    Calendar currentEndDate = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     currentEndDate.setTimeInMillis(actualDay.getTimeInMillis());
 
     boolean allDay = true;
@@ -132,7 +148,7 @@ public class CalendarUtils {
     String endDate = calendarOpeningsRequestParameters.getEndDate();
     openingPeriods.sort(Comparator.comparing(OpeningHoursPeriod::getDate));
     if (startDate == null) {
-      Calendar calendar = Calendar.getInstance();
+      Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
       if (openingPeriods.stream().findFirst().isPresent()) {
         calendar.setTimeInMillis(openingPeriods.stream().findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
@@ -141,19 +157,19 @@ public class CalendarUtils {
     if (endDate == null) {
       long count = openingPeriods.stream().count();
       Stream<OpeningHoursPeriod> stream = openingPeriods.stream();
-      Calendar calendar = Calendar.getInstance();
+      Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
       if (!openingPeriods.isEmpty()) {
         calendar.setTimeInMillis(stream.skip(count - 1).findFirst().orElse(new OpeningHoursPeriod()).getDate().getTime());
       }
       endDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
 
-    Calendar startDay = Calendar.getInstance();
+    Calendar startDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     startDay.setTimeInMillis(DateTime.parse(startDate, DATE_FORMATTER_SHORT).getMillis());
     startDay.set(Calendar.SECOND, 0);
     startDay.set(Calendar.MILLISECOND, 0);
 
-    Calendar endDay = Calendar.getInstance();
+    Calendar endDay = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     endDay.setTimeInMillis(DateTime.parse(endDate, DATE_FORMATTER_SHORT).getMillis());
     endDay.set(Calendar.SECOND, 0);
     endDay.set(Calendar.MILLISECOND, 1);
@@ -185,5 +201,62 @@ public class CalendarUtils {
 
   public static Date getDateWithoutHoursAndMinutes(Date date) {
     return date;
+  }
+
+  public static OpeningDayWeekDay mapActualOpeningHoursListToOpeningDayWeekDay(List<ActualOpeningHours> list) {
+
+    boolean exceptional = list.stream()
+      .anyMatch(ActualOpeningHours::getExceptional);
+
+    boolean allDay = list.stream()
+      .filter(o -> o.getExceptional() == exceptional)
+      .anyMatch(ActualOpeningHours::getAllDay);
+
+    boolean open = list.stream()
+      .filter(o -> o.getExceptional() == exceptional)
+      .anyMatch(ActualOpeningHours::getOpen);
+
+    Date date = list.stream()
+      .filter(o -> o.getExceptional() == exceptional).findAny()
+      .map(ActualOpeningHours::getActualDay)
+      .orElse(null);
+
+    List<OpeningHour> hours = list.stream()
+      .filter(o -> o.getExceptional() == exceptional).map(o -> new OpeningHour()
+        .withStartTime(o.getStartTime())
+        .withEndTime(o.getEndTime()))
+      .collect(Collectors.toList());
+
+    SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+    df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+
+    OpeningDay openingDay = new OpeningDay();
+    openingDay.setExceptional(exceptional);
+    openingDay.setAllDay(allDay);
+    openingDay.setOpen(open);
+    openingDay.setDate(date == null ? null : df.format(date));
+    openingDay.setOpeningHour(hours);
+
+    OpeningDayWeekDay openingDayWeekDay = new OpeningDayWeekDay();
+    openingDayWeekDay.setOpeningDay(openingDay);
+
+    return openingDayWeekDay;
+  }
+
+  public static OpeningDayWeekDay getOpeningDayWeekDayForTheEmptyDay(Date date) {
+
+    SimpleDateFormat format = new SimpleDateFormat(DATE_PATTERN);
+    format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+
+    OpeningDay openingDay = new OpeningDay();
+    openingDay.setDate(format.format(date));
+    openingDay.setOpen(false);
+    openingDay.setExceptional(false);
+    openingDay.setAllDay(true);
+
+    OpeningDayWeekDay openingDayWeekDay = new OpeningDayWeekDay();
+    openingDayWeekDay.setOpeningDay(openingDay);
+
+    return openingDayWeekDay;
   }
 }

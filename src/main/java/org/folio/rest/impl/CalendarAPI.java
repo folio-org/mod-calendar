@@ -1,17 +1,36 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.*;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.SQLConnection;
 import joptsimple.internal.Strings;
 import org.apache.commons.collections4.CollectionUtils;
 import org.folio.rest.annotations.Validate;
-import org.folio.rest.beans.*;
-import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.beans.CalendarOpeningsRequestParameters;
+import org.folio.rest.beans.Openings;
+import org.folio.rest.beans.PostCalendarPeriodsRequestParams;
+import org.folio.rest.beans.RegularHours;
+import org.folio.rest.jaxrs.model.OpeningCollection;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningHoursCollection;
+import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.jaxrs.resource.Calendar;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.interfaces.Results;
+import org.folio.rest.service.ActualOpeningHoursService;
+import org.folio.rest.service.ActualOpeningHoursServiceImpl;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
@@ -19,30 +38,52 @@ import org.folio.rest.utils.CalendarUtils;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.Response;
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
-import static org.folio.rest.utils.CalendarConstants.*;
+import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
+import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
+import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
+import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
+import static org.folio.rest.utils.CalendarConstants.END_DATE;
+import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
+import static org.folio.rest.utils.CalendarConstants.ID_FIELD;
+import static org.folio.rest.utils.CalendarConstants.OPENINGS;
+import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
+import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
+import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
+import static org.folio.rest.utils.CalendarConstants.START_DATE;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
+import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
+import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpeningDayWeekDay;
 
 
 public class CalendarAPI implements Calendar {
 
+  private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
+
   private final Messages messages = Messages.getInstance();
 
+  private ActualOpeningHoursService actualOpeningHoursService;
 
   public CalendarAPI() {
-    //stub
+    actualOpeningHoursService = new ActualOpeningHoursServiceImpl();
   }
 
   @Validate
@@ -242,65 +283,54 @@ public class CalendarAPI implements Calendar {
   @Validate
   @Override
   public void getCalendarPeriodsCalculateopeningByServicePointId(String servicePointId,
-                                                                 String startDate,
-                                                                 CalendarPeriodsServicePointIdCalculateopeningGetUnit unit,
-                                                                 int amount,
+                                                                 String requestedDate,
                                                                  String lang,
                                                                  Map<String, String> okapiHeaders,
                                                                  Handler<AsyncResult<Response>> asyncResultHandler,
                                                                  Context vertxContext) {
 
-    if (unit != null && unit != CalendarPeriodsServicePointIdCalculateopeningGetUnit.DAY && unit != CalendarPeriodsServicePointIdCalculateopeningGetUnit.HOUR) {
-      asyncResultHandler.handle(Future.succeededFuture(
-        GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(
-         messages.getMessage(lang, MessageConsts.InvalidParameters))));
-      return;
-    }
-    if (amount <= 0) {
-      asyncResultHandler.handle(Future.succeededFuture(
-        GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(
-          messages.getMessage(lang, MessageConsts.InvalidParameters))));
-      return;
-    }
+    vertxContext.runOnContext(v -> {
+      try {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+        Date date = df.parse(requestedDate);
 
-    OpeningCollection openingCollection = new OpeningCollection();
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+        String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
 
-    ZonedDateTime loanStartDateTime;
-    ZonedDateTime loanEndDateTime;
-    if (unit != null && unit == CalendarPeriodsServicePointIdCalculateopeningGetUnit.DAY) {
-      loanStartDateTime = ZonedDateTime.of(LocalDate.parse(startDate).atStartOfDay(), ZoneId.of("UTC"));
-      loanEndDateTime = loanStartDateTime.plusDays(amount);
-    } else{
-      loanStartDateTime = ZonedDateTime.of(LocalDate.parse(startDate).atTime(LocalTime.now()), ZoneId.of("UTC"));
-      loanEndDateTime = loanStartDateTime.plusHours(amount);
-    }
+        CompositeFuture.all(
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
+            tenantId, servicePointId, date, PREVIOUS_DAY),
+          actualOpeningHoursService.findActualOpeningHoursForGivenDay(
+            tenantId, servicePointId, date),
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
+            tenantId, servicePointId, date, NEXT_DAY)
+        ).setHandler(result -> {
+          List<ActualOpeningHours> prev = result.result().resultAt(0);
+          List<ActualOpeningHours> current = result.result().resultAt(1);
+          List<ActualOpeningHours> next = result.result().resultAt(2);
 
-    Criteria critOpeningServicePointId = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-    Criteria critOpeningByStartDateTime = new Criteria().addField(START_DATE).setJSONB(true).setOperation(Criteria.OP_LESS_THAN_EQ).setValue(loanStartDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    Criteria critOpeningByEndDateTime = new Criteria().addField(END_DATE).setJSONB(true).setOperation(Criteria.OP_GREATER_THAN_EQ).setValue(loanEndDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    Criterion criterionForOpeningHours = new Criterion();
-    criterionForOpeningHours.addCriterion(critOpeningServicePointId, Criteria.OP_AND);
-    criterionForOpeningHours.addCriterion(critOpeningByStartDateTime, Criteria.OP_AND, critOpeningByEndDateTime);
+          List<OpeningDayWeekDay> openingDays = new ArrayList<>();
+          openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(prev));
+          openingDays.add(current.isEmpty() ?
+            getOpeningDayWeekDayForTheEmptyDay(date) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
+          openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(next));
 
-    vertxContext.runOnContext(a ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
-          if (resultOfSelectOpenings.succeeded()) {
-            addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            if (CollectionUtils.isNotEmpty(openingCollection.getOpeningPeriods()) && openingCollection.getOpeningPeriods().size() == 1) {
-              String openingId = openingCollection.getOpeningPeriods().get(0).getId();
-              getOpening3DaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, openingId, loanEndDateTime, postgresClient, beginTx);
-            } else {
-              postgresClient.endTx(beginTx, done ->
-                asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond404WithTextPlain(messages.getMessage(lang, MessageConsts.ObjectDoesNotExist)))));
-            }
-          } else {
-            postgresClient.endTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })));
+          OpeningPeriod period = new OpeningPeriod();
+          period.setOpeningDays(openingDays);
+
+          asyncResultHandler.handle(Future.succeededFuture(
+            GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond200WithApplicationJson(period)));
+        });
+      } catch (ParseException e) {
+        asyncResultHandler.handle(Future.succeededFuture(
+          GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(e)));
+      } catch (Exception e) {
+        logger.error(e);
+        asyncResultHandler.handle(Future.succeededFuture(
+          GetCalendarPeriodsCalculateopeningByServicePointIdResponse
+            .respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError))));
+      }
+    });
   }
 
   private void saveRegularHours(PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams, PostgresClient postgresClient, Handler<AsyncResult<Response>> asyncResultHandler, AsyncResult<SQLConnection> beginTx, AsyncResult<String> replyOfSavingOpenings) {
@@ -458,11 +488,6 @@ public class CalendarAPI implements Calendar {
 
   private void getOpeningDaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
     List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
-    endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
-  }
-
-  private void getOpening3DaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, String openingId, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, loanEndDateTime, postgresClient, beginTx);
     endCalculation(asyncResultHandler, futures, openingCollection, openingId, postgresClient, beginTx);
   }
 
