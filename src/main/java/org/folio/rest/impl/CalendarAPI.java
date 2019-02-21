@@ -38,8 +38,11 @@ import org.folio.rest.utils.CalendarUtils;
 import org.joda.time.DateTime;
 
 import javax.ws.rs.core.Response;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
@@ -49,6 +52,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -287,12 +291,19 @@ public class CalendarAPI implements Calendar {
 
     vertxContext.runOnContext(v -> {
       try {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
+        Date date = df.parse(requestedDate);
+
         String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
 
         CompositeFuture.all(
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, requestedDate, PREVIOUS_DAY),
-          actualOpeningHoursService.findActualOpeningHoursForGivenDay(tenantId, servicePointId, requestedDate),
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(tenantId, servicePointId, requestedDate, NEXT_DAY)
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
+            tenantId, servicePointId, date, PREVIOUS_DAY),
+          actualOpeningHoursService.findActualOpeningHoursForGivenDay(
+            tenantId, servicePointId, date),
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
+            tenantId, servicePointId, date, NEXT_DAY)
         ).setHandler(result -> {
           List<ActualOpeningHours> prev = result.result().resultAt(0);
           List<ActualOpeningHours> current = result.result().resultAt(1);
@@ -301,7 +312,7 @@ public class CalendarAPI implements Calendar {
           List<OpeningDayWeekDay> openingDays = new ArrayList<>();
           openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(prev));
           openingDays.add(current.isEmpty() ?
-            getOpeningDayWeekDayForTheEmptyDay(requestedDate) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
+            getOpeningDayWeekDayForTheEmptyDay(date) : mapActualOpeningHoursListToOpeningDayWeekDay(current));
           openingDays.add(mapActualOpeningHoursListToOpeningDayWeekDay(next));
 
           OpeningPeriod period = new OpeningPeriod();
@@ -310,6 +321,9 @@ public class CalendarAPI implements Calendar {
           asyncResultHandler.handle(Future.succeededFuture(
             GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond200WithApplicationJson(period)));
         });
+      } catch (ParseException e) {
+        asyncResultHandler.handle(Future.succeededFuture(
+          GetCalendarPeriodsCalculateopeningByServicePointIdResponse.respond400WithTextPlain(e)));
       } catch (Exception e) {
         logger.error(e);
         asyncResultHandler.handle(Future.succeededFuture(

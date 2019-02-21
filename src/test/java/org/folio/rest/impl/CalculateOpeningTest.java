@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -62,7 +61,6 @@ public class CalculateOpeningTest {
   private static final String TENANT = "test";
   private static final String TOKEN = "test";
   private static final String SERVICE_POINT_ID = "acdee43c-9cf5-4f2c-aae0-8a70a2921c1a";
-  private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
   private LocalDate requestedDate;
   private LocalDate prevDate;
@@ -218,7 +216,7 @@ public class CalculateOpeningTest {
       .spec(spec)
       .when()
       .get(String.format("/calendar/periods/%s/calculateopening?requestedDate=%s",
-        SERVICE_POINT_ID, mapLocalDateToString(requestedDate)));
+        SERVICE_POINT_ID, mapLocalDateToString(requestedDate, "yyyy-MM-dd")));
 
     List<OpeningDay> openingDays = new JsonObject(response.asString())
       .mapTo(OpeningPeriod.class)
@@ -232,7 +230,7 @@ public class CalculateOpeningTest {
     assertThat(mapStringToLocalDate(openingDays.get(2).getDate()), equalTo(nextDate));
   }
 
-  private static OpeningPeriod createOpeningPeriod(String name, LocalDate startDate, LocalDate endDate,
+  private static void createOpeningPeriod(String name, LocalDate startDate, LocalDate endDate,
                                                    List<OpeningDayWeekDay> openingDays) {
 
     OpeningPeriod period = new OpeningPeriod();
@@ -255,8 +253,6 @@ public class CalculateOpeningTest {
       .post("/calendar/periods/" + SERVICE_POINT_ID + "/period")
       .then()
       .statusCode(201);
-
-    return period;
   }
 
   private static OpeningDayWeekDay buildOpeningDayWeekDay(String date, boolean open, boolean exceptional,
@@ -289,7 +285,11 @@ public class CalculateOpeningTest {
   }
 
   private static String mapLocalDateToString(LocalDate date) {
+    return mapLocalDateToString(date, DATE_PATTERN);
+  }
+
+  private static String mapLocalDateToString(LocalDate date, String pattern) {
     ZonedDateTime zonedDateTime = ZonedDateTime.of(date, LocalTime.of(0, 0), ZoneOffset.UTC);
-    return FORMATTER.format(zonedDateTime);
+    return DateTimeFormatter.ofPattern(pattern).withZone(ZoneOffset.UTC).format(zonedDateTime);
   }
 }

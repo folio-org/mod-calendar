@@ -5,17 +5,18 @@ import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Order;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ActualOpeningHoursService {
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String tenantId,
                                                                      String servicePointId,
-                                                                     String date);
+                                                                     Date requestedDate);
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String tenantId,
                                                                            String servicePointId,
-                                                                           String date,
+                                                                           Date requestedDate,
                                                                            SearchDirection searchDirection);
 
   enum SearchDirection {

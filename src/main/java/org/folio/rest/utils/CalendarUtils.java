@@ -241,10 +241,13 @@ public class CalendarUtils {
     return openingDayWeekDay;
   }
 
-  public static OpeningDayWeekDay getOpeningDayWeekDayForTheEmptyDay(String date) {
+  public static OpeningDayWeekDay getOpeningDayWeekDayForTheEmptyDay(Date date) {
+
+    SimpleDateFormat format = new SimpleDateFormat(DATE_PATTERN);
+    format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 
     OpeningDay openingDay = new OpeningDay();
-    openingDay.setDate(date);
+    openingDay.setDate(format.format(date));
     openingDay.setOpen(false);
     openingDay.setExceptional(false);
     openingDay.setAllDay(true);

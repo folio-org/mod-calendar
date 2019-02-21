@@ -7,18 +7,26 @@ import io.vertx.ext.sql.ResultSet;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.PostgresClient;
 
+import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
+import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
 
   @Override
   public Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String tenantId,
                                                                             String servicePointId,
-                                                                            String date) {
+                                                                            Date requestedDate) {
+
+    SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+    df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 
     PostgresClient pgClient = PostgresClient.getInstance(Vertx.vertx(), tenantId);
 
@@ -28,7 +36,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       "WHERE o.jsonb->>'servicePointId' = '%4$s' " +
       "AND aoh.jsonb->>'actualDay' = '%5$s'",
 
-      PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS, servicePointId, date);
+      PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS, servicePointId, df.format(requestedDate));
 
     Future<ResultSet> future = Future.future();
     pgClient.select(query, future.completer());
@@ -42,8 +50,11 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   @Override
   public Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String tenantId,
                                                                                   String servicePointId,
-                                                                                  String requestedDate,
+                                                                                  Date requestedDate,
                                                                                   SearchDirection searchDirection) {
+
+    SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
+    df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 
     PostgresClient pgClient = PostgresClient.getInstance(Vertx.vertx(), tenantId);
 
@@ -76,7 +87,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       "AND jsonb->>'actualDay' = (SELECT actual_day FROM closest_open_day)",
 
       PostgresClient.convertToPsqlStandard(tenantId), OPENINGS, ACTUAL_OPENING_HOURS, servicePointId,
-      requestedDate, searchDirection.getOrder(), searchDirection.getOperator());
+      df.format(requestedDate), searchDirection.getOrder(), searchDirection.getOperator());
 
     Future<ResultSet> future = Future.future();
     pgClient.select(query, future.completer());
