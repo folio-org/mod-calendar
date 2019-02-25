@@ -10,12 +10,10 @@ import java.util.List;
 
 public interface ActualOpeningHoursService {
 
-  Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String tenantId,
-                                                                     String servicePointId,
+  Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String servicePointId,
                                                                      Date requestedDate);
 
-  Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String tenantId,
-                                                                           String servicePointId,
+  Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String servicePointId,
                                                                            Date requestedDate,
                                                                            SearchDirection searchDirection);
 
