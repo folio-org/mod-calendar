@@ -5,6 +5,7 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.SQLConnection;
@@ -82,8 +83,8 @@ public class CalendarAPI implements Calendar {
 
   private ActualOpeningHoursService actualOpeningHoursService;
 
-  public CalendarAPI() {
-    actualOpeningHoursService = new ActualOpeningHoursServiceImpl();
+  public CalendarAPI(Vertx vertx, String tenantId) {
+    actualOpeningHoursService = new ActualOpeningHoursServiceImpl(vertx, tenantId);
   }
 
   @Validate
@@ -295,15 +296,10 @@ public class CalendarAPI implements Calendar {
         df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
         Date date = df.parse(requestedDate);
 
-        String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-
         CompositeFuture.all(
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
-            tenantId, servicePointId, date, PREVIOUS_DAY),
-          actualOpeningHoursService.findActualOpeningHoursForGivenDay(
-            tenantId, servicePointId, date),
-          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(
-            tenantId, servicePointId, date, NEXT_DAY)
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, PREVIOUS_DAY),
+          actualOpeningHoursService.findActualOpeningHoursForGivenDay(servicePointId, date),
+          actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, NEXT_DAY)
         ).setHandler(result -> {
           List<ActualOpeningHours> prev = result.result().resultAt(0);
           List<ActualOpeningHours> current = result.result().resultAt(1);
