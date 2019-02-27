@@ -5,7 +5,8 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import io.vertx.core.*;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -14,15 +15,26 @@ import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.*;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
@@ -281,6 +293,35 @@ public class CalendarIT {
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
       .statusCode(500);
+  }
+
+  @Test
+  public void overlappingExceptionalPeriodTest() {
+    String servicePointUUID = UUID.randomUUID().toString();
+
+    // create a new calendar
+    String uuid = UUID.randomUUID().toString();
+    OpeningPeriod opening = generateDescription(2017, Calendar.MARCH, 1, 5, servicePointUUID, uuid, true, true, false);
+    postPeriod(servicePointUUID, opening);
+
+    // create a new exceptional period
+    String uuidExPeriod = UUID.randomUUID().toString();
+    OpeningPeriod exceptionalPeriod = generateDescription(2017, Calendar.MARCH, 1, 1, servicePointUUID, uuidExPeriod, true, false, true);
+    postPeriod(servicePointUUID, exceptionalPeriod);
+
+    // save the same exceptional period
+    postWithHeaderAndBody(exceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
+
+    // save a new exceptional period
+    String newIdExPeriod = UUID.randomUUID().toString();
+    OpeningPeriod newExceptionalPeriod = generateDescription(2017, Calendar.MARCH, 2, 1, servicePointUUID, newIdExPeriod, true, true, true);
+    postWithHeaderAndBody(newExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .statusCode(201);
   }
 
   @Test

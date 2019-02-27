@@ -106,17 +106,17 @@ public class CalendarAPI implements Calendar {
       -> postgresClient.startTx(beginTx
         -> postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForId, true, false, resultOfSelectOpenings -> {
         if (resultOfSelectOpenings.failed()) {
-          asyncResultHandler.handle(Future.succeededFuture(
+          postgresClient.endTx(beginTx,end -> asyncResultHandler.handle(Future.succeededFuture(
             PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-              "Error while listing events.")));
+              "Error while listing events."))));
         } else if (resultOfSelectOpenings.result().getResults().isEmpty()) {
           PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams = new PostCalendarPeriodsRequestParams(lang, entity, isExceptional, openingsTable);
           postgresClient.save(beginTx, OPENINGS, openingsTable, replyOfSavingOpenings
             -> saveRegularHours(postCalendarPeriodsRequestParams, postgresClient, asyncResultHandler, beginTx, replyOfSavingOpenings));
         } else {
-          asyncResultHandler.handle(Future.succeededFuture(
+          postgresClient.endTx(beginTx,end -> asyncResultHandler.handle(Future.succeededFuture(
             PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-              "Intervals can not overlap.")));
+              "Intervals can not overlap."))));
         }
       })
       )
