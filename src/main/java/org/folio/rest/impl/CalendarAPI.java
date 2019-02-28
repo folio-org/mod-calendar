@@ -329,10 +329,12 @@ public class CalendarAPI implements Calendar {
     });
   }
 
-  private void saveRegularHours(PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams, PostgresClient postgresClient, Handler<AsyncResult<Response>> asyncResultHandler, AsyncResult<SQLConnection> beginTx, AsyncResult<String> replyOfSavingOpenings) {
+  private void saveRegularHours(PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams, PostgresClient postgresClient,
+                                Handler<AsyncResult<Response>> asyncResultHandler, AsyncResult<SQLConnection> beginTx,
+                                AsyncResult<String> replyOfSavingOpenings) {
     if (replyOfSavingOpenings.succeeded()) {
       RegularHours regularHours = new RegularHours(replyOfSavingOpenings.result(), postCalendarPeriodsRequestParams.getOpeningsTable().getId(), postCalendarPeriodsRequestParams.getEntity().getOpeningDays());
-      postgresClient.save(REGULAR_HOURS, regularHours, replyOfSavingRegularHours -> {
+      postgresClient.save(beginTx, REGULAR_HOURS, regularHours, replyOfSavingRegularHours -> {
         if (replyOfSavingRegularHours.succeeded()) {
           saveActualOpeningHours(postCalendarPeriodsRequestParams.getEntity(), postCalendarPeriodsRequestParams.getLang(), postCalendarPeriodsRequestParams.isExceptional(), asyncResultHandler, postgresClient, beginTx);
         } else {
@@ -423,7 +425,7 @@ public class CalendarAPI implements Calendar {
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler,
     OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
 
-    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang, null, postgresClient, beginTx);
+    List<Future> futures = getOpeningDays(asyncResultHandler, openingCollection, lang,  postgresClient, beginTx);
     CompositeFuture.all(futures).setHandler(querys -> {
       if (querys.succeeded()) {
         postgresClient.endTx(beginTx, done
@@ -588,19 +590,15 @@ public class CalendarAPI implements Calendar {
     }
   }
 
-  private List<Future> getOpeningDays(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-    return getOpeningDays(asyncResultHandler, openingCollection, lang, null, postgresClient, beginTx);
-  }
-
   private List<Future> getOpeningDays(Handler<AsyncResult<Response>> asyncResultHandler,
-    OpeningCollection openingCollection, String lang, ZonedDateTime loanEndDateTime, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
+    OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
  
     List<Future> futures = new ArrayList<>();
     for (OpeningPeriod openingPeriod : openingCollection.getOpeningPeriods()) {
       Criterion criterionForRegularHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingPeriod.getId() + "'"));
       Future<Void> future = Future.future();
       futures.add(future);
-      postgresClient.get(REGULAR_HOURS, RegularHours.class, criterionForRegularHours, true, false, resultOfSelectRegularHours -> {
+      postgresClient.get(beginTx, REGULAR_HOURS, RegularHours.class, criterionForRegularHours, true, false, resultOfSelectRegularHours -> {
         if (resultOfSelectRegularHours.succeeded()) {
           try {
             List<RegularHours> regularHoursList =  resultOfSelectRegularHours.result().getResults();
@@ -608,7 +606,7 @@ public class CalendarAPI implements Calendar {
             for (RegularHours regularHours : regularHoursList) {
               Map<String, OpeningPeriod> openingPeriods = openingCollection.getOpeningPeriods().stream()
                 .collect(Collectors.toMap(OpeningPeriod::getId, Function.identity()));
-              List<OpeningDayWeekDay> openingDays = loanEndDateTime != null ? processCalculation(loanEndDateTime, regularHours, openingPeriod) : regularHours.getOpeningDays();
+              List<OpeningDayWeekDay> openingDays = regularHours.getOpeningDays();
               openingPeriods.get(regularHours.getOpeningId()).setOpeningDays(openingDays);
             }
 
