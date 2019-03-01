@@ -40,6 +40,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.core.StringContains.containsString;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -261,15 +262,40 @@ public class CalendarIT {
   public void deletePeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
 
-    deleteWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+    // create a new period
+    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
+    postPeriod(servicePointUUID, opening);
+
+    // check created period
+    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .contentType(ContentType.JSON)
+      .body("id", equalTo(uuid))
+      .statusCode(200);
+
+    // delete created period
+    deleteWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .statusCode(204);
 
+    // verify that the created period has been deleted
     getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .body(equalTo(uuid))
+      .statusCode(404);
+  }
+
+  @Test
+  public void deleteNotExistPeriodTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+
+    // delete not exist period
+    deleteWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(containsString("Object does not exist"))
       .statusCode(404);
   }
 
@@ -370,25 +396,6 @@ public class CalendarIT {
     return openingPeriod;
   }
 
-  private OpeningPeriod generateDescriptionWithMultipleDays(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
-    List<OpeningDayWeekDay> openingDays = new ArrayList<>();
-    Calendar startDate = createStartDate(startYear, month, day);
-    Calendar endDate = createEndDate(startDate, numberOfDays);
-    OpeningPeriod openingPeriod = new OpeningPeriod();
-    openingPeriod.setId(uuid);
-    openingPeriod.setStartDate(startDate.getTime());
-    openingPeriod.setEndDate(endDate.getTime());
-    openingPeriod.setServicePointId(servicePointId);
-    openingPeriod.setName("test");
-
-    createAndAddOpeningDay(openingDays, Weekdays.Day.MONDAY, isAllDay, isOpen, isExceptional);
-    createAndAddOpeningDay(openingDays, Weekdays.Day.WEDNESDAY, isAllDay, isOpen, isExceptional);
-    createAndAddOpeningDay(openingDays, Weekdays.Day.FRIDAY, isAllDay, isOpen, isExceptional);
-
-    openingPeriod.setOpeningDays(openingDays);
-    return openingPeriod;
-  }
-
   private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, boolean isAllDay, boolean isOpen, boolean isExceptional) {
     OpeningDayWeekDay opening = new OpeningDayWeekDay();
     OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
@@ -448,10 +455,8 @@ public class CalendarIT {
       .put(path);
   }
 
-  private Response deleteWithHeaderAndBody(OpeningPeriod opening, String path) {
+  private Response deleteWithHeaderAndBody(String path) {
     return restGivenWithHeader()
-      .header(JSON_CONTENT_TYPE_HEADER)
-      .body(opening)
       .delete(path);
   }
 
