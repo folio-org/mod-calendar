@@ -118,14 +118,15 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void deleteCalendarPeriodsPeriodByServicePointIdAndPeriodId(String openingId, String servicePointId, String lang,
-    Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void deleteCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId, String periodId,
+                                                                     String lang, Map<String, String> okapiHeaders,
+                                                                     Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
 
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID)
-      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + periodId + "'"));
     Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD)
-      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + periodId + "'"));
 
     vertxContext.runOnContext(v
       -> postgresClient.startTx(beginTx
@@ -370,20 +371,32 @@ public class CalendarAPI implements Calendar {
   }
 
   private void deleteOpenings(Handler<AsyncResult<Response>> asyncResultHandler,
-    PostgresClient postgresClient, Criterion criterionForOpenings, String lang, AsyncResult<SQLConnection> beginTx) {
+                              PostgresClient postgresClient, Criterion criterionForOpenings,
+                              String lang, AsyncResult<SQLConnection> beginTx) {
 
-    postgresClient.delete(beginTx, OPENINGS, criterionForOpenings, replyOfDeletingOpenings -> {
-      if (replyOfDeletingOpenings.succeeded()) {
-        postgresClient.endTx(beginTx, done
-          -> asyncResultHandler.handle(Future.succeededFuture(
-            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
-      } else {
-        postgresClient.rollbackTx(beginTx, done
-          -> asyncResultHandler.handle(Future.succeededFuture(
+    postgresClient.delete(beginTx, OPENINGS, criterionForOpenings,
+      replyOfDeletingOpenings -> {
+        if (replyOfDeletingOpenings.failed()) {
+          postgresClient.rollbackTx(beginTx, done
+            -> asyncResultHandler.handle(Future.succeededFuture(
             DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(
               messages.getMessage(lang, MessageConsts.InternalServerError)))));
-      }
-    });
+          return;
+        }
+
+        int numberOfRowsDeleted = replyOfDeletingOpenings.result().getUpdated();
+        if (numberOfRowsDeleted <= 0) {
+          postgresClient.rollbackTx(beginTx, done
+            -> asyncResultHandler.handle(Future.succeededFuture(
+            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
+              .respond404WithTextPlain(messages.getMessage(lang, MessageConsts.ObjectDoesNotExist)))));
+          return;
+        }
+
+        postgresClient.endTx(beginTx, done
+          -> asyncResultHandler.handle(Future.succeededFuture(
+          DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
+      });
   }
 
   private void putActualOpeningHours(OpeningPeriod entity, Criterion openingId, String lang,
