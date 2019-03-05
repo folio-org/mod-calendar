@@ -119,10 +119,11 @@ public class CalendarIT {
       .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningCollection.json"))
       .statusCode(200);
 
-    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period/uuid")
+    String uuid = UUID.randomUUID().toString();
+    getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period/" + uuid)
       .then()
       .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo(ERROR_RESPONSE_404))
+      .assertThat().body(containsString(uuid))
       .statusCode(404);
   }
 
@@ -283,7 +284,7 @@ public class CalendarIT {
     // verify that the created period has been deleted
     getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
-      .body(equalTo(ERROR_RESPONSE_404))
+      .body(containsString(uuid))
       .statusCode(404);
   }
 

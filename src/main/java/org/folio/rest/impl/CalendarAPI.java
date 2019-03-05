@@ -70,6 +70,7 @@ import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpen
 public class CalendarAPI implements Calendar {
 
   private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
+  private static final String ERROR_MESSAGE = "Period with openingId=%s not found";
 
   private final Messages messages = Messages.getInstance();
 
@@ -235,7 +236,7 @@ public class CalendarAPI implements Calendar {
         postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
           if (resultOfSelectOpenings.succeeded()) {
             addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
-            getOpeningDaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
+            getOpeningDaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, openingId, postgresClient, beginTx);
           } else {
             postgresClient.endTx(beginTx, done ->
               asyncResultHandler.handle(Future.succeededFuture(
@@ -490,7 +491,7 @@ public class CalendarAPI implements Calendar {
   }
 
   private void getOpeningDaysByOpeningIdFuture(Handler<AsyncResult<Response>> asyncResultHandler, OpeningCollection openingCollection,
-                                               String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
+                                               String lang, String openingId, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
     Future<Void> future = getOpeningDays(postgresClient, beginTx, openingCollection);
     future.setHandler(resultHandler -> {
       if (resultHandler.failed()) {
@@ -506,7 +507,7 @@ public class CalendarAPI implements Calendar {
         postgresClient.endTx(beginTx, done ->
           asyncResultHandler.handle(Future.succeededFuture(
             GetCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
-              .respond404WithTextPlain(messages.getMessage(lang, MessageConsts.ObjectDoesNotExist)))));
+              .respond404WithTextPlain(String.format(ERROR_MESSAGE, openingId)))));
         return;
       }
 
