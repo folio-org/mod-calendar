@@ -44,6 +44,7 @@ import static org.hamcrest.core.StringContains.containsString;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
+  private static final String ERROR_RESPONSE_404 = "Object does not exist";
   private static final Header TENANT_HEADER = new Header("X-Okapi-Tenant", "test");
   private static final Header TOKEN_HEADER = new Header("X-Okapi-Token", "test");
   private static final Header OKAPI_URL_HEADER = new Header("X-Okapi-Url", "http://localhost:9130");
@@ -121,7 +122,7 @@ public class CalendarIT {
     getWithHeaderAndBody("/calendar/periods/" + UUID.randomUUID().toString() + "/period/uuid")
       .then()
       .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("uuid"))
+      .assertThat().body(equalTo(ERROR_RESPONSE_404))
       .statusCode(404);
   }
 
@@ -282,7 +283,7 @@ public class CalendarIT {
     // verify that the created period has been deleted
     getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
-      .body(equalTo(uuid))
+      .body(equalTo(ERROR_RESPONSE_404))
       .statusCode(404);
   }
 
@@ -295,7 +296,7 @@ public class CalendarIT {
     deleteWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .contentType(ContentType.TEXT)
-      .assertThat().body(containsString("Object does not exist"))
+      .assertThat().body(containsString(ERROR_RESPONSE_404))
       .statusCode(404);
   }
 
