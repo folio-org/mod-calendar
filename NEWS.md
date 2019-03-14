@@ -1,3 +1,13 @@
+## 1.3.0
+* Fix security vulnerabilities reported in jackson-databind (MODCAL-28)
+* Change calculate opening endpoint (MODCAL-33 MODCAL-34 MODCAL-29)
+* Update copyright year (FOLIO-1021)
+* Use the same Vertx instance for all postgres clients (MODCAL-33 MODCAL-34)
+* Save exceptional period error fix (MODCAL-35)
+* The created period or exception period is not deleted in mod-calendar (MODCAL-36)
+* Change GET and POST endpoints to avoid timezone issues (MODCAL-31)
+* Bug API GET: /periods/{servicePointId}/period related to getting more than one period (MODCAL-37)
+
 ## 1.2.0
 * Add endpoint /calendar/periods/{servicePointId}/calculateopening with GET to return open periods for given Service Point
 ## 1.0.3
