@@ -1,3 +1,6 @@
+## 1.3.1
+* Locking more than one DB connection from the pool for the same user request fix (MODCAL-40)
+
 ## 1.3.0
 * Fix security vulnerabilities reported in jackson-databind (MODCAL-28)
 * Change calculate opening endpoint (MODCAL-33 MODCAL-34 MODCAL-29)
