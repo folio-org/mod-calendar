@@ -350,7 +350,7 @@ public class CalendarAPI implements Calendar {
 
     List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
     if (!actualOpeningHours.isEmpty()) {
-      postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
+      postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
         if (replyOfSavingActualOpeningHours.succeeded()) {
           postgresClient.endTx(beginTx, done
             -> asyncResultHandler.handle(Future.succeededFuture(
@@ -407,7 +407,7 @@ public class CalendarAPI implements Calendar {
     List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
     postgresClient.delete(beginTx, ACTUAL_OPENING_HOURS, openingId, replyOfDeletingActualOpeningHours -> {
       if (replyOfDeletingActualOpeningHours.succeeded()) {
-        postgresClient.saveBatch(ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
+        postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
           if (replyOfSavingActualOpeningHours.succeeded()) {
             postgresClient.endTx(beginTx, done
               -> asyncResultHandler.handle(Future.succeededFuture(
