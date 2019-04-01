@@ -106,14 +106,14 @@ public class CalendarUtils {
     boolean allDay = true;
     boolean open = false;
     if (openingDay != null) {
-      allDay = openingDay.getAllDay();
+      allDay = BooleanUtils.isTrue(openingDay.getAllDay());
       open = BooleanUtils.isTrue(openingDay.getOpen());
     }
 
     List<ActualOpeningHours> actualOpeningHours = new ArrayList<>();
 
     if (openingDay != null) {
-      if (openingDay.getAllDay()) {
+      if (allDay) {
         ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
         actualOpeningHour.setId(generatedId);
         actualOpeningHour.setOpeningId(generatedId);

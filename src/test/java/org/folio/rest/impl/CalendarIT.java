@@ -244,11 +244,26 @@ public class CalendarIT {
       .statusCode(200);
   }
 
-  @Test
   public void getPeriodsExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
     OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+
+    postPeriod(servicePointUUID, opening);
+
+    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period?withOpeningDays=true&showPast=true&showExceptional=true")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningCollection.json"))
+      .body("totalRecords", greaterThan(0))
+      .statusCode(200);
+  }
+
+  @Test
+  public void postExceptionalTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, null, false, true);
 
     postPeriod(servicePointUUID, opening);
 
@@ -383,7 +398,7 @@ public class CalendarIT {
       .statusCode(200);
   }
 
-  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
     List<OpeningDayWeekDay> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
@@ -398,7 +413,7 @@ public class CalendarIT {
     return openingPeriod;
   }
 
-  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
     OpeningDayWeekDay opening = new OpeningDayWeekDay();
     OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
     List<OpeningHour> openingHours = new ArrayList<>();
