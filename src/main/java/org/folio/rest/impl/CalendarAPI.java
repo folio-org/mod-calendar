@@ -375,9 +375,9 @@ public class CalendarAPI implements Calendar {
     }, postgresClient, beginTx, asyncResultHandler);
   }
 
-  void handleExceptions(Runnable r, PostgresClient postgresClient,
-                        AsyncResult<SQLConnection> beginTx,
-                        Handler<AsyncResult<Response>> asyncResultHandler) {
+  static void handleExceptions(Runnable r, PostgresClient postgresClient,
+                               AsyncResult<SQLConnection> beginTx,
+                               Handler<AsyncResult<Response>> asyncResultHandler) {
     try {
       r.run();
     } catch (Exception ex) {
