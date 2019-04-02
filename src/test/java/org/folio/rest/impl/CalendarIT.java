@@ -431,9 +431,11 @@ public class CalendarIT {
 
     PostgresClient instance = PostgresClient.getInstance(vertx);
     instance.startTx(startTx ->
-      CalendarAPI.handleExceptions(() -> {
-        throw new RuntimeException();
-      }, instance, startTx, handler -> assertEquals(expectedResponse, handler.result().getEntity())));
+      CalendarAPI.handleExceptions(instance, startTx,
+        handler -> assertEquals(expectedResponse, handler.result().getEntity()),
+        () -> {
+          throw new RuntimeException();
+        }));
   }
 
   @Test
@@ -443,10 +445,11 @@ public class CalendarIT {
     PostgresClient instance = PostgresClient.getInstance(vertx);
     instance.startTx(startTx ->
       instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
-        result -> CalendarAPI.handleExceptions(() -> {
+        result -> CalendarAPI.handleExceptions(instance, startTx, handler -> {
+          assertEquals(expectedResponse, handler.result().getEntity());
+        }, () -> {
           throw new RuntimeException(result.cause());
-        }, instance, startTx, handler ->
-          assertEquals(expectedResponse, handler.result().getEntity())))
+        }))
     );
   }
 
