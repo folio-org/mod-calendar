@@ -30,6 +30,12 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -38,6 +44,7 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.StringContains.containsString;
@@ -241,6 +248,23 @@ public class CalendarIT {
       .contentType(ContentType.JSON)
       .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
       .body("id", equalTo(uuid))
+      .statusCode(200);
+  }
+
+  @Test
+  public void testGetCalendarPeriodsCalculateOpening() {
+    String pathCalculateOpening = "/calendar/periods/%s/calculateopening?requestedDate=%s";
+    LocalDate date = LocalDate.of(2019, Month.MARCH, 15);
+    String requestedDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+      .withZone(ZoneOffset.UTC)
+      .format(ZonedDateTime.of(date, LocalTime.of(0, 0), ZoneOffset.UTC));
+
+    restGivenWithHeader()
+      .when()
+      .get(String.format(pathCalculateOpening,
+        SERVICE_POINT_ID, requestedDate))
+      .then()
+      .contentType(ContentType.JSON)
       .statusCode(200);
   }
 
