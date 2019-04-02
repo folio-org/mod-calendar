@@ -10,7 +10,9 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
+import org.folio.rest.beans.Openings;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -81,5 +83,20 @@ public class CalendarAPITest {
       CalendarAPI.handleExceptions(() -> {
         throw new RuntimeException();
       }, instance, startTx, handler -> assertEquals(expectedResponse, handler.result().getEntity())));
+  }
+
+  @Test
+  public void testTxHandleExceptions() {
+    String expectedResponse = "Internal Server Error";
+
+    PostgresClient instance = PostgresClient.getInstance(vertx);
+    instance.startTx(startTx ->
+      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
+        result -> CalendarAPI.handleExceptions(() -> {
+          throw new RuntimeException(result.cause());
+        }, instance, startTx, handler -> {
+          assertEquals(expectedResponse, handler.result().getEntity());
+        }))
+    );
   }
 }
