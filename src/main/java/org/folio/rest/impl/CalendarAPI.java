@@ -100,9 +100,7 @@ public class CalendarAPI implements Calendar {
         handleExceptions(() ->
             postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForId, true, false, resultOfSelectOpenings -> {
               if (resultOfSelectOpenings.failed()) {
-                postgresClient.endTx(beginTx, end -> asyncResultHandler.handle(Future.succeededFuture(
-                  PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-                    "Error while listing events."))));
+                rollbackTx(postgresClient, beginTx, asyncResultHandler);
               } else if (resultOfSelectOpenings.result().getResults().isEmpty()) {
                 PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams = new PostCalendarPeriodsRequestParams(lang, entity, isExceptional, openingsTable);
                 postgresClient.save(beginTx, OPENINGS, openingsTable, replyOfSavingOpenings
@@ -334,16 +332,11 @@ public class CalendarAPI implements Calendar {
           if (replyOfSavingRegularHours.succeeded()) {
             saveActualOpeningHours(postCalendarPeriodsRequestParams.getEntity(), postCalendarPeriodsRequestParams.getLang(), postCalendarPeriodsRequestParams.isExceptional(), asyncResultHandler, postgresClient, beginTx);
           } else {
-            postgresClient.rollbackTx(beginTx, done ->
-              asyncResultHandler.handle(Future.succeededFuture(
-                PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(postCalendarPeriodsRequestParams.getLang(), MessageConsts.InternalServerError)))));
+            rollbackTx(postgresClient, beginTx, asyncResultHandler);
           }
         });
       } else {
-        postgresClient.rollbackTx(beginTx, done ->
-          asyncResultHandler.handle(Future.succeededFuture(
-            PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(
-              postCalendarPeriodsRequestParams.getLang(), MessageConsts.InternalServerError)))));
+        rollbackTx(postgresClient, beginTx, asyncResultHandler);
       }
     }, postgresClient, beginTx, asyncResultHandler);
   }
@@ -361,10 +354,7 @@ public class CalendarAPI implements Calendar {
               PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity,
                 PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201().withLocation(lang)))));
           } else {
-            postgresClient.rollbackTx(beginTx, done
-              -> asyncResultHandler.handle(Future.succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-                messages.getMessage(lang, MessageConsts.InternalServerError)))));
+            rollbackTx(postgresClient, beginTx, asyncResultHandler);
           }
         });
       } else {
@@ -382,10 +372,15 @@ public class CalendarAPI implements Calendar {
       r.run();
     } catch (Exception ex) {
       logger.error(ex);
-      postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.handle(
-        Future.succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
-          .respond500WithTextPlain("Internal Server Error"))));
+      rollbackTx(postgresClient, beginTx, asyncResultHandler);
     }
+  }
+
+  static void rollbackTx(PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx, Handler<AsyncResult<Response>> asyncResultHandler) {
+    logger.error("Rollback transaction");
+    postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.
+      handle(Future.succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
+        .respond500WithTextPlain("Internal Server Error"))));
   }
 
   private void deleteOpenings(Handler<AsyncResult<Response>> asyncResultHandler,
@@ -395,10 +390,7 @@ public class CalendarAPI implements Calendar {
     postgresClient.delete(beginTx, OPENINGS, criterionForOpenings,
       replyOfDeletingOpenings -> {
         if (replyOfDeletingOpenings.failed()) {
-          postgresClient.rollbackTx(beginTx, done
-            -> asyncResultHandler.handle(Future.succeededFuture(
-            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(
-              messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          rollbackTx(postgresClient, beginTx, asyncResultHandler);
           return;
         }
 

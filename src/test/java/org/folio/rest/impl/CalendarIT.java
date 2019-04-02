@@ -445,9 +445,20 @@ public class CalendarIT {
       instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
         result -> CalendarAPI.handleExceptions(() -> {
           throw new RuntimeException(result.cause());
-        }, instance, startTx, handler -> {
-          assertEquals(expectedResponse, handler.result().getEntity());
-        }))
+        }, instance, startTx, handler ->
+          assertEquals(expectedResponse, handler.result().getEntity())))
+    );
+  }
+
+  @Test
+  public void testMethodRollbackTx() {
+    String expectedResponse = "Internal Server Error";
+
+    PostgresClient instance = PostgresClient.getInstance(vertx);
+    instance.startTx(startTx ->
+      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
+        result -> CalendarAPI.rollbackTx(instance, startTx, handler ->
+          assertEquals(expectedResponse, handler.result().getEntity())))
     );
   }
 
