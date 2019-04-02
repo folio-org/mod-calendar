@@ -14,12 +14,14 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import org.folio.rest.RestVerticle;
+import org.folio.rest.beans.Openings;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.Weekdays;
+import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -30,6 +32,12 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -38,9 +46,11 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
@@ -245,10 +255,42 @@ public class CalendarIT {
   }
 
   @Test
+  public void testGetCalendarPeriodsCalculateOpening() {
+    String pathCalculateOpening = "/calendar/periods/%s/calculateopening?requestedDate=%s";
+    LocalDate date = LocalDate.of(2019, Month.MARCH, 15);
+    String requestedDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+      .withZone(ZoneOffset.UTC)
+      .format(ZonedDateTime.of(date, LocalTime.of(0, 0), ZoneOffset.UTC));
+
+    restGivenWithHeader()
+      .when()
+      .get(String.format(pathCalculateOpening,
+        SERVICE_POINT_ID, requestedDate))
+      .then()
+      .contentType(ContentType.JSON)
+      .statusCode(200);
+  }
+
   public void getPeriodsExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
     OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+
+    postPeriod(servicePointUUID, opening);
+
+    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period?withOpeningDays=true&showPast=true&showExceptional=true")
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/OpeningCollection.json"))
+      .body("totalRecords", greaterThan(0))
+      .statusCode(200);
+  }
+
+  @Test
+  public void postExceptionalTest() {
+    String uuid = UUID.randomUUID().toString();
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, null, false, true);
 
     postPeriod(servicePointUUID, opening);
 
@@ -383,7 +425,47 @@ public class CalendarIT {
       .statusCode(200);
   }
 
-  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  @Test
+  public void testMethodHandleExceptions() {
+    String expectedResponse = "Internal Server Error";
+
+    PostgresClient instance = PostgresClient.getInstance(vertx);
+    instance.startTx(startTx ->
+      CalendarAPI.handleExceptions(instance, startTx,
+        handler -> assertEquals(expectedResponse, handler.result().getEntity()),
+        () -> {
+          throw new RuntimeException();
+        }));
+  }
+
+  @Test
+  public void testTxHandleExceptions() {
+    String expectedResponse = "Internal Server Error";
+
+    PostgresClient instance = PostgresClient.getInstance(vertx);
+    instance.startTx(startTx ->
+      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
+        result -> CalendarAPI.handleExceptions(instance, startTx, handler -> {
+          assertEquals(expectedResponse, handler.result().getEntity());
+        }, () -> {
+          throw new RuntimeException(result.cause());
+        }))
+    );
+  }
+
+  @Test
+  public void testMethodRollbackTx() {
+    String expectedResponse = "Internal Server Error";
+
+    PostgresClient instance = PostgresClient.getInstance(vertx);
+    instance.startTx(startTx ->
+      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
+        result -> CalendarAPI.rollbackTx(instance, startTx, handler ->
+          assertEquals(expectedResponse, handler.result().getEntity())))
+    );
+  }
+
+  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
     List<OpeningDayWeekDay> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
@@ -398,7 +480,7 @@ public class CalendarIT {
     return openingPeriod;
   }
 
-  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
     OpeningDayWeekDay opening = new OpeningDayWeekDay();
     OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
     List<OpeningHour> openingHours = new ArrayList<>();

@@ -95,26 +95,24 @@ public class CalendarAPI implements Calendar {
           "Not valid json object. Missing field(s)...")));
       return;
     }
-    vertxContext.runOnContext(v
-      -> postgresClient.startTx(beginTx
-        -> postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForId, true, false, resultOfSelectOpenings -> {
-        if (resultOfSelectOpenings.failed()) {
-          postgresClient.endTx(beginTx,end -> asyncResultHandler.handle(Future.succeededFuture(
-            PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-              "Error while listing events."))));
-        } else if (resultOfSelectOpenings.result().getResults().isEmpty()) {
-          PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams = new PostCalendarPeriodsRequestParams(lang, entity, isExceptional, openingsTable);
-          postgresClient.save(beginTx, OPENINGS, openingsTable, replyOfSavingOpenings
-            -> saveRegularHours(postCalendarPeriodsRequestParams, postgresClient, asyncResultHandler, beginTx, replyOfSavingOpenings));
-        } else {
-          postgresClient.endTx(beginTx,end -> asyncResultHandler.handle(Future.succeededFuture(
-            PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-              "Intervals can not overlap."))));
-        }
-      })
+    vertxContext.runOnContext(v ->
+      postgresClient.startTx(beginTx ->
+        handleExceptions(postgresClient, beginTx, asyncResultHandler, () ->
+          postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForId, true, false, resultOfSelectOpenings -> {
+            if (resultOfSelectOpenings.failed()) {
+              rollbackTx(postgresClient, beginTx, asyncResultHandler);
+            } else if (resultOfSelectOpenings.result().getResults().isEmpty()) {
+              PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams = new PostCalendarPeriodsRequestParams(lang, entity, isExceptional, openingsTable);
+              postgresClient.save(beginTx, OPENINGS, openingsTable, replyOfSavingOpenings
+                -> saveRegularHours(postCalendarPeriodsRequestParams, postgresClient, asyncResultHandler, beginTx, replyOfSavingOpenings));
+            } else {
+              postgresClient.endTx(beginTx, end -> asyncResultHandler.handle(Future.succeededFuture(
+                PostCalendarPeriodsPeriodByServicePointIdResponse
+                  .respond500WithTextPlain("Intervals can not overlap."))));
+            }
+          }))
       )
     );
-
   }
 
   @Validate
@@ -326,49 +324,62 @@ public class CalendarAPI implements Calendar {
   private void saveRegularHours(PostCalendarPeriodsRequestParams postCalendarPeriodsRequestParams, PostgresClient postgresClient,
                                 Handler<AsyncResult<Response>> asyncResultHandler, AsyncResult<SQLConnection> beginTx,
                                 AsyncResult<String> replyOfSavingOpenings) {
-    if (replyOfSavingOpenings.succeeded()) {
-      RegularHours regularHours = new RegularHours(replyOfSavingOpenings.result(), postCalendarPeriodsRequestParams.getOpeningsTable().getId(), postCalendarPeriodsRequestParams.getEntity().getOpeningDays());
-      postgresClient.save(beginTx, REGULAR_HOURS, regularHours, replyOfSavingRegularHours -> {
-        if (replyOfSavingRegularHours.succeeded()) {
-          saveActualOpeningHours(postCalendarPeriodsRequestParams.getEntity(), postCalendarPeriodsRequestParams.getLang(), postCalendarPeriodsRequestParams.isExceptional(), asyncResultHandler, postgresClient, beginTx);
-        } else {
-          postgresClient.rollbackTx(beginTx, done ->
-            asyncResultHandler.handle(Future.succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(postCalendarPeriodsRequestParams.getLang(), MessageConsts.InternalServerError)))));
-        }
-      });
-    } else {
-      postgresClient.rollbackTx(beginTx, done ->
-        asyncResultHandler.handle(Future.succeededFuture(
-          PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(
-          postCalendarPeriodsRequestParams.getLang(), MessageConsts.InternalServerError)))));
-    }
+    handleExceptions(postgresClient, beginTx, asyncResultHandler, () -> {
+      if (replyOfSavingOpenings.succeeded()) {
+        RegularHours regularHours = new RegularHours(replyOfSavingOpenings.result(), postCalendarPeriodsRequestParams.getOpeningsTable().getId(), postCalendarPeriodsRequestParams.getEntity().getOpeningDays());
+        postgresClient.save(beginTx, REGULAR_HOURS, regularHours, replyOfSavingRegularHours -> {
+          if (replyOfSavingRegularHours.succeeded()) {
+            saveActualOpeningHours(postCalendarPeriodsRequestParams.getEntity(), postCalendarPeriodsRequestParams.getLang(), postCalendarPeriodsRequestParams.isExceptional(), asyncResultHandler, postgresClient, beginTx);
+          } else {
+            rollbackTx(postgresClient, beginTx, asyncResultHandler);
+          }
+        });
+      } else {
+        rollbackTx(postgresClient, beginTx, asyncResultHandler);
+      }
+    });
   }
 
   private void saveActualOpeningHours(OpeningPeriod entity, String lang, boolean isExceptional,
-    Handler<AsyncResult<Response>> asyncResultHandler, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-
-    List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
-    if (!actualOpeningHours.isEmpty()) {
-      postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
-        if (replyOfSavingActualOpeningHours.succeeded()) {
-          postgresClient.endTx(beginTx, done
-            -> asyncResultHandler.handle(Future.succeededFuture(
+                                      Handler<AsyncResult<Response>> asyncResultHandler,
+                                      PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
+    handleExceptions(postgresClient, beginTx, asyncResultHandler, () -> {
+      List<Object> actualOpeningHours = CalendarUtils.separateEvents(entity, isExceptional);
+      if (!actualOpeningHours.isEmpty()) {
+        postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
+          if (replyOfSavingActualOpeningHours.succeeded()) {
+            postgresClient.endTx(beginTx, done
+              -> asyncResultHandler.handle(Future.succeededFuture(
               PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity,
                 PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201().withLocation(lang)))));
-        } else {
-          postgresClient.rollbackTx(beginTx, done
-            -> asyncResultHandler.handle(Future.succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(
-                messages.getMessage(lang, MessageConsts.InternalServerError)))));
-        }
-      });
-    } else {
-      postgresClient.endTx(beginTx, done
-        -> asyncResultHandler.handle(Future.succeededFuture(
+          } else {
+            rollbackTx(postgresClient, beginTx, asyncResultHandler);
+          }
+        });
+      } else {
+        postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(Future.succeededFuture(
           PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity,
             PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201().withLocation(lang)))));
+      }
+    });
+  }
+
+  static void handleExceptions(PostgresClient postgresClient,
+                               AsyncResult<SQLConnection> beginTx,
+                               Handler<AsyncResult<Response>> asyncResultHandler, Runnable r) {
+    try {
+      r.run();
+    } catch (Exception ex) {
+      logger.error(ex);
+      rollbackTx(postgresClient, beginTx, asyncResultHandler);
     }
+  }
+
+  static void rollbackTx(PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx, Handler<AsyncResult<Response>> asyncResultHandler) {
+    logger.error("Rollback transaction");
+    postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.
+      handle(Future.succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
+        .respond500WithTextPlain("Internal Server Error"))));
   }
 
   private void deleteOpenings(Handler<AsyncResult<Response>> asyncResultHandler,
@@ -378,10 +389,7 @@ public class CalendarAPI implements Calendar {
     postgresClient.delete(beginTx, OPENINGS, criterionForOpenings,
       replyOfDeletingOpenings -> {
         if (replyOfDeletingOpenings.failed()) {
-          postgresClient.rollbackTx(beginTx, done
-            -> asyncResultHandler.handle(Future.succeededFuture(
-            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(
-              messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          rollbackTx(postgresClient, beginTx, asyncResultHandler);
           return;
         }
 
