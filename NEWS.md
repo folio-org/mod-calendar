@@ -1,3 +1,6 @@
+## 1.3.2
+* Module is not responding fix (MODCAL-38)
+
 ## 1.3.1
 * Locking more than one DB connection from the pool for the same user request fix (MODCAL-40)
 
