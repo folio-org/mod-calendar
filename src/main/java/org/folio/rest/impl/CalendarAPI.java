@@ -82,8 +82,13 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void postCalendarPeriodsPeriodByServicePointId(String servicePointId, String lang, OpeningPeriod entity,
-    Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void postCalendarPeriodsPeriodByServicePointId(String servicePointId,
+                                                        String lang,
+                                                        OpeningPeriod entity,
+                                                        Map<String, String> okapiHeaders,
+                                                        Handler<AsyncResult<Response>> asyncResultHandler,
+                                                        Context vertxContext) {
+
     boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
@@ -117,9 +122,12 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void deleteCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId, String periodId,
-                                                                     String lang, Map<String, String> okapiHeaders,
-                                                                     Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void deleteCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId,
+                                                                     String periodId,
+                                                                     String lang,
+                                                                     Map<String, String> okapiHeaders,
+                                                                     Handler<AsyncResult<Response>> asyncResultHandler,
+                                                                     Context vertxContext) {
 
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
     Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID)
@@ -154,8 +162,13 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void putCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId, String openingId, String lang, OpeningPeriod entity,
-    Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void putCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId,
+                                                                  String openingId,
+                                                                  String lang,
+                                                                  OpeningPeriod entity,
+                                                                  Map<String, String> okapiHeaders,
+                                                                  Handler<AsyncResult<Response>> asyncResultHandler,
+                                                                  Context vertxContext) {
 
     boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
@@ -188,7 +201,18 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void getCalendarPeriods(String servicePointId, String startDate, String endDate, boolean includeClosedDays, boolean actualOpenings, int offset, int limit, String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void getCalendarPeriods(String servicePointId,
+                                 String startDate,
+                                 String endDate,
+                                 boolean includeClosedDays,
+                                 boolean actualOpenings,
+                                 int offset,
+                                 int limit,
+                                 String lang,
+                                 Map<String, String> okapiHeaders,
+                                 Handler<AsyncResult<Response>> asyncResultHandler,
+                                 Context vertxContext) {
+
     OpeningCollection openingCollection = new OpeningCollection();
     CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
 
@@ -219,8 +243,12 @@ public class CalendarAPI implements Calendar {
   }
 
   @Override
-  public void getCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId, String openingId, String lang,
-    Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void getCalendarPeriodsPeriodByServicePointIdAndPeriodId(String servicePointId,
+                                                                  String openingId,
+                                                                  String lang,
+                                                                  Map<String, String> okapiHeaders,
+                                                                  Handler<AsyncResult<Response>> asyncResultHandler,
+                                                                  Context vertxContext) {
 
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
@@ -245,8 +273,14 @@ public class CalendarAPI implements Calendar {
 
   @Validate
   @Override
-  public void getCalendarPeriodsPeriodByServicePointId(String servicePointId, boolean withOpeningDays, boolean showPast, boolean exceptional,
-    String lang, Map<String, String> okapiHeaders, Handler<AsyncResult<Response>> asyncResultHandler, Context vertxContext) {
+  public void getCalendarPeriodsPeriodByServicePointId(String servicePointId,
+                                                       boolean withOpeningDays,
+                                                       boolean showPast,
+                                                       boolean exceptional,
+                                                       String lang,
+                                                       Map<String, String> okapiHeaders,
+                                                       Handler<AsyncResult<Response>> asyncResultHandler,
+                                                       Context vertxContext) {
 
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
