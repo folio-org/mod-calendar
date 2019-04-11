@@ -271,6 +271,7 @@ public class CalendarIT {
       .statusCode(200);
   }
 
+  @Test
   public void getPeriodsExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
