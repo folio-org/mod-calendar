@@ -1,54 +1,5 @@
 package org.folio.rest.impl;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.SQLConnection;
-import joptsimple.internal.Strings;
-import org.folio.rest.annotations.Validate;
-import org.folio.rest.beans.ActualOpeningHours;
-import org.folio.rest.beans.CalendarOpeningsRequestParameters;
-import org.folio.rest.beans.Openings;
-import org.folio.rest.beans.PostCalendarPeriodsRequestParams;
-import org.folio.rest.beans.RegularHours;
-import org.folio.rest.jaxrs.model.OpeningCollection;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
-import org.folio.rest.jaxrs.model.OpeningHoursCollection;
-import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
-import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.folio.rest.jaxrs.resource.Calendar;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.interfaces.Results;
-import org.folio.rest.service.ActualOpeningHoursService;
-import org.folio.rest.service.ActualOpeningHoursServiceImpl;
-import org.folio.rest.tools.messages.MessageConsts;
-import org.folio.rest.tools.messages.Messages;
-import org.folio.rest.tools.utils.TenantTool;
-import org.folio.rest.utils.CalendarUtils;
-import org.joda.time.DateTime;
-
-import javax.ws.rs.core.Response;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
@@ -65,6 +16,58 @@ import static org.folio.rest.utils.CalendarConstants.START_DATE;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
 import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpeningDayWeekDay;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ws.rs.core.Response;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.sql.SQLConnection;
+import joptsimple.internal.Strings;
+
+import org.joda.time.DateTime;
+
+import org.folio.rest.annotations.Validate;
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.beans.CalendarOpeningsRequestParameters;
+import org.folio.rest.beans.Openings;
+import org.folio.rest.beans.PostCalendarPeriodsRequestParams;
+import org.folio.rest.beans.RegularHours;
+import org.folio.rest.jaxrs.model.OpeningCollection;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningHoursCollection;
+import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.resource.Calendar;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.interfaces.Results;
+import org.folio.rest.service.ActualOpeningHoursService;
+import org.folio.rest.service.ActualOpeningHoursServiceImpl;
+import org.folio.rest.tools.messages.MessageConsts;
+import org.folio.rest.tools.messages.Messages;
+import org.folio.rest.tools.utils.TenantTool;
+import org.folio.rest.utils.CalendarUtils;
 
 
 public class CalendarAPI implements Calendar {
