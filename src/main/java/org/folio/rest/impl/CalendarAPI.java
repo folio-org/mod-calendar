@@ -6,6 +6,7 @@ import static joptsimple.internal.Strings.isNullOrEmpty;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201;
+import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
@@ -48,6 +49,7 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
 
 import org.joda.time.DateTime;
 
@@ -126,7 +128,7 @@ public class CalendarAPI implements Calendar {
           });
         } else {
           pgClient.endTx(conn, end -> {
-            logger.info("Opening period has been successfully saved");
+            logger.info(String.format("Openings with id '%s' has been successfully saved", entity.getId()));
             asyncResultHandler.handle(succeededFuture(
               PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity, headersFor201())));
           });
@@ -143,34 +145,36 @@ public class CalendarAPI implements Calendar {
                                                                      Handler<AsyncResult<Response>> asyncResultHandler,
                                                                      Context vertxContext) {
 
-    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID)
-      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + periodId + "'"));
-    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD)
-      .setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + periodId + "'"));
+    PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
-    vertxContext.runOnContext(v
-      -> postgresClient.startTx(beginTx
-        -> postgresClient.delete(beginTx, ACTUAL_OPENING_HOURS, criterionForOpeningHours, replyOfDeletingActualOpeningHours -> {
-        if (replyOfDeletingActualOpeningHours.succeeded()) {
-          postgresClient.delete(beginTx, REGULAR_HOURS, criterionForOpeningHours, replyOfDeletingRegularHours -> {
-            if (replyOfDeletingRegularHours.succeeded()) {
-              deleteOpenings(asyncResultHandler, postgresClient, criterionForOpenings, lang, beginTx);
-            } else {
-              postgresClient.rollbackTx(beginTx, done
-                -> asyncResultHandler.handle(succeededFuture(
-                  DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.
-                    respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-            }
+    pgClient.startTx(conn -> succeededFuture()
+      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
+      .compose(v -> deleteRegularHoursByOpeningsId(pgClient, conn, periodId))
+      .compose(v -> deleteOpeningsById(pgClient, conn, periodId))
+      .setHandler(deleted -> {
+        if (deleted.failed()) {
+          pgClient.rollbackTx(conn, rollback -> {
+            logger.error(deleted.cause().getMessage());
+            asyncResultHandler.handle(succeededFuture(DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
+              .respond500WithTextPlain(deleted.cause().getMessage())));
           });
         } else {
-          postgresClient.rollbackTx(beginTx, done
-            -> asyncResultHandler.handle(succeededFuture(
-              DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.
-                respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
+          if (deleted.result() == 0) {
+              pgClient.rollbackTx(conn, rollback -> {
+                String msg = String.format("Openings with id '%s' is not found", periodId);
+                logger.error(msg);
+                asyncResultHandler.handle(succeededFuture(
+                  DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond404WithTextPlain(msg)));
+              });
+          } else {
+            pgClient.endTx(conn, end -> {
+              logger.info("Openings with id '%s' has been successfully deleted");
+              asyncResultHandler.handle(succeededFuture(
+                DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204()));
+            });
+          }
         }
       })
-      )
     );
   }
 
@@ -187,8 +191,8 @@ public class CalendarAPI implements Calendar {
     boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
     Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
     PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
-    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'"));
+    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'"));
+    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'"));
 
     vertxContext.runOnContext(v ->
       postgresClient.startTx(beginTx ->
@@ -237,7 +241,7 @@ public class CalendarAPI implements Calendar {
       Criteria critServicePoint;
       Criterion criterionForServicePoint;
       if (servicePointId != null) {
-        critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
+        critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + servicePointId + "'");
         criterionForServicePoint = new Criterion().addCriterion(critServicePoint);
       } else {
         criterionForServicePoint = new Criterion();
@@ -267,7 +271,7 @@ public class CalendarAPI implements Calendar {
     OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
-    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
+    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
     Criterion criterionForOpeningHours = new Criterion();
     criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_AND);
 
@@ -369,28 +373,91 @@ public class CalendarAPI implements Calendar {
     });
   }
 
-  private void saveActualOpeningHours(OpeningPeriod entity, String lang, boolean isExceptional,
-                                      Handler<AsyncResult<Response>> asyncResultHandler,
-                                      PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-    handleExceptions(postgresClient, beginTx, asyncResultHandler, () -> {
-      List<Object> actualOpeningHours = separateEvents(entity, isExceptional);
-      if (!actualOpeningHours.isEmpty()) {
-        postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
-          if (replyOfSavingActualOpeningHours.succeeded()) {
-            postgresClient.endTx(beginTx, done
-              -> asyncResultHandler.handle(succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity,
-                headersFor201().withLocation(lang)))));
-          } else {
-            rollbackTx(postgresClient, beginTx, asyncResultHandler);
-          }
-        });
-      } else {
-        postgresClient.endTx(beginTx, done -> asyncResultHandler.handle(succeededFuture(
-          PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity,
-            headersFor201().withLocation(lang)))));
-      }
-    });
+  private Future<Void> checkOpeningsForOverlap(PostgresClient pgClient,
+                                               AsyncResult<SQLConnection> conn,
+                                               Openings openings) {
+
+    Future<Results<Openings>> future = Future.future();
+    Criterion crit = assembleCriterionForCheckingOverlap(openings);
+    pgClient.get(conn, OPENINGS, Openings.class, crit, false, false, future.completer());
+
+    return future.compose(get ->
+      get.getResults().isEmpty() ? succeededFuture() : failedFuture("Intervals can not overlap."));
+  }
+
+  private Future<Void> saveOpenings(PostgresClient pgClient,
+                                    AsyncResult<SQLConnection> conn,
+                                    Openings openings) {
+
+    Future<String> future = Future.future();
+    pgClient.save(conn, OPENINGS, openings, future.completer());
+
+    return future.map(s -> null);
+  }
+
+  private Future<Void> saveRegularHours(PostgresClient pgClient,
+                                        AsyncResult<SQLConnection> conn,
+                                        RegularHours entity) {
+
+    Future<String> future = Future.future();
+    pgClient.save(conn, REGULAR_HOURS, entity, future.completer());
+
+    return future.map(s -> null);
+  }
+
+  private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
+                                              AsyncResult<SQLConnection> conn,
+                                              List<Object> actualOpeningHours) {
+
+    Future<ResultSet> future = Future.future();
+    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
+
+    return future.map(rs -> null);
+  }
+
+  private Future<Integer> deleteOpeningsById(PostgresClient pgClient,
+                                             AsyncResult<SQLConnection> conn,
+                                             String openingsId) {
+
+    Criteria criteria = new Criteria()
+      .addField(ID_FIELD)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingsId + "'");
+
+    Future<UpdateResult> future = Future.future();
+    pgClient.delete(conn, OPENINGS, new Criterion(criteria), future.completer());
+
+    return future.map(UpdateResult::getUpdated);
+  }
+
+  private Future<Void> deleteActualOpeningHoursByOpeningsId(PostgresClient pgClient,
+                                                            AsyncResult<SQLConnection> conn,
+                                                            String openingsId) {
+
+    Criteria criteria = new Criteria()
+      .addField(OPENING_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingsId + "'");
+
+    Future<UpdateResult> future = Future.future();
+    pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), future.completer());
+
+    return future.map(ur -> null);
+  }
+
+  private Future<Void> deleteRegularHoursByOpeningsId(PostgresClient pgClient,
+                                                      AsyncResult<SQLConnection> conn,
+                                                      String openingsId) {
+
+    Criteria criteria = new Criteria()
+      .addField(ID_FIELD)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingsId + "'");
+
+    Future<UpdateResult> future = Future.future();
+    pgClient.delete(conn, REGULAR_HOURS, new Criterion(criteria), future.completer());
+
+    return future.map(ur -> null);
   }
 
   static void handleExceptions(PostgresClient postgresClient,
@@ -409,32 +476,6 @@ public class CalendarAPI implements Calendar {
     postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.
       handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
         .respond500WithTextPlain("Internal Server Error"))));
-  }
-
-  private void deleteOpenings(Handler<AsyncResult<Response>> asyncResultHandler,
-                              PostgresClient postgresClient, Criterion criterionForOpenings,
-                              String lang, AsyncResult<SQLConnection> beginTx) {
-
-    postgresClient.delete(beginTx, OPENINGS, criterionForOpenings,
-      replyOfDeletingOpenings -> {
-        if (replyOfDeletingOpenings.failed()) {
-          rollbackTx(postgresClient, beginTx, asyncResultHandler);
-          return;
-        }
-
-        int numberOfRowsDeleted = replyOfDeletingOpenings.result().getUpdated();
-        if (numberOfRowsDeleted <= 0) {
-          postgresClient.rollbackTx(beginTx, done
-            -> asyncResultHandler.handle(succeededFuture(
-            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
-              .respond404WithTextPlain(messages.getMessage(lang, MessageConsts.ObjectDoesNotExist)))));
-          return;
-        }
-
-        postgresClient.endTx(beginTx, done
-          -> asyncResultHandler.handle(succeededFuture(
-          DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
-      });
   }
 
   private void putActualOpeningHours(OpeningPeriod entity, Criterion openingId, String lang,
@@ -559,7 +600,7 @@ public class CalendarAPI implements Calendar {
   private Criterion assembleCriterionByServicePointId(String servicePointId, boolean showPast, boolean exceptional) {
     Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'");
     Criteria critShowPast = new Criteria();
-    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + exceptional + "'");
+    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + exceptional + "'");
 
     critShowPast.addField(END_DATE);
     critShowPast.setOperation(Criteria.OP_GREATER_THAN_EQ);
@@ -577,7 +618,7 @@ public class CalendarAPI implements Calendar {
 
 
   private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
-    Criteria critOpeningId = new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
+    Criteria critOpeningId = new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
     Criteria critStartDate = new Criteria();
     critStartDate.addField(ACTUAL_DAY);
     critStartDate.setOperation(Criteria.OP_GREATER_THAN_EQ);
@@ -602,9 +643,9 @@ public class CalendarAPI implements Calendar {
 
 
   private Criterion assembleCriterionForCheckingOverlap(String openingId, String servicePointId, Date startDate, Date endDate, boolean exceptional) {
-    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + openingId + "'");
-    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + servicePointId + "'");
-    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(Criteria.OP_EQUAL).setValue("'" + exceptional + "'");
+    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
+    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + servicePointId + "'");
+    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + exceptional + "'");
     Criteria critStartDate = new Criteria();
     critStartDate.addField(START_DATE);
     critStartDate.setOperation(Criteria.OP_LESS_THAN_EQ);
@@ -659,7 +700,7 @@ public class CalendarAPI implements Calendar {
     Criteria criteria = new Criteria()
       .addField(OPENING_ID)
       .setJSONB(true)
-      .setOperation(Criteria.OP_EQUAL)
+      .setOperation(OP_EQUAL)
       .setValue("'" + openingPeriod.getId() + "'");
 
     postgresClient.get(beginTx, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), true, false,
@@ -758,47 +799,5 @@ public class CalendarAPI implements Calendar {
   private static PostgresClient getPostgresClient(Map<String, String> okapiHeaders, Context vertxContext) {
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     return PostgresClient.getInstance(vertxContext.owner(), tenantId);
-  }
-
-  private Future<Void> checkOpeningsForOverlap(PostgresClient pgClient,
-                                               AsyncResult<SQLConnection> conn,
-                                               Openings openings) {
-
-    Future<Results<Openings>> future = Future.future();
-    Criterion crit = assembleCriterionForCheckingOverlap(openings);
-    pgClient.get(conn, OPENINGS, Openings.class, crit, false, false, future.completer());
-
-    return future.compose(get ->
-      get.getResults().isEmpty() ? succeededFuture() : failedFuture("Intervals can not overlap."));
-  }
-
-  private Future<Void> saveOpenings(PostgresClient pgClient,
-                                    AsyncResult<SQLConnection> conn,
-                                    Openings openings) {
-
-    Future<String> future = Future.future();
-    pgClient.save(conn, OPENINGS, openings, future.completer());
-
-    return future.map(s -> null);
-  }
-
-  private Future<Void> saveRegularHours(PostgresClient pgClient,
-                                        AsyncResult<SQLConnection> conn,
-                                        RegularHours entity) {
-
-    Future<String> future = Future.future();
-    pgClient.save(conn, REGULAR_HOURS, entity, future.completer());
-
-    return future.map(s -> null);
-  }
-
-  private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
-                                              AsyncResult<SQLConnection> conn,
-                                              List<Object> actualOpeningHours) {
-
-    Future<ResultSet> future = Future.future();
-    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
-
-    return future.map(rs -> null);
   }
 }
