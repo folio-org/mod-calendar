@@ -3,6 +3,7 @@ package org.folio.rest.utils;
 import org.apache.commons.lang.BooleanUtils;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.beans.CalendarOpeningsRequestParameters;
+import org.folio.rest.beans.Openings;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
@@ -258,5 +259,22 @@ public class CalendarUtils {
     openingDayWeekDay.setOpeningDay(openingDay);
 
     return openingDayWeekDay;
+  }
+
+  public static Openings mapOpeningPeriodToOpenings(OpeningPeriod entity) {
+
+    boolean exceptional = entity.getOpeningDays()
+      .stream()
+      .noneMatch(p -> p.getWeekdays() != null);
+
+    Openings openings = new Openings();
+    openings.setId(entity.getId());
+    openings.setName(entity.getName());
+    openings.setServicePointId(entity.getServicePointId());
+    openings.setStartDate(entity.getStartDate());
+    openings.setEndDate(entity.getEndDate());
+    openings.setExceptional(exceptional);
+
+    return openings;
   }
 }
