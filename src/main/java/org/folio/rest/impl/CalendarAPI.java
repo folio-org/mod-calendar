@@ -2,6 +2,7 @@ package org.folio.rest.impl;
 
 import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
+import static java.lang.String.format;
 import static joptsimple.internal.Strings.isNullOrEmpty;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
@@ -37,6 +38,7 @@ import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
 import io.vertx.core.AsyncResult;
@@ -121,17 +123,11 @@ public class CalendarAPI implements Calendar {
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
         if (v.failed()) {
-          pgClient.rollbackTx(conn, rollback -> {
-            logger.error(v.cause().getMessage());
-            asyncResultHandler.handle(succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(v.cause().getMessage())));
-          });
+          logger.error(v.cause().getMessage());
+          pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
         } else {
-          pgClient.endTx(conn, end -> {
-            logger.info(String.format("Openings with id '%s' has been successfully saved", entity.getId()));
-            asyncResultHandler.handle(succeededFuture(
-              PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity, headersFor201())));
-          });
+          pgClient.endTx(conn, end -> asyncResultHandler.handle(succeededFuture(
+            PostCalendarPeriodsPeriodByServicePointIdResponse.respond201WithApplicationJson(entity, headersFor201()))));
         }
       }));
   }
@@ -145,34 +141,20 @@ public class CalendarAPI implements Calendar {
                                                                      Handler<AsyncResult<Response>> asyncResultHandler,
                                                                      Context vertxContext) {
 
+
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
-      .compose(v -> deleteRegularHoursByOpeningsId(pgClient, conn, periodId))
       .compose(v -> deleteOpeningsById(pgClient, conn, periodId))
-      .setHandler(deleted -> {
-        if (deleted.failed()) {
-          pgClient.rollbackTx(conn, rollback -> {
-            logger.error(deleted.cause().getMessage());
-            asyncResultHandler.handle(succeededFuture(DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
-              .respond500WithTextPlain(deleted.cause().getMessage())));
-          });
+      .compose(v -> deleteRegularHoursByOpeningsId(pgClient, conn, periodId))
+      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
+      .setHandler(v -> {
+        if (v.failed()) {
+          logger.error(v.cause().getMessage());
+          pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
         } else {
-          if (deleted.result() == 0) {
-              pgClient.rollbackTx(conn, rollback -> {
-                String msg = String.format("Openings with id '%s' is not found", periodId);
-                logger.error(msg);
-                asyncResultHandler.handle(succeededFuture(
-                  DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond404WithTextPlain(msg)));
-              });
-          } else {
-            pgClient.endTx(conn, end -> {
-              logger.info("Openings with id '%s' has been successfully deleted");
-              asyncResultHandler.handle(succeededFuture(
-                DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204()));
-            });
-          }
+          pgClient.endTx(conn, end -> asyncResultHandler.handle(succeededFuture(
+            DeleteCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
         }
       })
     );
@@ -188,32 +170,22 @@ public class CalendarAPI implements Calendar {
                                                                   Handler<AsyncResult<Response>> asyncResultHandler,
                                                                   Context vertxContext) {
 
-    boolean isExceptional = entity.getOpeningDays().stream().noneMatch(p -> p.getWeekdays() != null);
-    Openings openingsTable = new Openings(entity.getId(), entity.getServicePointId(), entity.getName(), entity.getStartDate(), entity.getEndDate(), isExceptional);
-    PostgresClient postgresClient = getPostgresClient(okapiHeaders, vertxContext);
-    Criterion criterionForOpeningHours = new Criterion(new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'"));
-    Criterion criterionForOpenings = new Criterion(new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'"));
+    Openings openings = mapOpeningPeriodToOpenings(entity);
+    PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
-    vertxContext.runOnContext(v ->
-      postgresClient.startTx(beginTx ->
-        postgresClient.update(OPENINGS, openingsTable, criterionForOpenings, true, replyOfSavingOpenings -> {
-          if (replyOfSavingOpenings.succeeded()) {
-            RegularHours regularHours = new RegularHours(openingId, openingsTable.getId(), entity.getOpeningDays());
-            postgresClient.update(REGULAR_HOURS, regularHours, criterionForOpeningHours, true, replyOfSavingRegularHours -> {
-              if (replyOfSavingRegularHours.succeeded()) {
-                putActualOpeningHours(entity, criterionForOpeningHours, lang, isExceptional, asyncResultHandler, postgresClient, beginTx);
-              } else {
-                postgresClient.rollbackTx(beginTx, done ->
-                  asyncResultHandler.handle(succeededFuture(
-                    PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-              }
-            });
-          } else {
-            postgresClient.rollbackTx(beginTx, done ->
-              asyncResultHandler.handle(succeededFuture(PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        })
-      )
+    pgClient.startTx(conn -> succeededFuture()
+      .compose(v -> updateOpenings(pgClient, conn, openings))
+      .compose(v -> updateRegularHours(pgClient, conn, new RegularHours(openingId, openings.getId(), entity.getOpeningDays())))
+      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, entity.getId()))
+      .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
+      .setHandler(v -> {
+        if (v.failed()) {
+          pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
+        } else {
+          pgClient.endTx(conn, end -> asyncResultHandler.handle(succeededFuture(
+            PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
+        }
+      })
     );
   }
 
@@ -415,7 +387,7 @@ public class CalendarAPI implements Calendar {
     return future.map(rs -> null);
   }
 
-  private Future<Integer> deleteOpeningsById(PostgresClient pgClient,
+  private Future<Void> deleteOpeningsById(PostgresClient pgClient,
                                              AsyncResult<SQLConnection> conn,
                                              String openingsId) {
 
@@ -427,7 +399,10 @@ public class CalendarAPI implements Calendar {
     Future<UpdateResult> future = Future.future();
     pgClient.delete(conn, OPENINGS, new Criterion(criteria), future.completer());
 
-    return future.map(UpdateResult::getUpdated);
+    return future.map(UpdateResult::getUpdated)
+      .compose(updated -> updated == 0 ?
+        failedFuture(new NotFoundException(format("Openings with id '%s' is not found", openingsId))) :
+        succeededFuture());
   }
 
   private Future<Void> deleteActualOpeningHoursByOpeningsId(PostgresClient pgClient,
@@ -460,6 +435,37 @@ public class CalendarAPI implements Calendar {
     return future.map(ur -> null);
   }
 
+  private Future<Void> updateOpenings(PostgresClient pgClient,
+                                      AsyncResult<SQLConnection> conn,
+                                      Openings openings) {
+
+    Future<UpdateResult> future = Future.future();
+    String where = String.format("WHERE jsonb->>'id' = '%s'", openings.getId());
+    pgClient.update(conn, OPENINGS, openings, "jsonb", where, false, future.completer());
+
+    return future.map(ur -> null);
+  }
+
+  private Future<Void> updateRegularHours(PostgresClient pgClient,
+                                          AsyncResult<SQLConnection> conn,
+                                          RegularHours regularHours) {
+
+
+    Future<UpdateResult> future = Future.future();
+    String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
+    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
+
+    return future.map(ur -> null);
+  }
+
+  private static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
+    if (e.getClass() == NotFoundException.class) {
+      return succeededFuture(Response.status(404).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+    } else {
+      return succeededFuture(Response.status(500).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+    }
+  }
+
   static void handleExceptions(PostgresClient postgresClient,
                                AsyncResult<SQLConnection> beginTx,
                                Handler<AsyncResult<Response>> asyncResultHandler, Runnable r) {
@@ -476,34 +482,6 @@ public class CalendarAPI implements Calendar {
     postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.
       handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
         .respond500WithTextPlain("Internal Server Error"))));
-  }
-
-  private void putActualOpeningHours(OpeningPeriod entity, Criterion openingId, String lang,
-    boolean isExceptional, Handler<AsyncResult<Response>> asyncResultHandler,
-    PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
-
-    List<Object> actualOpeningHours = separateEvents(entity, isExceptional);
-    postgresClient.delete(beginTx, ACTUAL_OPENING_HOURS, openingId, replyOfDeletingActualOpeningHours -> {
-      if (replyOfDeletingActualOpeningHours.succeeded()) {
-        postgresClient.saveBatch(beginTx, ACTUAL_OPENING_HOURS, actualOpeningHours, replyOfSavingActualOpeningHours -> {
-          if (replyOfSavingActualOpeningHours.succeeded()) {
-            postgresClient.endTx(beginTx, done
-              -> asyncResultHandler.handle(succeededFuture(
-                PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond204())));
-          } else {
-            postgresClient.rollbackTx(beginTx, done
-              -> asyncResultHandler.handle(succeededFuture(
-                PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(
-                  messages.getMessage(lang, MessageConsts.InternalServerError)))));
-          }
-        });
-      } else {
-        postgresClient.rollbackTx(beginTx, done
-          -> asyncResultHandler.handle(succeededFuture(
-            PutCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond500WithTextPlain(
-              messages.getMessage(lang, MessageConsts.InternalServerError)))));
-      }
-    });
   }
 
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler,
@@ -585,7 +563,7 @@ public class CalendarAPI implements Calendar {
         postgresClient.endTx(beginTx, done ->
           asyncResultHandler.handle(succeededFuture(
             GetCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse
-              .respond404WithTextPlain(String.format(ERROR_MESSAGE, openingId)))));
+              .respond404WithTextPlain(format(ERROR_MESSAGE, openingId)))));
         return;
       }
 
@@ -794,10 +772,5 @@ public class CalendarAPI implements Calendar {
   private OpeningHoursPeriod getElsePreviousOpeningPeriod(List<OpeningHoursPeriod> openingPeriods, ActualOpeningHours actualOpeningHour, OpeningHoursPeriod openingPeriod, boolean isExceptional) {
     return openingPeriods.stream().filter(o -> o.getDate().equals(actualOpeningHour.getActualDay())).
       filter(o -> o.getOpeningDay().getExceptional().equals(isExceptional)).findFirst().orElse(openingPeriod);
-  }
-
-  private static PostgresClient getPostgresClient(Map<String, String> okapiHeaders, Context vertxContext) {
-    String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    return PostgresClient.getInstance(vertxContext.owner(), tenantId);
   }
 }
