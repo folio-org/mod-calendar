@@ -204,8 +204,8 @@ public class CalendarAPI implements Calendar {
                                  Handler<AsyncResult<Response>> asyncResultHandler,
                                  Context vertxContext) {
 
-    OpeningCollection openingCollection = new OpeningCollection();
-    CalendarOpeningsRequestParameters calendarOpeningsRequestParameters = new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
+    CalendarOpeningsRequestParameters calendarOpeningsRequestParameters =
+      new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
 
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
@@ -219,9 +219,9 @@ public class CalendarAPI implements Calendar {
     }
 
     postgresClient.startTx(beginTx ->
-      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, resultOfSelectOpenings -> {
-        if (resultOfSelectOpenings.succeeded()) {
-          addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForServicePoint, true, false, get -> {
+        if (get.succeeded()) {
+          OpeningCollection openingCollection = mapOpeningsToOpeningCollection(get.result().getResults());
           getOpeningDaysByDatesFuture(asyncResultHandler, openingCollection, calendarOpeningsRequestParameters, postgresClient, beginTx);
         } else {
           postgresClient.endTx(beginTx, done ->
@@ -238,7 +238,6 @@ public class CalendarAPI implements Calendar {
                                                                   Handler<AsyncResult<Response>> asyncResultHandler,
                                                                   Context vertxContext) {
 
-    OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
@@ -246,9 +245,9 @@ public class CalendarAPI implements Calendar {
     criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_AND);
 
     postgresClient.startTx(beginTx ->
-      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
-        if (resultOfSelectOpenings.succeeded()) {
-          addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, get -> {
+        if (get.succeeded()) {
+          OpeningCollection openingCollection = mapOpeningsToOpeningCollection(get.result().getResults());
           getOpeningDaysByOpeningIdFuture(asyncResultHandler, openingCollection, lang, openingId, postgresClient, beginTx);
         } else {
           postgresClient.endTx(beginTx, done ->
@@ -269,15 +268,14 @@ public class CalendarAPI implements Calendar {
                                                        Handler<AsyncResult<Response>> asyncResultHandler,
                                                        Context vertxContext) {
 
-    OpeningCollection openingCollection = new OpeningCollection();
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
     PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     Criterion criterionForOpeningHours = assembleCriterionByServicePointId(servicePointId, showPast, exceptional);
 
     postgresClient.startTx(beginTx ->
-      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, resultOfSelectOpenings -> {
-        if (resultOfSelectOpenings.succeeded()) {
-          addOpeningPeriodsToCollection(openingCollection, resultOfSelectOpenings);
+      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, get -> {
+        if (get.succeeded()) {
+          OpeningCollection openingCollection = mapOpeningsToOpeningCollection(get.result().getResults());
           if (withOpeningDays) {
             getOpeningDaysByServicePointIdFuture(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
           } else {
@@ -450,6 +448,27 @@ public class CalendarAPI implements Calendar {
     pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
 
     return future.map(ur -> null);
+  }
+
+  private OpeningCollection mapOpeningsToOpeningCollection(List<Openings> openings) {
+
+    List<OpeningPeriod> openingPeriods = openings.stream()
+      .map(this::mapOpeningsToOpeningPeriod)
+      .collect(Collectors.toList());
+
+    return new OpeningCollection()
+      .withTotalRecords(openings.size())
+      .withOpeningPeriods(openingPeriods);
+  }
+
+  private OpeningPeriod mapOpeningsToOpeningPeriod(Openings openings) {
+
+    return new OpeningPeriod()
+      .withId(openings.getId())
+      .withName(openings.getName())
+      .withServicePointId(openings.getServicePointId())
+      .withStartDate(openings.getStartDate())
+      .withEndDate(openings.getEndDate());
   }
 
   private static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
@@ -641,19 +660,6 @@ public class CalendarAPI implements Calendar {
       .addCriterion(critServicePoint, Criteria.OP_AND)
       .addCriterion(critStartDate, Criteria.OP_AND, critEndDate)
       .addCriterion(critOpeningId, Criteria.OP_OR);
-  }
-
-  private void addOpeningPeriodsToCollection(OpeningCollection openingCollection, AsyncResult<Results<Openings>> resultOfSelectOpenings) {
-    openingCollection.setTotalRecords(resultOfSelectOpenings.result().getResults().size());
-    for (Openings openings : resultOfSelectOpenings.result().getResults()) {
-      OpeningPeriod openingPeriod = new OpeningPeriod();
-      openingPeriod.setStartDate(openings.getStartDate());
-      openingPeriod.setEndDate(openings.getEndDate());
-      openingPeriod.setName(openings.getName());
-      openingPeriod.setServicePointId(openings.getServicePointId());
-      openingPeriod.setId(openings.getId());
-      openingCollection.getOpeningPeriods().add(openingPeriod);
-    }
   }
 
   private Future<Void> getOpeningDays(PostgresClient pgClient, AsyncResult<SQLConnection> beginTx,
