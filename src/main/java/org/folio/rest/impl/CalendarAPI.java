@@ -20,6 +20,7 @@ import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
 import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
 import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.folio.rest.utils.CalendarConstants.START_DATE;
+import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
 import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpeningDayWeekDay;
@@ -569,77 +570,95 @@ public class CalendarAPI implements Calendar {
   }
 
   private Criterion assembleCriterionByServicePointId(String servicePointId, boolean showPast, boolean exceptional) {
-    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation("=").setValue("'" + servicePointId + "'");
-    Criteria critShowPast = new Criteria();
-    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + exceptional + "'");
+    Criteria critServicePoint = new Criteria()
+      .addField(SERVICE_POINT_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + servicePointId + "'");
 
-    critShowPast.addField(END_DATE);
-    critShowPast.setOperation(Criteria.OP_GREATER_THAN_EQ);
-    critShowPast.setValue(DATE_FORMATTER_SHORT.print(new DateTime()));
+    Criteria critExceptional = new Criteria()
+      .addField(EXCEPTIONAL)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + exceptional + "'");
+
+    Criteria critShowPast = new Criteria()
+      .addField(END_DATE)
+      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setValue(DATE_FORMATTER_SHORT.print(new DateTime()));
 
     Criterion criterionForOpeningHours = new Criterion();
+
     if (!showPast) {
       criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND, critShowPast);
     } else {
       criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND);
     }
     criterionForOpeningHours.addCriterion(critExceptional, Criteria.OP_AND);
+
     return criterionForOpeningHours;
   }
 
 
   private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
-    Criteria critOpeningId = new Criteria().addField(OPENING_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
-    Criteria critStartDate = new Criteria();
-    critStartDate.addField(ACTUAL_DAY);
-    critStartDate.setOperation(Criteria.OP_GREATER_THAN_EQ);
-    critStartDate.setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
+    Criteria critOpeningId = new Criteria()
+      .addField(OPENING_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingId + "'");
 
-    Criteria critEndDate = new Criteria();
-    critEndDate.addField(ACTUAL_DAY);
-    critEndDate.setOperation(Criteria.OP_LESS_THAN_EQ);
-    critEndDate.setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
+    Criteria critStartDate = new Criteria()
+      .addField(ACTUAL_DAY)
+      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
 
-    Criterion criterionForOpeningHours = new Criterion();
+    Criteria critEndDate = new Criteria()
+      .addField(ACTUAL_DAY)
+      .setOperation(Criteria.OP_LESS_THAN_EQ)
+      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
 
-    criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_AND);
+    Criterion criterionForOpeningHours = new Criterion()
+      .addCriterion(critOpeningId, Criteria.OP_AND);
+
     if (startDate != null) {
       criterionForOpeningHours.addCriterion(critStartDate, Criteria.OP_AND);
     }
     if (endDate != null) {
       criterionForOpeningHours.addCriterion(critEndDate, Criteria.OP_AND);
     }
-    return criterionForOpeningHours;
-  }
-
-
-  private Criterion assembleCriterionForCheckingOverlap(String openingId, String servicePointId, Date startDate, Date endDate, boolean exceptional) {
-    Criteria critOpeningId = new Criteria().addField(ID_FIELD).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + openingId + "'");
-    Criteria critServicePoint = new Criteria().addField(SERVICE_POINT_ID).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + servicePointId + "'");
-    Criteria critExceptional = new Criteria().addField(EXCEPTIONAL).setJSONB(true).setOperation(OP_EQUAL).setValue("'" + exceptional + "'");
-    Criteria critStartDate = new Criteria();
-    critStartDate.addField(START_DATE);
-    critStartDate.setOperation(Criteria.OP_LESS_THAN_EQ);
-    critStartDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(startDate))));
-
-    Criteria critEndDate = new Criteria();
-    critEndDate.addField(END_DATE);
-    critEndDate.setOperation(Criteria.OP_GREATER_THAN_EQ);
-    critEndDate.setValue(CalendarUtils.DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(endDate))));
-
-    Criterion criterionForOpeningHours = new Criterion();
-    criterionForOpeningHours.addCriterion(critExceptional, Criteria.OP_AND);
-    criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND);
-    criterionForOpeningHours.addCriterion(critStartDate, Criteria.OP_AND, critEndDate);
-    criterionForOpeningHours.addCriterion(critOpeningId, Criteria.OP_OR);
 
     return criterionForOpeningHours;
   }
 
   private Criterion assembleCriterionForCheckingOverlap(Openings openings) {
+    Criteria critOpeningId = new Criteria()
+      .addField(ID_FIELD)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openings.getId() + "'");
 
-    return assembleCriterionForCheckingOverlap(openings.getId(), openings.getServicePointId(), openings.getStartDate(),
-      openings.getEndDate(), openings.getExceptional());
+    Criteria critServicePoint = new Criteria()
+      .addField(SERVICE_POINT_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openings.getServicePointId() + "'");
+
+    Criteria critExceptional = new Criteria()
+      .addField(EXCEPTIONAL)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openings.getExceptional() + "'");
+
+    Criteria critStartDate = new Criteria()
+      .addField(START_DATE)
+      .setOperation(Criteria.OP_LESS_THAN_EQ)
+      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
+
+    Criteria critEndDate = new Criteria()
+      .addField(END_DATE)
+      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
+
+
+    return new Criterion()
+      .addCriterion(critExceptional, Criteria.OP_AND)
+      .addCriterion(critServicePoint, Criteria.OP_AND)
+      .addCriterion(critStartDate, Criteria.OP_AND, critEndDate)
+      .addCriterion(critOpeningId, Criteria.OP_OR);
   }
 
   private void addOpeningPeriodsToCollection(OpeningCollection openingCollection, AsyncResult<Results<Openings>> resultOfSelectOpenings) {
