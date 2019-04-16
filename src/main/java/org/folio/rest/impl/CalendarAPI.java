@@ -460,24 +460,6 @@ public class CalendarAPI implements Calendar {
     }
   }
 
-  static void handleExceptions(PostgresClient postgresClient,
-                               AsyncResult<SQLConnection> beginTx,
-                               Handler<AsyncResult<Response>> asyncResultHandler, Runnable r) {
-    try {
-      r.run();
-    } catch (Exception ex) {
-      logger.error(ex);
-      rollbackTx(postgresClient, beginTx, asyncResultHandler);
-    }
-  }
-
-  static void rollbackTx(PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx, Handler<AsyncResult<Response>> asyncResultHandler) {
-    logger.error("Rollback transaction");
-    postgresClient.rollbackTx(beginTx, rollback -> asyncResultHandler.
-      handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
-        .respond500WithTextPlain("Internal Server Error"))));
-  }
-
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler,
     OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
 

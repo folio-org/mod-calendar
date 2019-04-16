@@ -5,7 +5,6 @@ import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInC
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
 
 import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 
@@ -43,7 +42,6 @@ import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 
 import org.folio.rest.RestVerticle;
-import org.folio.rest.beans.Openings;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
@@ -51,7 +49,6 @@ import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 
@@ -427,46 +424,6 @@ public class CalendarIT {
       .body("id", equalTo(uuid))
       .body("name", equalTo("PUT_TEST"))
       .statusCode(200);
-  }
-
-  @Test
-  public void testMethodHandleExceptions() {
-    String expectedResponse = "Internal Server Error";
-
-    PostgresClient instance = PostgresClient.getInstance(vertx);
-    instance.startTx(startTx ->
-      CalendarAPI.handleExceptions(instance, startTx,
-        handler -> assertEquals(expectedResponse, handler.result().getEntity()),
-        () -> {
-          throw new RuntimeException();
-        }));
-  }
-
-  @Test
-  public void testTxHandleExceptions() {
-    String expectedResponse = "Internal Server Error";
-
-    PostgresClient instance = PostgresClient.getInstance(vertx);
-    instance.startTx(startTx ->
-      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
-        result -> CalendarAPI.handleExceptions(instance, startTx, handler -> {
-          assertEquals(expectedResponse, handler.result().getEntity());
-        }, () -> {
-          throw new RuntimeException(result.cause());
-        }))
-    );
-  }
-
-  @Test
-  public void testMethodRollbackTx() {
-    String expectedResponse = "Internal Server Error";
-
-    PostgresClient instance = PostgresClient.getInstance(vertx);
-    instance.startTx(startTx ->
-      instance.get(startTx, "test_table", Openings.class, new Criterion(), true, false,
-        result -> CalendarAPI.rollbackTx(instance, startTx, handler ->
-          assertEquals(expectedResponse, handler.result().getEntity())))
-    );
   }
 
   private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
