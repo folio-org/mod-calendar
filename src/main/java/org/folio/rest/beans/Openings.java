@@ -23,9 +23,6 @@ public class Openings {
   @JsonProperty("exceptional")
   private Boolean exceptional;
 
-  public Openings() {
-  }
-
   public String getId() {
     return id;
   }
