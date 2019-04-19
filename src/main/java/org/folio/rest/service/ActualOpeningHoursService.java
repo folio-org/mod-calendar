@@ -27,6 +27,8 @@ public interface ActualOpeningHoursService {
                                                                              String startDate,
                                                                              String endDate);
 
+  Future<Void> saveActualOpeningHours(AsyncResult<SQLConnection> conn, List<Object> actualOpeningHours);
+
   Future<Void> deleteActualOpeningHoursByOpeningsId(AsyncResult<SQLConnection> conn, String openingsId);
 
   enum SearchDirection {

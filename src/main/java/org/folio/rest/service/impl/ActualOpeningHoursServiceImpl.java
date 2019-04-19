@@ -127,6 +127,15 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   }
 
   @Override
+  public Future<Void> saveActualOpeningHours(AsyncResult<SQLConnection> conn, List<Object> actualOpeningHours) {
+
+    Future<ResultSet> future = Future.future();
+    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
+
+    return future.map(rs -> null);
+  }
+
+  @Override
   public Future<Void> deleteActualOpeningHoursByOpeningsId(AsyncResult<SQLConnection> conn, String openingsId) {
 
     Criteria criteria = new Criteria()

@@ -10,7 +10,6 @@ import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodBy
 import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
-import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
 import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
@@ -44,7 +43,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 
 import org.joda.time.DateTime;
@@ -109,12 +107,13 @@ public class CalendarAPI implements Calendar {
 
     OpeningsService openingsService = new OpeningsServiceImpl(pgClient);
     RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
+    ActualOpeningHoursService actualOpeningHoursService = new ActualOpeningHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings))
       .compose(v -> openingsService.saveOpenings(conn, openings))
       .compose(v -> regularHoursService.saveRegularHours(conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
-      .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
+      .compose(v -> actualOpeningHoursService.saveActualOpeningHours(conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
@@ -181,7 +180,7 @@ public class CalendarAPI implements Calendar {
       .compose(v -> openingsService.updateOpenings(conn, openings))
       .compose(v -> regularHoursService.updateRegularHours(conn, regularHours))
       .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, entity.getId()))
-      .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
+      .compose(v -> actualOpeningHoursService.saveActualOpeningHours(conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
@@ -346,16 +345,6 @@ public class CalendarAPI implements Calendar {
         GetCalendarPeriodsCalculateopeningByServicePointIdResponse
           .respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError))));
     }
-  }
-
-  private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
-                                              AsyncResult<SQLConnection> conn,
-                                              List<Object> actualOpeningHours) {
-
-    Future<ResultSet> future = Future.future();
-    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
-
-    return future.map(rs -> null);
   }
 
   private Future<OpeningPeriod> setOpeningDaysForOpeningPeriod(RegularHoursService regularHoursService,
