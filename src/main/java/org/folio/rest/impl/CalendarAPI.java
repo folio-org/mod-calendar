@@ -207,7 +207,7 @@ public class CalendarAPI implements Calendar {
                                  Context vertxContext) {
 
     CalendarOpeningsRequestParameters params =
-      new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, lang, includeClosedDays, actualOpenings);
+      new CalendarOpeningsRequestParameters(startDate, endDate, offset, limit, includeClosedDays, actualOpenings);
 
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 

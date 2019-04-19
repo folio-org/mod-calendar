@@ -1,21 +1,20 @@
 package org.folio.rest.beans;
 
 public class CalendarOpeningsRequestParameters {
-  String servicePointId;
-  String startDate;
-  String endDate;
-  int offset;
-  int limit;
-  String lang;
-  boolean includeClosedDays;
-  boolean actualOpenings;
 
-  public CalendarOpeningsRequestParameters(String startDate, String endDate, int offset, int limit, String lang, boolean includeClosedDays, boolean actualOpenings) {
+  private String startDate;
+  private String endDate;
+  private int offset;
+  private int limit;
+  private boolean includeClosedDays;
+  private boolean actualOpenings;
+
+  public CalendarOpeningsRequestParameters(String startDate, String endDate, int offset, int limit,
+                                           boolean includeClosedDays, boolean actualOpenings) {
     this.startDate = startDate;
     this.endDate = endDate;
     this.offset = offset;
     this.limit = limit;
-    this.lang = lang;
     this.includeClosedDays = includeClosedDays;
     this.actualOpenings = actualOpenings;
   }
@@ -34,10 +33,6 @@ public class CalendarOpeningsRequestParameters {
 
   public int getLimit() {
     return limit;
-  }
-
-  public String getLang() {
-    return lang;
   }
 
   public boolean isIncludeClosedDays() {

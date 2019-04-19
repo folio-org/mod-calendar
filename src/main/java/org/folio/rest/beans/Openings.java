@@ -1,8 +1,10 @@
 package org.folio.rest.beans;
 
-import com.fasterxml.jackson.annotation.*;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "id", "servicePointId", "name", "startDate", "endDate" })
@@ -22,15 +24,6 @@ public class Openings {
   private Boolean exceptional;
 
   public Openings() {
-  }
-
-  public Openings(String id, String servicePointId, String name, Date startDate, Date endDate, Boolean exceptional) {
-    this.id = id;
-    this.servicePointId = servicePointId;
-    this.name = name;
-    this.startDate = startDate;
-    this.endDate = endDate;
-    this.exceptional = exceptional;
   }
 
   public String getId() {

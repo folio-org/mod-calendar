@@ -1,9 +1,9 @@
 package org.folio.rest.beans;
 
-import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
-
 import java.util.List;
 import java.util.UUID;
+
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 
 public class RegularHours {
 
