@@ -14,10 +14,8 @@ import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
 import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
-import static org.folio.rest.utils.CalendarConstants.ID_FIELD;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
 import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
-import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
 import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
@@ -72,8 +70,11 @@ import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.service.ActualOpeningHoursService;
+import org.folio.rest.service.OpeningsService;
+import org.folio.rest.service.RegularHoursService;
 import org.folio.rest.service.impl.ActualOpeningHoursServiceImpl;
 import org.folio.rest.service.impl.OpeningsServiceImpl;
+import org.folio.rest.service.impl.RegularHoursServiceImpl;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
@@ -115,12 +116,13 @@ public class CalendarAPI implements Calendar {
     Openings openings = mapOpeningPeriodToOpenings(entity);
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
-    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+    OpeningsService openingsService = new OpeningsServiceImpl(pgClient);
+    RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings))
       .compose(v -> openingsService.saveOpenings(conn, openings))
-      .compose(v -> saveRegularHours(pgClient, conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
+      .compose(v -> regularHoursService.saveRegularHours(conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
         if (v.failed()) {
@@ -146,10 +148,11 @@ public class CalendarAPI implements Calendar {
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+    RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.deleteOpeningsById(conn, periodId))
-      .compose(v -> deleteRegularHoursByOpeningsId(pgClient, conn, periodId))
+      .compose(v -> regularHoursService.deleteRegularHoursByOpeningsId(conn, periodId))
       .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
       .setHandler(v -> {
         if (v.failed()) {
@@ -177,10 +180,11 @@ public class CalendarAPI implements Calendar {
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+    RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.updateOpenings(conn, openings))
-      .compose(v -> updateRegularHours(pgClient, conn, new RegularHours(openingId, openings.getId(), entity.getOpeningDays())))
+      .compose(v -> regularHoursService.updateRegularHours(conn, new RegularHours(openingId, openings.getId(), entity.getOpeningDays())))
       .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, entity.getId()))
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
@@ -242,13 +246,14 @@ public class CalendarAPI implements Calendar {
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+    RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> openingsService.findOpeningsById(conn, openingId)
       .compose(openings -> openings.isEmpty() ?
         failedFuture(new NotFoundException(format(ERROR_MESSAGE, openingId))) : succeededFuture(openings))
       .map(openings -> openings.get(0))
       .map(this::mapOpeningsToOpeningPeriod)
-      .compose(period -> setOpeningDaysForOpeningPeriod(pgClient, conn, period))
+      .compose(period -> setOpeningDaysForOpeningPeriod(regularHoursService, conn, period))
       .setHandler(period -> {
         if (period.failed()) {
           logger.error(period.cause().getMessage());
@@ -273,22 +278,24 @@ public class CalendarAPI implements Calendar {
                                                        Context vertxContext) {
 
     String tenantId = TenantTool.calculateTenantId(okapiHeaders.get(OKAPI_HEADER_TENANT));
-    PostgresClient postgresClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
+    PostgresClient pgClient = PostgresClient.getInstance(vertxContext.owner(), tenantId);
     Criterion criterionForOpeningHours = assembleCriterionByServicePointId(servicePointId, showPast, exceptional);
 
-    postgresClient.startTx(beginTx ->
-      postgresClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, get -> {
+    RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
+
+    pgClient.startTx(beginTx ->
+      pgClient.get(beginTx, OPENINGS, Openings.class, criterionForOpeningHours, true, false, get -> {
         if (get.succeeded()) {
           OpeningCollection openingCollection = mapOpeningsToOpeningCollection(get.result().getResults());
           if (withOpeningDays) {
-            getOpeningDaysByServicePointIdFuture(asyncResultHandler, openingCollection, lang, postgresClient, beginTx);
+            getOpeningDaysByServicePointIdFuture(asyncResultHandler, openingCollection, lang,pgClient, beginTx, regularHoursService);
           } else {
-            postgresClient.endTx(beginTx, done ->
+            pgClient.endTx(beginTx, done ->
               asyncResultHandler.handle(succeededFuture(
                 GetCalendarPeriodsPeriodByServicePointIdResponse.respond200WithApplicationJson(openingCollection))));
           }
         } else {
-          postgresClient.endTx(beginTx, done ->
+          pgClient.endTx(beginTx, done ->
             asyncResultHandler.handle(succeededFuture(
               GetCalendarPeriodsPeriodByServicePointIdResponse.respond500WithTextPlain(messages.getMessage(lang, MessageConsts.InternalServerError)))));
         }
@@ -341,11 +348,6 @@ public class CalendarAPI implements Calendar {
     }
   }
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
   private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
                                               AsyncResult<SQLConnection> conn,
                                               List<Object> actualOpeningHours) {
@@ -356,42 +358,7 @@ public class CalendarAPI implements Calendar {
     return future.map(rs -> null);
   }
 
-  private Future<Void> saveRegularHours(PostgresClient pgClient,
-                                        AsyncResult<SQLConnection> conn,
-                                        RegularHours entity) {
 
-    Future<String> future = Future.future();
-    pgClient.save(conn, REGULAR_HOURS, entity, future.completer());
-
-    return future.map(s -> null);
-  }
-
-  private Future<Void> updateRegularHours(PostgresClient pgClient,
-                                          AsyncResult<SQLConnection> conn,
-                                          RegularHours regularHours) {
-
-
-    Future<UpdateResult> future = Future.future();
-    String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
-    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
-
-    return future.map(ur -> null);
-  }
-
-  private Future<List<RegularHours>> findRegularHoursByOpeningId(PostgresClient pgClient,
-                                                                 AsyncResult<SQLConnection> conn,
-                                                                 String openingId) {
-
-    Criteria criteria = new Criteria()
-      .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingId + "'");
-
-    Future<Results<RegularHours>> future = Future.future();
-    pgClient.get(conn, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), false, false, future.completer());
-
-    return future.map(Results::getResults);
-  }
 
   private Future<Void> deleteActualOpeningHoursByOpeningsId(PostgresClient pgClient,
                                                             AsyncResult<SQLConnection> conn,
@@ -408,29 +375,11 @@ public class CalendarAPI implements Calendar {
     return future.map(ur -> null);
   }
 
-  private Future<Void> deleteRegularHoursByOpeningsId(PostgresClient pgClient,
-                                                      AsyncResult<SQLConnection> conn,
-                                                      String openingsId) {
-
-    Criteria criteria = new Criteria()
-      .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingsId + "'");
-
-    Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, REGULAR_HOURS, new Criterion(criteria), future.completer());
-
-    return future.map(ur -> null);
-  }
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private Future<OpeningPeriod> setOpeningDaysForOpeningPeriod(PostgresClient pgClient,
+  private Future<OpeningPeriod> setOpeningDaysForOpeningPeriod(RegularHoursService regularHoursService,
                                                                AsyncResult<SQLConnection> conn,
                                                                OpeningPeriod period) {
 
-    return findRegularHoursByOpeningId(pgClient, conn, period.getId())
+    return regularHoursService.findRegularHoursByOpeningId(conn, period.getId())
       .map(rhs -> period.withOpeningDays(rhs.get(0).getOpeningDays()));
   }
 
@@ -464,9 +413,13 @@ public class CalendarAPI implements Calendar {
   }
 
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler,
-    OpeningCollection openingCollection, String lang, PostgresClient postgresClient, AsyncResult<SQLConnection> beginTx) {
+                                                    OpeningCollection openingCollection,
+                                                    String lang,
+                                                    PostgresClient postgresClient,
+                                                    AsyncResult<SQLConnection> beginTx,
+                                                    RegularHoursService regularHoursService) {
 
-    Future<Void> future = getOpeningDays(postgresClient, beginTx, openingCollection.getOpeningPeriods());
+    Future<Void> future = getOpeningDays(regularHoursService, beginTx, openingCollection.getOpeningPeriods());
     future.setHandler(querys -> {
       if (querys.succeeded()) {
         postgresClient.endTx(beginTx, done
@@ -584,14 +537,14 @@ public class CalendarAPI implements Calendar {
     return criterionForOpeningHours;
   }
 
-  private Future<Void> getOpeningDays(PostgresClient pgClient,
+  private Future<Void> getOpeningDays(RegularHoursService regularHoursService,
                                       AsyncResult<SQLConnection> conn,
                                       List<OpeningPeriod> openingPeriods) {
 
     Future<Void> future = succeededFuture();
 
     for (OpeningPeriod period : openingPeriods) {
-      future = future.compose(handler -> findRegularHoursByOpeningId(pgClient, conn, period.getId())
+      future = future.compose(handler -> regularHoursService.findRegularHoursByOpeningId(conn, period.getId())
         .compose(rhs -> fillOpeningDays(rhs, openingPeriods)));
     }
     return future;
