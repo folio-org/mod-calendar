@@ -19,8 +19,6 @@ import static org.folio.rest.utils.CalendarConstants.OPENINGS;
 import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
 import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
 import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
-import static org.folio.rest.utils.CalendarConstants.START_DATE;
-import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
 import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpeningDayWeekDay;
@@ -74,7 +72,8 @@ import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
 import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.service.ActualOpeningHoursService;
-import org.folio.rest.service.ActualOpeningHoursServiceImpl;
+import org.folio.rest.service.impl.ActualOpeningHoursServiceImpl;
+import org.folio.rest.service.impl.OpeningsServiceImpl;
 import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
@@ -116,9 +115,11 @@ public class CalendarAPI implements Calendar {
     Openings openings = mapOpeningPeriodToOpenings(entity);
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
+    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> checkOpeningsForOverlap(pgClient, conn, openings))
-      .compose(v -> saveOpenings(pgClient, conn, openings))
+      .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings))
+      .compose(v -> openingsService.saveOpenings(conn, openings))
       .compose(v -> saveRegularHours(pgClient, conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
@@ -144,8 +145,10 @@ public class CalendarAPI implements Calendar {
 
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
+    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> deleteOpeningsById(pgClient, conn, periodId))
+      .compose(v -> openingsService.deleteOpeningsById(conn, periodId))
       .compose(v -> deleteRegularHoursByOpeningsId(pgClient, conn, periodId))
       .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
       .setHandler(v -> {
@@ -173,8 +176,10 @@ public class CalendarAPI implements Calendar {
     Openings openings = mapOpeningPeriodToOpenings(entity);
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
+    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> updateOpenings(pgClient, conn, openings))
+      .compose(v -> openingsService.updateOpenings(conn, openings))
       .compose(v -> updateRegularHours(pgClient, conn, new RegularHours(openingId, openings.getId(), entity.getOpeningDays())))
       .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, entity.getId()))
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
@@ -209,8 +214,10 @@ public class CalendarAPI implements Calendar {
 
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
+    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> findOpeningsByServicePointId(pgClient, conn, servicePointId))
+      .compose(v -> openingsService.findOpeningsByServicePointId(conn, servicePointId))
       .map(this::mapOpeningsToOpeningCollection)
       .compose(collection -> getOpeningDaysByDatesFuture(pgClient, conn, collection, params))
       .setHandler(result -> {
@@ -234,7 +241,9 @@ public class CalendarAPI implements Calendar {
 
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
-    pgClient.startTx(conn -> findOpeningsById(pgClient, conn, openingId)
+    OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+
+    pgClient.startTx(conn -> openingsService.findOpeningsById(conn, openingId)
       .compose(openings -> openings.isEmpty() ?
         failedFuture(new NotFoundException(format(ERROR_MESSAGE, openingId))) : succeededFuture(openings))
       .map(openings -> openings.get(0))
@@ -332,26 +341,19 @@ public class CalendarAPI implements Calendar {
     }
   }
 
-  private Future<Void> checkOpeningsForOverlap(PostgresClient pgClient,
-                                               AsyncResult<SQLConnection> conn,
-                                               Openings openings) {
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    Future<Results<Openings>> future = Future.future();
-    Criterion crit = assembleCriterionForCheckingOverlap(openings);
-    pgClient.get(conn, OPENINGS, Openings.class, crit, false, false, future.completer());
 
-    return future.compose(get ->
-      get.getResults().isEmpty() ? succeededFuture() : failedFuture("Intervals can not overlap."));
-  }
 
-  private Future<Void> saveOpenings(PostgresClient pgClient,
-                                    AsyncResult<SQLConnection> conn,
-                                    Openings openings) {
+  private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
+                                              AsyncResult<SQLConnection> conn,
+                                              List<Object> actualOpeningHours) {
 
-    Future<String> future = Future.future();
-    pgClient.save(conn, OPENINGS, openings, future.completer());
+    Future<ResultSet> future = Future.future();
+    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
 
-    return future.map(s -> null);
+    return future.map(rs -> null);
   }
 
   private Future<Void> saveRegularHours(PostgresClient pgClient,
@@ -364,32 +366,31 @@ public class CalendarAPI implements Calendar {
     return future.map(s -> null);
   }
 
-  private Future<Void> saveActualOpeningHours(PostgresClient pgClient,
-                                              AsyncResult<SQLConnection> conn,
-                                              List<Object> actualOpeningHours) {
+  private Future<Void> updateRegularHours(PostgresClient pgClient,
+                                          AsyncResult<SQLConnection> conn,
+                                          RegularHours regularHours) {
 
-    Future<ResultSet> future = Future.future();
-    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
-
-    return future.map(rs -> null);
-  }
-
-  private Future<Void> deleteOpeningsById(PostgresClient pgClient,
-                                             AsyncResult<SQLConnection> conn,
-                                             String openingsId) {
-
-    Criteria criteria = new Criteria()
-      .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingsId + "'");
 
     Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, OPENINGS, new Criterion(criteria), future.completer());
+    String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
+    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
 
-    return future.map(UpdateResult::getUpdated)
-      .compose(updated -> updated == 0 ?
-        failedFuture(new NotFoundException(format("Openings with id '%s' is not found", openingsId))) :
-        succeededFuture());
+    return future.map(ur -> null);
+  }
+
+  private Future<List<RegularHours>> findRegularHoursByOpeningId(PostgresClient pgClient,
+                                                                 AsyncResult<SQLConnection> conn,
+                                                                 String openingId) {
+
+    Criteria criteria = new Criteria()
+      .addField(OPENING_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingId + "'");
+
+    Future<Results<RegularHours>> future = Future.future();
+    pgClient.get(conn, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), false, false, future.completer());
+
+    return future.map(Results::getResults);
   }
 
   private Future<Void> deleteActualOpeningHoursByOpeningsId(PostgresClient pgClient,
@@ -422,79 +423,8 @@ public class CalendarAPI implements Calendar {
     return future.map(ur -> null);
   }
 
-  private Future<Void> updateOpenings(PostgresClient pgClient,
-                                      AsyncResult<SQLConnection> conn,
-                                      Openings openings) {
-
-    Future<UpdateResult> future = Future.future();
-    String where = String.format("WHERE jsonb->>'id' = '%s'", openings.getId());
-    pgClient.update(conn, OPENINGS, openings, "jsonb", where, false, future.completer());
-
-    return future.map(ur -> null);
-  }
-
-  private Future<Void> updateRegularHours(PostgresClient pgClient,
-                                          AsyncResult<SQLConnection> conn,
-                                          RegularHours regularHours) {
-
-
-    Future<UpdateResult> future = Future.future();
-    String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
-    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
-
-    return future.map(ur -> null);
-  }
-
-  private Future<List<Openings>> findOpeningsById(PostgresClient pgClient,
-                                                  AsyncResult<SQLConnection> conn,
-                                                  String openingId) {
-
-    Criteria criteria = new Criteria()
-      .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingId + "'");
-
-    Future<Results<Openings>> future = Future.future();
-
-    pgClient.get(conn, OPENINGS, Openings.class, new Criterion(criteria), false, false, future.completer());
-
-    return future.map(Results::getResults);
-  }
-
-  private Future<List<Openings>> findOpeningsByServicePointId(PostgresClient pgClient,
-                                                              AsyncResult<SQLConnection> conn,
-                                                              String servicePointId) {
-
-    Criterion criterion = new Criterion();
-    if (servicePointId != null) {
-      Criteria criteria = new Criteria()
-        .addField(SERVICE_POINT_ID)
-        .setOperation(OP_EQUAL)
-        .setValue("'" + servicePointId + "'");
-
-      criterion = criterion.addCriterion(criteria);
-    }
-
-    Future<Results<Openings>> future = Future.future();
-    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, future.completer());
-
-    return future.map(Results::getResults);
-  }
-
-  private Future<List<RegularHours>> findRegularHoursByOpeningId(PostgresClient pgClient,
-                                                                 AsyncResult<SQLConnection> conn,
-                                                                 String openingId) {
-
-    Criteria criteria = new Criteria()
-      .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingId + "'");
-
-    Future<Results<RegularHours>> future = Future.future();
-    pgClient.get(conn, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), false, false, future.completer());
-
-    return future.map(Results::getResults);
-  }
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   private Future<OpeningPeriod> setOpeningDaysForOpeningPeriod(PostgresClient pgClient,
                                                                AsyncResult<SQLConnection> conn,
@@ -652,40 +582,6 @@ public class CalendarAPI implements Calendar {
     }
 
     return criterionForOpeningHours;
-  }
-
-  private Criterion assembleCriterionForCheckingOverlap(Openings openings) {
-    Criteria critOpeningId = new Criteria()
-      .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openings.getId() + "'");
-
-    Criteria critServicePoint = new Criteria()
-      .addField(SERVICE_POINT_ID)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openings.getServicePointId() + "'");
-
-    Criteria critExceptional = new Criteria()
-      .addField(EXCEPTIONAL)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openings.getExceptional() + "'");
-
-    Criteria critStartDate = new Criteria()
-      .addField(START_DATE)
-      .setOperation(Criteria.OP_LESS_THAN_EQ)
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
-
-    Criteria critEndDate = new Criteria()
-      .addField(END_DATE)
-      .setOperation(Criteria.OP_GREATER_THAN_EQ)
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
-
-
-    return new Criterion()
-      .addCriterion(critExceptional, Criteria.OP_AND)
-      .addCriterion(critServicePoint, Criteria.OP_AND)
-      .addCriterion(critStartDate, Criteria.OP_AND, critEndDate)
-      .addCriterion(critOpeningId, Criteria.OP_OR);
   }
 
   private Future<Void> getOpeningDays(PostgresClient pgClient,

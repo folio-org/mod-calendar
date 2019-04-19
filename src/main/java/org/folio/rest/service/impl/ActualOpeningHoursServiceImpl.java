@@ -1,11 +1,8 @@
-package org.folio.rest.service;
+package org.folio.rest.service.impl;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.ext.sql.ResultSet;
-import org.folio.rest.beans.ActualOpeningHours;
-import org.folio.rest.persist.PostgresClient;
+import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
+import static org.folio.rest.utils.CalendarConstants.OPENINGS;
+import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
@@ -14,9 +11,14 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
-import static org.folio.rest.utils.CalendarConstants.OPENINGS;
-import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.sql.ResultSet;
+
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.service.ActualOpeningHoursService;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
 
