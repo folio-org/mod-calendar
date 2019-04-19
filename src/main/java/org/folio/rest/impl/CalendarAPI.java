@@ -42,7 +42,6 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
@@ -87,12 +86,6 @@ public class CalendarAPI implements Calendar {
   private static final String ERROR_MESSAGE = "Period with openingId=%s not found";
 
   private final Messages messages = Messages.getInstance();
-
-  private ActualOpeningHoursService actualOpeningHoursService;
-
-  public CalendarAPI(Vertx vertx, String tenantId) {
-    actualOpeningHoursService = new ActualOpeningHoursServiceImpl(vertx, tenantId);
-  }
 
   @Validate
   @Override
@@ -312,14 +305,18 @@ public class CalendarAPI implements Calendar {
                                                                  Context vertxContext) {
 
     try {
+      PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
+      String tenant = okapiHeaders.get(OKAPI_HEADER_TENANT);
+      ActualOpeningHoursService actualOpeningHoursService =
+        new ActualOpeningHoursServiceImpl(pgClient);
       SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
       df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
       Date date = df.parse(requestedDate);
 
       CompositeFuture.all(
-        actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, PREVIOUS_DAY),
-        actualOpeningHoursService.findActualOpeningHoursForGivenDay(servicePointId, date),
-        actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, NEXT_DAY)
+        actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, PREVIOUS_DAY, tenant),
+        actualOpeningHoursService.findActualOpeningHoursForGivenDay(servicePointId, date, tenant),
+        actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, NEXT_DAY, tenant)
       ).setHandler(result -> {
         List<ActualOpeningHours> prev = result.result().resultAt(0);
         List<ActualOpeningHours> current = result.result().resultAt(1);

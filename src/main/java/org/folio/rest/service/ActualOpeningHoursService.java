@@ -1,21 +1,24 @@
 package org.folio.rest.service;
 
+import java.util.Date;
+import java.util.List;
+
 import io.vertx.core.Future;
+
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Order;
 
-import java.util.Date;
-import java.util.List;
-
 public interface ActualOpeningHoursService {
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String servicePointId,
-                                                                     Date requestedDate);
+                                                                     Date requestedDate,
+                                                                     String tenantId);
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String servicePointId,
                                                                            Date requestedDate,
-                                                                           SearchDirection searchDirection);
+                                                                           SearchDirection searchDirection,
+                                                                           String tenantId);
 
   enum SearchDirection {
 

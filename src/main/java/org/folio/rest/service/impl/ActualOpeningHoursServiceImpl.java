@@ -12,7 +12,6 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
 
@@ -22,21 +21,19 @@ import org.folio.rest.service.ActualOpeningHoursService;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
 
-  private Vertx vertx;
-  private String tenantId;
+  private PostgresClient pgClient;
 
-  public ActualOpeningHoursServiceImpl(Vertx vertx, String tenantId) {
-    this.vertx = vertx;
-    this.tenantId = tenantId;
+  public ActualOpeningHoursServiceImpl(PostgresClient pgClient) {
+    this.pgClient = pgClient;
   }
 
   @Override
   public Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String servicePointId,
-                                                                            Date requestedDate) {
+                                                                            Date requestedDate,
+                                                                            String tenantId) {
 
     SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
     df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-    PostgresClient pgClient = PostgresClient.getInstance(vertx, tenantId);
 
     String query = String.format(
       "SELECT aoh.jsonb FROM %1$s.%2$s aoh " +
@@ -58,12 +55,11 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   @Override
   public Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String servicePointId,
                                                                                   Date requestedDate,
-                                                                                  SearchDirection searchDirection) {
+                                                                                  SearchDirection searchDirection,
+                                                                                  String tenantId) {
 
     SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
     df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
-
-    PostgresClient pgClient = PostgresClient.getInstance(vertx, tenantId);
 
     //Following query extracts all ActualOpenHours for the closest open day (next or previous).
     //The day is considered as open when it contains at least one ActualOpenHours record and also
