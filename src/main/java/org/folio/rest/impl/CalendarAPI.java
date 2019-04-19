@@ -81,7 +81,6 @@ import org.folio.rest.utils.CalendarUtils;
 public class CalendarAPI implements Calendar {
 
   private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
-  private static final String ERROR_MESSAGE = "Period with openingId=%s not found";
 
   private final Messages messages = Messages.getInstance();
 
@@ -246,7 +245,7 @@ public class CalendarAPI implements Calendar {
 
     pgClient.startTx(conn -> openingsService.findOpeningsById(conn, openingId)
       .compose(openings -> openings.isEmpty() ?
-        failedFuture(new NotFoundException(format(ERROR_MESSAGE, openingId))) : succeededFuture(openings))
+        failedFuture(new NotFoundException(format("Openings with id '%s' is not found", openingId))) : succeededFuture(openings))
       .map(openings -> openings.get(0))
       .map(CalendarUtils::mapOpeningsToOpeningPeriod)
       .compose(period -> setOpeningDaysForOpeningPeriod(regularHoursService, conn, period))
