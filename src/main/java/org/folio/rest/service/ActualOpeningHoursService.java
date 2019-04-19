@@ -1,21 +1,35 @@
 package org.folio.rest.service;
 
+import java.util.Date;
+import java.util.List;
+
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.ext.sql.SQLConnection;
+
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Order;
 
-import java.util.Date;
-import java.util.List;
-
 public interface ActualOpeningHoursService {
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForGivenDay(String servicePointId,
-                                                                     Date requestedDate);
+                                                                     Date requestedDate,
+                                                                     String tenantId);
 
   Future<List<ActualOpeningHours>> findActualOpeningHoursForClosestOpenDay(String servicePointId,
                                                                            Date requestedDate,
-                                                                           SearchDirection searchDirection);
+                                                                           SearchDirection searchDirection,
+                                                                           String tenantId);
+
+  Future<List<ActualOpeningHours>> findActualOpeningHoursByOpeningIdAndRange(AsyncResult<SQLConnection> conn,
+                                                                             String openingId,
+                                                                             String startDate,
+                                                                             String endDate);
+
+  Future<Void> saveActualOpeningHours(AsyncResult<SQLConnection> conn, List<Object> actualOpeningHours);
+
+  Future<Void> deleteActualOpeningHoursByOpeningsId(AsyncResult<SQLConnection> conn, String openingsId);
 
   enum SearchDirection {
 

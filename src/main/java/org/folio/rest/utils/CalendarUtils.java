@@ -1,16 +1,6 @@
 package org.folio.rest.utils;
 
-import org.apache.commons.lang.BooleanUtils;
-import org.folio.rest.beans.ActualOpeningHours;
-import org.folio.rest.beans.CalendarOpeningsRequestParameters;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
-import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
-import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+import static io.vertx.core.Future.succeededFuture;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -27,21 +17,38 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.Response;
+
+import io.vertx.core.AsyncResult;
+
+import org.apache.commons.lang.BooleanUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.beans.CalendarOpeningsRequestParameters;
+import org.folio.rest.beans.Openings;
+import org.folio.rest.jaxrs.model.OpeningCollection;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+
 public class CalendarUtils {
 
-
-  private static final String TIME_PATTERN = "HH:mm:ss.SSS'Z'";
-  public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormat.forPattern(TIME_PATTERN);
   public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
-  public static final String DAY_PATTERN = "EEEE";
+  private static final String DAY_PATTERN = "EEEE";
 
   private CalendarUtils() {
   }
 
-  public static DayOfWeek dayOfDate(Date inputDate) {
+  private static DayOfWeek dayOfDate(Date inputDate) {
     SimpleDateFormat format = new SimpleDateFormat(DAY_PATTERN, Locale.ENGLISH);
     format.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
     return DayOfWeek.valueOf(format.format(inputDate).toUpperCase());
@@ -155,7 +162,7 @@ public class CalendarUtils {
       startDate = DATE_FORMATTER_SHORT.print(new DateTime(calendar));
     }
     if (endDate == null) {
-      long count = openingPeriods.stream().count();
+      long count = (long) openingPeriods.size();
       Stream<OpeningHoursPeriod> stream = openingPeriods.stream();
       Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
       if (!openingPeriods.isEmpty()) {
@@ -258,5 +265,51 @@ public class CalendarUtils {
     openingDayWeekDay.setOpeningDay(openingDay);
 
     return openingDayWeekDay;
+  }
+
+  public static Openings mapOpeningPeriodToOpenings(OpeningPeriod entity) {
+
+    boolean exceptional = entity.getOpeningDays()
+      .stream()
+      .noneMatch(p -> p.getWeekdays() != null);
+
+    Openings openings = new Openings();
+    openings.setId(entity.getId());
+    openings.setName(entity.getName());
+    openings.setServicePointId(entity.getServicePointId());
+    openings.setStartDate(entity.getStartDate());
+    openings.setEndDate(entity.getEndDate());
+    openings.setExceptional(exceptional);
+
+    return openings;
+  }
+
+  public static OpeningCollection mapOpeningsToOpeningCollection(List<Openings> openings) {
+
+    List<OpeningPeriod> openingPeriods = openings.stream()
+      .map(CalendarUtils::mapOpeningsToOpeningPeriod)
+      .collect(Collectors.toList());
+
+    return new OpeningCollection()
+      .withTotalRecords(openings.size())
+      .withOpeningPeriods(openingPeriods);
+  }
+
+  public static OpeningPeriod mapOpeningsToOpeningPeriod(Openings openings) {
+
+    return new OpeningPeriod()
+      .withId(openings.getId())
+      .withName(openings.getName())
+      .withServicePointId(openings.getServicePointId())
+      .withStartDate(openings.getStartDate())
+      .withEndDate(openings.getEndDate());
+  }
+
+  public static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
+    if (e.getClass() == NotFoundException.class) {
+      return succeededFuture(Response.status(404).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+    } else {
+      return succeededFuture(Response.status(500).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+    }
   }
 }
