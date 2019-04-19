@@ -10,17 +10,17 @@ import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodBy
 import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
-import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
 import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
-import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
 import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.getOpeningDayWeekDayForTheEmptyDay;
 import static org.folio.rest.utils.CalendarUtils.mapActualOpeningHoursListToOpeningDayWeekDay;
+import static org.folio.rest.utils.CalendarUtils.mapExceptionToResponseResult;
 import static org.folio.rest.utils.CalendarUtils.mapOpeningPeriodToOpenings;
+import static org.folio.rest.utils.CalendarUtils.mapOpeningsToOpeningCollection;
 import static org.folio.rest.utils.CalendarUtils.separateEvents;
 
 import java.text.ParseException;
@@ -46,7 +46,6 @@ import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
 
 import org.joda.time.DateTime;
 
@@ -67,7 +66,6 @@ import org.folio.rest.persist.PgUtil;
 import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.service.ActualOpeningHoursService;
 import org.folio.rest.service.OpeningsService;
 import org.folio.rest.service.RegularHoursService;
@@ -142,11 +140,12 @@ public class CalendarAPI implements Calendar {
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
     RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
+    ActualOpeningHoursService actualOpeningHoursService = new ActualOpeningHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.deleteOpeningsById(conn, periodId))
       .compose(v -> regularHoursService.deleteRegularHoursByOpeningsId(conn, periodId))
-      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, periodId))
+      .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, periodId))
       .setHandler(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
@@ -174,11 +173,14 @@ public class CalendarAPI implements Calendar {
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
     RegularHoursService regularHoursService = new RegularHoursServiceImpl(pgClient);
+    ActualOpeningHoursService actualOpeningHoursService = new ActualOpeningHoursServiceImpl(pgClient);
+
+    RegularHours regularHours = new RegularHours(openingId, openings.getId(), entity.getOpeningDays());
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.updateOpenings(conn, openings))
-      .compose(v -> regularHoursService.updateRegularHours(conn, new RegularHours(openingId, openings.getId(), entity.getOpeningDays())))
-      .compose(v -> deleteActualOpeningHoursByOpeningsId(pgClient, conn, entity.getId()))
+      .compose(v -> regularHoursService.updateRegularHours(conn, regularHours))
+      .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, entity.getId()))
       .compose(v -> saveActualOpeningHours(pgClient, conn, separateEvents(entity, openings.getExceptional())))
       .setHandler(v -> {
         if (v.failed()) {
@@ -212,11 +214,12 @@ public class CalendarAPI implements Calendar {
     PostgresClient pgClient = PgUtil.postgresClient(vertxContext, okapiHeaders);
 
     OpeningsServiceImpl openingsService = new OpeningsServiceImpl(pgClient);
+    ActualOpeningHoursService actualOpeningHoursService = new ActualOpeningHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
       .compose(v -> openingsService.findOpeningsByServicePointId(conn, servicePointId))
-      .map(this::mapOpeningsToOpeningCollection)
-      .compose(collection -> getOpeningDaysByDatesFuture(pgClient, conn, collection, params))
+      .map(CalendarUtils::mapOpeningsToOpeningCollection)
+      .compose(collection -> getOpeningDaysByDatesFuture(actualOpeningHoursService, conn, collection, params))
       .setHandler(result -> {
         if (result.failed()) {
           logger.error(result.cause().getMessage());
@@ -245,7 +248,7 @@ public class CalendarAPI implements Calendar {
       .compose(openings -> openings.isEmpty() ?
         failedFuture(new NotFoundException(format(ERROR_MESSAGE, openingId))) : succeededFuture(openings))
       .map(openings -> openings.get(0))
-      .map(this::mapOpeningsToOpeningPeriod)
+      .map(CalendarUtils::mapOpeningsToOpeningPeriod)
       .compose(period -> setOpeningDaysForOpeningPeriod(regularHoursService, conn, period))
       .setHandler(period -> {
         if (period.failed()) {
@@ -355,58 +358,12 @@ public class CalendarAPI implements Calendar {
     return future.map(rs -> null);
   }
 
-
-
-  private Future<Void> deleteActualOpeningHoursByOpeningsId(PostgresClient pgClient,
-                                                            AsyncResult<SQLConnection> conn,
-                                                            String openingsId) {
-
-    Criteria criteria = new Criteria()
-      .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingsId + "'");
-
-    Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), future.completer());
-
-    return future.map(ur -> null);
-  }
-
   private Future<OpeningPeriod> setOpeningDaysForOpeningPeriod(RegularHoursService regularHoursService,
                                                                AsyncResult<SQLConnection> conn,
                                                                OpeningPeriod period) {
 
     return regularHoursService.findRegularHoursByOpeningId(conn, period.getId())
       .map(rhs -> period.withOpeningDays(rhs.get(0).getOpeningDays()));
-  }
-
-  private OpeningCollection mapOpeningsToOpeningCollection(List<Openings> openings) {
-
-    List<OpeningPeriod> openingPeriods = openings.stream()
-      .map(this::mapOpeningsToOpeningPeriod)
-      .collect(Collectors.toList());
-
-    return new OpeningCollection()
-      .withTotalRecords(openings.size())
-      .withOpeningPeriods(openingPeriods);
-  }
-
-  private OpeningPeriod mapOpeningsToOpeningPeriod(Openings openings) {
-
-    return new OpeningPeriod()
-      .withId(openings.getId())
-      .withName(openings.getName())
-      .withServicePointId(openings.getServicePointId())
-      .withStartDate(openings.getStartDate())
-      .withEndDate(openings.getEndDate());
-  }
-
-  private static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
-    if (e.getClass() == NotFoundException.class) {
-      return succeededFuture(Response.status(404).header("Content-Type", "text/plain").entity(e.getMessage()).build());
-    } else {
-      return succeededFuture(Response.status(500).header("Content-Type", "text/plain").entity(e.getMessage()).build());
-    }
   }
 
   private void getOpeningDaysByServicePointIdFuture(Handler<AsyncResult<Response>> asyncResultHandler,
@@ -432,7 +389,7 @@ public class CalendarAPI implements Calendar {
     });
   }
 
-  private Future<OpeningHoursCollection> getOpeningDaysByDatesFuture(PostgresClient pgClient,
+  private Future<OpeningHoursCollection> getOpeningDaysByDatesFuture(ActualOpeningHoursService service,
                                                                      AsyncResult<SQLConnection> conn,
                                                                      OpeningCollection openingCollection,
                                                                      CalendarOpeningsRequestParameters params) {
@@ -440,7 +397,7 @@ public class CalendarAPI implements Calendar {
     Future<OpeningHoursCollection> future = Future.future();
     OpeningHoursCollection openingHoursCollection = new OpeningHoursCollection();
 
-    getOpeningDaysByDate(pgClient, conn, openingHoursCollection, openingCollection, params)
+    getOpeningDaysByDate(service, conn, openingHoursCollection, openingCollection, params)
       .setHandler(querys -> {
       if (querys.succeeded()) {
         if (params.isIncludeClosedDays() && !openingHoursCollection.getOpeningPeriods().isEmpty()) {
@@ -504,36 +461,6 @@ public class CalendarAPI implements Calendar {
     return criterionForOpeningHours;
   }
 
-
-  private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
-    Criteria critOpeningId = new Criteria()
-      .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
-      .setValue("'" + openingId + "'");
-
-    Criteria critStartDate = new Criteria()
-      .addField(ACTUAL_DAY)
-      .setOperation(Criteria.OP_GREATER_THAN_EQ)
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
-
-    Criteria critEndDate = new Criteria()
-      .addField(ACTUAL_DAY)
-      .setOperation(Criteria.OP_LESS_THAN_EQ)
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
-
-    Criterion criterionForOpeningHours = new Criterion()
-      .addCriterion(critOpeningId, Criteria.OP_AND);
-
-    if (startDate != null) {
-      criterionForOpeningHours.addCriterion(critStartDate, Criteria.OP_AND);
-    }
-    if (endDate != null) {
-      criterionForOpeningHours.addCriterion(critEndDate, Criteria.OP_AND);
-    }
-
-    return criterionForOpeningHours;
-  }
-
   private Future<Void> getOpeningDays(RegularHoursService regularHoursService,
                                       AsyncResult<SQLConnection> conn,
                                       List<OpeningPeriod> openingPeriods) {
@@ -558,7 +485,7 @@ public class CalendarAPI implements Calendar {
     return succeededFuture();
   }
 
-  private Future<Void> getOpeningDaysByDate(PostgresClient pgClient,
+  private Future<Void> getOpeningDaysByDate(ActualOpeningHoursService service,
                                             AsyncResult<SQLConnection> conn,
                                             OpeningHoursCollection openingHoursCollection,
                                             OpeningCollection openingCollection,
@@ -569,25 +496,12 @@ public class CalendarAPI implements Calendar {
 
     for (OpeningPeriod period : openingCollection.getOpeningPeriods()) {
       future = future
-        .compose(v -> getActualOpeningHoursByOpeningIdAndRange(
-          pgClient, conn, period.getId(), params.getStartDate(), params.getEndDate()))
+        .compose(v -> service.findActualOpeningHoursByOpeningIdAndRange(
+          conn, period.getId(), params.getStartDate(), params.getEndDate()))
         .compose(aohs -> setOpeningPeriodsForEachActualOpeningHour(aohs, openingHoursCollection, openingPeriods));
     }
 
     return future;
-  }
-
-  private Future<List<ActualOpeningHours>> getActualOpeningHoursByOpeningIdAndRange(PostgresClient pgClient,
-                                                                                    AsyncResult<SQLConnection> conn,
-                                                                                    String openingId,
-                                                                                    String startDate,
-                                                                                    String endDate) {
-
-    Future<Results<ActualOpeningHours>> future = Future.future();
-    Criterion criterion = assembleCriterionByRange(openingId, startDate, endDate);
-    pgClient.get(conn, ACTUAL_OPENING_HOURS, ActualOpeningHours.class, criterion, false, false, future.completer());
-
-    return future.map(Results::getResults);
   }
 
   private Future<Void> setOpeningPeriodsForEachActualOpeningHour(List<ActualOpeningHours> actualOpeningHoursList,

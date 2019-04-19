@@ -1,7 +1,11 @@
 package org.folio.rest.service.impl;
 
+import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
+import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
+import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
+import static org.folio.rest.utils.CalendarUtils.DATE_FORMATTER_SHORT;
 import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 
 import java.text.SimpleDateFormat;
@@ -11,12 +15,20 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
+import io.vertx.ext.sql.SQLConnection;
+import io.vertx.ext.sql.UpdateResult;
+
+import org.joda.time.DateTime;
 
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.service.ActualOpeningHoursService;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
@@ -99,5 +111,61 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       .stream()
       .map(objects -> new JsonObject(objects.getString(0)).mapTo(ActualOpeningHours.class))
       .collect(Collectors.toList()));
+  }
+
+  @Override
+  public Future<List<ActualOpeningHours>> findActualOpeningHoursByOpeningIdAndRange(AsyncResult<SQLConnection> conn,
+                                                                                    String openingId,
+                                                                                    String startDate,
+                                                                                    String endDate) {
+
+    Future<Results<ActualOpeningHours>> future = Future.future();
+    Criterion criterion = assembleCriterionByRange(openingId, startDate, endDate);
+    pgClient.get(conn, ACTUAL_OPENING_HOURS, ActualOpeningHours.class, criterion, false, false, future.completer());
+
+    return future.map(Results::getResults);
+  }
+
+  @Override
+  public Future<Void> deleteActualOpeningHoursByOpeningsId(AsyncResult<SQLConnection> conn, String openingsId) {
+
+    Criteria criteria = new Criteria()
+      .addField(OPENING_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingsId + "'");
+
+    Future<UpdateResult> future = Future.future();
+    pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), future.completer());
+
+    return future.map(ur -> null);
+  }
+
+  private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
+    Criteria critOpeningId = new Criteria()
+      .addField(OPENING_ID)
+      .setOperation(OP_EQUAL)
+      .setValue("'" + openingId + "'");
+
+    Criteria critStartDate = new Criteria()
+      .addField(ACTUAL_DAY)
+      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
+
+    Criteria critEndDate = new Criteria()
+      .addField(ACTUAL_DAY)
+      .setOperation(Criteria.OP_LESS_THAN_EQ)
+      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
+
+    Criterion criterionForOpeningHours = new Criterion()
+      .addCriterion(critOpeningId, Criteria.OP_AND);
+
+    if (startDate != null) {
+      criterionForOpeningHours.addCriterion(critStartDate, Criteria.OP_AND);
+    }
+    if (endDate != null) {
+      criterionForOpeningHours.addCriterion(critEndDate, Criteria.OP_AND);
+    }
+
+    return criterionForOpeningHours;
   }
 }

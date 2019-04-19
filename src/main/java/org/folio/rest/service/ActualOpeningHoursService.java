@@ -3,7 +3,9 @@ package org.folio.rest.service;
 import java.util.Date;
 import java.util.List;
 
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.ext.sql.SQLConnection;
 
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.persist.Criteria.Criteria;
@@ -19,6 +21,13 @@ public interface ActualOpeningHoursService {
                                                                            Date requestedDate,
                                                                            SearchDirection searchDirection,
                                                                            String tenantId);
+
+  Future<List<ActualOpeningHours>> findActualOpeningHoursByOpeningIdAndRange(AsyncResult<SQLConnection> conn,
+                                                                             String openingId,
+                                                                             String startDate,
+                                                                             String endDate);
+
+  Future<Void> deleteActualOpeningHoursByOpeningsId(AsyncResult<SQLConnection> conn, String openingsId);
 
   enum SearchDirection {
 
