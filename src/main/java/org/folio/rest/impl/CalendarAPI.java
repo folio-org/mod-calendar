@@ -78,6 +78,7 @@ import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.CalendarUtils;
 
 
+@SuppressWarnings({"squid:S1854", "squid:S1481"})
 public class CalendarAPI implements Calendar {
 
   private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
