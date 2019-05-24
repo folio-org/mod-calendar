@@ -1,6 +1,5 @@
 package org.folio.rest.service.impl;
 
-import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.utils.CalendarConstants.ID_FIELD;
 import static org.folio.rest.utils.CalendarConstants.OPENING_ID;
 import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
@@ -52,7 +51,7 @@ public class RegularHoursServiceImpl implements RegularHoursService {
 
     Criteria criteria = new Criteria()
       .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingId + "'");
 
     Future<Results<RegularHours>> future = Future.future();
@@ -66,7 +65,7 @@ public class RegularHoursServiceImpl implements RegularHoursService {
 
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingsId + "'");
 
     Future<UpdateResult> future = Future.future();

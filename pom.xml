@@ -25,11 +25,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <folio.domain-models-runtime.version>23.12.0</folio.domain-models-runtime.version>
+    <folio.domain-models-runtime.version>24.0.0</folio.domain-models-runtime.version>
 
     <vertx.version>3.5.4</vertx.version>
-    <jackson.version>2.8.11</jackson.version>
-    <jackson.databind.version>2.8.11.3</jackson.databind.version>
+    <jackson.version>2.9.9</jackson.version>
 
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
 
@@ -86,31 +85,7 @@
 
       <dependency>
         <groupId>io.vertx</groupId>
-        <artifactId>vertx-core</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-web</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.vertx</groupId>
         <artifactId>vertx-unit</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-dropwizard-metrics</artifactId>
-        <version>${vertx.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.vertx</groupId>
-        <artifactId>vertx-mysql-postgresql-client</artifactId>
         <version>${vertx.version}</version>
       </dependency>
 
@@ -123,12 +98,30 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.databind.version}</version>
+        <version>${jackson.version}</version>
       </dependency>
 
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-json-provider</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.jaxrs</groupId>
+        <artifactId>jackson-jaxrs-base</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-yaml</artifactId>
         <version>${jackson.version}</version>
       </dependency>
 

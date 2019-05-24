@@ -33,8 +33,8 @@ public interface ActualOpeningHoursService {
 
   enum SearchDirection {
 
-    PREVIOUS_DAY(Order.DESC, Criteria.OP_LESS_THAN),
-    NEXT_DAY(Order.ASC, Criteria.OP_GREATER_THAN);
+    PREVIOUS_DAY(Order.DESC, "<"),
+    NEXT_DAY(Order.ASC, ">");
 
     private final String order;
     private final String operator;
