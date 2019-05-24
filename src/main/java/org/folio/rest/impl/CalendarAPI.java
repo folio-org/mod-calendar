@@ -7,7 +7,6 @@ import static joptsimple.internal.Strings.isNullOrEmpty;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201;
-import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.PREVIOUS_DAY;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
@@ -425,27 +424,27 @@ public class CalendarAPI implements Calendar {
   private Criterion assembleCriterionByServicePointId(String servicePointId, boolean showPast, boolean exceptional) {
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + servicePointId + "'");
 
     Criteria critExceptional = new Criteria()
       .addField(EXCEPTIONAL)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + exceptional + "'");
 
     Criteria critShowPast = new Criteria()
       .addField(END_DATE)
-      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setOperation(">=")
       .setValue(DATE_FORMATTER_SHORT.print(new DateTime()));
 
     Criterion criterionForOpeningHours = new Criterion();
 
     if (!showPast) {
-      criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND, critShowPast);
+      criterionForOpeningHours.addCriterion(critServicePoint, "AND", critShowPast);
     } else {
-      criterionForOpeningHours.addCriterion(critServicePoint, Criteria.OP_AND);
+      criterionForOpeningHours.addCriterion(critServicePoint, "AND");
     }
-    criterionForOpeningHours.addCriterion(critExceptional, Criteria.OP_AND);
+    criterionForOpeningHours.addCriterion(critExceptional, "AND");
 
     return criterionForOpeningHours;
   }
