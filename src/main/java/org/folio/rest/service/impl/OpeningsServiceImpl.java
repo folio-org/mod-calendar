@@ -4,7 +4,6 @@ import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
 import static java.lang.String.format;
 
-import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
 import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
 import static org.folio.rest.utils.CalendarConstants.ID_FIELD;
@@ -54,7 +53,7 @@ public class OpeningsServiceImpl implements OpeningsService {
 
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingId + "'");
 
     Future<Results<Openings>> future = Future.future();
@@ -71,7 +70,7 @@ public class OpeningsServiceImpl implements OpeningsService {
     if (servicePointId != null) {
       Criteria criteria = new Criteria()
         .addField(SERVICE_POINT_ID)
-        .setOperation(OP_EQUAL)
+        .setOperation("=")
         .setValue("'" + servicePointId + "'");
 
       criterion = criterion.addCriterion(criteria);
@@ -98,7 +97,7 @@ public class OpeningsServiceImpl implements OpeningsService {
 
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingsId + "'");
 
     Future<UpdateResult> future = Future.future();
@@ -124,34 +123,34 @@ public class OpeningsServiceImpl implements OpeningsService {
   private Criterion assembleCriterionForCheckingOverlap(Openings openings) {
     Criteria critOpeningId = new Criteria()
       .addField(ID_FIELD)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openings.getId() + "'");
 
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openings.getServicePointId() + "'");
 
     Criteria critExceptional = new Criteria()
       .addField(EXCEPTIONAL)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openings.getExceptional() + "'");
 
     Criteria critStartDate = new Criteria()
       .addField(START_DATE)
-      .setOperation(Criteria.OP_LESS_THAN_EQ)
+      .setOperation("<=")
       .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
 
     Criteria critEndDate = new Criteria()
       .addField(END_DATE)
-      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setOperation(">=")
       .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
 
 
     return new Criterion()
-      .addCriterion(critExceptional, Criteria.OP_AND)
-      .addCriterion(critServicePoint, Criteria.OP_AND)
-      .addCriterion(critStartDate, Criteria.OP_AND, critEndDate)
-      .addCriterion(critOpeningId, Criteria.OP_OR);
+      .addCriterion(critExceptional, "AND")
+      .addCriterion(critServicePoint, "AND")
+      .addCriterion(critStartDate, "AND", critEndDate)
+      .addCriterion(critOpeningId, "AND");
   }
 }
