@@ -14,6 +14,14 @@ The [raml-module-builder](https://github.com/folio-org/raml-module-builder) fram
 
 Other [modules](https://dev.folio.org/source-code/#server-side).
 
+Other FOLIO Developer documentation is at [dev.folio.org](https://dev.folio.org/)
+
+### Issue tracker
+
 See project [MODCAL](https://issues.folio.org/browse/MODCAL) at the [FOLIO issue tracker](https://dev.folio.org/guidelines/issue-tracker).
 
-Other FOLIO Developer documentation is at [dev.folio.org](https://dev.folio.org/)
+### ModuleDescriptor
+
+See the built `target/ModuleDescriptor.json` for the interfaces that this module
+requires and provides, the permissions, and the additional module metadata.
+
