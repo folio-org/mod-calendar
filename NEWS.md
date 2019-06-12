@@ -1,3 +1,8 @@
+## 1.5.0
+* Initial module metadata (FOLIO-2003)
+* Fix security vulnerabilities
+* Add links to README additional info (FOLIO-473)
+
 ## 1.4.0
 * Investigate mod-calendar module freeze (MODCAL-40)
 * Error setting exceptional closing hours for single day (MODCAL-38)
