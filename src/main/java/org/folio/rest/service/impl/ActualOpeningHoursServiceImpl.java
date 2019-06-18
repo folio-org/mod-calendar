@@ -1,6 +1,5 @@
 package org.folio.rest.service.impl;
 
-import static org.folio.rest.persist.Criteria.Criteria.OP_EQUAL;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_DAY;
 import static org.folio.rest.utils.CalendarConstants.ACTUAL_OPENING_HOURS;
 import static org.folio.rest.utils.CalendarConstants.OPENINGS;
@@ -140,7 +139,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
 
     Criteria criteria = new Criteria()
       .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingsId + "'");
 
     Future<UpdateResult> future = Future.future();
@@ -152,27 +151,27 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
     Criteria critOpeningId = new Criteria()
       .addField(OPENING_ID)
-      .setOperation(OP_EQUAL)
+      .setOperation("=")
       .setValue("'" + openingId + "'");
 
     Criteria critStartDate = new Criteria()
       .addField(ACTUAL_DAY)
-      .setOperation(Criteria.OP_GREATER_THAN_EQ)
+      .setOperation(">=")
       .setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
 
     Criteria critEndDate = new Criteria()
       .addField(ACTUAL_DAY)
-      .setOperation(Criteria.OP_LESS_THAN_EQ)
+      .setOperation("<=")
       .setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
 
     Criterion criterionForOpeningHours = new Criterion()
-      .addCriterion(critOpeningId, Criteria.OP_AND);
+      .addCriterion(critOpeningId, "AND");
 
     if (startDate != null) {
-      criterionForOpeningHours.addCriterion(critStartDate, Criteria.OP_AND);
+      criterionForOpeningHours.addCriterion(critStartDate, "AND");
     }
     if (endDate != null) {
-      criterionForOpeningHours.addCriterion(critEndDate, Criteria.OP_AND);
+      criterionForOpeningHours.addCriterion(critEndDate, "AND");
     }
 
     return criterionForOpeningHours;

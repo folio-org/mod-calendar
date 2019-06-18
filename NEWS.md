@@ -1,3 +1,13 @@
+## 1.5.0
+* Initial module metadata (FOLIO-2003)
+* Fix security vulnerabilities
+* Add links to README additional info (FOLIO-473)
+
+## 1.4.0
+* Investigate mod-calendar module freeze (MODCAL-40)
+* Error setting exceptional closing hours for single day (MODCAL-38)
+* Mod-calendar refactoring (MODCAL-41)
+
 ## 1.3.0
 * Fix security vulnerabilities reported in jackson-databind (MODCAL-28)
 * Change calculate opening endpoint (MODCAL-33 MODCAL-34 MODCAL-29)

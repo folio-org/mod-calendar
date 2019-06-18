@@ -1,6 +1,7 @@
 {
   "id": "${artifactId}-${version}",
   "name": "Calendar module",
+  "requires": [],
   "provides": [
     {
       "id": "calendar",
@@ -120,7 +121,10 @@
       "visible": true
     }
   ],
-  "requires": [],
+  "metadata": {
+    "containerMemory": "256",
+    "databaseConnection": "true"
+  },
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",
     "dockerArgs": {
