@@ -17,25 +17,46 @@
         },
         {
           "methods": [
-            "GET",
-            "POST"
+            "GET"
           ],
           "pathPattern": "/calendar/periods/{servicePointId}/period",
           "permissionsRequired": [
-            "calendar.collection.add",
             "calendar.collection.get"
           ]
         },
         {
           "methods": [
-            "GET",
-            "DELETE",
+            "POST"
+          ],
+          "pathPattern": "/calendar/periods/{servicePointId}/period",
+          "permissionsRequired": [
+            "calendar.collection.add"
+          ]
+        },
+        {
+          "methods": [
+            "GET"
+          ],
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
+          "permissionsRequired": [
+            "calendar.collection.get"
+          ]
+        },
+        {
+          "methods": [
             "PUT"
           ],
           "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
           "permissionsRequired": [
-            "calendar.collection.get",
-            "calendar.collection.update",
+            "calendar.collection.update"
+          ]
+        },
+        {
+          "methods": [
+            "DELETE"
+          ],
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
+          "permissionsRequired": [
             "calendar.collection.remove"
           ]
         },
@@ -49,13 +70,17 @@
           ]
         }
       ]
-    },{
+    },
+    {
       "id": "_tenant",
       "version": "1.0",
       "interfaceType": "system",
       "handlers": [
         {
-          "methods" : [ "POST", "DELETE" ],
+          "methods": [
+            "POST",
+            "DELETE"
+          ],
           "pathPattern": "/_/tenant"
         }
       ]
@@ -99,8 +124,16 @@
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",
     "dockerArgs": {
-      "HostConfig": { "PortBindings": { "8081/tcp":  [{ "HostPort": "%p" }] } }
+      "HostConfig": {
+        "PortBindings": {
+          "8081/tcp": [
+            {
+              "HostPort": "%p"
+            }
+          ]
+        }
+      }
     },
-    "dockerPull" : false
+    "dockerPull": false
   }
 }
