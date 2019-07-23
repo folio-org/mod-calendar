@@ -1,3 +1,7 @@
+## 1.6.0
+* Split permissions in mod-calendar (MODCAL-45)
+* Fix security vulnerabilities in jackson databind
+
 ## 1.5.0
 * Initial module metadata (FOLIO-2003)
 * Fix security vulnerabilities
