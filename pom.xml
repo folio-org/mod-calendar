@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>mod-calendar</artifactId>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.6.2-SNAPSHOT</version>
   <name>Calendar module</name>
 
   <licenses>

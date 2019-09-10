@@ -1,3 +1,6 @@
+## 1.6.1
+* Fix security vulnerabilities in jackson databind (MODCAL-47)
+
 ## 1.6.0
 * Split permissions in mod-calendar (MODCAL-45)
 * Fix security vulnerabilities in jackson databind
