@@ -39,7 +39,21 @@
       "withMetadata": true,
       "withAuditing": true,
       "generateId": true,
-      "populateJsonWithId": true
+      "populateJsonWithId": true,
+      "index": [
+        {
+          "fieldName": "actualDay",
+          "tOps": "ADD",
+          "caseSensitive": true,
+          "removeAccents": false
+        },
+        {
+          "fieldName": "openingId",
+          "tOps": "ADD",
+          "caseSensitive": true,
+          "removeAccents": false
+        }
+      ]
     }
   ]
 }
