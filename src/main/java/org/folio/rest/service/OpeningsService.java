@@ -20,5 +20,5 @@ public interface OpeningsService {
 
   Future<Void> deleteOpeningsById(AsyncResult<SQLConnection> conn, String openingsId);
 
-  Future<Void> checkOpeningsForOverlap(AsyncResult<SQLConnection> conn, Openings openings);
+  Future<Void> checkOpeningsForOverlap(AsyncResult<SQLConnection> conn, Openings openings, boolean isUpdate);
 }

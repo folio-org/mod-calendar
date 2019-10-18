@@ -95,7 +95,7 @@ public class CalendarAPI implements Calendar {
       isNullOrEmpty(entity.getServicePointId()) ||
       isNullOrEmpty(entity.getName()) ||
       isNullOrEmpty(entity.getId())) {
-      
+
       asyncResultHandler.handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
         .respond400WithTextPlain("Not valid json object. Missing field(s)...")));
       return;
@@ -109,7 +109,7 @@ public class CalendarAPI implements Calendar {
     ActualOpeningHoursService actualOpeningHoursService = new ActualOpeningHoursServiceImpl(pgClient);
 
     pgClient.startTx(conn -> succeededFuture()
-      .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings))
+      .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings, false))
       .compose(v -> openingsService.saveOpenings(conn, openings))
       .compose(v -> regularHoursService.saveRegularHours(conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
       .compose(v -> actualOpeningHoursService.saveActualOpeningHours(conn, separateEvents(entity, openings.getExceptional())))
@@ -176,6 +176,7 @@ public class CalendarAPI implements Calendar {
     RegularHours regularHours = new RegularHours(openingId, openings.getId(), entity.getOpeningDays());
 
     pgClient.startTx(conn -> succeededFuture()
+      .compose(v -> openingsService.checkOpeningsForOverlap(conn, openings, true))
       .compose(v -> openingsService.updateOpenings(conn, openings))
       .compose(v -> regularHoursService.updateRegularHours(conn, regularHours))
       .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, entity.getId()))
@@ -507,7 +508,7 @@ public class CalendarAPI implements Calendar {
     openingDay.setOpen(actualOpeningHour.getOpen());
     openingDay.setAllDay(actualOpeningHour.getAllDay());
     openingDay.setExceptional(actualOpeningHour.getExceptional());
-    
+
     List<OpeningHour> openingHours = new ArrayList<>();
     OpeningHour openingHour = new OpeningHour();
     openingHour.setStartTime(actualOpeningHour.getStartTime());

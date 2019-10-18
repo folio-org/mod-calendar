@@ -110,21 +110,20 @@ public class OpeningsServiceImpl implements OpeningsService {
   }
 
   @Override
-  public Future<Void> checkOpeningsForOverlap(AsyncResult<SQLConnection> conn, Openings openings) {
+  public Future<Void> checkOpeningsForOverlap(AsyncResult<SQLConnection> conn,
+                                              Openings openings, boolean isUpdate) {
 
     Future<Results<Openings>> future = Future.future();
-    Criterion crit = assembleCriterionForCheckingOverlap(openings);
-    pgClient.get(conn, OPENINGS, Openings.class, crit, false, false, future.completer());
+    Criterion criterion = isUpdate
+      ? assembleCriterionToCheckOverlapExcludeOwnId(openings)
+      : assembleCriterionForCheckingOverlap(openings);
+    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, future.completer());
 
     return future.compose(get ->
       get.getResults().isEmpty() ? succeededFuture() : failedFuture("Intervals can not overlap."));
   }
 
   private Criterion assembleCriterionForCheckingOverlap(Openings openings) {
-    Criteria critOpeningId = new Criteria()
-      .addField(ID_FIELD)
-      .setOperation("=")
-      .setValue("'" + openings.getId() + "'");
 
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
@@ -139,18 +138,28 @@ public class OpeningsServiceImpl implements OpeningsService {
     Criteria critStartDate = new Criteria()
       .addField(START_DATE)
       .setOperation("<=")
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
+      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
 
     Criteria critEndDate = new Criteria()
       .addField(END_DATE)
       .setOperation(">=")
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
+      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
 
 
     return new Criterion()
       .addCriterion(critExceptional, "AND")
       .addCriterion(critServicePoint, "AND")
-      .addCriterion(critStartDate, "AND", critEndDate)
+      .addCriterion(critStartDate, "AND", critEndDate);
+  }
+
+  private Criterion assembleCriterionToCheckOverlapExcludeOwnId(Openings openings) {
+
+    Criteria critOpeningId = new Criteria()
+      .addField(ID_FIELD)
+      .setOperation("!=")
+      .setValue("'" + openings.getId() + "'");
+
+    return assembleCriterionForCheckingOverlap(openings)
       .addCriterion(critOpeningId, "AND");
   }
 }
