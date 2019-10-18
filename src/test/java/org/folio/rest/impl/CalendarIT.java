@@ -67,7 +67,7 @@ public class CalendarIT {
   private static Vertx vertx;
 
   @Rule
-  public Timeout rule = Timeout.seconds(500);
+  public Timeout rule = Timeout.seconds(60);
 
   @BeforeClass
   public static void setup(TestContext context) {
