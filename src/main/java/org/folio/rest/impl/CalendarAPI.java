@@ -251,10 +251,10 @@ public class CalendarAPI implements Calendar {
       .setHandler(period -> {
         if (period.failed()) {
           logger.error(period.cause().getMessage());
-          asyncResultHandler.handle(mapExceptionToResponseResult(period.cause()));
+          pgClient.rollbackTx(conn, done -> asyncResultHandler.handle(mapExceptionToResponseResult(period.cause())));
         } else {
-          asyncResultHandler.handle(succeededFuture(
-            GetCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond200WithApplicationJson(period.result())));
+          pgClient.endTx(conn, done -> asyncResultHandler.handle(succeededFuture(
+            GetCalendarPeriodsPeriodByServicePointIdAndPeriodIdResponse.respond200WithApplicationJson(period.result()))));
         }
       })
     );
