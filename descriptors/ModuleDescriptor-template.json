@@ -130,13 +130,9 @@
         "calendar.periods.item.put",
         "calendar.periods.item.delete"
       ],
-      "visible": true
+      "visible": false
     }
   ],
-  "metadata": {
-    "containerMemory": "256",
-    "databaseConnection": "true"
-  },
   "launchDescriptor": {
     "dockerImage": "${artifactId}:${version}",
     "dockerPull": false,
