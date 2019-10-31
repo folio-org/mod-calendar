@@ -130,7 +130,7 @@
         "calendar.periods.item.put",
         "calendar.periods.item.delete"
       ],
-      "visible": true
+      "visible": false
     }
   ],
   "launchDescriptor": {
