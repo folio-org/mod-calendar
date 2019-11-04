@@ -367,39 +367,88 @@ public class CalendarIT {
   }
 
   @Test
-  public void overlappingExceptionalPeriodTest() {
+  public void canCreateExceptionalPeriodWithoutOverlapping() {
     String servicePointUUID = UUID.randomUUID().toString();
 
     // create a new calendar
     String uuid = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.MARCH, 1, 5, servicePointUUID, uuid, true, true, false);
+    OpeningPeriod opening = generateDescription(2020, Calendar.MARCH, 1, 5,
+      servicePointUUID, uuid, true, true, false);
     postPeriod(servicePointUUID, opening);
 
-    // create a new exceptional period
-    String uuidExPeriod = UUID.randomUUID().toString();
-    OpeningPeriod exceptionalPeriod = generateDescription(2017, Calendar.MARCH, 1, 1, servicePointUUID, uuidExPeriod, true, false, true);
-    postPeriod(servicePointUUID, exceptionalPeriod);
-
-    // save the same exceptional period
-    postWithHeaderAndBody(exceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
-      .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+    createExceptionalExistingPeriod(servicePointUUID);
 
     // save a new exceptional period
     String newIdExPeriod = UUID.randomUUID().toString();
-    OpeningPeriod newExceptionalPeriod = generateDescription(2017, Calendar.MARCH, 2, 1, servicePointUUID, newIdExPeriod, true, true, true);
+    OpeningPeriod newExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 6, 1,
+      servicePointUUID, newIdExPeriod, true, true, true);
     postWithHeaderAndBody(newExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .statusCode(201);
   }
 
   @Test
+  public void cannotCreateExceptionalPeriodWithOverlappingAtTheBeginning() {
+    String servicePointUUID = UUID.randomUUID().toString();
+    createExceptionalExistingPeriod(servicePointUUID);
+
+    OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 3, 3,
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+    postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
+  }
+
+  @Test
+  public void cannotCreateExceptionalPeriodWithOverlappingAtTheEnd() {
+    String servicePointUUID = UUID.randomUUID().toString();
+    createExceptionalExistingPeriod(servicePointUUID);
+
+    OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 3,
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+    postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
+  }
+
+  @Test
+  public void cannotCreateExceptionalPeriodInsideOverlapping() {
+    String servicePointUUID = UUID.randomUUID().toString();
+    createExceptionalExistingPeriod(servicePointUUID);
+
+    OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 2, 2,
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+    postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
+  }
+
+  @Test
+  public void cannotCreateExceptionalPeriodWithTotalOverlapping() {
+    String servicePointUUID = UUID.randomUUID().toString();
+    createExceptionalExistingPeriod(servicePointUUID);
+
+    OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 10,
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+    postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.TEXT)
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
+  }
+
+  @Test
   public void putPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7,
+      servicePointUUID, uuid, true, false, true);
 
     postPeriod(servicePointUUID, opening);
 
@@ -424,6 +473,36 @@ public class CalendarIT {
       .body("id", equalTo(uuid))
       .body("name", equalTo("PUT_TEST"))
       .statusCode(200);
+  }
+
+  @Test
+  public void cannotUpdateOverlappingExceptionalPeriod() {
+
+    String servicePointUUID = UUID.randomUUID().toString();
+    OpeningPeriod existingOpening = generateDescription(2020, Calendar.JANUARY, 1, 7,
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+    postPeriod(servicePointUUID, existingOpening);
+
+    String uuid = UUID.randomUUID().toString();
+    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 10, 7,
+      servicePointUUID, uuid, true, false, true);
+    postPeriod(servicePointUUID, opening);
+
+    OpeningPeriod invalidUpdatedOpening = generateDescription(2020, Calendar.JANUARY, 4, 7,
+      servicePointUUID, uuid, true, false, true);
+
+    getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .contentType(ContentType.JSON)
+      .body(matchesJsonSchemaInClasspath("ramls/schemas/Opening.json"))
+      .body("id", equalTo(uuid))
+      .body("name", equalTo("test"))
+      .statusCode(200);
+
+    putWithHeaderAndBody(invalidUpdatedOpening.withName("PUT_TEST"), "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
+      .then()
+      .assertThat().body(equalTo("Intervals can not overlap."))
+      .statusCode(500);
   }
 
   private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
@@ -511,5 +590,12 @@ public class CalendarIT {
       .header(TOKEN_HEADER)
       .header(OKAPI_URL_HEADER)
       .header(JSON_CONTENT_TYPE_HEADER);
+  }
+
+  private void createExceptionalExistingPeriod(String servicePointUUID) {
+    String uuidExPeriod = UUID.randomUUID().toString();
+    OpeningPeriod exceptionalPeriod = generateDescription(2020, Calendar.MARCH, 1,
+      3, servicePointUUID, uuidExPeriod, true, false, true);
+    postPeriod(servicePointUUID, exceptionalPeriod);
   }
 }
