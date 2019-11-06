@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
@@ -54,10 +55,10 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
 
       PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS, servicePointId, df.format(requestedDate));
 
-    Future<ResultSet> future = Future.future();
-    pgClient.select(query, future.completer());
+    Promise<ResultSet> promise = Promise.promise();
+    pgClient.select(query, promise);
 
-    return future.map(rs -> rs.getResults()
+    return promise.future().map(rs -> rs.getResults()
       .stream()
       .map(objects -> new JsonObject(objects.getString(0)).mapTo(ActualOpeningHours.class))
       .collect(Collectors.toList()));
@@ -88,7 +89,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
         "AND aoh1.jsonb->>'actualDay' %7$s '%5$s' " +
         "AND aoh1.jsonb->>'open' = 'true' " +
         "AND (" +
-          "SELECT count(_id) FROM %1$s.%3$s aoh2 " +
+          "SELECT count(id) FROM %1$s.%3$s aoh2 " +
           "WHERE aoh2.jsonb->>'openingId' IN (SELECT opening_id FROM openings_ids) " +
           "AND aoh2.jsonb->>'actualDay' = aoh1.jsonb->>'actualDay' " +
           "AND aoh2.jsonb->>'exceptional' = 'true' " +
@@ -103,10 +104,10 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       PostgresClient.convertToPsqlStandard(tenantId), OPENINGS, ACTUAL_OPENING_HOURS, servicePointId,
       df.format(requestedDate), searchDirection.getOrder(), searchDirection.getOperator());
 
-    Future<ResultSet> future = Future.future();
-    pgClient.select(query, future.completer());
+    Promise<ResultSet> promise = Promise.promise();
+    pgClient.select(query, promise);
 
-    return future.map(rs -> rs.getResults()
+    return promise.future().map(rs -> rs.getResults()
       .stream()
       .map(objects -> new JsonObject(objects.getString(0)).mapTo(ActualOpeningHours.class))
       .collect(Collectors.toList()));
@@ -118,20 +119,20 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
                                                                                     String startDate,
                                                                                     String endDate) {
 
-    Future<Results<ActualOpeningHours>> future = Future.future();
+    Promise<Results<ActualOpeningHours>> promise = Promise.promise();
     Criterion criterion = assembleCriterionByRange(openingId, startDate, endDate);
-    pgClient.get(conn, ACTUAL_OPENING_HOURS, ActualOpeningHours.class, criterion, false, false, future.completer());
+    pgClient.get(conn, ACTUAL_OPENING_HOURS, ActualOpeningHours.class, criterion, false, false, promise);
 
-    return future.map(Results::getResults);
+    return promise.future().map(Results::getResults);
   }
 
   @Override
   public Future<Void> saveActualOpeningHours(AsyncResult<SQLConnection> conn, List<Object> actualOpeningHours) {
 
-    Future<ResultSet> future = Future.future();
-    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, future.completer());
+    Promise<ResultSet> promise = Promise.promise();
+    pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, promise);
 
-    return future.map(rs -> null);
+    return promise.future().map(rs -> null);
   }
 
   @Override
@@ -140,29 +141,29 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
     Criteria criteria = new Criteria()
       .addField(OPENING_ID)
       .setOperation("=")
-      .setValue("'" + openingsId + "'");
+      .setVal(openingsId);
 
-    Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), future.completer());
+    Promise<UpdateResult> promise = Promise.promise();
+    pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), promise);
 
-    return future.map(ur -> null);
+    return promise.future().map(ur -> null);
   }
 
   private Criterion assembleCriterionByRange(String openingId, String startDate, String endDate) {
     Criteria critOpeningId = new Criteria()
       .addField(OPENING_ID)
       .setOperation("=")
-      .setValue("'" + openingId + "'");
+      .setVal(openingId);
 
     Criteria critStartDate = new Criteria()
       .addField(ACTUAL_DAY)
       .setOperation(">=")
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
+      .setVal(DATE_FORMATTER_SHORT.print(new DateTime(startDate)));
 
     Criteria critEndDate = new Criteria()
       .addField(ACTUAL_DAY)
       .setOperation("<=")
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
+      .setVal(DATE_FORMATTER_SHORT.print(new DateTime(endDate)));
 
     Criterion criterionForOpeningHours = new Criterion()
       .addCriterion(critOpeningId, "AND");

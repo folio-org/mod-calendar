@@ -8,6 +8,7 @@ import java.util.List;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
@@ -29,21 +30,21 @@ public class RegularHoursServiceImpl implements RegularHoursService {
   @Override
   public Future<Void> saveRegularHours(AsyncResult<SQLConnection> conn, RegularHours entity) {
 
-    Future<String> future = Future.future();
-    pgClient.save(conn, REGULAR_HOURS, entity, future.completer());
+    Promise<String> promise = Promise.promise();
+    pgClient.save(conn, REGULAR_HOURS, entity, promise);
 
-    return future.map(s -> null);
+    return promise.future().map(s -> null);
   }
 
   @Override
   public Future<Void> updateRegularHours(AsyncResult<SQLConnection> conn, RegularHours regularHours) {
 
 
-    Future<UpdateResult> future = Future.future();
+    Promise<UpdateResult> promise = Promise.promise();
     String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
-    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, future.completer());
+    pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, promise);
 
-    return future.map(ur -> null);
+    return promise.future().map(ur -> null);
   }
 
   @Override
@@ -52,12 +53,12 @@ public class RegularHoursServiceImpl implements RegularHoursService {
     Criteria criteria = new Criteria()
       .addField(OPENING_ID)
       .setOperation("=")
-      .setValue("'" + openingId + "'");
+      .setVal(openingId);
 
-    Future<Results<RegularHours>> future = Future.future();
-    pgClient.get(conn, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), false, false, future.completer());
+    Promise<Results<RegularHours>> promise = Promise.promise();
+    pgClient.get(conn, REGULAR_HOURS, RegularHours.class, new Criterion(criteria), false, false, promise);
 
-    return future.map(Results::getResults);
+    return promise.future().map(Results::getResults);
   }
 
   @Override
@@ -66,11 +67,11 @@ public class RegularHoursServiceImpl implements RegularHoursService {
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
       .setOperation("=")
-      .setValue("'" + openingsId + "'");
+      .setVal(openingsId);
 
-    Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, REGULAR_HOURS, new Criterion(criteria), future.completer());
+    Promise<UpdateResult> promise = Promise.promise();
+    pgClient.delete(conn, REGULAR_HOURS, new Criterion(criteria), promise);
 
-    return future.map(ur -> null);
+    return promise.future().map(ur -> null);
   }
 }

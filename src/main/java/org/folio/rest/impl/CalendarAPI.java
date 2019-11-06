@@ -3,7 +3,6 @@ package org.folio.rest.impl;
 import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
 import static java.lang.String.format;
-import static joptsimple.internal.Strings.isNullOrEmpty;
 
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201;
@@ -35,15 +34,12 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
+import io.vertx.core.*;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.sql.SQLConnection;
 
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import org.folio.rest.annotations.Validate;
@@ -92,9 +88,9 @@ public class CalendarAPI implements Calendar {
                                                         Context vertxContext) {
 
     if (entity.getOpeningDays().isEmpty() ||
-      isNullOrEmpty(entity.getServicePointId()) ||
-      isNullOrEmpty(entity.getName()) ||
-      isNullOrEmpty(entity.getId())) {
+      StringUtils.isEmpty(entity.getServicePointId()) ||
+      StringUtils.isEmpty(entity.getName()) ||
+      StringUtils.isEmpty(entity.getId())) {
 
       asyncResultHandler.handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
         .respond400WithTextPlain("Not valid json object. Missing field(s)...")));
@@ -383,7 +379,7 @@ public class CalendarAPI implements Calendar {
                                                                      OpeningCollection openingCollection,
                                                                      CalendarOpeningsRequestParameters params) {
 
-    Future<OpeningHoursCollection> future = Future.future();
+    Promise<OpeningHoursCollection> promise = Promise.promise();
     OpeningHoursCollection openingHoursCollection = new OpeningHoursCollection();
 
     getOpeningDaysByDate(service, conn, openingHoursCollection, openingCollection, params)
@@ -400,11 +396,11 @@ public class CalendarAPI implements Calendar {
         openingHoursCollection.setTotalRecords(openingHoursCollection.getOpeningPeriods().size());
         openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().skip(params.getOffset()).limit(params.getLimit()).collect(Collectors.toList()));
 
-        future.complete(openingHoursCollection);
+        promise.complete(openingHoursCollection);
       }
     });
 
-    return future;
+    return promise.future();
   }
 
   private void overrideOpeningPeriodsByExceptionalPeriods(OpeningHoursCollection openingHoursCollection) {
@@ -426,17 +422,17 @@ public class CalendarAPI implements Calendar {
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
       .setOperation("=")
-      .setValue("'" + servicePointId + "'");
+      .setVal(servicePointId);
 
     Criteria critExceptional = new Criteria()
       .addField(EXCEPTIONAL)
       .setOperation("=")
-      .setValue("'" + exceptional + "'");
+      .setVal(String.valueOf(exceptional));
 
     Criteria critShowPast = new Criteria()
       .addField(END_DATE)
       .setOperation(">=")
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime()));
+      .setVal(DATE_FORMATTER_SHORT.print(new DateTime()));
 
     Criterion criterionForOpeningHours = new Criterion();
 

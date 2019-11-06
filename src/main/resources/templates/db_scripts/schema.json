@@ -3,43 +3,28 @@
   "tables": [
     {
       "tableName": "openings",
-      "pkColumnName": "_id",
       "withMetadata": true,
-      "withAuditing": true,
-      "generateId": true,
-      "populateJsonWithId": false
+      "withAuditing": true
     },
     {
       "tableName": "regular_hours",
-      "pkColumnName": "_id",
       "withMetadata": true,
-      "withAuditing": true,
-      "generateId": true,
-      "populateJsonWithId": true
+      "withAuditing": true
     },
     {
       "tableName": "exceptions",
-      "pkColumnName": "_id",
       "withMetadata": true,
-      "withAuditing": true,
-      "generateId": true,
-      "populateJsonWithId": false
+      "withAuditing": true
     },
     {
       "tableName": "exceptional_hours",
-      "pkColumnName": "_id",
       "withMetadata": true,
-      "withAuditing": true,
-      "generateId": true,
-      "populateJsonWithId": true
+      "withAuditing": true
     },
     {
       "tableName": "actual_opening_hours",
-      "pkColumnName": "_id",
       "withMetadata": true,
       "withAuditing": true,
-      "generateId": true,
-      "populateJsonWithId": true,
       "index": [
         {
           "fieldName": "actualDay",
