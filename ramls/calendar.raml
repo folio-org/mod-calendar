@@ -127,6 +127,8 @@ resourceTypes:
                   type: OpeningPeriod
             400:
               description: "Bad request"
+            422:
+              description: "Unprocessable Entity"
             500:
               description: "Internal server error"
 
@@ -168,6 +170,8 @@ resourceTypes:
                 description: "Library period successfully updated"
               404:
                 description: "Library period id or service point with the given ID is not found"
+              422:
+                description: "Unprocessable Entity"
               400:
                 description: "Bad request, e.g. malformed request body or query parameter. Details of the error (e.g. name of the parameter or line/character number with malformed data) provided in the response."
               500:

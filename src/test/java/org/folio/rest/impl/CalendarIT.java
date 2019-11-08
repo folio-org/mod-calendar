@@ -363,7 +363,7 @@ public class CalendarIT {
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   @Test
@@ -398,7 +398,7 @@ public class CalendarIT {
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   @Test
@@ -412,7 +412,7 @@ public class CalendarIT {
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   @Test
@@ -426,7 +426,7 @@ public class CalendarIT {
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   @Test
@@ -440,7 +440,7 @@ public class CalendarIT {
       .then()
       .contentType(ContentType.TEXT)
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   @Test
@@ -502,7 +502,7 @@ public class CalendarIT {
     putWithHeaderAndBody(invalidUpdatedOpening.withName("PUT_TEST"), "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
       .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .statusCode(422);
   }
 
   private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {

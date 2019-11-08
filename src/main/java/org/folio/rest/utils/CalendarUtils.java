@@ -1,6 +1,8 @@
 package org.folio.rest.utils;
 
 import static io.vertx.core.Future.succeededFuture;
+import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
@@ -23,6 +25,7 @@ import javax.ws.rs.core.Response;
 import io.vertx.core.AsyncResult;
 
 import org.apache.commons.lang.BooleanUtils;
+import org.folio.rest.exceptions.OverlapIntervalException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -306,10 +309,23 @@ public class CalendarUtils {
   }
 
   public static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
+    Response errResponse;
     if (e.getClass() == NotFoundException.class) {
-      return succeededFuture(Response.status(404).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+      errResponse = buildErrorResponse(404, e.getMessage());
+    } else if (e.getClass() == OverlapIntervalException.class) {
+      errResponse = buildErrorResponse(422, e.getMessage());
     } else {
-      return succeededFuture(Response.status(500).header("Content-Type", "text/plain").entity(e.getMessage()).build());
+      errResponse = buildErrorResponse(500, e.getMessage());
     }
+
+    return succeededFuture(errResponse);
+  }
+
+  private static Response buildErrorResponse(int status, String errMessage) {
+    return Response
+      .status(status)
+      .header(CONTENT_TYPE, TEXT_PLAIN)
+      .entity(errMessage)
+      .build();
   }
 }
