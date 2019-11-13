@@ -9,6 +9,7 @@ import java.time.DayOfWeek;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
@@ -26,6 +27,8 @@ import io.vertx.core.AsyncResult;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.folio.rest.exceptions.OverlapIntervalException;
+import org.folio.rest.jaxrs.model.Error;
+import org.folio.rest.jaxrs.model.Errors;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -47,6 +50,8 @@ public class CalendarUtils {
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
   private static final String DAY_PATTERN = "EEEE";
+
+  private static final String ERROR_CODE_INTERVALS_OVERLAP = "intervalsOverlap";
 
   private CalendarUtils() {
   }
@@ -325,7 +330,15 @@ public class CalendarUtils {
     return Response
       .status(status)
       .header(CONTENT_TYPE, TEXT_PLAIN)
-      .entity(errMessage)
+      .entity(createErrorMsg(errMessage))
       .build();
+  }
+
+  private static Errors createErrorMsg(String errMessage) {
+    Error error = new Error()
+      .withMessage(errMessage)
+      .withCode(ERROR_CODE_INTERVALS_OVERLAP);
+    return new Errors()
+      .withErrors(Collections.singletonList(error));
   }
 }
