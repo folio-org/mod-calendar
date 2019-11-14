@@ -366,7 +366,7 @@ public class CalendarIT {
 
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
+      .contentType(ContentType.JSON)
       .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
       .statusCode(422);
   }
@@ -401,7 +401,7 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
+      .contentType(ContentType.JSON)
       .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
       .statusCode(422);
   }
@@ -415,7 +415,7 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
+      .contentType(ContentType.JSON)
       .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
       .statusCode(422);
   }
@@ -429,7 +429,7 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
+      .contentType(ContentType.JSON)
       .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
       .statusCode(422);
   }
@@ -443,7 +443,7 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
+      .contentType(ContentType.JSON)
       .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
       .statusCode(422);
   }

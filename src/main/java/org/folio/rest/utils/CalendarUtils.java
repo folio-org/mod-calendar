@@ -2,6 +2,7 @@ package org.folio.rest.utils;
 
 import static io.vertx.core.Future.succeededFuture;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
 import java.text.SimpleDateFormat;
@@ -316,20 +317,20 @@ public class CalendarUtils {
   public static AsyncResult<Response> mapExceptionToResponseResult(Throwable e) {
     Response errResponse;
     if (e.getClass() == NotFoundException.class) {
-      errResponse = buildErrorResponse(404, e.getMessage());
+      errResponse = buildErrorResponse(404, TEXT_PLAIN, e.getMessage());
     } else if (e.getClass() == OverlapIntervalException.class) {
-      errResponse = buildErrorResponse(422, e.getMessage());
+      errResponse = buildErrorResponse(422, APPLICATION_JSON, e.getMessage());
     } else {
-      errResponse = buildErrorResponse(500, e.getMessage());
+      errResponse = buildErrorResponse(500, TEXT_PLAIN, e.getMessage());
     }
 
     return succeededFuture(errResponse);
   }
 
-  private static Response buildErrorResponse(int status, String errMessage) {
+  private static Response buildErrorResponse(int status, String contentType, String errMessage) {
     return Response
       .status(status)
-      .header(CONTENT_TYPE, TEXT_PLAIN)
+      .header(CONTENT_TYPE, contentType)
       .entity(createErrorMsg(errMessage))
       .build();
   }
