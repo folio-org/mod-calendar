@@ -21,6 +21,7 @@ import io.vertx.core.Future;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
+import org.folio.rest.exceptions.OverlapIntervalException;
 import org.joda.time.DateTime;
 
 import org.folio.rest.beans.Openings;
@@ -119,8 +120,9 @@ public class OpeningsServiceImpl implements OpeningsService {
       : assembleCriterionForCheckingOverlap(openings);
     pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, future.completer());
 
-    return future.compose(get ->
-      get.getResults().isEmpty() ? succeededFuture() : failedFuture("Intervals can not overlap."));
+    return future.compose(get -> get.getResults().isEmpty()
+      ? succeededFuture()
+      : Future.failedFuture(new OverlapIntervalException("Intervals can not overlap.")));
   }
 
   private Criterion assembleCriterionForCheckingOverlap(Openings openings) {

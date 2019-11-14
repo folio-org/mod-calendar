@@ -1,12 +1,12 @@
 package org.folio.rest.impl;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchema;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.core.StringContains.containsString;
-
-import static org.folio.rest.utils.CalendarConstants.SERVICE_POINT_ID;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,9 +16,29 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+
+import org.folio.rest.RestVerticle;
+import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.Error;
+import org.folio.rest.jaxrs.model.Errors;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.Weekdays;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.client.test.HttpClientMock2;
+import org.folio.rest.tools.utils.NetworkUtils;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.Timeout;
+import org.junit.runner.RunWith;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -34,24 +54,6 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.Timeout;
-import org.junit.runner.RunWith;
-
-import org.folio.rest.RestVerticle;
-import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
-import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.client.test.HttpClientMock2;
-import org.folio.rest.tools.utils.NetworkUtils;
-
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT {
   private static final Header TENANT_HEADER = new Header("X-Okapi-Tenant", "test");
@@ -62,6 +64,9 @@ public class CalendarIT {
   private static final String HOST = "localhost";
   private static final Header JSON_CONTENT_TYPE_HEADER = new Header("Content-Type", "application/json");
   private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
+
+  private static final String ERROR_CODE_INTERVALS_OVERLAP = "intervalsOverlap";
+  private static final String ERROR_MESSAGE_INTERVALS_OVERLAP = "Intervals can not overlap.";
 
   private static int port;
   private static Vertx vertx;
@@ -361,9 +366,9 @@ public class CalendarIT {
 
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   @Test
@@ -396,9 +401,9 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   @Test
@@ -410,9 +415,9 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   @Test
@@ -424,9 +429,9 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   @Test
@@ -438,9 +443,9 @@ public class CalendarIT {
       servicePointUUID, UUID.randomUUID().toString(), true, false, true);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
-      .contentType(ContentType.TEXT)
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   @Test
@@ -501,8 +506,8 @@ public class CalendarIT {
 
     putWithHeaderAndBody(invalidUpdatedOpening.withName("PUT_TEST"), "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
-      .assertThat().body(equalTo("Intervals can not overlap."))
-      .statusCode(500);
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema()))
+      .statusCode(422);
   }
 
   private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
@@ -597,5 +602,15 @@ public class CalendarIT {
     OpeningPeriod exceptionalPeriod = generateDescription(2020, Calendar.MARCH, 1,
       3, servicePointUUID, uuidExPeriod, true, false, true);
     postPeriod(servicePointUUID, exceptionalPeriod);
+  }
+
+  private String errIntervalsOverlapSchema() {
+    Error error = new Error()
+      .withMessage(ERROR_MESSAGE_INTERVALS_OVERLAP)
+      .withCode(ERROR_CODE_INTERVALS_OVERLAP);
+
+    return JsonObject
+      .mapFrom(new Errors().withErrors(Collections.singletonList(error)))
+      .toString();
   }
 }
