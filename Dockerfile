@@ -1,4 +1,4 @@
-FROM folioci/openjdk8-jre:latest
+FROM folioci/alpine-jre-openjdk8:latest
 
 ENV TRUST_ALL_CERTIFICATES false
 
