@@ -1,3 +1,11 @@
+## 1.7.0
+* FOLIO-2358 manage container memory (MODCAL-60)
+* Update error code for overlapping exceptional periods (MODCAL-57)
+* Remove UI permission | Calendar: All permissions (MODCAL-56)
+* TestTimedOutException: test timed out after 500 seconds (MODCAL-53)
+* Indexes to improve /calendar/periods/{servicePointId}/calculateopening performance (MODCAL-50)
+* As a user i can create mutually exclusive exception periods fixed (MODCAL-49)
+
 ## 1.6.1
 * Fix security vulnerabilities in jackson databind (MODCAL-47)
 
