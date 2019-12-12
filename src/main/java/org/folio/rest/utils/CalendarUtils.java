@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -131,7 +132,7 @@ public class CalendarUtils {
     if (openingDay != null) {
       if (allDay) {
         ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
-        actualOpeningHour.setId(generatedId);
+        actualOpeningHour.setId(UUID.randomUUID().toString());
         actualOpeningHour.setOpeningId(generatedId);
         actualOpeningHour.setActualDay(currentStartDate.getTime());
         actualOpeningHour.setStartTime("00:00");
@@ -143,7 +144,7 @@ public class CalendarUtils {
       } else {
         for (OpeningHour openingHour : openingDay.getOpeningHour()) {
           ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
-          actualOpeningHour.setId(generatedId);
+          actualOpeningHour.setId(UUID.randomUUID().toString());
           actualOpeningHour.setOpeningId(generatedId);
           actualOpeningHour.setActualDay(currentStartDate.getTime());
           actualOpeningHour.setStartTime(openingHour.getStartTime());
@@ -201,7 +202,7 @@ public class CalendarUtils {
         openingDay.setOpen(false);
         openingDay.setAllDay(true);
         openingDay.setExceptional(false);
-        
+
         List<OpeningHour> openingHours = new ArrayList<>();
         OpeningHour openingHour = new OpeningHour();
         openingHour.setStartTime("00:00");

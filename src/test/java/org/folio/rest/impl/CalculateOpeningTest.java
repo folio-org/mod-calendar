@@ -17,8 +17,10 @@ import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -160,12 +162,14 @@ public class CalculateOpeningTest {
 
     vertx.deployVerticle(RestVerticle.class, options, deploy -> {
       try {
-        tenantClient.postTenant(null, post -> {
+        TenantAttributes t = new TenantAttributes()
+          .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
+        tenantClient.postTenant(t, post -> {
           populateOpeningPeriods();
           future.complete(null);
         });
       } catch (Exception e) {
-        e.printStackTrace();
+        logger.error(e.getMessage());
       }
     });
 
