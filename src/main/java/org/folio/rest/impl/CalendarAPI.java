@@ -426,17 +426,17 @@ public class CalendarAPI implements Calendar {
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
       .setOperation("=")
-      .setValue("'" + servicePointId + "'");
+      .setVal(servicePointId);
 
     Criteria critExceptional = new Criteria()
       .addField(EXCEPTIONAL)
       .setOperation("=")
-      .setValue("'" + exceptional + "'");
+      .setVal(String.valueOf(exceptional));
 
     Criteria critShowPast = new Criteria()
       .addField(END_DATE)
       .setOperation(">=")
-      .setValue(DATE_FORMATTER_SHORT.print(new DateTime()));
+      .setVal(DATE_FORMATTER_SHORT.print(new DateTime()));
 
     Criterion criterionForOpeningHours = new Criterion();
 

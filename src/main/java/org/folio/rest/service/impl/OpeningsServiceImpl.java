@@ -18,6 +18,7 @@ import javax.ws.rs.NotFoundException;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.sql.UpdateResult;
 
@@ -43,10 +44,10 @@ public class OpeningsServiceImpl implements OpeningsService {
   @Override
   public Future<Void> saveOpenings(AsyncResult<SQLConnection> conn, Openings openings) {
 
-    Future<String> future = Future.future();
-    pgClient.save(conn, OPENINGS, openings, future.completer());
+    Promise<String> promise = Promise.promise();
+    pgClient.save(conn, OPENINGS, openings.getId(), openings, promise);
 
-    return future.map(s -> null);
+    return promise.future().map(s -> null);
   }
 
   @Override
@@ -55,7 +56,7 @@ public class OpeningsServiceImpl implements OpeningsService {
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
       .setOperation("=")
-      .setValue("'" + openingId + "'");
+      .setVal(openingId);
 
     Future<Results<Openings>> future = Future.future();
 
@@ -72,25 +73,25 @@ public class OpeningsServiceImpl implements OpeningsService {
       Criteria criteria = new Criteria()
         .addField(SERVICE_POINT_ID)
         .setOperation("=")
-        .setValue("'" + servicePointId + "'");
+        .setVal(servicePointId);
 
       criterion = criterion.addCriterion(criteria);
     }
 
-    Future<Results<Openings>> future = Future.future();
-    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, future.completer());
+    Promise<Results<Openings>> promise = Promise.promise();;
+    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, promise);
 
-    return future.map(Results::getResults);
+    return promise.future().map(Results::getResults);
   }
 
   @Override
   public Future<Void> updateOpenings(AsyncResult<SQLConnection> conn, Openings openings) {
 
-    Future<UpdateResult> future = Future.future();
+    Promise<UpdateResult> promise = Promise.promise();;
     String where = String.format("WHERE jsonb->>'id' = '%s'", openings.getId());
-    pgClient.update(conn, OPENINGS, openings, "jsonb", where, false, future.completer());
+    pgClient.update(conn, OPENINGS, openings, "jsonb", where, false, promise);
 
-    return future.map(ur -> null);
+    return promise.future().map(ur -> null);
   }
 
   @Override
@@ -99,12 +100,12 @@ public class OpeningsServiceImpl implements OpeningsService {
     Criteria criteria = new Criteria()
       .addField(ID_FIELD)
       .setOperation("=")
-      .setValue("'" + openingsId + "'");
+      .setVal(openingsId);
 
-    Future<UpdateResult> future = Future.future();
-    pgClient.delete(conn, OPENINGS, new Criterion(criteria), future.completer());
+    Promise<UpdateResult> promise = Promise.promise();
+    pgClient.delete(conn, OPENINGS, new Criterion(criteria), promise);
 
-    return future.map(UpdateResult::getUpdated)
+    return promise.future().map(UpdateResult::getUpdated)
       .compose(updated -> updated == 0 ?
         failedFuture(new NotFoundException(format("Openings with id '%s' is not found", openingsId))) :
         succeededFuture());
@@ -114,13 +115,13 @@ public class OpeningsServiceImpl implements OpeningsService {
   public Future<Void> checkOpeningsForOverlap(AsyncResult<SQLConnection> conn,
                                               Openings openings, boolean isUpdate) {
 
-    Future<Results<Openings>> future = Future.future();
+    Promise<Results<Openings>> promise = Promise.promise();
     Criterion criterion = isUpdate
       ? assembleCriterionToCheckOverlapExcludeOwnId(openings)
       : assembleCriterionForCheckingOverlap(openings);
-    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, future.completer());
+    pgClient.get(conn, OPENINGS, Openings.class, criterion, false, false, promise);
 
-    return future.compose(get -> get.getResults().isEmpty()
+    return promise.future().compose(get -> get.getResults().isEmpty()
       ? succeededFuture()
       : Future.failedFuture(new OverlapIntervalException("Intervals can not overlap.")));
   }
@@ -130,22 +131,22 @@ public class OpeningsServiceImpl implements OpeningsService {
     Criteria critServicePoint = new Criteria()
       .addField(SERVICE_POINT_ID)
       .setOperation("=")
-      .setValue("'" + openings.getServicePointId() + "'");
+      .setVal(openings.getServicePointId());
 
     Criteria critExceptional = new Criteria()
       .addField(EXCEPTIONAL)
       .setOperation("=")
-      .setValue("'" + openings.getExceptional() + "'");
+      .setVal(String.valueOf(openings.getExceptional()));
 
     Criteria critStartDate = new Criteria()
       .addField(START_DATE)
       .setOperation("<=")
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
+      .setVal(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getEndDate()))));
 
     Criteria critEndDate = new Criteria()
       .addField(END_DATE)
       .setOperation(">=")
-      .setValue(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
+      .setVal(DATE_FORMATTER.print(new DateTime(CalendarUtils.getDateWithoutHoursAndMinutes(openings.getStartDate()))));
 
 
     return new Criterion()
@@ -159,7 +160,7 @@ public class OpeningsServiceImpl implements OpeningsService {
     Criteria critOpeningId = new Criteria()
       .addField(ID_FIELD)
       .setOperation("!=")
-      .setValue("'" + openings.getId() + "'");
+      .setVal(openings.getId());
 
     return assembleCriterionForCheckingOverlap(openings)
       .addCriterion(critOpeningId, "AND");

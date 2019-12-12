@@ -29,8 +29,10 @@ import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.junit.AfterClass;
@@ -89,7 +91,9 @@ public class CalendarIT {
     Async async = context.async();
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
-        tenantClient.postTenant(null, res2 -> async.complete());
+        TenantAttributes t = new TenantAttributes()
+          .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
+        tenantClient.postTenant(t, res2 -> async.complete());
       } catch (Exception e) {
         context.fail(e);
       }
