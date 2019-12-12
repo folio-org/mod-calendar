@@ -130,10 +130,9 @@ public class CalendarUtils {
     List<ActualOpeningHours> actualOpeningHours = new ArrayList<>();
 
     if (openingDay != null) {
-      final String id = UUID.randomUUID().toString();
       if (allDay) {
         ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
-        actualOpeningHour.setId(id);
+        actualOpeningHour.setId(UUID.randomUUID().toString());
         actualOpeningHour.setOpeningId(generatedId);
         actualOpeningHour.setActualDay(currentStartDate.getTime());
         actualOpeningHour.setStartTime("00:00");
@@ -145,7 +144,7 @@ public class CalendarUtils {
       } else {
         for (OpeningHour openingHour : openingDay.getOpeningHour()) {
           ActualOpeningHours actualOpeningHour = new ActualOpeningHours();
-          actualOpeningHour.setId(id);
+          actualOpeningHour.setId(UUID.randomUUID().toString());
           actualOpeningHour.setOpeningId(generatedId);
           actualOpeningHour.setActualDay(currentStartDate.getTime());
           actualOpeningHour.setStartTime(openingHour.getStartTime());
