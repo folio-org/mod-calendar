@@ -123,7 +123,7 @@ public class OpeningsServiceImpl implements OpeningsService {
 
     return promise.future().compose(get -> get.getResults().isEmpty()
       ? succeededFuture()
-      : Future.failedFuture(new OverlapIntervalException("Intervals can not overlap.")));
+      : Future.failedFuture(new OverlapIntervalException(getErrorMessage(openings.getExceptional()))));
   }
 
   private Criterion assembleCriterionForCheckingOverlap(Openings openings) {
@@ -164,5 +164,11 @@ public class OpeningsServiceImpl implements OpeningsService {
 
     return assembleCriterionForCheckingOverlap(openings)
       .addCriterion(critOpeningId, "AND");
+  }
+
+  private String getErrorMessage(boolean isExceptional) {
+    return isExceptional
+      ? "Intervals can not overlap."
+      : "The date range entered overlaps with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
   }
 }
