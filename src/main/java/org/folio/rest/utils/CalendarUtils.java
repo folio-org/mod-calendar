@@ -107,10 +107,40 @@ public class CalendarUtils {
     EnumMap openingDays = new EnumMap(DayOfWeek.class);
 
     for (OpeningDayWeekDay openingDay : entity.getOpeningDays()) {
-      openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
+      if (!isOverlap(openingDay.getOpeningDay().getOpeningHour())) {
+        openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
+      } else {
+        throw new OverlapIntervalException("Intervals can not overlap.");
+      }
     }
-
     return openingDays;
+  }
+
+  private static boolean isOverlap(List<OpeningHour> openingHours)
+  {
+    // Sort intervals in increasing order of start time
+    openingHours.sort(Comparator.comparingInt(hours -> toMinutes(hours.getStartTime())));
+
+    // In the sorted array, if start time of an interval
+    // is less than end of previous interval, then there is an overlap
+    for (int i = 1; i < openingHours.size(); i++) {
+      if (toMinutes(openingHours.get(i - 1).getEndTime()) > toMinutes(openingHours.get(i).getStartTime())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @param time H:m timestamp, i.e. [Hour in day (0-23)]:[Minute in hour (0-59)]
+   * @return total minutes after 00:00
+   */
+  private static int toMinutes(String time) {
+    String[] hourMin = time.split(":");
+    int hour = Integer.parseInt(hourMin[0]);
+    int minutes = Integer.parseInt(hourMin[1]);
+    int hoursInMinutes = hour * 60;
+    return hoursInMinutes + minutes;
   }
 
   private static List<ActualOpeningHours> createEvents(OpeningDay openingDay, Calendar actualDay, String generatedId, boolean isExceptional) {
