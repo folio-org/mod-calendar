@@ -68,8 +68,8 @@ public class CalendarIT {
   private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
 
   private static final String ERROR_CODE_INTERVALS_OVERLAP = "intervalsOverlap";
-  private static final String ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP = "Intervals can not overlap.";
-  private static final String ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP = "Intervals can The date range entered overlaps " +
+  private static final String ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP = "Intervals cannot overlap.";
+  private static final String ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP = "The date range entered overlaps " +
     "with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
 
   private static int port;
@@ -151,7 +151,9 @@ public class CalendarIT {
   public void addNewPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -167,7 +169,9 @@ public class CalendarIT {
   public void addInvalidPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 0, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 0, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -183,7 +187,9 @@ public class CalendarIT {
   public void addNewPeriodWithoutServicePoint() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      true, true, false, openingHours);
     opening.setServicePointId(null);
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
@@ -196,7 +202,9 @@ public class CalendarIT {
   public void getPeriodsWithServicePointIdTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -212,7 +220,9 @@ public class CalendarIT {
   public void getPeriodsWithIncludedDateRange() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -228,7 +238,10 @@ public class CalendarIT {
   public void getPeriodsWithExcludedDateRange() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid, true, true, false);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+
+    OpeningPeriod opening = generateDescription(2018, Calendar.AUGUST, 27, 8, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -252,7 +265,10 @@ public class CalendarIT {
   public void getPeriodWithOpeningDaysTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2018, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, false);
+
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2018, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      true, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -285,7 +301,9 @@ public class CalendarIT {
   public void getPeriodsExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, false, true);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      true, false, true, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -301,7 +319,10 @@ public class CalendarIT {
   public void postExceptionalTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, null, false, true);
+
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2019, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      null, false, true, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -319,7 +340,9 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
 
     // create a new period
-    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, true, true, true);
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      true, true, true, openingHours);
     postPeriod(servicePointUUID, opening);
 
     // check created period
@@ -359,7 +382,10 @@ public class CalendarIT {
   public void overlappingPeriodsTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
-    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid, false, true, false);
+
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
+    OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7, servicePointUUID, uuid,
+      false, true, false, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -373,7 +399,7 @@ public class CalendarIT {
     postWithHeaderAndBody(opening, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -383,8 +409,9 @@ public class CalendarIT {
 
     // create a new calendar
     String uuid = UUID.randomUUID().toString();
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod opening = generateDescription(2020, Calendar.MARCH, 1, 5,
-      servicePointUUID, uuid, true, true, false);
+      servicePointUUID, uuid, true, true, false, openingHours);
     postPeriod(servicePointUUID, opening);
 
     createExceptionalExistingPeriod(servicePointUUID);
@@ -392,7 +419,7 @@ public class CalendarIT {
     // save a new exceptional period
     String newIdExPeriod = UUID.randomUUID().toString();
     OpeningPeriod newExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 6, 1,
-      servicePointUUID, newIdExPeriod, true, true, true);
+      servicePointUUID, newIdExPeriod, true, true, true, openingHours);
     postWithHeaderAndBody(newExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .statusCode(201);
@@ -403,12 +430,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createExceptionalExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 3, 3,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true, openingHours);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -417,12 +445,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createExceptionalExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 3,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true, openingHours);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -431,12 +460,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createExceptionalExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.MARCH, 2, 2,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true, openingHours);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -445,12 +475,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createExceptionalExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidExceptionalPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 10,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true, openingHours);
     postWithHeaderAndBody(invalidExceptionalPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -458,8 +489,9 @@ public class CalendarIT {
   public void putPeriodTest() {
     String uuid = UUID.randomUUID().toString();
     String servicePointUUID = UUID.randomUUID().toString();
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod opening = generateDescription(2017, Calendar.JANUARY, 1, 7,
-      servicePointUUID, uuid, true, false, true);
+      servicePointUUID, uuid, true, false, true, openingHours);
 
     postPeriod(servicePointUUID, opening);
 
@@ -490,17 +522,18 @@ public class CalendarIT {
   public void cannotUpdateOverlappingExceptionalPeriod() {
 
     String servicePointUUID = UUID.randomUUID().toString();
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod existingOpening = generateDescription(2020, Calendar.JANUARY, 1, 7,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, true);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, true, openingHours);
     postPeriod(servicePointUUID, existingOpening);
 
     String uuid = UUID.randomUUID().toString();
     OpeningPeriod opening = generateDescription(2020, Calendar.JANUARY, 10, 7,
-      servicePointUUID, uuid, true, false, true);
+      servicePointUUID, uuid, true, false, true, openingHours);
     postPeriod(servicePointUUID, opening);
 
     OpeningPeriod invalidUpdatedOpening = generateDescription(2020, Calendar.JANUARY, 4, 7,
-      servicePointUUID, uuid, true, false, true);
+      servicePointUUID, uuid, true, false, true, openingHours);
 
     getWithHeaderAndBody("/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
@@ -512,7 +545,7 @@ public class CalendarIT {
 
     putWithHeaderAndBody(invalidUpdatedOpening.withName("PUT_TEST"), "/calendar/periods/" + servicePointUUID + "/period/" + uuid)
       .then()
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
       .statusCode(422);
   }
 
@@ -521,8 +554,9 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createWorkingHoursExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidOpeningPeriod = generateDescription(2020, Calendar.MARCH, 3, 3,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, false);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, false, openingHours);
     postWithHeaderAndBody(invalidOpeningPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
@@ -535,12 +569,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createWorkingHoursExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidOpeningPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 3,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, false);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, false, openingHours);
     postWithHeaderAndBody(invalidOpeningPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP)))
       .statusCode(422);
   }
 
@@ -549,12 +584,13 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createWorkingHoursExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidOpeningPeriod = generateDescription(2020, Calendar.MARCH, 2, 2,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, false);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, false, openingHours);
     postWithHeaderAndBody(invalidOpeningPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP)))
       .statusCode(422);
   }
 
@@ -563,16 +599,64 @@ public class CalendarIT {
     String servicePointUUID = UUID.randomUUID().toString();
     createWorkingHoursExistingPeriod(servicePointUUID);
 
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod invalidOpeningPeriod = generateDescription(2020, Calendar.FEBRUARY, 28, 10,
-      servicePointUUID, UUID.randomUUID().toString(), true, false, false);
+      servicePointUUID, UUID.randomUUID().toString(), true, false, false, openingHours);
     postWithHeaderAndBody(invalidOpeningPeriod, "/calendar/periods/" + servicePointUUID + "/period")
       .then()
       .contentType(ContentType.JSON)
-      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_EXCEPTION_PERIOD_INTERVALS_OVERLAP)))
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP)))
       .statusCode(422);
   }
 
-  private OpeningPeriod generateDescription(int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  @Test
+  public void cannotCreateWorkingHoursWithOverlappingAtTheEnd() {
+    String servicePointUUID = UUID.randomUUID().toString();
+
+    List<OpeningHour> openingHoursWithOverlapping = prepareOpeningHours("08:00", "14:00", "12:00", "16:00");
+    OpeningPeriod invalidOpeningPeriodWithOverlapping = generateDescription(2020, Calendar.JANUARY, 8, 2,
+      servicePointUUID, UUID.randomUUID().toString(), false, true, false, openingHoursWithOverlapping);
+
+    postWithHeaderAndBody(invalidOpeningPeriodWithOverlapping, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
+      .statusCode(422);
+  }
+
+  @Test
+  public void cannotCreateWorkingHoursWithOverlappingAtTheBeginning() {
+    String servicePointUUID = UUID.randomUUID().toString();
+
+    List<OpeningHour> openingHoursWithOverlapping = prepareOpeningHours("08:00", "14:00", "06:00", "09:00");
+    OpeningPeriod invalidOpeningPeriodWithOverlapping = generateDescription(2020, Calendar.JANUARY, 8, 2,
+      servicePointUUID, UUID.randomUUID().toString(), false, true, false, openingHoursWithOverlapping);
+
+    postWithHeaderAndBody(invalidOpeningPeriodWithOverlapping, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
+      .statusCode(422);
+  }
+
+  @Test
+  public void cannotCreateWorkingHoursWithTotalOverlapping() {
+    String servicePointUUID = UUID.randomUUID().toString();
+
+    List<OpeningHour> openingHoursWithOverlapping = prepareOpeningHours("08:00", "14:00", "10:00", "12:00");
+    OpeningPeriod invalidOpeningPeriodWithOverlapping = generateDescription(2020, Calendar.JANUARY, 8, 2,
+      servicePointUUID, UUID.randomUUID().toString(), false, true, false, openingHoursWithOverlapping);
+
+    postWithHeaderAndBody(invalidOpeningPeriodWithOverlapping, "/calendar/periods/" + servicePointUUID + "/period")
+      .then()
+      .contentType(ContentType.JSON)
+      .assertThat().body(matchesJsonSchema(errIntervalsOverlapSchema(ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP)))
+      .statusCode(422);
+  }
+
+  private OpeningPeriod generateDescription(
+    int startYear, int month, int day, int numberOfDays, String servicePointId, String uuid, Boolean isAllDay,
+    boolean isOpen, boolean isExceptional, List<OpeningHour> openingHours) {
     List<OpeningDayWeekDay> openingDays = new ArrayList<>();
     Calendar startDate = createStartDate(startYear, month, day);
     Calendar endDate = createEndDate(startDate, numberOfDays);
@@ -582,31 +666,39 @@ public class CalendarIT {
     openingPeriod.setEndDate(endDate.getTime());
     openingPeriod.setServicePointId(servicePointId);
     openingPeriod.setName("test");
-    createAndAddOpeningDay(openingDays, Weekdays.Day.MONDAY, isAllDay, isOpen, isExceptional);
+    createAndAddOpeningDay(openingDays, Weekdays.Day.MONDAY, isAllDay, isOpen, isExceptional, openingHours);
     openingPeriod.setOpeningDays(openingDays);
     return openingPeriod;
   }
 
-  private void createAndAddOpeningDay(List<OpeningDayWeekDay> openingDays, Weekdays.Day day, Boolean isAllDay, boolean isOpen, boolean isExceptional) {
+  private void createAndAddOpeningDay(
+    List<OpeningDayWeekDay> openingDays, Weekdays.Day day, Boolean isAllDay, boolean isOpen, boolean isExceptional, List<OpeningHour> openingHours) {
     OpeningDayWeekDay opening = new OpeningDayWeekDay();
     OpeningDay openingDay = new OpeningDay().withAllDay(isAllDay).withOpen(isOpen).withExceptional(isExceptional);
-    List<OpeningHour> openingHours = new ArrayList<>();
     if (!isExceptional) {
       opening.setWeekdays(new Weekdays().withDay(day));
-      OpeningHour openingHour = new OpeningHour();
-      openingHour.setStartTime("08:00");
-      openingHour.setEndTime("12:00");
-      openingHours.add(openingHour);
-      openingHour.setStartTime("13:00");
-      openingHour.setEndTime("17:00");
-      openingHours.add(openingHour);
     } else {
       openingDay.setAllDay(true);
     }
     openingDay.setOpeningHour(openingHours);
     opening.setOpeningDay(openingDay);
-
     openingDays.add(opening);
+  }
+
+  private List<OpeningHour> prepareOpeningHours(
+    String startFirstPeriod, String endFirstPeriod, String startSecondPeriod, String endSecondPeriod) {
+
+    List<OpeningHour> openingHours = new ArrayList<>();
+    OpeningHour firstOpeningHour = new OpeningHour();
+    firstOpeningHour.setStartTime(startFirstPeriod);
+    firstOpeningHour.setEndTime(endFirstPeriod);
+    openingHours.add(firstOpeningHour);
+    OpeningHour secondOpeningHour = new OpeningHour();
+    secondOpeningHour.setStartTime(startSecondPeriod);
+    secondOpeningHour.setEndTime(endSecondPeriod);
+    openingHours.add(secondOpeningHour);
+
+    return openingHours;
   }
 
   private Calendar createStartDate(int startYear, int month, int day) {
@@ -661,15 +753,17 @@ public class CalendarIT {
 
   private void createExceptionalExistingPeriod(String servicePointUUID) {
     String uuidExPeriod = UUID.randomUUID().toString();
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod exceptionalPeriod = generateDescription(2020, Calendar.MARCH, 1,
-      3, servicePointUUID, uuidExPeriod, true, false, true);
+      3, servicePointUUID, uuidExPeriod, true, false, true, openingHours);
     postPeriod(servicePointUUID, exceptionalPeriod);
   }
 
   private void createWorkingHoursExistingPeriod(String servicePointUUID) {
     String uuidExPeriod = UUID.randomUUID().toString();
+    List<OpeningHour> openingHours = prepareOpeningHours("08:00", "12:00", "13:00", "17:00");
     OpeningPeriod openingPeriod = generateDescription(2020, Calendar.MARCH, 1,
-      3, servicePointUUID, uuidExPeriod, true, false, false);
+      3, servicePointUUID, uuidExPeriod, true, false, false, openingHours);
     postPeriod(servicePointUUID, openingPeriod);
   }
 

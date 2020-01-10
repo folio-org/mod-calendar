@@ -168,7 +168,7 @@ public class OpeningsServiceImpl implements OpeningsService {
 
   private String getErrorMessage(boolean isExceptional) {
     return isExceptional
-      ? "Intervals can not overlap."
+      ? "Intervals cannot overlap."
       : "The date range entered overlaps with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
   }
 }
