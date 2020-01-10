@@ -68,7 +68,7 @@ public class CalendarIT {
   private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
 
   private static final String ERROR_CODE_INTERVALS_OVERLAP = "intervalsOverlap";
-  private static final String ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP = "Intervals can not overlap.";
+  private static final String ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP = "Intervals cannot overlap.";
   private static final String ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP = "The date range entered overlaps " +
     "with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
 

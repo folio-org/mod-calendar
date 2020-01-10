@@ -110,7 +110,7 @@ public class CalendarUtils {
       if (!isOverlap(openingDay.getOpeningDay().getOpeningHour())) {
         openingDays.put(DayOfWeek.valueOf(openingDay.getWeekdays().getDay().toString()), openingDay);
       } else {
-        throw new OverlapIntervalException("Intervals can not overlap.");
+        throw new OverlapIntervalException("Intervals cannot overlap.");
       }
     }
     return openingDays;
