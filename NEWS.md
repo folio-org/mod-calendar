@@ -1,3 +1,7 @@
+## 1.8.0
+* Update RMB version from 24.0.0 to 29.1.2 (MODCAL-58)
+* Forbid creation of overlapping Library Hours (MODCAL-61 and MODCAL-63)
+
 ## 1.7.0
 * FOLIO-2358 manage container memory (MODCAL-60)
 * Update error code for overlapping exceptional periods (MODCAL-57)
