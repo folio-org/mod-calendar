@@ -1,5 +1,11 @@
 {
-  "scripts": [],
+  "scripts": [
+    {
+      "run": "before",
+      "snippetPath": "renameIdColumns.sql",
+      "fromModuleVersion": "1.7.0"
+    }
+  ],
   "tables": [
     {
       "tableName": "openings",
