@@ -3,7 +3,7 @@
     {
       "run": "before",
       "snippetPath": "renameIdColumns.sql",
-      "fromModuleVersion": "1.7.0"
+      "fromModuleVersion": "1.8.1"
     }
   ],
   "tables": [
