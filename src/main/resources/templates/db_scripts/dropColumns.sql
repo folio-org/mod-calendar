@@ -1,19 +1,19 @@
-ALTER TABLE audit_actual_opening_hours DROP COLUMN IF EXISTS created_date;
-ALTER TABLE audit_actual_opening_hours DROP COLUMN IF EXISTS operation;
-ALTER TABLE audit_actual_opening_hours DROP COLUMN IF EXISTS orig_id;
+DO $$ BEGIN ALTER TABLE audit_openings DROP COLUMN created_date; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_openings DROP COLUMN operation; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_openings DROP COLUMN orig_id; EXCEPTION WHEN OTHERS THEN END; $$;
 
-ALTER TABLE audit_openings DROP COLUMN IF EXISTS created_date;
-ALTER TABLE audit_openings DROP COLUMN IF EXISTS operation;
-ALTER TABLE audit_openings DROP COLUMN IF EXISTS orig_id;
+DO $$ BEGIN ALTER TABLE audit_regular_hours	DROP COLUMN created_date; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_regular_hours DROP COLUMN operation; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_regular_hours DROP COLUMN orig_id; EXCEPTION WHEN OTHERS THEN END; $$;
 
-ALTER TABLE audit_regular_hours	DROP COLUMN IF EXISTS created_date;
-ALTER TABLE audit_regular_hours DROP COLUMN IF EXISTS operation;
-ALTER TABLE audit_regular_hours DROP COLUMN IF EXISTS orig_id;
+DO $$ BEGIN ALTER TABLE audit_exceptions DROP COLUMN created_date; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_exceptions DROP COLUMN operation; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_exceptions DROP COLUMN orig_id; EXCEPTION WHEN OTHERS THEN END; $$;
 
-ALTER TABLE audit_exceptions DROP COLUMN IF EXISTS created_date;
-ALTER TABLE audit_exceptions DROP COLUMN IF EXISTS operation;
-ALTER TABLE audit_exceptions DROP COLUMN IF EXISTS orig_id;
+DO $$ BEGIN ALTER TABLE audit_exceptional_hours DROP COLUMN created_date; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_exceptional_hours DROP COLUMN operation; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_exceptional_hours DROP COLUMN orig_id; EXCEPTION WHEN OTHERS THEN END; $$;
 
-ALTER TABLE audit_exceptional_hours DROP COLUMN IF EXISTS created_date;
-ALTER TABLE audit_exceptional_hours DROP COLUMN IF EXISTS operation;
-ALTER TABLE audit_exceptional_hours DROP COLUMN IF EXISTS orig_id;
+DO $$ BEGIN ALTER TABLE audit_actual_opening_hours DROP COLUMN created_date; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_actual_opening_hours DROP COLUMN operation; EXCEPTION WHEN OTHERS THEN END; $$;
+DO $$ BEGIN ALTER TABLE audit_actual_opening_hours DROP COLUMN orig_id; EXCEPTION WHEN OTHERS THEN END; $$;
