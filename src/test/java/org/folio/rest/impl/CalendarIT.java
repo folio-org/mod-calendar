@@ -31,11 +31,8 @@ import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.PomReader;
-import org.folio.rest.tools.client.test.HttpClientMock2;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,14 +47,12 @@ import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
-public class CalendarIT {
+public class CalendarIT extends EmbeddedPostgresBase {
   private static final Header TENANT_HEADER = new Header("X-Okapi-Tenant", "test");
   private static final Header TOKEN_HEADER = new Header("X-Okapi-Token", "test");
   private static final Header OKAPI_URL_HEADER = new Header("X-Okapi-Url", "http://localhost:9130");
@@ -65,7 +60,6 @@ public class CalendarIT {
   private static final String TOKEN = "test";
   private static final String HOST = "localhost";
   private static final Header JSON_CONTENT_TYPE_HEADER = new Header("Content-Type", "application/json");
-  private static final Logger log = LoggerFactory.getLogger(CalendarIT.class);
 
   private static final String ERROR_CODE_INTERVALS_OVERLAP = "intervalsOverlap";
   private static final String ERROR_MESSAGE_INTERVALS_CANNOT_OVERLAP = "Intervals cannot overlap.";
@@ -83,19 +77,20 @@ public class CalendarIT {
     vertx = Vertx.vertx();
     port = NetworkUtils.nextFreePort();
 
-    startEmbeddedPostgres(context);
-
     DeploymentOptions options = new DeploymentOptions()
-      .setConfig(new JsonObject().put("http.port", port)
-        .put(HttpClientMock2.MOCK_MODE, "true"));
+      .setConfig(new JsonObject().put("http.port", port));
 
-    TenantClient tenantClient = new TenantClient(HOST, port, TENANT, TOKEN);
+    TenantClient tenantClient = new TenantClient("http://" + HOST + ":" + port, TENANT, TOKEN);
     Async async = context.async();
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
+        deleteTenant(tenantClient);
         TenantAttributes t = new TenantAttributes()
           .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, res2 -> async.complete());
+        tenantClient.postTenant(t, posted -> {
+          context.assertEquals(201, posted.statusCode(), posted.statusMessage());
+          async.complete();
+        });
       } catch (Exception e) {
         context.fail(e);
       }
@@ -103,22 +98,6 @@ public class CalendarIT {
 
     RestAssured.port = port;
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-  }
-
-  private static void startEmbeddedPostgres(TestContext context) {
-    try {
-      PostgresClient.setIsEmbedded(true);
-      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-    } catch (Exception e) {
-      log.error("", e);
-      context.fail(e);
-    }
-  }
-
-  @AfterClass
-  public static void teardown(TestContext context) {
-    PostgresClient.stopEmbeddedPostgres();
-    vertx.close(context.asyncAssertSuccess());
   }
 
   @Test
