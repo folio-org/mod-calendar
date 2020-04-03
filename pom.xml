@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.folio</groupId>
   <artifactId>mod-calendar</artifactId>
-  <version>1.8.1-SNAPSHOT</version>
+  <version>1.8.1</version>
   <name>Calendar module</name>
 
   <licenses>
@@ -107,7 +107,7 @@
     <url>https://github.com/folio-org/${project.artifactId}</url>
     <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:folio-org/${project.artifactId}.git</developerConnection>
-    <tag>v1.8.0</tag>
+    <tag>v1.8.1</tag>
   </scm>
 
   <build>
