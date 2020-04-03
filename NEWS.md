@@ -1,4 +1,9 @@
 ## 1.8.0
+* Update RMB version from 29.1.2 to 29.4.0 (MODCAL-69)
+* Create migration scripts from version 1.7.0 (MODCAL-68)
+* Truncate the existing content of audit_* tables (MODCAL-68)
+
+## 1.8.0
 * Update RMB version from 24.0.0 to 29.1.2 (MODCAL-58)
 * Forbid creation of overlapping Library Hours (MODCAL-61 and MODCAL-63)
 
