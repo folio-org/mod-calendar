@@ -14,6 +14,21 @@
       "run": "before",
       "snippetPath": "dropColumns.sql",
       "fromModuleVersion": "1.8.1"
+    },
+    {
+      "run": "before",
+      "snippetPath": "removeDefaultIds.sql",
+      "fromModuleVersion": "1.8.1"
+    },
+    {
+      "run": "before",
+      "snippetPath": "setNotNullConstraintForJsonb.sql",
+      "fromModuleVersion": "1.8.1"
+    },
+    {
+      "run": "before",
+      "snippetPath": "convertCreationDateType.sql",
+      "fromModuleVersion": "1.8.1"
     }
   ],
   "tables": [
