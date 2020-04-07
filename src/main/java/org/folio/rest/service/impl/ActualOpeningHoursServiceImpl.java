@@ -83,18 +83,18 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
         "SELECT jsonb->>'id' opening_id FROM %1$s.%2$s " +
         "WHERE jsonb->>'servicePointId' = '%4$s'" +
       ")," +
+      "exceptional_closed_days as (" +
+        "SELECT aoh.jsonb ->> 'actualDay' FROM %1$s.%3$s aoh " +
+        "WHERE aoh.jsonb ->> 'openingId' IN (SELECT opening_id FROM openings_ids) " +
+        "AND aoh.jsonb ->> 'exceptional' = 'true' " +
+        "AND aoh.jsonb ->> 'open' = 'false'" +
+      "), " +
       "closest_open_day as (" +
         "SELECT aoh1.jsonb->>'actualDay' actual_day FROM %1$s.%3$s aoh1 " +
         "WHERE aoh1.jsonb->>'openingId' IN (SELECT opening_id FROM openings_ids) " +
         "AND aoh1.jsonb->>'actualDay' %7$s '%5$s' " +
         "AND aoh1.jsonb->>'open' = 'true' " +
-        "AND (" +
-          "SELECT count(id) FROM %1$s.%3$s aoh2 " +
-          "WHERE aoh2.jsonb->>'openingId' IN (SELECT opening_id FROM openings_ids) " +
-          "AND aoh2.jsonb->>'actualDay' = aoh1.jsonb->>'actualDay' " +
-          "AND aoh2.jsonb->>'exceptional' = 'true' " +
-          "AND aoh2.jsonb->>'open' = 'false'" +
-        ") = 0 " +
+        "AND aoh1.jsonb ->> 'actualDay' NOT IN (SELECT * FROM exceptional_closed_days)" +
         "ORDER BY aoh1.jsonb->>'actualDay' %6$s LIMIT 1" +
       ")" +
       "SELECT jsonb FROM %1$s.%3$s " +
