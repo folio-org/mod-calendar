@@ -2,17 +2,7 @@
   "scripts": [
     {
       "run": "before",
-      "snippetPath": "renameIdColumns.sql",
-      "fromModuleVersion": "1.8.1"
-    },
-    {
-      "run": "before",
-      "snippetPath": "uuidFunctions.sql",
-      "fromModuleVersion": "1.8.1"
-    },
-    {
-      "run": "before",
-      "snippetPath": "dropColumns.sql",
+      "snippetPath": "upgradeFromRmb24.0.0.sql",
       "fromModuleVersion": "1.8.1"
     }
   ],
