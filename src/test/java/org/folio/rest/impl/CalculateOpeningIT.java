@@ -19,16 +19,13 @@ import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -57,9 +54,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
-public class CalculateOpeningTest {
+public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
-  private static final Logger logger = LoggerFactory.getLogger(CalculateOpeningTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(CalculateOpeningIT.class);
 
   private static RequestSpecification spec;
   private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
@@ -123,7 +120,7 @@ public class CalculateOpeningTest {
   }
 
 
-  public CalculateOpeningTest(String testCaseName,
+  public CalculateOpeningIT(String testCaseName,
                               LocalDate requestedDate,
                               LocalDate prevDate,
                               LocalDate currentDate,
@@ -149,12 +146,6 @@ public class CalculateOpeningTest {
       .addHeader("x-okapi-token", TOKEN)
       .build();
 
-    try {
-      PostgresClient.getInstance(vertx).startEmbeddedPostgres();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
     DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     TenantClient tenantClient = new TenantClient("http://localhost:" + port, TENANT, TOKEN);
 
@@ -162,6 +153,7 @@ public class CalculateOpeningTest {
 
     vertx.deployVerticle(RestVerticle.class, options, deploy -> {
       try {
+        deleteTenant(tenantClient);
         TenantAttributes t = new TenantAttributes()
           .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
         tenantClient.postTenant(t, post -> {
@@ -169,16 +161,11 @@ public class CalculateOpeningTest {
           future.complete(null);
         });
       } catch (Exception e) {
-        logger.error(e.getMessage());
+        logger.error(e.getMessage(), e);
       }
     });
 
     future.join();
-  }
-
-  @AfterClass
-  public static void tearDown() {
-    PostgresClient.stopEmbeddedPostgres();
   }
 
   @Test
