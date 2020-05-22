@@ -9,27 +9,27 @@ import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 
 import java.text.SimpleDateFormat;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
+
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.SQLConnection;
+import org.folio.rest.persist.interfaces.Results;
+import org.folio.rest.service.ActualOpeningHoursService;
+import org.joda.time.DateTime;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.sql.ResultSet;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
-
-import org.joda.time.DateTime;
-
-import org.folio.rest.beans.ActualOpeningHours;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.interfaces.Results;
-import org.folio.rest.service.ActualOpeningHoursService;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowIterator;
+import io.vertx.sqlclient.RowSet;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
 
@@ -55,13 +55,10 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
 
       PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS, servicePointId, df.format(requestedDate));
 
-    Promise<ResultSet> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.select(query, promise);
 
-    return promise.future().map(rs -> rs.getResults()
-      .stream()
-      .map(objects -> new JsonObject(objects.getString(0)).mapTo(ActualOpeningHours.class))
-      .collect(Collectors.toList()));
+    return promise.future().map(this::getActualOpeningHours);
   }
 
   @Override
@@ -104,13 +101,10 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       PostgresClient.convertToPsqlStandard(tenantId), OPENINGS, ACTUAL_OPENING_HOURS, servicePointId,
       df.format(requestedDate), searchDirection.getOrder(), searchDirection.getOperator());
 
-    Promise<ResultSet> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.select(query, promise);
 
-    return promise.future().map(rs -> rs.getResults()
-      .stream()
-      .map(objects -> new JsonObject(objects.getString(0)).mapTo(ActualOpeningHours.class))
-      .collect(Collectors.toList()));
+    return promise.future().map(this::getActualOpeningHours);
   }
 
   @Override
@@ -129,7 +123,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
   @Override
   public Future<Void> saveActualOpeningHours(AsyncResult<SQLConnection> conn, List<Object> actualOpeningHours) {
 
-    Promise<ResultSet> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.saveBatch(conn, ACTUAL_OPENING_HOURS, actualOpeningHours, promise);
 
     return promise.future().map(rs -> null);
@@ -143,7 +137,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       .setOperation("=")
       .setVal(openingsId);
 
-    Promise<UpdateResult> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.delete(conn, ACTUAL_OPENING_HOURS, new Criterion(criteria), promise);
 
     return promise.future().map(ur -> null);
@@ -176,5 +170,14 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
     }
 
     return criterionForOpeningHours;
+  }
+
+  private List<ActualOpeningHours> getActualOpeningHours(RowSet<Row> rowSet) {
+    RowIterator<Row> iterator = rowSet.iterator();
+    List<ActualOpeningHours> actualOpeningHours = new ArrayList<>();
+    iterator.forEachRemaining(row -> actualOpeningHours.add(
+      row.get(JsonObject.class, 0).mapTo(ActualOpeningHours.class)));
+
+    return actualOpeningHours;
   }
 }

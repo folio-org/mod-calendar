@@ -3,7 +3,6 @@ package org.folio.rest.service.impl;
 import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
 import static java.lang.String.format;
-
 import static org.folio.rest.utils.CalendarConstants.END_DATE;
 import static org.folio.rest.utils.CalendarConstants.EXCEPTIONAL;
 import static org.folio.rest.utils.CalendarConstants.ID_FIELD;
@@ -16,22 +15,22 @@ import java.util.List;
 
 import javax.ws.rs.NotFoundException;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Future;
-import io.vertx.core.Promise;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
-
-import org.folio.rest.exceptions.OverlapIntervalException;
-import org.joda.time.DateTime;
-
 import org.folio.rest.beans.Openings;
-import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.exceptions.OverlapIntervalException;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.SQLConnection;
 import org.folio.rest.persist.interfaces.Results;
 import org.folio.rest.service.OpeningsService;
 import org.folio.rest.utils.CalendarUtils;
+import org.joda.time.DateTime;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Promise;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 
 public class OpeningsServiceImpl implements OpeningsService {
 
@@ -58,11 +57,11 @@ public class OpeningsServiceImpl implements OpeningsService {
       .setOperation("=")
       .setVal(openingId);
 
-    Future<Results<Openings>> future = Future.future();
+    Promise<Results<Openings>> promise = Promise.promise();
 
-    pgClient.get(conn, OPENINGS, Openings.class, new Criterion(criteria), false, false, future.completer());
+    pgClient.get(conn, OPENINGS, Openings.class, new Criterion(criteria), false, false, promise);
 
-    return future.map(Results::getResults);
+    return promise.future().map(Results::getResults);
   }
 
   @Override
@@ -87,7 +86,7 @@ public class OpeningsServiceImpl implements OpeningsService {
   @Override
   public Future<Void> updateOpenings(AsyncResult<SQLConnection> conn, Openings openings) {
 
-    Promise<UpdateResult> promise = Promise.promise();;
+    Promise<RowSet<Row>> promise = Promise.promise();
     String where = String.format("WHERE jsonb->>'id' = '%s'", openings.getId());
     pgClient.update(conn, OPENINGS, openings, "jsonb", where, false, promise);
 
@@ -102,10 +101,10 @@ public class OpeningsServiceImpl implements OpeningsService {
       .setOperation("=")
       .setVal(openingsId);
 
-    Promise<UpdateResult> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.delete(conn, OPENINGS, new Criterion(criteria), promise);
 
-    return promise.future().map(UpdateResult::getUpdated)
+    return promise.future().map(RowSet<Row>::rowCount)
       .compose(updated -> updated == 0 ?
         failedFuture(new NotFoundException(format("Openings with id '%s' is not found", openingsId))) :
         succeededFuture());
