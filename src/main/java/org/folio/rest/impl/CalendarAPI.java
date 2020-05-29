@@ -4,7 +4,6 @@ import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
 import static java.lang.String.format;
 import static joptsimple.internal.Strings.isNullOrEmpty;
-
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
@@ -35,17 +34,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
-import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
-import io.vertx.core.Context;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.sql.SQLConnection;
-
-import org.joda.time.DateTime;
-
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.beans.CalendarOpeningsRequestParameters;
@@ -59,10 +47,11 @@ import org.folio.rest.jaxrs.model.OpeningHoursCollection;
 import org.folio.rest.jaxrs.model.OpeningHoursPeriod;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.resource.Calendar;
-import org.folio.rest.persist.PgUtil;
-import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.persist.Criteria.Criteria;
 import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.PgUtil;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.SQLConnection;
 import org.folio.rest.service.ActualOpeningHoursService;
 import org.folio.rest.service.OpeningsService;
 import org.folio.rest.service.RegularHoursService;
@@ -73,6 +62,16 @@ import org.folio.rest.tools.messages.MessageConsts;
 import org.folio.rest.tools.messages.Messages;
 import org.folio.rest.tools.utils.TenantTool;
 import org.folio.rest.utils.CalendarUtils;
+import org.joda.time.DateTime;
+
+import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Context;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 
 
 @SuppressWarnings({"squid:S1854", "squid:S1481"})
@@ -113,7 +112,7 @@ public class CalendarAPI implements Calendar {
       .compose(v -> openingsService.saveOpenings(conn, openings))
       .compose(v -> regularHoursService.saveRegularHours(conn, new RegularHours(entity.getId(), entity.getOpeningDays())))
       .compose(v -> actualOpeningHoursService.saveActualOpeningHours(conn, separateEvents(entity, openings.getExceptional())))
-      .setHandler(v -> {
+      .onComplete(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
           pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
@@ -144,7 +143,7 @@ public class CalendarAPI implements Calendar {
       .compose(v -> openingsService.deleteOpeningsById(conn, periodId))
       .compose(v -> regularHoursService.deleteRegularHoursByOpeningsId(conn, periodId))
       .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, periodId))
-      .setHandler(v -> {
+      .onComplete(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
           pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
@@ -181,7 +180,7 @@ public class CalendarAPI implements Calendar {
       .compose(v -> regularHoursService.updateRegularHours(conn, regularHours))
       .compose(v -> actualOpeningHoursService.deleteActualOpeningHoursByOpeningsId(conn, entity.getId()))
       .compose(v -> actualOpeningHoursService.saveActualOpeningHours(conn, separateEvents(entity, openings.getExceptional())))
-      .setHandler(v -> {
+      .onComplete(v -> {
         if (v.failed()) {
           logger.error(v.cause().getMessage());
           pgClient.rollbackTx(conn, rollback -> asyncResultHandler.handle(mapExceptionToResponseResult(v.cause())));
@@ -219,7 +218,7 @@ public class CalendarAPI implements Calendar {
       .compose(v -> openingsService.findOpeningsByServicePointId(conn, servicePointId))
       .map(CalendarUtils::mapOpeningsToOpeningCollection)
       .compose(collection -> getOpeningDaysByDatesFuture(actualOpeningHoursService, conn, collection, params))
-      .setHandler(result -> {
+      .onComplete(result -> {
         if (result.failed()) {
           logger.error(result.cause().getMessage());
           pgClient.rollbackTx(conn, done -> asyncResultHandler.handle(mapExceptionToResponseResult(result.cause())));
@@ -249,7 +248,7 @@ public class CalendarAPI implements Calendar {
       .map(openings -> openings.get(0))
       .map(CalendarUtils::mapOpeningsToOpeningPeriod)
       .compose(period -> setOpeningDaysForOpeningPeriod(regularHoursService, conn, period))
-      .setHandler(period -> {
+      .onComplete(period -> {
         if (period.failed()) {
           logger.error(period.cause().getMessage());
           pgClient.rollbackTx(conn, done -> asyncResultHandler.handle(mapExceptionToResponseResult(period.cause())));
@@ -319,7 +318,7 @@ public class CalendarAPI implements Calendar {
         actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, PREVIOUS_DAY, tenant),
         actualOpeningHoursService.findActualOpeningHoursForGivenDay(servicePointId, date, tenant),
         actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, NEXT_DAY, tenant)
-      ).setHandler(result -> {
+      ).onComplete(result -> {
         List<ActualOpeningHours> prev = result.result().resultAt(0);
         List<ActualOpeningHours> current = result.result().resultAt(1);
         List<ActualOpeningHours> next = result.result().resultAt(2);
@@ -363,7 +362,7 @@ public class CalendarAPI implements Calendar {
                                                     RegularHoursService regularHoursService) {
 
     Future<Void> future = getOpeningDays(regularHoursService, beginTx, openingCollection.getOpeningPeriods());
-    future.setHandler(querys -> {
+    future.onComplete(querys -> {
       if (querys.succeeded()) {
         postgresClient.endTx(beginTx, done
           -> asyncResultHandler.handle(succeededFuture(
@@ -383,11 +382,11 @@ public class CalendarAPI implements Calendar {
                                                                      OpeningCollection openingCollection,
                                                                      CalendarOpeningsRequestParameters params) {
 
-    Future<OpeningHoursCollection> future = Future.future();
+    Promise<OpeningHoursCollection> promise = Promise.promise();
     OpeningHoursCollection openingHoursCollection = new OpeningHoursCollection();
 
     getOpeningDaysByDate(service, conn, openingHoursCollection, openingCollection, params)
-      .setHandler(querys -> {
+      .onComplete(querys -> {
       if (querys.succeeded()) {
         if (params.isIncludeClosedDays() && !openingHoursCollection.getOpeningPeriods().isEmpty()) {
           CalendarUtils.addClosedDaysToOpenings(openingHoursCollection.getOpeningPeriods(), params);
@@ -400,11 +399,11 @@ public class CalendarAPI implements Calendar {
         openingHoursCollection.setTotalRecords(openingHoursCollection.getOpeningPeriods().size());
         openingHoursCollection.setOpeningPeriods(openingHoursCollection.getOpeningPeriods().stream().skip(params.getOffset()).limit(params.getLimit()).collect(Collectors.toList()));
 
-        future.complete(openingHoursCollection);
+        promise.complete(openingHoursCollection);
       }
     });
 
-    return future;
+    return promise.future();
   }
 
   private void overrideOpeningPeriodsByExceptionalPeriods(OpeningHoursCollection openingHoursCollection) {

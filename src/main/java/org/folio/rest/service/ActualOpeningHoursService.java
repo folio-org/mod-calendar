@@ -3,13 +3,12 @@ package org.folio.rest.service;
 import java.util.Date;
 import java.util.List;
 
+import org.folio.rest.beans.ActualOpeningHours;
+import org.folio.rest.persist.Criteria.Order;
+import org.folio.rest.persist.SQLConnection;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.ext.sql.SQLConnection;
-
-import org.folio.rest.beans.ActualOpeningHours;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Order;
 
 public interface ActualOpeningHoursService {
 

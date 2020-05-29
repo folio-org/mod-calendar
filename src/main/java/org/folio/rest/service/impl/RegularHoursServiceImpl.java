@@ -6,18 +6,19 @@ import static org.folio.rest.utils.CalendarConstants.REGULAR_HOURS;
 
 import java.util.List;
 
+import org.folio.rest.beans.RegularHours;
+import org.folio.rest.persist.Criteria.Criteria;
+import org.folio.rest.persist.Criteria.Criterion;
+import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.persist.SQLConnection;
+import org.folio.rest.persist.interfaces.Results;
+import org.folio.rest.service.RegularHoursService;
+
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.sql.UpdateResult;
-
-import org.folio.rest.beans.RegularHours;
-import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.persist.Criteria.Criteria;
-import org.folio.rest.persist.Criteria.Criterion;
-import org.folio.rest.persist.interfaces.Results;
-import org.folio.rest.service.RegularHoursService;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 
 public class RegularHoursServiceImpl implements RegularHoursService {
 
@@ -40,7 +41,7 @@ public class RegularHoursServiceImpl implements RegularHoursService {
   public Future<Void> updateRegularHours(AsyncResult<SQLConnection> conn, RegularHours regularHours) {
 
 
-    Promise<UpdateResult> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     String where = String.format("WHERE jsonb->>'openingId' = '%s'", regularHours.getOpeningId());
     pgClient.update(conn, REGULAR_HOURS, regularHours, "jsonb", where, false, promise);
 
@@ -69,7 +70,7 @@ public class RegularHoursServiceImpl implements RegularHoursService {
       .setOperation("=")
       .setVal(openingsId);
 
-    Promise<UpdateResult> promise = Promise.promise();
+    Promise<RowSet<Row>> promise = Promise.promise();
     pgClient.delete(conn, REGULAR_HOURS, new Criterion(criteria), promise);
 
     return promise.future().map(ur -> null);

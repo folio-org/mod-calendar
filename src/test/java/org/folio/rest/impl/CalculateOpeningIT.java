@@ -1,30 +1,13 @@
 package org.folio.rest.impl;
 
-import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
-import org.folio.rest.RestVerticle;
-import org.folio.rest.client.TenantClient;
-import org.folio.rest.jaxrs.model.OpeningDay;
-import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
-import org.folio.rest.jaxrs.model.OpeningHour;
-import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.folio.rest.jaxrs.model.TenantAttributes;
-import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.tools.PomReader;
-import org.folio.rest.tools.utils.NetworkUtils;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import static java.time.Month.APRIL;
+import static java.time.Month.FEBRUARY;
+import static java.time.Month.JANUARY;
+import static java.time.Month.MARCH;
+import static java.time.Month.MAY;
+import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,14 +26,32 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-import static java.time.Month.APRIL;
-import static java.time.Month.FEBRUARY;
-import static java.time.Month.JANUARY;
-import static java.time.Month.MARCH;
-import static java.time.Month.MAY;
-import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.folio.rest.RestVerticle;
+import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.OpeningDay;
+import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
+import org.folio.rest.jaxrs.model.OpeningHour;
+import org.folio.rest.jaxrs.model.OpeningPeriod;
+import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.jaxrs.model.Weekdays;
+import org.folio.rest.tools.PomReader;
+import org.folio.rest.tools.utils.NetworkUtils;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
