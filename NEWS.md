@@ -1,3 +1,9 @@
+## 1.9.0
+* Update RMB version from 29.1.2 to 30.0.0 (MODCAL-74)
+* RMB automatically starts embedded postgres if needed (MODCAL-73)
+* Update SQL request to fix performance issue (MODCAL-70)
+* Create sql migration script from 1.7 version (MODCAL-68)
+
 ## 1.8.0
 * Update RMB version from 24.0.0 to 29.1.2 (MODCAL-58)
 * Forbid creation of overlapping Library Hours (MODCAL-61 and MODCAL-63)
