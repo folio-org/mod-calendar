@@ -30,6 +30,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 import io.vertx.sqlclient.RowSet;
+import io.vertx.sqlclient.Tuple;
 
 public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService {
 
@@ -50,13 +51,14 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
     String query = String.format(
       "SELECT aoh.jsonb FROM %1$s.%2$s aoh " +
       "JOIN %1$s.%3$s o ON aoh.jsonb->>'openingId' = o.jsonb->>'id' " +
-      "WHERE o.jsonb->>'servicePointId' = '%4$s' " +
-      "AND aoh.jsonb->>'actualDay' = '%5$s'",
+      "WHERE o.jsonb->>'servicePointId' = $1 " +
+      "AND aoh.jsonb->>'actualDay' = $2",
 
-      PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS, servicePointId, df.format(requestedDate));
+      PostgresClient.convertToPsqlStandard(tenantId), ACTUAL_OPENING_HOURS, OPENINGS);
+    Tuple params = Tuple.of(servicePointId, df.format(requestedDate));
 
     Promise<RowSet<Row>> promise = Promise.promise();
-    pgClient.select(query, promise);
+    pgClient.select(query, params, promise);
 
     return promise.future().map(this::getActualOpeningHours);
   }
@@ -78,7 +80,7 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       "WITH " +
       "openings_ids as (" +
         "SELECT jsonb->>'id' opening_id FROM %1$s.%2$s " +
-        "WHERE jsonb->>'servicePointId' = '%4$s'" +
+        "WHERE jsonb->>'servicePointId' = $1" +
       ")," +
       "exceptional_closed_days as (" +
         "SELECT aoh.jsonb ->> 'actualDay' FROM %1$s.%3$s aoh " +
@@ -89,20 +91,26 @@ public class ActualOpeningHoursServiceImpl implements ActualOpeningHoursService 
       "closest_open_day as (" +
         "SELECT aoh1.jsonb->>'actualDay' actual_day FROM %1$s.%3$s aoh1 " +
         "WHERE aoh1.jsonb->>'openingId' IN (SELECT opening_id FROM openings_ids) " +
-        "AND aoh1.jsonb->>'actualDay' %7$s '%5$s' " +
+        "AND aoh1.jsonb->>'actualDay' %5$s $2 " +
         "AND aoh1.jsonb->>'open' = 'true' " +
         "AND aoh1.jsonb ->> 'actualDay' NOT IN (SELECT * FROM exceptional_closed_days)" +
-        "ORDER BY aoh1.jsonb->>'actualDay' %6$s LIMIT 1" +
+        "ORDER BY aoh1.jsonb->>'actualDay' %4$s LIMIT 1" +
       ")" +
       "SELECT jsonb FROM %1$s.%3$s " +
       "WHERE jsonb->>'openingId' IN (SELECT opening_id FROM openings_ids) " +
       "AND jsonb->>'actualDay' = (SELECT actual_day FROM closest_open_day)",
 
-      PostgresClient.convertToPsqlStandard(tenantId), OPENINGS, ACTUAL_OPENING_HOURS, servicePointId,
-      df.format(requestedDate), searchDirection.getOrder(), searchDirection.getOperator());
+      /* %1 */ PostgresClient.convertToPsqlStandard(tenantId),
+      /* %2 */ OPENINGS,
+      /* %3 */ ACTUAL_OPENING_HOURS,
+      /* %4 */ searchDirection.getOrder(),
+      /* %5 */ searchDirection.getOperator());
+    Tuple params = Tuple.of(
+        /* $1 */ servicePointId,
+        /* $2 */ df.format(requestedDate));
 
     Promise<RowSet<Row>> promise = Promise.promise();
-    pgClient.select(query, promise);
+    pgClient.select(query, params, promise);
 
     return promise.future().map(this::getActualOpeningHours);
   }
