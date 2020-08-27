@@ -23,20 +23,19 @@
   <properties>
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
 
-    <raml-module-builder.version>30.2.3</raml-module-builder.version>
+    <raml-module-builder.version>31.0.2</raml-module-builder.version>
     <vertx.version>3.9.0</vertx.version>
-    <rest-assured.version>3.2.0</rest-assured.version>
-    <aspectjrt.version>1.9.4</aspectjrt.version>
+    <rest-assured.version>4.3.0</rest-assured.version>
+    <aspectjrt.version>1.9.5</aspectjrt.version>
     <copy-rename-maven-plugin.version>1.0.1</copy-rename-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
-    <aspectj-maven-plugin.version>1.11</aspectj-maven-plugin.version>
+    <aspectj-maven-plugin.version>1.12.6</aspectj-maven-plugin.version>
     <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
-    <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
-    <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+    <build-helper-maven-plugin.version>3.2.0</build-helper-maven-plugin.version>
+    <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
 
   </properties>
 
@@ -117,8 +116,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <source>${maven.compiler.source}</source>
-          <target>${maven.compiler.target}</target>
+          <release>11</release>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -183,7 +181,7 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
+        <groupId>com.nickwongdev</groupId>
         <artifactId>aspectj-maven-plugin</artifactId>
         <version>${aspectj-maven-plugin.version}</version>
         <configuration>
@@ -318,7 +316,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.20.1</version>
+        <version>${maven-failsafe-plugin.version}</version>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
         </configuration>
