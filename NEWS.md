@@ -1,3 +1,7 @@
+## 1.10.0 2020-10-09
+* RMB 30.2.3, fixing pg_catalog.pg_trgm and sql injection (MODCAL-78)
+* Upgrade to RMB v31 and JDK 11 (MODCAL-81)
+
 ## 1.9.0
 * Update RMB version from 29.1.2 to 30.0.0 (MODCAL-74)
 * RMB automatically starts embedded postgres if needed (MODCAL-73)
