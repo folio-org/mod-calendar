@@ -47,7 +47,7 @@ import org.folio.rest.jaxrs.model.OpeningPeriod;
 
 public class CalendarUtils {
 
-  public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+  public static final String DATE_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS+00:00";
   private static final String DATE_PATTERN_SHORT = "yyyy-MM-dd";
   public static final DateTimeFormatter DATE_FORMATTER_SHORT = DateTimeFormat.forPattern(DATE_PATTERN_SHORT).withZoneUTC();
   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_PATTERN).withZoneUTC();
