@@ -46,10 +46,12 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.client.HttpResponse;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT extends EmbeddedPostgresBase {
@@ -87,7 +89,8 @@ public class CalendarIT extends EmbeddedPostgresBase {
         deleteTenant(tenantClient);
         TenantAttributes t = new TenantAttributes()
           .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, posted -> {
+        tenantClient.postTenant(t, ar -> {
+          HttpResponse<Buffer> posted = ar.result();
           context.assertEquals(201, posted.statusCode(), posted.statusMessage());
           async.complete();
         });
