@@ -30,6 +30,7 @@ import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -46,12 +47,10 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.ext.web.client.HttpResponse;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT extends EmbeddedPostgresBase {
@@ -84,16 +83,22 @@ public class CalendarIT extends EmbeddedPostgresBase {
 
     TenantClient tenantClient = new TenantClient("http://" + HOST + ":" + port, TENANT, TOKEN);
     Async async = context.async();
+
     vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
-        deleteTenant(tenantClient);
-        TenantAttributes t = new TenantAttributes()
+        TenantAttributes tenantAttributes = new TenantAttributes()
           .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, ar -> {
-          HttpResponse<Buffer> posted = ar.result();
-          context.assertEquals(201, posted.statusCode(), posted.statusMessage());
-          async.complete();
-        });
+        tenantClient.postTenant(tenantAttributes, context.asyncAssertSuccess(post -> {
+          context.assertEquals(201, post.statusCode(), post.statusMessage());
+
+          String jobId = post.bodyAsJson(TenantJob.class).getId();
+          tenantClient.getTenantByOperationId(jobId, 10000, context.asyncAssertSuccess(get -> {
+            context.assertEquals(200, get.statusCode());
+            context.assertTrue(get.bodyAsJson(TenantJob.class).getComplete());
+
+            async.complete();
+          }));
+        }));
       } catch (Exception e) {
         context.fail(e);
       }

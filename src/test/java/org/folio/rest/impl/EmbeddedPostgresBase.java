@@ -11,21 +11,17 @@ import io.vertx.ext.web.client.HttpResponse;
 
 public class EmbeddedPostgresBase {
   static {
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        // PostgresClient automatically starts embedded postgres if needed.
-        // Stop it after all IT tests have finished.
-        PostgresClient.stopEmbeddedPostgres();
-      }
-    });
+    // PostgresClient automatically starts embedded postgres if needed.
+    // Stop it after all IT tests have finished.
+    Runtime.getRuntime().addShutdownHook(new Thread(PostgresClient::stopEmbeddedPostgres));
   }
 
   /**
    * Delete the tenant if it exists.
    */
-  static public void deleteTenant(TenantClient tenantClient) {
+  static public void deleteTenant(TenantClient tenantClient, String operationId) {
     CompletableFuture<Void> future = new CompletableFuture<>();
-    tenantClient.getTenantByOperationId("", 0, ar -> {
+    tenantClient.getTenantByOperationId(operationId, 0, ar -> {
       HttpResponse<Buffer> get = ar.result();
       if (get.statusCode() != 200) {
         future.completeExceptionally(new RuntimeException(
@@ -39,7 +35,7 @@ public class EmbeddedPostgresBase {
           future.complete(null);
           return;
         }
-        tenantClient.deleteTenantByOperationId("", delAr -> {
+        tenantClient.deleteTenantByOperationId(operationId, delAr -> {
           HttpResponse<Buffer> deleted = delAr.result();
           if (deleted.statusCode() != 204) {
             future.completeExceptionally(new RuntimeException(

@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.beans.CalendarOpeningsRequestParameters;
@@ -70,14 +72,12 @@ import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 
 @SuppressWarnings({"squid:S1854", "squid:S1481"})
 public class CalendarAPI implements Calendar {
 
-  private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
+  private static final Logger logger = LogManager.getLogger(CalendarAPI.class);
 
   private final Messages messages = Messages.getInstance();
 

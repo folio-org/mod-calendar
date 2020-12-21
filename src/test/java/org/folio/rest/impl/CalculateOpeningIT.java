@@ -7,6 +7,7 @@ import static java.time.Month.MARCH;
 import static java.time.Month.MAY;
 import static org.folio.rest.utils.CalendarUtils.DATE_PATTERN;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.text.ParseException;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.OpeningDay;
@@ -33,6 +36,7 @@ import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.jaxrs.model.Weekdays;
 import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
@@ -48,16 +52,16 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
+import io.vertx.ext.web.client.HttpResponse;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
-  private static final Logger logger = LoggerFactory.getLogger(CalculateOpeningIT.class);
+  private static final Logger logger = LogManager.getLogger(CalculateOpeningIT.class);
 
   private static RequestSpecification spec;
   private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
@@ -149,20 +153,45 @@ public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
     DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
     TenantClient tenantClient = new TenantClient("http://localhost:" + port, TENANT, TOKEN);
+    TenantAttributes tenantAttributes = new TenantAttributes()
+      .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
 
     CompletableFuture<Void> future = new CompletableFuture<>();
 
-    vertx.deployVerticle(RestVerticle.class, options, deploy -> {
+    vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
       try {
-        deleteTenant(tenantClient);
-        TenantAttributes t = new TenantAttributes()
-          .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, post -> {
-          populateOpeningPeriods();
-          future.complete(null);
+        tenantClient.postTenant(tenantAttributes, postResult -> {
+          if (postResult.failed()) {
+            Throwable cause = postResult.cause();
+            logger.error(cause);
+            future.completeExceptionally(cause);
+            return;
+          }
+
+          final HttpResponse<Buffer> postResponse = postResult.result();
+          assertThat(postResponse.statusCode(), is(201));
+
+          String jobId = postResponse.bodyAsJson(TenantJob.class).getId();
+
+          tenantClient.getTenantByOperationId(jobId, 10000, getResult -> {
+            if (getResult.failed()) {
+              Throwable cause = getResult.cause();
+              logger.error(cause.getMessage());
+              future.completeExceptionally(cause);
+              return;
+            }
+
+            final HttpResponse<Buffer> getResponse = getResult.result();
+            assertThat(getResponse.statusCode(), is(200));
+            assertThat(getResponse.bodyAsJson(TenantJob.class).getComplete(), is(true));
+
+            populateOpeningPeriods();
+            future.complete(null);
+          });
         });
       } catch (Exception e) {
-        logger.error(e.getMessage(), e);
+        logger.error(e.getMessage());
+        future.completeExceptionally(e);
       }
     });
 
