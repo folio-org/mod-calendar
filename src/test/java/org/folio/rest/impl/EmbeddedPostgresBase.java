@@ -1,12 +1,30 @@
 package org.folio.rest.impl;
 
-import java.nio.charset.StandardCharsets;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.folio.HttpStatus;
 import org.folio.rest.client.TenantClient;
+import org.folio.rest.jaxrs.model.TenantAttributes;
+import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.PomReader;
+
+import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.web.client.HttpResponse;
 
 public class EmbeddedPostgresBase {
+  private static final Logger LOGGER = LogManager.getLogger(EmbeddedPostgresBase.class);
+
+  public static final int GET_TENANT_DELAY_MS = 1000;
+
+  static TenantClient tenantClient;
+  private static String jobId;
+
   static {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
@@ -17,34 +35,54 @@ public class EmbeddedPostgresBase {
     });
   }
 
-  /**
-   * Delete the tenant if it exists.
-   */
-  static public void deleteTenant(TenantClient tenantClient) {
-    CompletableFuture<Void> future = new CompletableFuture<>();
-    tenantClient.getTenant(get -> {
-      if (get.statusCode() != 200) {
-        future.completeExceptionally(new RuntimeException(
-          get.statusCode() + ": " + get.statusMessage()));
-        return;
-      }
-      get.bodyHandler(body -> {
-        String tenantExists = body.getString(0, body.length(), StandardCharsets.UTF_8.name());
-        if ("false".equals(tenantExists)) {
-          // tenant does not exists, no need to delete
-          future.complete(null);
+  static public void postTenant(TenantClient tenantClient, Runnable runAfterSuccess,
+    Runnable runAfterFailure) {
+
+    try {
+      TenantAttributes t = new TenantAttributes()
+        .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
+
+      tenantClient.postTenant(t, postResult -> {
+        if (postResult.failed()) {
+          Throwable cause = postResult.cause();
+          LOGGER.error(cause);
+          runAfterFailure.run();
           return;
         }
-        tenantClient.deleteTenant(deleted -> {
-          if (deleted.statusCode() != 204) {
-            future.completeExceptionally(new RuntimeException(
-                deleted.statusCode() + ": " + deleted.statusMessage()));
+
+        final HttpResponse<Buffer> postResponse = postResult.result();
+        assertThat(postResponse.statusCode(), is(HttpStatus.HTTP_CREATED.toInt()));
+
+        jobId = postResponse.bodyAsJson(TenantJob.class).getId();
+
+        tenantClient.getTenantByOperationId(jobId, GET_TENANT_DELAY_MS, getResult -> {
+          if (getResult.failed()) {
+            Throwable cause = getResult.cause();
+            LOGGER.error(cause.getMessage());
+            runAfterFailure.run();
             return;
           }
-          future.complete(null);
+
+          final HttpResponse<Buffer> getResponse = getResult.result();
+          assertThat(getResponse.statusCode(), is(HttpStatus.HTTP_OK.toInt()));
+          assertThat(getResponse.bodyAsJson(TenantJob.class).getComplete(), is(true));
+
+          runAfterSuccess.run();
         });
       });
+    } catch (Exception e) {
+      runAfterFailure.run();
+    }
+  }
+
+  static void deleteTenant(TenantClient tenantClient) {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    tenantClient.deleteTenantByOperationId(jobId, deleted -> {
+      if (deleted.failed()) {
+        future.completeExceptionally(new RuntimeException("Failed to delete tenant"));
+        return;
+      }
+      future.complete(null);
     });
-    future.join();
   }
 }

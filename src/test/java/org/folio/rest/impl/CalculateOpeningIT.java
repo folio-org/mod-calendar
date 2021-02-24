@@ -26,16 +26,17 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,15 +50,13 @@ import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
-  private static final Logger logger = LoggerFactory.getLogger(CalculateOpeningIT.class);
+  private static final Logger logger = LogManager.getLogger(CalculateOpeningIT.class);
 
   private static RequestSpecification spec;
   private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);
@@ -148,25 +147,23 @@ public class CalculateOpeningIT extends EmbeddedPostgresBase {
       .build();
 
     DeploymentOptions options = new DeploymentOptions().setConfig(new JsonObject().put("http.port", port));
-    TenantClient tenantClient = new TenantClient("http://localhost:" + port, TENANT, TOKEN);
+    tenantClient = new TenantClient("http://localhost:" + port, TENANT, TOKEN);
 
     CompletableFuture<Void> future = new CompletableFuture<>();
 
     vertx.deployVerticle(RestVerticle.class, options, deploy -> {
-      try {
-        deleteTenant(tenantClient);
-        TenantAttributes t = new TenantAttributes()
-          .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, post -> {
-          populateOpeningPeriods();
-          future.complete(null);
-        });
-      } catch (Exception e) {
-        logger.error(e.getMessage(), e);
-      }
+      postTenant(tenantClient, () -> {
+        populateOpeningPeriods();
+        future.complete(null);
+      }, () -> {});
     });
 
     future.join();
+  }
+
+  @AfterClass
+  public static void tearDown() {
+    deleteTenant(tenantClient);
   }
 
   @Test

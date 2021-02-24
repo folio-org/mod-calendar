@@ -34,6 +34,9 @@ import java.util.stream.Collectors;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.folio.okapi.common.GenericCompositeFuture;
 import org.folio.rest.annotations.Validate;
 import org.folio.rest.beans.ActualOpeningHours;
 import org.folio.rest.beans.CalendarOpeningsRequestParameters;
@@ -65,19 +68,16 @@ import org.folio.rest.utils.CalendarUtils;
 import org.joda.time.DateTime;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Context;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 
 
 @SuppressWarnings({"squid:S1854", "squid:S1481"})
 public class CalendarAPI implements Calendar {
 
-  private static final Logger logger = LoggerFactory.getLogger(CalendarAPI.class);
+  private static final Logger logger = LogManager.getLogger(CalendarAPI.class);
 
   private final Messages messages = Messages.getInstance();
 
@@ -314,11 +314,11 @@ public class CalendarAPI implements Calendar {
       df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
       Date date = df.parse(requestedDate);
 
-      CompositeFuture.all(
+      GenericCompositeFuture.all(List.of(
         actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, PREVIOUS_DAY, tenant),
         actualOpeningHoursService.findActualOpeningHoursForGivenDay(servicePointId, date, tenant),
         actualOpeningHoursService.findActualOpeningHoursForClosestOpenDay(servicePointId, date, NEXT_DAY, tenant)
-      ).onComplete(result -> {
+      )).onComplete(result -> {
         List<ActualOpeningHours> prev = result.result().resultAt(0);
         List<ActualOpeningHours> current = result.result().resultAt(1);
         List<ActualOpeningHours> next = result.result().resultAt(2);
