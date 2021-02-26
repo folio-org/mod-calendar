@@ -18,7 +18,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpResponse;
 
 public class EmbeddedPostgresBase {
-  private static final Logger LOGGER = LogManager.getLogger(EmbeddedPostgresBase.class);
+  private static final Logger LOGGER = LogManager.getLogger();
 
   public static final int GET_TENANT_DELAY_MS = 1000;
 

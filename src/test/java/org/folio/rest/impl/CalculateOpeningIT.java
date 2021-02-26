@@ -56,7 +56,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunnerWithParametersFactory;
 @Parameterized.UseParametersRunnerFactory(VertxUnitRunnerWithParametersFactory.class)
 public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
-  private static final Logger logger = LogManager.getLogger(CalculateOpeningIT.class);
+  private static final Logger logger = LogManager.getLogger();
 
   private static RequestSpecification spec;
   private static SimpleDateFormat df = new SimpleDateFormat(DATE_PATTERN);

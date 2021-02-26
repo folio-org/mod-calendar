@@ -22,8 +22,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.Error;
@@ -56,7 +54,6 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT extends EmbeddedPostgresBase {
-  private static final Logger LOGGER = LogManager.getLogger(CalendarIT.class);
 
   private static final Header TENANT_HEADER = new Header("X-Okapi-Tenant", "test");
   private static final Header TOKEN_HEADER = new Header("X-Okapi-Token", "test");
@@ -71,19 +68,16 @@ public class CalendarIT extends EmbeddedPostgresBase {
   private static final String ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP = "The date range entered overlaps " +
     "with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
 
-  private static int port;
-  private static Vertx vertx;
-
   @Rule
   public Timeout rule = Timeout.seconds(60);
 
   @BeforeClass
   public static void setup(TestContext context) {
-    vertx = Vertx.vertx(new VertxOptions()
+    Vertx vertx = Vertx.vertx(new VertxOptions()
       .setMaxEventLoopExecuteTimeUnit(TimeUnit.MILLISECONDS)
       .setMaxEventLoopExecuteTime(GET_TENANT_DELAY_MS));
 
-    port = NetworkUtils.nextFreePort();
+    int port = NetworkUtils.nextFreePort();
 
     DeploymentOptions options = new DeploymentOptions()
       .setConfig(new JsonObject().put("http.port", port));

@@ -77,7 +77,7 @@ import io.vertx.core.Promise;
 @SuppressWarnings({"squid:S1854", "squid:S1481"})
 public class CalendarAPI implements Calendar {
 
-  private static final Logger logger = LogManager.getLogger(CalendarAPI.class);
+  private static final Logger logger = LogManager.getLogger();
 
   private final Messages messages = Messages.getInstance();
 
