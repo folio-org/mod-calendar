@@ -20,7 +20,7 @@ import io.vertx.ext.web.client.HttpResponse;
 public class EmbeddedPostgresBase {
   private static final Logger LOGGER = LogManager.getLogger();
 
-  public static final int GET_TENANT_DELAY_MS = 1000;
+  public static final int GET_TENANT_TIMEOUT_MS = 1000;
 
   static TenantClient tenantClient;
   private static String jobId;
@@ -55,7 +55,7 @@ public class EmbeddedPostgresBase {
 
         jobId = postResponse.bodyAsJson(TenantJob.class).getId();
 
-        tenantClient.getTenantByOperationId(jobId, GET_TENANT_DELAY_MS, getResult -> {
+        tenantClient.getTenantByOperationId(jobId, GET_TENANT_TIMEOUT_MS, getResult -> {
           if (getResult.failed()) {
             Throwable cause = getResult.cause();
             LOGGER.error(cause.getMessage());
