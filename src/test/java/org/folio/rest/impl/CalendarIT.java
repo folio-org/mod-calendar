@@ -73,9 +73,7 @@ public class CalendarIT extends EmbeddedPostgresBase {
 
   @BeforeClass
   public static void setup(TestContext context) {
-    Vertx vertx = Vertx.vertx(new VertxOptions()
-      .setMaxEventLoopExecuteTimeUnit(TimeUnit.MILLISECONDS)
-      .setMaxEventLoopExecuteTime(GET_TENANT_DELAY_MS));
+    Vertx vertx = Vertx.vertx();
 
     int port = NetworkUtils.nextFreePort();
 
