@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
@@ -29,10 +30,9 @@ import org.folio.rest.jaxrs.model.OpeningDay;
 import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
-import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.Weekdays;
-import org.folio.rest.tools.PomReader;
 import org.folio.rest.tools.utils.NetworkUtils;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,6 +46,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -53,6 +54,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 @RunWith(VertxUnitRunner.class)
 public class CalendarIT extends EmbeddedPostgresBase {
+
   private static final Header TENANT_HEADER = new Header("X-Okapi-Tenant", "test");
   private static final Header TOKEN_HEADER = new Header("X-Okapi-Token", "test");
   private static final Header OKAPI_URL_HEADER = new Header("X-Okapi-Url", "http://localhost:9130");
@@ -66,38 +68,31 @@ public class CalendarIT extends EmbeddedPostgresBase {
   private static final String ERROR_MESSAGE_OPENING_PERIOD_INTERVALS_OVERLAP = "The date range entered overlaps " +
     "with another calendar for this service point. Please correct the date range or enter the hours as exceptions.";
 
-  private static int port;
-  private static Vertx vertx;
-
   @Rule
   public Timeout rule = Timeout.seconds(60);
 
   @BeforeClass
   public static void setup(TestContext context) {
-    vertx = Vertx.vertx();
-    port = NetworkUtils.nextFreePort();
+    Vertx vertx = Vertx.vertx();
+
+    int port = NetworkUtils.nextFreePort();
 
     DeploymentOptions options = new DeploymentOptions()
       .setConfig(new JsonObject().put("http.port", port));
 
-    TenantClient tenantClient = new TenantClient("http://" + HOST + ":" + port, TENANT, TOKEN);
+    tenantClient = new TenantClient("http://" + HOST + ":" + port, TENANT, TOKEN);
+
     Async async = context.async();
-    vertx.deployVerticle(RestVerticle.class.getName(), options, res -> {
-      try {
-        deleteTenant(tenantClient);
-        TenantAttributes t = new TenantAttributes()
-          .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
-        tenantClient.postTenant(t, posted -> {
-          context.assertEquals(201, posted.statusCode(), posted.statusMessage());
-          async.complete();
-        });
-      } catch (Exception e) {
-        context.fail(e);
-      }
-    });
+    vertx.deployVerticle(RestVerticle.class.getName(), options,
+      res -> postTenant(tenantClient, async::complete, context::fail));
 
     RestAssured.port = port;
     RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+  }
+
+  @AfterClass
+  public static void tearDown() {
+    deleteTenant(tenantClient);
   }
 
   @Test
