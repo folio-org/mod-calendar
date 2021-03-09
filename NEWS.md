@@ -1,3 +1,6 @@
+## 1.11.0 2021-03-09
+* Upgrade to RMB 32.2.0 and Vertx 4.0.2 (MODCAL-87)
+
 ## 1.10.0 2020-10-09
 * RMB 30.2.3, fixing pg_catalog.pg_trgm and sql injection (MODCAL-78)
 * Upgrade to RMB v31 and JDK 11 (MODCAL-81)
