@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 
 import io.vertx.core.AsyncResult;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.folio.rest.exceptions.OverlapIntervalException;
 import org.folio.rest.jaxrs.model.Error;
 import org.folio.rest.jaxrs.model.Errors;

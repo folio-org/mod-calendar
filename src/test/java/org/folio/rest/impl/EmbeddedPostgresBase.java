@@ -12,7 +12,6 @@ import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.PomReader;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpResponse;
@@ -26,13 +25,8 @@ public class EmbeddedPostgresBase {
   private static String jobId;
 
   static {
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      public void run() {
-        // PostgresClient automatically starts embedded postgres if needed.
-        // Stop it after all IT tests have finished.
-        PostgresClient.stopEmbeddedPostgres();
-      }
-    });
+    Runtime.getRuntime()
+      .addShutdownHook(new Thread(PostgresClient::stopPostgresTester));
   }
 
   static public void postTenant(TenantClient tenantClient, Runnable runAfterSuccess,
@@ -40,7 +34,8 @@ public class EmbeddedPostgresBase {
 
     try {
       TenantAttributes t = new TenantAttributes()
-        .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
+        .withModuleFrom("mod-calendar-1.0.0")
+        .withModuleTo("mod-calendar-1.0.1");
 
       tenantClient.postTenant(t, postResult -> {
         if (postResult.failed()) {

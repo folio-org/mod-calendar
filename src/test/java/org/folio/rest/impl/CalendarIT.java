@@ -20,8 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.Error;
@@ -31,6 +31,7 @@ import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.Weekdays;
+import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -73,8 +74,9 @@ public class CalendarIT extends EmbeddedPostgresBase {
 
   @BeforeClass
   public static void setup(TestContext context) {
-    Vertx vertx = Vertx.vertx();
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
 
+    Vertx vertx = Vertx.vertx();
     int port = NetworkUtils.nextFreePort();
 
     DeploymentOptions options = new DeploymentOptions()
@@ -101,7 +103,7 @@ public class CalendarIT extends EmbeddedPostgresBase {
     given()
       .get("/calendar/periods/non_exist")
       .then()
-      .statusCode(400);
+      .statusCode(404);
 
     getWithHeaderAndBody("/calendar/periods")
       .then()
