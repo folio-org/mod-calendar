@@ -3,16 +3,20 @@ package org.folio.rest.impl;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.folio.HttpStatus;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.persist.PostgresClient;
-import org.folio.rest.tools.PomReader;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpResponse;
@@ -35,7 +39,7 @@ public class EmbeddedPostgresBase {
 
     try {
       TenantAttributes t = new TenantAttributes()
-        .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
+        .withModuleTo(getModuleNameAndVersion());
 
       tenantClient.postTenant(t, postResult -> {
         if (postResult.failed()) {
@@ -79,5 +83,11 @@ public class EmbeddedPostgresBase {
       }
       future.complete(null);
     });
+  }
+
+  private static String getModuleNameAndVersion() throws IOException, XmlPullParserException {
+    Model model = new MavenXpp3Reader().read(new FileReader("pom.xml"));
+
+    return model.getArtifactId() + "-" + model.getVersion();
   }
 }
