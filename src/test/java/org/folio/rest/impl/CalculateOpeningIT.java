@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.folio.postgres.testing.PostgresTesterContainer;
 import org.folio.rest.RestVerticle;
 import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.OpeningDay;
@@ -35,6 +36,7 @@ import org.folio.rest.jaxrs.model.OpeningDayWeekDay;
 import org.folio.rest.jaxrs.model.OpeningHour;
 import org.folio.rest.jaxrs.model.OpeningPeriod;
 import org.folio.rest.jaxrs.model.Weekdays;
+import org.folio.rest.persist.PostgresClient;
 import org.folio.rest.tools.utils.NetworkUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -134,6 +136,8 @@ public class CalculateOpeningIT extends EmbeddedPostgresBase {
 
   @BeforeClass
   public static void setUp() {
+    PostgresClient.setPostgresTester(new PostgresTesterContainer());
+
     df.setTimeZone(TimeZone.getTimeZone(ZoneOffset.UTC));
 
     Vertx vertx = Vertx.vertx();

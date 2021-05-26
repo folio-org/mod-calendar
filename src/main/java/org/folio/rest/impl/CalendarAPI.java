@@ -3,7 +3,7 @@ package org.folio.rest.impl;
 import static io.vertx.core.Future.failedFuture;
 import static io.vertx.core.Future.succeededFuture;
 import static java.lang.String.format;
-import static joptsimple.internal.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.isAnyEmpty;
 import static org.folio.rest.RestVerticle.OKAPI_HEADER_TENANT;
 import static org.folio.rest.jaxrs.resource.Calendar.PostCalendarPeriodsPeriodByServicePointIdResponse.headersFor201;
 import static org.folio.rest.service.ActualOpeningHoursService.SearchDirection.NEXT_DAY;
@@ -91,9 +91,7 @@ public class CalendarAPI implements Calendar {
                                                         Context vertxContext) {
 
     if (entity.getOpeningDays().isEmpty() ||
-      isNullOrEmpty(entity.getServicePointId()) ||
-      isNullOrEmpty(entity.getName()) ||
-      isNullOrEmpty(entity.getId())) {
+      isAnyEmpty(entity.getServicePointId(), entity.getName(), entity.getId())) {
 
       asyncResultHandler.handle(succeededFuture(PostCalendarPeriodsPeriodByServicePointIdResponse
         .respond400WithTextPlain("Not valid json object. Missing field(s)...")));
