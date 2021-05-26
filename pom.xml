@@ -55,6 +55,13 @@
       <version>${raml-module-builder.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.folio</groupId>
+      <artifactId>domain-models-interface-extensions</artifactId>
+      <!-- replace with ${raml-module-builder.version} when corresponding version of this library becomes available -->
+      <version>32.2.2</version>
+    </dependency>
+
     <!-- Dependencies for testing -->
 
     <dependency>

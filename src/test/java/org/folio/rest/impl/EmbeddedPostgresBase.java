@@ -12,6 +12,7 @@ import org.folio.rest.client.TenantClient;
 import org.folio.rest.jaxrs.model.TenantAttributes;
 import org.folio.rest.jaxrs.model.TenantJob;
 import org.folio.rest.persist.PostgresClient;
+import org.folio.rest.tools.PomReader;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.client.HttpResponse;
@@ -34,8 +35,7 @@ public class EmbeddedPostgresBase {
 
     try {
       TenantAttributes t = new TenantAttributes()
-        .withModuleFrom("mod-calendar-1.0.0")
-        .withModuleTo("mod-calendar-1.0.1");
+        .withModuleTo(String.format("mod-calendar-%s", PomReader.INSTANCE.getVersion()));
 
       tenantClient.postTenant(t, postResult -> {
         if (postResult.failed()) {
