@@ -1,3 +1,6 @@
+## 1.12.0 2021-06-11
+* Upgrade to RMB 33.0.0 and Vertx 4.1.0 (MODCAL-90)
+
 ## 1.11.0 2021-03-09
 * Upgrade to RMB 32.2.0 and Vertx 4.0.2 (MODCAL-87)
 
