@@ -46,17 +46,13 @@
           "fieldName": "actualDay",
           "tOps": "ADD",
           "caseSensitive": true,
-          "removeAccents": false,
-          "sqlExpression" : "(jsonb->>'actualDay')",
-          "sqlExpressionQuery": "$"
+          "removeAccents": false
         },
         {
           "fieldName": "openingId",
           "tOps": "ADD",
           "caseSensitive": true,
-          "removeAccents": false,
-          "sqlExpression" : "(jsonb->>'openingId')",
-          "sqlExpressionQuery": "$"
+          "removeAccents": false
         }
       ]
     }
