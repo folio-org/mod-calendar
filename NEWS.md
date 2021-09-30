@@ -1,3 +1,6 @@
+## 1.13.0 2021-09-30
+* Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours` table (MODCAL-72)
+
 ## 1.12.0 2021-06-11
 * Upgrade to RMB 33.0.0 and Vertx 4.1.0 (MODCAL-90)
 
