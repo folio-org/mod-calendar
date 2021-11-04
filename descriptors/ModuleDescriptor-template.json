@@ -5,7 +5,13 @@
     {
       "id": "@artifactId@",
       "version": "5.0",
-      "handlers": []
+      "handlers": [
+        {
+          "methods": ["GET"],
+          "pathPattern": "/hello",
+          "permissionsRequired": []
+        }
+      ]
     },
     {
       "id": "_tenant",
