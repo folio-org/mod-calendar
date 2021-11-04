@@ -1,8 +1,0 @@
-{
-	"printWidth": 100,
-	"useTabs": true,
-	"semi": true,
-	"proseWrap": "always",
-	"trailingComma": "all",
-	"quoteProps": "consistent"
-}
