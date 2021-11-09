@@ -47,7 +47,7 @@ logging:
       springframework:
         cache: OFF
 
-server.port: 8081
+server.port: 8082
 
 folio:
   tenant:

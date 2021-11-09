@@ -54,3 +54,11 @@ The deployment descriptor is much more straightforward -- all this does is run t
 Maven. `embed_postgres` may be something for testing, or with Postgres itself -- unsure at the time
 of writing. This deployment descriptor will support both `port` and `http.port`, however, it seems
 to be implemented outside the module's purview (likely in `folio-spring-base`).
+
+## Compilation Step
+
+`mvn -e install` will compile the actual module code, generating the classes as well as other boilerplate (from Lombok, OpenAPI, etc.).
+
+## Dockerization
+
+To build the docker module, `docker build -t mod-calendar .`.  Note the `.` is part of the command in order to build the current directory.  Docker will automatically expand the tag's version to `mod-calendar:latest`, therefore, this does not need to be manually specified.
