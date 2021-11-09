@@ -1,0 +1,29 @@
+openapi: 3.0.3
+info:
+  title: Calendar API
+  version: v5
+servers:
+  - url: /hello/
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          description: Test
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/example"
+        '500':
+          description: Internal server error
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Internal server error
+      description: Test
+      operationId: getHelloWorld
+components:
+  schemas:
+    example:
+      $ref: schemas/example.json

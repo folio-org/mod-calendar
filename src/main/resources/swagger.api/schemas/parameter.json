@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "List of key/value parameters of an error",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Key of the parameter"
+    },
+    "value": {
+      "type": "string",
+      "description": "Value of the parameter"
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "key"
+  ]
+}

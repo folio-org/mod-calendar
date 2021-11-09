@@ -27,6 +27,8 @@
     <openapi-generator.version>5.3.0</openapi-generator.version>
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <json.version>20200518</json.version>
+
+    <calendar-api-defintions-yaml-file>src/main/resources/swagger.api/mod-calendar.yaml</calendar-api-defintions-yaml-file>
   </properties>
 
   <dependencies>
@@ -182,6 +184,40 @@
           <pushChanges>false</pushChanges>
           <localCheckout>true</localCheckout>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi-generator.version}</version>
+        <executions>
+          <execution>
+            <id>remoteStorage</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${calendar-api-defintions-yaml-file}</inputSpec>
+              <output>${project.build.directory}/generated-sources</output>
+              <generatorName>spring</generatorName>
+              <modelPackage>${project.groupId}.calendar.domain.dto</modelPackage>
+              <apiPackage>${project.groupId}.calendar.rest.resource</apiPackage>
+              <generateApis>true</generateApis>
+              <generateApiTests>true</generateApiTests>
+              <generateApiDocumentation>true</generateApiDocumentation>
+              <generateModels>true</generateModels>
+              <generateModelTests>false</generateModelTests>
+              <generateSupportingFiles>true</generateSupportingFiles>
+              <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
+              <generateModelDocumentation>true</generateModelDocumentation>
+              <configOptions>
+                <java8>true</java8>
+                <dateLibrary>java</dateLibrary>
+                <interfaceOnly>true</interfaceOnly>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
