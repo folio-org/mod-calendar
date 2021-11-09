@@ -211,7 +211,6 @@
               <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
               <generateModelDocumentation>true</generateModelDocumentation>
               <configOptions>
-                <java8>true</java8>
                 <dateLibrary>java</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>
               </configOptions>
