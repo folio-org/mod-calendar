@@ -40,3 +40,15 @@ be `NULL`.
 
 Exceptional opening hours will close the library for the rest of the calendar day (allowing an
 exception to effectively reduce the hours).
+
+## Versioning
+
+For database versioning, `liquibase` is used. The changelogs are stored in
+`src/main/resources/db/changes`. Each new change should be stored as a separate file (preferably
+YAML, unless SQL is required) in this directory with the form `####-LABEL.yaml`, where `####` is ten
+above the previous change.
+
+This numbering system allows changes to be inserted between others later, for maximum flexibility.
+If possible, a changelog should be split into separate parts, which will then be in the form
+`####-LABEL-$$-sublabel.yaml` where `$$` is sequential within the specific changelog. See
+`0010-initial` for a good example of this.
