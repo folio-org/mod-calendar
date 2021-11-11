@@ -8,6 +8,6 @@ databaseChangeLog:
             indexName: calendar_start_end_date
             columns:
               - column:
-                name: start_date
+                  name: start_date
               - column:
-                name: end_date
+                  name: end_date
