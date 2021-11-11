@@ -3,9 +3,9 @@ info:
   title: Calendar API
   version: v5
 servers:
-  - url: /hello/
+  - url: /
 paths:
-  /:
+  /hello:
     get:
       responses:
         "200":
