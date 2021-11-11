@@ -57,11 +57,18 @@ to be implemented outside the module's purview (likely in `folio-spring-base`).
 
 ## Compilation Step
 
-`mvn -e install` will compile the actual module code, generating the classes as well as other
-boilerplate (from Lombok, OpenAPI, etc.).
+`mvn -e clean install` will fully compile the actual module code from scratch, generating the
+classes as well as other boilerplate (from Lombok, OpenAPI, etc.). Maven is also responsible for
+generating the deployment and module descriptors.
 
 ## Dockerization
 
-To build the docker module, `docker build -t mod-calendar .`. Note the `.` is part of the command in
-order to build the current directory. Docker will automatically expand the tag's version to
-`mod-calendar:latest`, therefore, this does not need to be manually specified.
+To build the docker module, use:
+
+```sh
+docker build -t docker.ci.folio.org/mod-calendar .
+```
+
+Docker will automatically expand the tag's version to `mod-calendar:latest`, therefore, this does
+not need to be manually specified. The `docker.ci.folio.org` path is required as Okapi will _only_
+search this repository when the module is deployed.

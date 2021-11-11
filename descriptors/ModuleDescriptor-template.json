@@ -32,7 +32,7 @@
   "permissionSets": [],
   "requires": [],
   "launchDescriptor": {
-    "dockerImage": "@artifactId@:@version@",
+    "dockerImage": "@artifactId@",
     "dockerPull": false,
     "dockerArgs": {
       "HostConfig": {
