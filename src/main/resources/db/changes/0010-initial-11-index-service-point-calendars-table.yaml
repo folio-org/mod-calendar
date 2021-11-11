@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-11-index-service-point-calendars-table
+      author: university-of-alabama/ncovercash
+      changes:
+        - createIndex:
+            tableName: service_point_calendars
+            indexName: service_point_calendars_calendar_id
+            columns:
+              - column:
+                  name: calendar_id
+        - createIndex:
+            tableName: service_point_calendars
+            indexName: service_point_calendars_service_point_id
+            columns:
+              - column:
+                  name: service_point_id

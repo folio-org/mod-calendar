@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-07-index-exceptions-table
+      author: university-of-alabama/ncovercash
+      changes:
+        - createIndex:
+            tableName: exceptions
+            indexName: exceptions_calendar_id
+            columns:
+              - column:
+                  name: calendar_id
+        - createIndex:
+            tableName: exceptions
+            indexName: exceptions_start_date_end_date
+            columns:
+              - column:
+                  name: start_date
+              - column:
+                  name: end_date

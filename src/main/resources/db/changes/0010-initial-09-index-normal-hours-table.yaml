@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-09-index-normal-hours-table
+      author: university-of-alabama/ncovercash
+      changes:
+        - createIndex:
+            tableName: normal_hours
+            indexName: normal_hours_calendar_id
+            columns:
+              - column:
+                  name: calendar_id

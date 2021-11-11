@@ -28,7 +28,7 @@ To use this, you must have the following globally available and in your PATH (`n
 alternative, too):
 
 ```sh
-npm install -g --save-dev prettier prettier-xml
+npm install -g --save-dev prettier prettier-xml prettier-plugin-sql
 ```
 
 ## React
