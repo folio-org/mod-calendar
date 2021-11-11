@@ -1,5 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.springframework.boot</groupId>
@@ -28,7 +32,8 @@
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <json.version>20200518</json.version>
 
-    <calendar-api-defintions-yaml-file>src/main/resources/swagger.api/mod-calendar.yaml</calendar-api-defintions-yaml-file>
+    <calendar-api-defintions-yaml-file
+    >src/main/resources/swagger.api/mod-calendar.yaml</calendar-api-defintions-yaml-file>
   </properties>
 
   <dependencies>
@@ -134,11 +139,14 @@
               <fileSets>
                 <fileSet>
                   <sourceFile>${project.build.directory}/ModuleDescriptor-template.json</sourceFile>
-                  <destinationFile>${project.build.directory}/ModuleDescriptor.json</destinationFile>
+                  <destinationFile
+                  >${project.build.directory}/ModuleDescriptor.json</destinationFile>
                 </fileSet>
                 <fileSet>
-                  <sourceFile>${project.build.directory}/DeploymentDescriptor-template.json</sourceFile>
-                  <destinationFile>${project.build.directory}/DeploymentDescriptor.json</destinationFile>
+                  <sourceFile
+                  >${project.build.directory}/DeploymentDescriptor-template.json</sourceFile>
+                  <destinationFile
+                  >${project.build.directory}/DeploymentDescriptor.json</destinationFile>
                 </fileSet>
               </fileSets>
             </configuration>
@@ -250,7 +258,8 @@
   <scm>
     <url>https://github.com/folio-org/${project.artifactId}</url>
     <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
-    <developerConnection>scm:git:git@github.com:folio-org/${project.artifactId}.git</developerConnection>
+    <developerConnection
+    >scm:git:git@github.com:folio-org/${project.artifactId}.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 

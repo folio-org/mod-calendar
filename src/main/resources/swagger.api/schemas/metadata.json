@@ -32,7 +32,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "createdDate"
-  ]
+  "required": ["createdDate"]
 }

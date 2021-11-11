@@ -9,8 +9,10 @@ separate schemas. For the provided `examples`, it is a fair bit looser -- it see
 response for each endpoint, but I have yet to find anywhere that these are actually referenced
 (maybe in the generated docs)?
 
-It seems that the error 
+It seems that the error
+
 ```
 [INFO] 'host' (OAS 2.0) or 'servers' (OAS 3.0) not defined in the spec. Default to [http://localhost] for server URL [http://localhost/{endpoint}/]
 ```
+
 cannot be fixed.
