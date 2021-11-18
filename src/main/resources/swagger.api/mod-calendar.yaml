@@ -7,13 +7,24 @@ servers:
 paths:
   /hello:
     get:
+      description: Request the server to greet you
+      operationId: getHelloWorld
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - name: salutation
+          in: query
+          schema:
+            type: string
+            default: "Welcome"
+          description: The requested salutation
+          required: false
       responses:
         "200":
-          description: Test
+          description: A hello-related message
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/example"
+                $ref: "#/components/schemas/greeting"
         "500":
           description: Internal server error
           content:
@@ -21,9 +32,15 @@ paths:
               schema:
                 type: string
                 example: Internal server error
-      description: Test
-      operationId: getHelloWorld
 components:
   schemas:
-    example:
-      $ref: schemas/example.json
+    greeting:
+      $ref: schemas/greeting.json
+  parameters:
+    x-okapi-tenant:
+      name: x-okapi-tenant
+      in: header
+      description: X-Okapi-Tenant Value
+      required: true
+      schema:
+        type: string

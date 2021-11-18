@@ -7,25 +7,8 @@ however, mandates a two-space indentation style.
 
 There is a `.prettierrc` in this repo with some basic settings (really just two-space indentation).
 
-A simple `pre-commit` hook can be used to ensure these guidelines are being followed:
-
-```sh
-#!/bin/bash
-set -euxo pipefail
-
-RED="\033[1;31m"
-GREEN="\033[1;32m"
-NC="\033[0m"
-
-files_to_lint=$(git diff --cached --diff-filter=d --name-only | egrep '\.(java|md|xml|sql|json|yaml|yml)$')
-
-prettier --write $files_to_lint
-
-git add -f $files_to_lint
-```
-
-To use this, you must have the following globally available and in your PATH (`npx` is a slow
-alternative, too):
+To use prettier on the codebase, you must have the following NPM modules globally available and in
+your PATH:
 
 ```sh
 npm install -g --save-dev prettier prettier-xml prettier-plugin-sql

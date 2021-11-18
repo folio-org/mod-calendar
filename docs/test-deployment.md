@@ -70,3 +70,15 @@ curl -w '\n' -X POST -D - \
 
 From here, you can use the module's routes directly on Okapi's `:9130` so long as you provide
 `-H "X-Okapi-Tenant: diku"` on your requests.
+
+### Test Examples
+
+```sh
+curl -H "X-Okapi-Tenant: diku" http://localhost:9130/hello
+```
+
+Produces output:
+
+```json
+{ "hello": "heya!" }
+```

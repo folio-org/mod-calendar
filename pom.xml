@@ -208,7 +208,7 @@
         <version>${openapi-generator.version}</version>
         <executions>
           <execution>
-            <id>remoteStorage</id>
+            <id>calendar</id>
             <goals>
               <goal>generate</goal>
             </goals>

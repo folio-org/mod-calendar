@@ -1,7 +1,7 @@
 package org.folio.calendar.controller;
 
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.Example;
+import org.folio.calendar.domain.dto.Greeting;
 import org.folio.calendar.rest.resource.HelloApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloWorldController implements HelloApi {
 
   @Override
-  public ResponseEntity<Example> getHelloWorld() {
-    Example sampleResponse = new Example();
-    sampleResponse.setHello("heya!");
+  public ResponseEntity<Greeting> getHelloWorld(String tenantId, String salutation) {
+    Greeting sampleResponse = new Greeting();
+    sampleResponse.setHello(salutation + " " + tenantId + "!");
     return new ResponseEntity<>(sampleResponse, HttpStatus.OK);
   }
 }
