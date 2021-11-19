@@ -10,6 +10,11 @@
           "methods": ["GET"],
           "pathPattern": "/hello",
           "permissionsRequired": []
+        },
+        {
+          "methods": ["POST"],
+          "pathPattern": "/hello",
+          "permissionsRequired": []
         }
       ]
     },

@@ -1,0 +1,28 @@
+description: A parameter was invalid error
+type: object
+properties:
+  timestamp:
+    description: The time that the error occurred
+    type: string
+    format: date-time
+  status:
+    description: The HTTP response code
+    type: integer
+    enum: [400] # const workaround
+  error:
+    description: A description of the error
+    type: string
+  path:
+    description: The API route that failed
+    type: string
+additionalProperties: false
+required:
+  - timestamp
+  - status
+  - error
+  - path
+example:
+  timestamp: 2021-1118T13:38.5130:00
+  status: 400
+  error: Cannot divide by zero (parameter b = 0)
+  path: /hello

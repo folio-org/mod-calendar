@@ -16,6 +16,7 @@ paths:
           schema:
             type: string
             default: "Welcome"
+          example: "Greetings"
           description: The requested salutation
           required: false
       responses:
@@ -28,14 +29,74 @@ paths:
         "500":
           description: Internal server error
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-                example: Internal server error
+                $ref: "#/components/schemas/internalServerError"
+    post:
+      description: Parameter consumption example
+      operationId: postHello
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - name: a
+          in: query
+          schema:
+            type: integer
+          required: true
+          example: 3
+        - name: b
+          in: query
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        "200":
+          description: Basic maths
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/arithmetics"
+        "400":
+          description: Invalid parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/invalidParameterError"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/internalServerError"
 components:
   schemas:
     greeting:
-      $ref: schemas/greeting.json
+      $ref: schemas/greeting.yaml
+    arithmetics: # put here as example of inline schema
+      type: object
+      properties:
+        product:
+          description: a times b
+          type: integer
+        sum:
+          description: a plus b
+          type: integer
+        quotient:
+          description: a divided by b
+          type: number
+      required:
+        - product
+        - sum
+        - quotient
+      additionalProperties: false
+      example:
+        product: 15
+        sum: 8
+        quotient: 0.6
+    internalServerError:
+      $ref: schemas/internalServerError.yaml
+    invalidParameterError:
+      $ref: schemas/invalidParameterError.yaml
   parameters:
     x-okapi-tenant:
       name: x-okapi-tenant

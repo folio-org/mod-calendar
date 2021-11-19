@@ -1,0 +1,29 @@
+description: An internal server error
+type: object
+properties:
+  timestamp:
+    description: The time that the error occurred
+    type: string
+    format: date-time
+  status:
+    description: The HTTP response code
+    type: integer
+    enum: [400] # const workaround
+  error:
+    description: A description of the error
+    type: string
+    enum: [Internal Server Error] # const workaround
+  path:
+    description: The API route that failed
+    type: string
+additionalProperties: false
+required:
+  - timestamp
+  - status
+  - error
+  - path
+example:
+  timestamp: 2021-1118T13:38.5130:00
+  status: 500
+  error: Internal Server Error
+  path: /hello
