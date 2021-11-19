@@ -72,3 +72,6 @@ docker build -t docker.ci.folio.org/mod-calendar .
 Docker will automatically expand the tag's version to `mod-calendar:latest`, therefore, this does
 not need to be manually specified. The `docker.ci.folio.org` path is required as Okapi will _only_
 search this repository when the module is deployed.
+
+This is done as part of the [`scripts/build.sh`](/scripts/build.sh) script: see
+`./scripts/build.sh -h` for usage instructions.

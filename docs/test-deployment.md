@@ -8,12 +8,13 @@ docker module can then be ran with `docker run -t -i -p 8082:8082 mod-calendar`,
 container's 8082 as local 8082. Please note that environment variables must be provided or this will
 likely fail (due to lack of a database connection).
 
-**_TBD: Investigate
-https://wiki.folio.org/plugins/servlet/mobile?contentId=25729430#content/view/25729430_**
-
 If Okapi is running in a Vagrant box (likely), the build process should be performed in the VM.
 Using shared folders is recommended (by default, the folder with the Vagrantfile is mounted in
 `/vagrant`).
+
+All of the steps in this file, as well as those in the [build-process.md](build-process.md), are
+executed as part of [`scripts/build.sh`](/scripts/build.sh) script. See `./scripts/build.sh -h` for
+usage information.
 
 ## Declare Module
 
