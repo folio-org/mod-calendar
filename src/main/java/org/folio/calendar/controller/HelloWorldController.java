@@ -46,12 +46,12 @@ public class HelloWorldController implements HelloApi {
     Arithmetics answers = new Arithmetics();
     answers.setSum(a + b);
     answers.setProduct(a * b);
-    try {
-      answers.setQuotient(new BigDecimal(a).divide(new BigDecimal(b)));
-    } catch (ArithmeticException e) {
-      var error = new InvalidParameterError();
-      error.setError("");
-    }
+    // try {
+    answers.setQuotient(new BigDecimal(a).divide(new BigDecimal(b)));
+    // } catch (ArithmeticException e) {
+    //   var error = new InvalidParameterError();
+    //   error.setError(""); // ERROR TODO
+    // }
 
     return new ResponseEntity<>(answers, HttpStatus.OK);
   }

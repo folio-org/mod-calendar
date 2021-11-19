@@ -24,7 +24,7 @@ databaseChangeLog:
                     nullable: false
                   name: start_day
                   remarks: no TZ
-                  type: CALENDAR_V2.WEEKDAY
+                  type: WEEKDAY
               - column:
                   constraints:
                     nullable: false
@@ -35,7 +35,7 @@ databaseChangeLog:
                     nullable: false
                   name: end_day
                   remarks: no TZ
-                  type: CALENDAR_V2.WEEKDAY
+                  type: WEEKDAY
               - column:
                   constraints:
                     nullable: false
