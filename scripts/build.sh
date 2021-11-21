@@ -100,7 +100,7 @@ error() {
   red "The last command failed unexpectedly.  Please rerun with -v for more information."
 }
 
-trap error EXIT
+trap error ERR
 
 
 findRoot() {
@@ -144,10 +144,10 @@ DOCKER_BUILD_ARGS=""
 API_DOC_ARGS=""
 
 if [ "$VERBOSE" -gt 1 ]; then
-  CURL_ARGS='-D -'
+  CURL_ARGS="-D - -w '\n'"
   API_DOC_ARGS="-l debug"
 elif [ "$VERBOSE" -gt 0 ]; then
-  CURL_ARGS="-D - -s -o /dev/null"
+  CURL_ARGS="-D - -w '\n' -s -o /dev/null"
   API_DOC_ARGS="-l info"
 else
   DOCKER_BUILD_ARGS="--quiet"
