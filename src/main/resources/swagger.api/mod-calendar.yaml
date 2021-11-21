@@ -31,7 +31,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/internalServerError"
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/internalServerError"
     post:
       description: Parameter consumption example
       operationId: postHello
@@ -61,7 +63,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/invalidParameterError"
         "500":
@@ -69,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/error"
+                $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/internalServerError"
 components:
@@ -97,8 +99,8 @@ components:
         product: 15
         sum: 8
         quotient: 0.6
-    error:
-      $ref: schemas/error.yaml
+    errorResponse:
+      $ref: schemas/errorResponse.yaml
   parameters:
     x-okapi-tenant:
       name: x-okapi-tenant
@@ -109,12 +111,16 @@ components:
         type: string
   examples:
     internalServerError:
-      timestamp: 2021-11-18T13:38.5130:00
-      status: 500
-      error: Internal Server Error
-      path: /hello
+      value:
+        timestamp: 2021-11-18T13:38.5130:00
+        status: 500
+        error_code: internal_server_error
+        error: Internal Server Error
+        path: /hello
     invalidParameterError:
-      timestamp: 2021-11-18T13:38.5130:00
-      status: 400
-      error: Cannot divide by zero (parameter b = 0)
-      path: /hello
+      value:
+        timestamp: 2021-11-18T13:38.5130:00
+        status: 400
+        error_code: hello.post.bad_arithmetic
+        error: Cannot divide by zero (parameter b = 0)
+        path: /hello

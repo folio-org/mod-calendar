@@ -1,4 +1,4 @@
-description: An error
+description: Any kind of error coming from an endpoint
 type: object
 properties:
   timestamp:
@@ -13,7 +13,7 @@ properties:
     type: string
     enum:
       - internal_server_error
-      - test_arithmetic.invalid_division
+      - hello.post.bad_arithmetic
   error:
     description: A description of the error
     type: string
@@ -29,5 +29,6 @@ required:
 example:
   timestamp: 2021-1118T13:38.5130:00
   status: 500
+  error_code: internal_server_error
   error: Internal Server Error
   path: /hello
