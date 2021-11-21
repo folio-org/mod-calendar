@@ -5,10 +5,10 @@ bold() {
   echo $(tput bold)"$@"$(tput sgr0)
 }
 green() {
-  echo $(tput setaf 10)"$@"$(tput sgr0)
+  echo $(tput bold)$(tput setaf 10)"$@"$(tput sgr0)
 }
 red() {
-  echo $(tput setaf 9)"$@"$(tput sgr0)
+  echo $(tput bold)$(tput setaf 9)"$@"$(tput sgr0)
 }
 
 usage() {
@@ -28,6 +28,12 @@ usage() {
   echo "         -vvv:  Even more verbose"
   echo
 }
+
+error() {
+  red "The last command failed unexpectedly.  Please rerun with -v for more information."
+}
+
+trap error EXIT
 
 optstring=":hFfbaovvvd:"
 
