@@ -1,4 +1,4 @@
-description: An internal server error
+description: An error
 type: object
 properties:
   timestamp:
@@ -8,11 +8,15 @@ properties:
   status:
     description: The HTTP response code
     type: integer
-    enum: [400] # const workaround
+  error_code:
+    description: A code describing the error, namespaced when applicable
+    type: string
+    enum:
+      - internal_server_error
+      - test_arithmetic.invalid_division
   error:
     description: A description of the error
     type: string
-    enum: [Internal Server Error] # const workaround
   path:
     description: The API route that failed
     type: string

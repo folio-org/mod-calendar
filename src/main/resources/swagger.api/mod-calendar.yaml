@@ -61,13 +61,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/invalidParameterError"
+                $ref: "#/components/schemas/error"
+              example:
+                $ref: "#/components/examples/invalidParameterError"
         "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/internalServerError"
+                $ref: "#/components/schemas/error"
+              example:
+                $ref: "#/components/examples/internalServerError"
 components:
   schemas:
     greeting:
@@ -93,10 +97,8 @@ components:
         product: 15
         sum: 8
         quotient: 0.6
-    internalServerError:
-      $ref: schemas/internalServerError.yaml
-    invalidParameterError:
-      $ref: schemas/invalidParameterError.yaml
+    error:
+      $ref: schemas/error.yaml
   parameters:
     x-okapi-tenant:
       name: x-okapi-tenant
@@ -105,3 +107,14 @@ components:
       required: true
       schema:
         type: string
+  examples:
+    internalServerError:
+      timestamp: 2021-11-18T13:38.5130:00
+      status: 500
+      error: Internal Server Error
+      path: /hello
+    invalidParameterError:
+      timestamp: 2021-11-18T13:38.5130:00
+      status: 400
+      error: Cannot divide by zero (parameter b = 0)
+      path: /hello
