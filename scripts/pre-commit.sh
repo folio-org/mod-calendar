@@ -23,7 +23,7 @@ fi
 
 api_changes=$(git diff --cached --diff-filter=d --name-only | grep 'src/main/resources/swagger.api')
 
-if [ -n "$api" ]; then
+if [ -n "$api_changes" ]; then
   set -euo pipefail # if this returns failure, stop
   # verify the API
   swagger-cli validate src/main/resources/swagger.api/mod-calendar.yaml
