@@ -29,12 +29,6 @@ usage() {
   echo
 }
 
-error() {
-  red "The last command failed unexpectedly.  Please rerun with -v for more information."
-}
-
-trap error EXIT
-
 optstring=":hFfbaovvvd:"
 
 MAVEN_BUILD_CMD=""
@@ -100,6 +94,14 @@ done
 if [ "$VERBOSE" -gt 2 ]; then
   set -x
 fi
+
+# Setup after parsing args since some of those exit immediately
+error() {
+  red "The last command failed unexpectedly.  Please rerun with -v for more information."
+}
+
+trap error EXIT
+
 
 findRoot() {
   local DIR="$1"
