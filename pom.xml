@@ -34,8 +34,9 @@
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <json.version>20200518</json.version>
 
-    <calendar-api-defintions-yaml-file
-    >src/main/resources/swagger.api/mod-calendar.yaml</calendar-api-defintions-yaml-file>
+    <calendar-api-defintions-yaml-file>
+      src/main/resources/swagger.api/mod-calendar.yaml
+    </calendar-api-defintions-yaml-file>
   </properties>
 
   <dependencies>
@@ -82,7 +83,6 @@
 
   <build>
     <plugins>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
@@ -141,14 +141,17 @@
               <fileSets>
                 <fileSet>
                   <sourceFile>${project.build.directory}/ModuleDescriptor-template.json</sourceFile>
-                  <destinationFile
-                  >${project.build.directory}/ModuleDescriptor.json</destinationFile>
+                  <destinationFile>
+                    ${project.build.directory}/ModuleDescriptor.json
+                  </destinationFile>
                 </fileSet>
                 <fileSet>
-                  <sourceFile
-                  >${project.build.directory}/DeploymentDescriptor-template.json</sourceFile>
-                  <destinationFile
-                  >${project.build.directory}/DeploymentDescriptor.json</destinationFile>
+                  <sourceFile>
+                    ${project.build.directory}/DeploymentDescriptor-template.json
+                  </sourceFile>
+                  <destinationFile>
+                    ${project.build.directory}/DeploymentDescriptor.json
+                  </destinationFile>
                 </fileSet>
               </fileSets>
             </configuration>
@@ -234,7 +237,6 @@
           </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 
@@ -266,9 +268,9 @@
   <scm>
     <url>https://github.com/folio-org/${project.artifactId}</url>
     <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
-    <developerConnection
-    >scm:git:git@github.com:folio-org/${project.artifactId}.git</developerConnection>
+    <developerConnection>
+      scm:git:git@github.com:folio-org/${project.artifactId}.git
+    </developerConnection>
     <tag>HEAD</tag>
   </scm>
-
 </project>

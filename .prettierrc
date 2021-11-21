@@ -5,5 +5,7 @@
   "semi": true,
   "proseWrap": "always",
   "trailingComma": "all",
-  "quoteProps": "consistent"
+  "quoteProps": "consistent",
+  "bracketSameLine": false,
+  "xmlWhitespaceSensitivity": "ignore"
 }
