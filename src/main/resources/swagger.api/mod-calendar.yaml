@@ -59,7 +59,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/arithmetics"
         "400":
-          description: Invalid parameter
+          description: Invalid parameter (cannot divide by zero)
           content:
             application/json:
               schema:
