@@ -46,6 +46,7 @@ public class ApiExceptionHandler {
   ) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
+      exception,
       ErrorCodeEnum.INVALID_PARAMETER,
       "One of the parameters was of the incorrect type (%s)",
       exception.getMessage()
@@ -65,6 +66,7 @@ public class ApiExceptionHandler {
   ) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
+      exception,
       ErrorCodeEnum.INVALID_PARAMETER,
       "One of the parameters was missing or null (%s)",
       exception.getMessage()
@@ -83,6 +85,7 @@ public class ApiExceptionHandler {
     log.log(ERROR, exception);
 
     return new NonspecificCalendarException(
+      exception,
       HttpStatus.INTERNAL_SERVER_ERROR,
       ErrorCodeEnum.INTERNAL_SERVER_ERROR,
       "Internal server error (%s): %s",

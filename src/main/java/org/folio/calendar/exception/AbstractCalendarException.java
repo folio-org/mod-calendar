@@ -25,22 +25,41 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * @param errorCode An error code as described in the ErrorResponse API type
    * @param message   A printf-style string for the error message
    * @param format    Formatting for the printf style message
-   * @see             String#format
+   * @see String#format
    */
   protected AbstractCalendarException(ErrorCodeEnum errorCode, String message, Object... format) {
-    super(String.format(message, format));
-    this.errorCode = errorCode;
-    this.statusCode = HttpStatus.BAD_REQUEST;
+    this(null, HttpStatus.BAD_REQUEST, errorCode, message, format);
   }
 
   /**
-   * Create an AbstractCalendarException with the given HTTP status code, error
-   * code, message, and format.
+   * Create an AbstractCalendarException with the given causing exception, error
+   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
+   * Request
    *
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param cause     The exception which caused this (may be null)
    * @param errorCode An error code as described in the ErrorResponse API type
    * @param message   A printf-style string for the error message
    * @param format    Formatting for the printf style message
+   * @see String#format
+   */
+  protected AbstractCalendarException(
+    Throwable cause,
+    ErrorCodeEnum errorCode,
+    String message,
+    Object... format
+  ) {
+    this(cause, HttpStatus.BAD_REQUEST, errorCode, message, format);
+  }
+
+  /**
+   * Create an AbstractCalendarException with the given causing exception, error
+   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
+   * Request
+   *
+   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param errorCode  An error code as described in the ErrorResponse API type
+   * @param message    A printf-style string for the error message
+   * @param format     Formatting for the printf style message
    * @see String#format
    */
   protected AbstractCalendarException(
@@ -49,7 +68,28 @@ public abstract class AbstractCalendarException extends RuntimeException {
     String message,
     Object... format
   ) {
-    super(String.format(message, format));
+    this(null, statusCode, errorCode, message, format);
+  }
+
+  /**
+   * Create an AbstractCalendarException with the given HTTP status code, error
+   * code, message, and format.
+   *
+   * @param cause      The exception which caused this (may be null)
+   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param errorCode  An error code as described in the ErrorResponse API type
+   * @param message    A printf-style string for the error message
+   * @param format     Formatting for the printf style message
+   * @see String#format
+   */
+  protected AbstractCalendarException(
+    Throwable cause,
+    HttpStatus statusCode,
+    ErrorCodeEnum errorCode,
+    String message,
+    Object... format
+  ) {
+    super(String.format(message, format), cause);
     this.errorCode = errorCode;
     this.statusCode = statusCode;
   }
