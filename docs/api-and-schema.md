@@ -4,7 +4,7 @@ The API routing, parameters, etc., are all managed through Swagger. This is done
 `mod-calendar.yaml` in `main/resources/swagger.api` folder. This should be entirely up to the
 OpenAPI spec.
 
-Other FOLIO projects seem to aggresively prefer abstracting every parameter, response, etc., into
+Other FOLIO projects seem to aggressively prefer abstracting every parameter, response, etc., into
 separate schemas. For the provided `examples`, it is a fair bit looser -- it seems to be an example
 response for each endpoint, but I have yet to find anywhere that these are actually referenced?
 
