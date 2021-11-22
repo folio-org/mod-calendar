@@ -32,7 +32,8 @@ This is used by Okapi to get information about the module.
 
 The main block (besides the meta `_tenant` present in all module) is the `mod-calendar` block
 (`@artifactId@`). This block contains the schema of what API calls are allowed and all the
-information about them.
+information about them. API versioning here is inconsistent with the package version itself,
+however, should be consistent with the Swagger YAML in `mod-calendar.yaml`.
 
 ### `permissionSets`
 
@@ -51,9 +52,8 @@ currently just the original value and should be re-defined based on actual needs
 ## Deployment Descriptor
 
 The deployment descriptor is much more straightforward -- all this does is run the JAR produced by
-Maven. `embed_postgres` may be something for testing, or with Postgres itself -- unsure at the time
-of writing. This deployment descriptor will support both `port` and `http.port`, however, it seems
-to be implemented outside the module's purview (likely in `folio-spring-base`).
+Maven. The `exec` key found in many of these descriptors is ignored and pointless -- at some point
+they hope to replace the majority of this declare/deploy process with a single install step.
 
 ## Compilation Step
 
