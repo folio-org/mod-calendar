@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Calendar API
-  version: v5
+  version: v4.1
 servers:
   - url: /
 paths:
@@ -64,8 +64,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-              example:
-                $ref: "#/components/examples/invalidParameterError"
+              examples:
+                invalidParameterError:
+                  $ref: "#/components/examples/invalidParameterError"
+                divideByZeroError:
+                  value:
+                    timestamp: 2021-11-18T13:38.51-50:00
+                    status: 400
+                    error_code: hello.post.bad_arithmetic
+                    error_message: Cannot divide by zero (parameter b = 0)
+                  summary: Division by zero error
         "500":
           description: Internal server error
           content:
@@ -112,15 +120,15 @@ components:
   examples:
     internalServerError:
       value:
-        timestamp: 2021-11-18T13:38.5130:00
+        timestamp: 2021-11-18T13:38.51-50:00
         status: 500
         error_code: internal_server_error
-        error: Internal Server Error
-        path: /hello
+        error_message: Internal Server Error
+      summary: Any kind of internal error
     invalidParameterError:
       value:
-        timestamp: 2021-11-18T13:38.5130:00
+        timestamp: 2021-11-18T13:38.51-05:00
         status: 400
-        error_code: hello.post.bad_arithmetic
-        error: Cannot divide by zero (parameter b = 0)
-        path: /hello
+        error_code: invalid_parameter
+        error_message: Cannot divide by zero (parameter b = 0)
+      summary: A parameter was not of the correct type

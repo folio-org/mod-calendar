@@ -3,8 +3,8 @@
   "name": "Calendar for Service Point Opening Hours",
   "provides": [
     {
-      "id": "@artifactId@",
-      "version": "5.0",
+      "id": "calendar",
+      "version": "4.1",
       "handlers": [
         {
           "methods": ["GET"],
