@@ -32,7 +32,8 @@ CSS classes should be written in `camelCase`.
 
 ## SonarLint
 
-SonarLint is a wonderful IDE plugin to lint your code. I recommend enabling the following rules:
+[SonarLint](https://sonarlint.org/) is a wonderful IDE plugin to lint your code. I recommend
+enabling the following rules:
 
 ```json
 "sonarlint.rules": {
