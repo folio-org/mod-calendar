@@ -13,22 +13,21 @@ properties:
     type: string
     enum:
       - internal_server_error
+      - invalid_parameter
       - hello.post.bad_arithmetic
-  error:
-    description: A description of the error
-    type: string
-  path:
-    description: The API route that failed
+  error_message:
+    description:
+      A description of the error, primarily for internal use.  Only error codes should be used
+      (which must be specific and localized for the frontend).
     type: string
 additionalProperties: false
 required:
   - timestamp
   - status
-  - error
-  - path
+  - error_code
+  - error_message
 example:
-  timestamp: 2021-1118T13:38.5130:00
+  timestamp: 2021-1118T13:38.51-05:00
   status: 500
   error_code: internal_server_error
-  error: Internal Server Error
-  path: /hello
+  error_message: Internal Server Error
