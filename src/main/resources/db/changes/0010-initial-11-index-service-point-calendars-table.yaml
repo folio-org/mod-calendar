@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-11-index-service-point-calendars-table
       author: university-of-alabama/ncovercash
+      comment: Add calendar_id and service_point_id indexes to service_point_calendars table
       changes:
         - createIndex:
             tableName: service_point_calendars

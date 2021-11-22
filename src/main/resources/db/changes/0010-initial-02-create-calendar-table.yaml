@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-02-create-calendar-table
       author: university-of-alabama/ncovercash
+      comment: Create table calendar
       changes:
         - createTable:
             tableName: calendars

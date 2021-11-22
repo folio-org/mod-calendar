@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-08-create-normal-hours-table
       author: university-of-alabama/ncovercash
+      comment: Create normal_hours table
       changes:
         - createTable:
             tableName: normal_hours

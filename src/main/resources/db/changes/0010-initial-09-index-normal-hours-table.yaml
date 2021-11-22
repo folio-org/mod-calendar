@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-09-index-normal-hours-table
       author: university-of-alabama/ncovercash
+      comment: Add calendar_id index to normal_hours table
       changes:
         - createIndex:
             tableName: normal_hours

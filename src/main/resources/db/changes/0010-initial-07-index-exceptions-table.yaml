@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-07-index-exceptions-table
       author: university-of-alabama/ncovercash
+      comment: Add calendar_id and start/end date indexes to exception table
       changes:
         - createIndex:
             tableName: exceptions

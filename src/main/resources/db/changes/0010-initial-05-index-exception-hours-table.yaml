@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-05-index-exception-hours-table
       author: university-of-alabama/ncovercash
+      comment: Add exception_id index to exception_hours table
       changes:
         - createIndex:
             tableName: exception_hours

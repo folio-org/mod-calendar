@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-12-create-foreign-keys
       author: university-of-alabama/ncovercash
+      comment: Create foreign keys to link all the tables
       changes:
         - addForeignKeyConstraint:
             constraintName: exceptions_calendar_id_fkey

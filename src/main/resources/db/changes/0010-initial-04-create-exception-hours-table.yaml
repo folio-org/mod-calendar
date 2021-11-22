@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: 0010-initial-04-create-exception-hours-table
       author: university-of-alabama/ncovercash
+      comment: Create table exception_hours
       changes:
         - createTable:
             remarks:
