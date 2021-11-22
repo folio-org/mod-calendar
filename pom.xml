@@ -13,10 +13,10 @@
   </parent>
   <groupId>org.folio</groupId>
   <artifactId>mod-calendar</artifactId>
-  <name>mod-calendar</name>
   <version>2.0.0-SNAPSHOT</version>
-  <description>FOLIO calendar module for service point openings</description>
   <packaging>jar</packaging>
+  <name>mod-calendar</name>
+  <description>FOLIO calendar module for service point openings</description>
 
   <licenses>
     <license>
@@ -24,6 +24,31 @@
       <url>https://spdx.org/licenses/Apache-2.0</url>
     </license>
   </licenses>
+  <scm>
+    <url>https://github.com/folio-org/${project.artifactId}</url>
+    <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
+    <developerConnection>
+      scm:git:git@github.com:folio-org/${project.artifactId}.git
+    </developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>folio-nexus</id>
+      <name>FOLIO Release Repository</name>
+      <url>https://repository.folio.org/repository/maven-releases/</url>
+      <uniqueVersion>false</uniqueVersion>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <id>folio-nexus</id>
+      <name>FOLIO Snapshot Repository</name>
+      <uniqueVersion>true</uniqueVersion>
+      <url>https://repository.folio.org/repository/maven-snapshots/</url>
+      <layout>default</layout>
+    </snapshotRepository>
+  </distributionManagement>
 
   <properties>
     <java.version>11</java.version>
@@ -80,6 +105,13 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>folio-nexus</id>
+      <name>FOLIO Maven repository</name>
+      <url>https://repository.folio.org/repository/maven-folio</url>
+    </repository>
+  </repositories>
 
   <build>
     <plugins>
@@ -239,38 +271,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>folio-nexus</id>
-      <name>FOLIO Maven repository</name>
-      <url>https://repository.folio.org/repository/maven-folio</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>folio-nexus</id>
-      <name>FOLIO Release Repository</name>
-      <url>https://repository.folio.org/repository/maven-releases/</url>
-      <uniqueVersion>false</uniqueVersion>
-      <layout>default</layout>
-    </repository>
-    <snapshotRepository>
-      <id>folio-nexus</id>
-      <name>FOLIO Snapshot Repository</name>
-      <uniqueVersion>true</uniqueVersion>
-      <url>https://repository.folio.org/repository/maven-snapshots/</url>
-      <layout>default</layout>
-    </snapshotRepository>
-  </distributionManagement>
-
-  <scm>
-    <url>https://github.com/folio-org/${project.artifactId}</url>
-    <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
-    <developerConnection>
-      scm:git:git@github.com:folio-org/${project.artifactId}.git
-    </developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 </project>
