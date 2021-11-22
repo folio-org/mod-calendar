@@ -5,7 +5,7 @@ spring:
     name: @project.artifactId@
     version: @project.version@
   jackson:
-    default-property-inclusion: non_null
+    default-property-inclusion: NON_NULL
   datasource:
     continue-on-error: true
     username: ${DB_USERNAME:postgres}
@@ -24,6 +24,8 @@ spring:
     implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
     hibernate:
       format_sql: true
+  banner:
+    location: classpath:/banner.txt
 
 management:
   endpoints:
