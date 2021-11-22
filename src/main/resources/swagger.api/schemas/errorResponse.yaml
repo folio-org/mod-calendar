@@ -12,9 +12,9 @@ properties:
     description: A code describing the error, namespaced when applicable
     type: string
     enum:
-      - internal_server_error
-      - invalid_parameter
-      - hello.post.bad_arithmetic
+      - internal_server_error # Catch-all for any other unhandled exceptions
+      - invalid_parameter # Catch-all for missing or wrongly-typed parameters
+      - hello.post.bad_arithmetic # Sample response based on /hello when b=0, causing impossible division
   error_message:
     description:
       A description of the error, primarily for internal use.  Only error codes should be used

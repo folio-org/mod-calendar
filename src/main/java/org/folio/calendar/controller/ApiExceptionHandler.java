@@ -3,10 +3,11 @@ package org.folio.calendar.controller;
 import static org.apache.logging.log4j.Level.ERROR;
 import static org.apache.logging.log4j.Level.INFO;
 
-import java.util.Date;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.domain.dto.ErrorResponse.ErrorCodeEnum;
+import org.folio.calendar.exception.AbstractCalendarException;
+import org.folio.calendar.exception.NonspecificCalendarException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestValueException;
@@ -19,6 +20,21 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class ApiExceptionHandler {
 
   /**
+   * Handles exceptions from our application
+   *
+   * @param exception {@link AbstractCalendarException} object
+   * @see AbstractCalendarException
+   * @return ResponseEntity<ErrorResponse>
+   */
+  @ExceptionHandler(AbstractCalendarException.class)
+  public ResponseEntity<ErrorResponse> handleCalendarException(
+    AbstractCalendarException exception
+  ) {
+    log.log(INFO, exception);
+    return exception.getErrorResponseEntity();
+  }
+
+  /**
    * Handles improperly typed parameters
    *
    * @param exception {@link Exception} object
@@ -29,12 +45,12 @@ public class ApiExceptionHandler {
     MethodArgumentTypeMismatchException exception
   ) {
     log.log(INFO, exception);
-    return buildErrorResponse(
-      HttpStatus.BAD_REQUEST,
+    return new NonspecificCalendarException(
       ErrorCodeEnum.INVALID_PARAMETER,
       "One of the parameters was of the incorrect type (%s)",
       exception.getMessage()
-    );
+    )
+      .getErrorResponseEntity();
   }
 
   /**
@@ -48,12 +64,12 @@ public class ApiExceptionHandler {
     MissingRequestValueException exception
   ) {
     log.log(INFO, exception);
-    return buildErrorResponse(
-      HttpStatus.BAD_REQUEST,
+    return new NonspecificCalendarException(
       ErrorCodeEnum.INVALID_PARAMETER,
-      "One of the parameters was of the missing or null (%s)",
+      "One of the parameters was missing or null (%s)",
       exception.getMessage()
-    );
+    )
+      .getErrorResponseEntity();
   }
 
   /**
@@ -65,35 +81,14 @@ public class ApiExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception) {
     log.log(ERROR, exception);
-    return buildErrorResponse(
+
+    return new NonspecificCalendarException(
       HttpStatus.INTERNAL_SERVER_ERROR,
       ErrorCodeEnum.INTERNAL_SERVER_ERROR,
       "Internal server error (%s): %s",
-      exception.getClass().getName(),
+      exception.getClass().getSimpleName(),
       exception.getMessage()
-    );
-  }
-
-  /**
-   * Create a standardized error response from the
-   *
-   * @param status
-   * @param errorCode
-   * @throws Exception
-   * @return
-   */
-  protected ResponseEntity<ErrorResponse> buildErrorResponse(
-    HttpStatus status,
-    ErrorCodeEnum errorCode,
-    String errorMessage,
-    Object... format
-  ) {
-    ErrorResponse error = new ErrorResponse();
-    error.setTimestamp(new Date());
-    error.setErrorCode(errorCode);
-    error.setErrorMessage(String.format(errorMessage, format));
-    error.setStatus(status.value());
-    // error.set
-    return new ResponseEntity<>(error, status);
+    )
+      .getErrorResponseEntity();
   }
 }
