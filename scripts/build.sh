@@ -173,7 +173,7 @@ if [ "$REDEFINE" == "yes" ]; then
     http://localhost:9130/_/proxy/tenants/diku/modules/mod-calendar-2.0.0-SNAPSHOT
 
   # undefine module
-  green "Undefining the module for diku"
+  green "Undefining the module"
   curl $CURL_ARGS -X DELETE \
     http://localhost:9130/_/proxy/modules/mod-calendar-2.0.0-SNAPSHOT
 
