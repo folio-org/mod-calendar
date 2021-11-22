@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-02-create-calendar-table
+      author: university-of-alabama/ncovercash
+      comment: Create table calendar
+      changes:
+        - createTable:
+            tableName: calendars
+            remarks: Stores calendar metadata
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: calendar_id
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_date
+                  remarks: no TZ
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  remarks: no TZ
+                  type: date
+                  constraints:
+                    nullable: false
