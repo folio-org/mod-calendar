@@ -144,10 +144,10 @@ DOCKER_BUILD_ARGS=""
 API_DOC_ARGS=""
 
 if [ "$VERBOSE" -gt 1 ]; then
-  CURL_ARGS="-D - -w '\n'"
+  CURL_ARGS="-D - -w \n"
   API_DOC_ARGS="-l debug"
 elif [ "$VERBOSE" -gt 0 ]; then
-  CURL_ARGS="-D - -w '\n' -s -o /dev/null"
+  CURL_ARGS="-D - -w \n -s -o /dev/null"
   API_DOC_ARGS="-l info"
 else
   DOCKER_BUILD_ARGS="--quiet"
