@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-01-create-weekday-type
+      author: university-of-alabama/ncovercash
+      comment: Add weekday type
+      changes:
+        - sql:
+            sql: |
+              CREATE TYPE "weekday" AS ENUM (
+                'sunday',
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday'
+              );
+      rollback:
+        - sql:
+            sql: DROP TYPE "weekday";
