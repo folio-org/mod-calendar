@@ -2,8 +2,7 @@ spring:
   cache:
     type: none
   application:
-    name: @project.artifactId@
-    version: @project.version@
+    name: mod-calendar
   jackson:
     default-property-inclusion: NON_NULL
   liquibase:
