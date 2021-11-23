@@ -5,36 +5,32 @@ databaseChangeLog:
       comment:
         "Delete all existing mod-calendar tables to make way for new schema. TODO: Make this an
         actual migration script"
-      preConditions:
-        - onFail: mark_ran
-        - tableExists:
-            tableName: rmb_internal
       changes:
-        - dropTable:
-            tableName: actual_opening_hours
-        - dropTable:
-            tableName: audit_actual_opening_hours
-        - dropTable:
-            tableName: audit_exceptional_hours
-        - dropTable:
-            tableName: audit_exceptions
-        - dropTable:
-            tableName: audit_openings
-        - dropTable:
-            tableName: audit_regular_hours
-        - dropTable:
-            tableName: exceptional_hours
-        - dropTable:
-            tableName: exceptions
-        - dropTable:
-            tableName: openings
-        - dropTable:
-            tableName: regular_hours
-        - dropTable:
-            tableName: rmb_internal
-        - dropTable:
-            tableName: rmb_internal_analyze
-        - dropTable:
-            tableName: rmb_internal_index
-        - dropTable:
-            tableName: rmb_job
+        - sql:
+            sql: DROP TABLE IF EXISTS actual_opening_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_actual_opening_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_exceptional_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_exceptions;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_openings;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_regular_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS exceptional_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS exceptions;
+        - sql:
+            sql: DROP TABLE IF EXISTS openings;
+        - sql:
+            sql: DROP TABLE IF EXISTS regular_hours;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal_analyze;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal_index;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_job;
