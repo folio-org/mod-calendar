@@ -1,4 +1,4 @@
-package org.folio.calendar;
+package org.folio.calendar.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.calendar.utils.APITestUtils.TENANT_ID;
