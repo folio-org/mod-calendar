@@ -39,18 +39,12 @@ paths:
       operationId: postHello
       parameters:
         - $ref: "#/components/parameters/x-okapi-tenant"
-        - name: a
-          in: query
-          schema:
-            type: integer
-          required: true
-          example: 3
-        - name: b
-          in: query
-          schema:
-            type: integer
-          required: true
-          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/arithmeticRequest"
       responses:
         "200":
           description: Basic maths
@@ -59,7 +53,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/arithmetics"
         "400":
-          description: Invalid parameter (cannot divide by zero)
+          description: Invalid parameter
           content:
             application/json:
               schema:
@@ -107,6 +101,20 @@ components:
         product: 15
         sum: 8
         quotient: 0.6
+    arithmeticRequest:
+      type: object
+      properties:
+        a:
+          type: integer
+        b:
+          type: integer
+      required:
+        - a
+        - b
+      additionalProperties: false
+      example:
+        a: 3
+        b: 5
     errorResponse:
       $ref: schemas/errorResponse.yaml
   parameters:
@@ -125,10 +133,16 @@ components:
         error_code: internal_server_error
         error_message: Internal Server Error
       summary: Any kind of internal error
+    invalidRequest:
+      value:
+        timestamp: 2021-11-18T13:38.51-50:00
+        status: 400
+        error_code: invalid_request
+        error_message: The request could not be parsed
     invalidParameterError:
       value:
         timestamp: 2021-11-18T13:38.51-05:00
         status: 400
         error_code: invalid_parameter
-        error_message: Cannot divide by zero (parameter b = 0)
+        error_message: One of the parameters was of the incorrect type ()
       summary: A parameter was not of the correct type

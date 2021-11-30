@@ -1,6 +1,7 @@
 package org.folio.calendar.controller;
 
 import java.math.BigDecimal;
+import org.folio.calendar.domain.dto.ArithmeticRequest;
 import org.folio.calendar.domain.dto.Arithmetics;
 import org.folio.calendar.domain.dto.Greeting;
 import org.folio.calendar.exception.InvalidDivisionException;
@@ -22,12 +23,12 @@ public class HelloWorldController implements HelloApi {
   }
 
   @Override
-  public ResponseEntity<Arithmetics> postHello(String xOkapiTenant, Integer a, Integer b) {
+  public ResponseEntity<Arithmetics> postHello(String xOkapiTenant, ArithmeticRequest request) {
     Arithmetics answers = new Arithmetics();
-    answers.setSum(a + b);
-    answers.setProduct(a * b);
+    answers.setSum(request.getA() + request.getB());
+    answers.setProduct(request.getA() * request.getB());
     try {
-      answers.setQuotient(new BigDecimal(a).divide(new BigDecimal(b)));
+      answers.setQuotient(new BigDecimal(request.getA()).divide(new BigDecimal(request.getB())));
     } catch (ArithmeticException e) {
       throw new InvalidDivisionException(e);
     }

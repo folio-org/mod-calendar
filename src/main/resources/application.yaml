@@ -2,8 +2,8 @@ spring:
   cache:
     type: none
   application:
-    name: @project.artifactId@
-    version: @project.version@
+    name: "@project.artifactId@"
+    version: "@project.version@"
   jackson:
     default-property-inclusion: NON_NULL
   datasource:
