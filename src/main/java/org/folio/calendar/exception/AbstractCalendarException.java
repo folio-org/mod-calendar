@@ -106,6 +106,9 @@ public abstract class AbstractCalendarException extends RuntimeException {
     error.setErrorMessage(
       String.format("%s: %s", this.getClass().getSimpleName(), this.getMessage())
     );
+    for (StackTraceElement frame : this.getStackTrace()) {
+      error.addTraceItem(frame.toString());
+    }
     error.setStatus(this.getStatusCode().value());
     return error;
   }
