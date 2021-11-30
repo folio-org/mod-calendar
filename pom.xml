@@ -68,6 +68,7 @@
     <wiremock.version>2.31.0</wiremock.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
+    <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
   </properties>
 
   <dependencies>
@@ -110,6 +111,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.atlassian.oai</groupId>
+      <artifactId>swagger-request-validator-restassured</artifactId>
+      <version>${swagger-request-validator.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>io.zonky.test</groupId>
       <artifactId>embedded-database-spring-test</artifactId>
       <version>${embedded-database-spring-test.version}</version>
@@ -148,6 +155,11 @@
   </repositories>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -291,9 +303,8 @@
               <generateApiTests>true</generateApiTests>
               <generateApiDocumentation>true</generateApiDocumentation>
               <generateModels>true</generateModels>
-              <generateModelTests>false</generateModelTests>
+              <generateModelTests>true</generateModelTests>
               <generateSupportingFiles>true</generateSupportingFiles>
-              <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
               <generateModelDocumentation>true</generateModelDocumentation>
               <configOptions>
                 <dateLibrary>java</dateLibrary>
