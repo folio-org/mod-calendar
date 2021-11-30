@@ -3,6 +3,8 @@ package org.folio.calendar.controller;
 import static org.apache.logging.log4j.Level.ERROR;
 import static org.apache.logging.log4j.Level.INFO;
 
+import java.util.Arrays;
+import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.domain.dto.ErrorResponse.ErrorCodeEnum;
@@ -37,7 +39,25 @@ public class ApiExceptionHandler {
   /**
    * Handles improperly typed parameters
    *
-   * @param exception {@link Exception} object
+   * @param exception exception indicating that the request could not be parsed
+   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   */
+  @ExceptionHandler(ServletException.class)
+  public ResponseEntity<ErrorResponse> handleBadRequest(ServletException exception) {
+    log.log(INFO, exception);
+    return new NonspecificCalendarException(
+      exception,
+      ErrorCodeEnum.INVALID_PARAMETER,
+      "One of the parameters was of the incorrect type (%s)",
+      exception.getMessage()
+    )
+      .getErrorResponseEntity();
+  }
+
+  /**
+   * Handles improperly typed parameters
+   *
+   * @param exception exception indicating that a method parameter type was incorrect
    * @return {@link ResponseEntity} with {@link ErrorResponse} body.
    */
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
@@ -57,7 +77,7 @@ public class ApiExceptionHandler {
   /**
    * Handles entirely missing parameters
    *
-   * @param exception {@link Exception} object
+   * @param exception exception indicating that a request value was missing
    * @return {@link ResponseEntity} with {@link ErrorResponse} body.
    */
   @ExceptionHandler(MissingRequestValueException.class)
@@ -77,13 +97,28 @@ public class ApiExceptionHandler {
   /**
    * Handles all uncaught exceptions.
    *
-   * @param exception {@link Exception} object
+   * @param exception exceptions not otherwise caught
    * @return {@link ResponseEntity} with {@link ErrorResponse} body.
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception) {
     log.log(ERROR, exception);
 
+    // NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
+    // However, NPE is far too generic to catch and always attribute to bad input.
+    if (
+      exception instanceof NullPointerException &&
+      Arrays.toString(exception.getStackTrace()).indexOf("calendar") == -1
+    ) {
+      return new NonspecificCalendarException(
+        exception,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        "NullPointerException that does not appear to have occurred without the Calendar application.  Check that your input is valid?  %s",
+        exception.getMessage()
+      )
+        .getErrorResponseEntity();
+    }
     return new NonspecificCalendarException(
       exception,
       HttpStatus.INTERNAL_SERVER_ERROR,
