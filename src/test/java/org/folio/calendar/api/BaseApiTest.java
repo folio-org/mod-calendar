@@ -2,11 +2,14 @@ package org.folio.calendar.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.calendar.utils.APITestUtils.TENANT_ID;
+import static org.hamcrest.Matchers.is;
 
 import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
+import io.restassured.config.JsonConfig;
 import io.restassured.http.Header;
+import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import lombok.Getter;
@@ -36,7 +39,7 @@ class BaseApiTest {
 
   @Getter
   @Setter
-  protected static boolean dbInitialized = false;
+  protected static boolean initialized = false;
 
   @Autowired
   protected WireMockServer wireMockServer;
@@ -53,23 +56,29 @@ class BaseApiTest {
   @LocalServerPort
   protected Integer port;
 
-  private final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
+  protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
     "swagger.api/mod-calendar.yaml"
   );
 
   @BeforeEach
   void beforeEach() {
     // workaround for JUnit 5
-    if (!isDbInitialized()) {
+    if (!isInitialized()) {
       ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(new TenantAttributes().moduleTo(""))
         .post(getRequestUrl("/_/tenant"))
         .then()
-        .statusCode(HttpStatus.OK.value());
-      setDbInitialized(true);
+        .statusCode(is(HttpStatus.OK.value()));
+
+      // allow comparison with doubles, not floats
+      JsonConfig jsonConfig = JsonConfig
+        .jsonConfig()
+        .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
+      RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
+
+      setInitialized(true);
     }
-    RestAssured.port = this.port;
   }
 
   @AfterEach
