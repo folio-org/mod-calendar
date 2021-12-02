@@ -83,3 +83,15 @@ Produces output:
 ```json
 { "hello": "heya!" }
 ```
+
+### Running Locally
+
+Please note that the module can be ran locally. It is recommended to do this _on top of/alongside_
+an existing Okapi environment (a la Vagrant) where the module has been deployed the first time
+(which will create the permissions/databases/etc. needed) with the database exposed. Once the
+environment is ready to go (and defined in a `.env` file -- an example is provided in
+`.env.sample`), Java can execute the application normally. A sample launch configuration for VS code
+is in `.vscode/launch.json`.
+
+Running it this way does not allow testing any of the features of Okapi (permissions, deployments,
+tenants, etc), however, it makes testing things much quicker.
