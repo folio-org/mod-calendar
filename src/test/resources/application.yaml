@@ -12,11 +12,6 @@ spring:
     show-sql: false
     hibernate:
       ddl-auto: none
-  properties:
-    physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-    implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    hibernate:
-      format_sql: true
   banner:
     location: classpath:/banner.txt
 
@@ -24,11 +19,6 @@ management:
   endpoints:
     web:
       base-path: /admin
-    health:
-      defaults:
-        enabled: false
-      readinessstate:
-        enabled: true
 
 feign:
   client:
@@ -38,12 +28,11 @@ feign:
 
 logging:
   level:
-    io.zonky.test.db.postgres: FATAL
     org:
       springframework:
         cache: OFF
 
-server.port: 8082
+server.port: 8081
 
 folio:
   tenant:
