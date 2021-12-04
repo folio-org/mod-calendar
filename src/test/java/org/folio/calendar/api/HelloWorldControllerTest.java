@@ -1,10 +1,14 @@
 package org.folio.calendar.api;
 
 import static org.folio.calendar.utils.APITestUtils.TENANT_ID;
+import static org.folio.calendar.utils.DateTimeHandler.isCurrentInstant;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import org.folio.calendar.domain.dto.ArithmeticRequest;
-import org.folio.calendar.domain.dto.ErrorResponse.ErrorCodeEnum;
+import org.folio.calendar.utils.DateTimeHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,17 +48,21 @@ class HelloWorldControllerTest extends BaseApiTest {
       .statusCode(is(HttpStatus.OK.value()))
       .body("product", is(12))
       .body("sum", is(7))
-      .body("quotient", is(closeTo(0.75, 1.0)));
+      .body("quotient", is(closeTo(0.75, 0.1)));
   }
 
   @Test
   void testArithmeticByZero() {
-    ra()
+    Response response = ra()
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(new ArithmeticRequest().a(3).b(0))
-      .post(getRequestUrl(HELLO_API_ROUTE))
-      .then()
-      .statusCode(is(HttpStatus.BAD_REQUEST.value()))
-      .body("error_code", is(equalTo(ErrorCodeEnum.HELLO_POST_BAD_ARITHMETIC.getValue())));
+      .post(getRequestUrl(HELLO_API_ROUTE));
+
+    // check status code is 400
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
+
+    // pull body apart for timestamp only
+    JsonPath body = JsonPath.from(response.asString());
+    assertThat(DateTimeHandler.parseTimestamp(body.get("timestamp")), isCurrentInstant());
   }
 }

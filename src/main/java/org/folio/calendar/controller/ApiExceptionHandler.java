@@ -6,8 +6,8 @@ import static org.apache.logging.log4j.Level.INFO;
 import java.util.Arrays;
 import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
-import org.folio.calendar.domain.dto.ErrorResponse.ErrorCodeEnum;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
 import org.springframework.http.HttpStatus;
@@ -47,7 +47,7 @@ public class ApiExceptionHandler {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
-      ErrorCodeEnum.INVALID_PARAMETER,
+      ErrorCode.INVALID_PARAMETER,
       "One of the parameters was of the incorrect type (%s)",
       exception.getMessage()
     )
@@ -67,7 +67,7 @@ public class ApiExceptionHandler {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
-      ErrorCodeEnum.INVALID_PARAMETER,
+      ErrorCode.INVALID_PARAMETER,
       "One of the parameters was of the incorrect type (%s)",
       exception.getMessage()
     )
@@ -87,7 +87,7 @@ public class ApiExceptionHandler {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
-      ErrorCodeEnum.INVALID_PARAMETER,
+      ErrorCode.INVALID_PARAMETER,
       "One of the parameters was missing or null (%s)",
       exception.getMessage()
     )
@@ -113,7 +113,7 @@ public class ApiExceptionHandler {
       return new NonspecificCalendarException(
         exception,
         HttpStatus.INTERNAL_SERVER_ERROR,
-        ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        ErrorCode.INTERNAL_SERVER_ERROR,
         "NullPointerException that does not appear to have occurred without the Calendar application.  Check that your input is valid?  %s",
         exception.getMessage()
       )
@@ -122,7 +122,7 @@ public class ApiExceptionHandler {
     return new NonspecificCalendarException(
       exception,
       HttpStatus.INTERNAL_SERVER_ERROR,
-      ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+      ErrorCode.INTERNAL_SERVER_ERROR,
       "Internal server error (%s): %s",
       exception.getClass().getSimpleName(),
       exception.getMessage()

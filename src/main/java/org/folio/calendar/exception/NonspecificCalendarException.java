@@ -1,6 +1,6 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.domain.dto.ErrorResponse.ErrorCodeEnum;
+import org.folio.calendar.domain.dto.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -25,7 +25,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
    */
   public NonspecificCalendarException(
     Throwable cause,
-    ErrorCodeEnum errorCode,
+    ErrorCode errorCode,
     String message,
     Object... format
   ) {
@@ -46,7 +46,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
   public NonspecificCalendarException(
     Exception cause,
     HttpStatus statusCode,
-    ErrorCodeEnum errorCode,
+    ErrorCode errorCode,
     String message,
     Object... format
   ) {

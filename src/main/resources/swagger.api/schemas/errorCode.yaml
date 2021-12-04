@@ -1,0 +1,21 @@
+description:
+  A code describing the error.  Typically will have a corresponding translation in UI module
+type: string
+enum:
+  - internalServerError
+  - invalidRequest
+  - invalidParameter
+  - badArithmetic
+x-enum-varnames:
+  - INTERNAL_SERVER_ERROR
+  - INVALID_REQUEST
+  - INVALID_PARAMETER
+  - BAD_ARITHMETIC
+x-enum-descriptions:
+  - Catch-all for any other unhandled exceptions
+  - Catch-all for unparsable requests (bad JSON, etc)
+  - Catch-all for missing or wrongly-typed parameters
+  - Sample response based on /hello when b=0, causing impossible division
+example:
+  code: internalServerError
+  message: Internal Server Error

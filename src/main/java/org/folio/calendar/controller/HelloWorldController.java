@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import org.folio.calendar.domain.dto.ArithmeticRequest;
 import org.folio.calendar.domain.dto.Arithmetics;
 import org.folio.calendar.domain.dto.Greeting;
+import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDivisionException;
 import org.folio.calendar.rest.resource.HelloApi;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,7 @@ public class HelloWorldController implements HelloApi {
     try {
       answers.setQuotient(new BigDecimal(request.getA()).divide(new BigDecimal(request.getB())));
     } catch (ArithmeticException e) {
-      throw new InvalidDivisionException(e);
+      throw new InvalidDivisionException(e, new ExceptionParameters("request", request));
     }
 
     return new ResponseEntity<>(answers, HttpStatus.OK);
