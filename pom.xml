@@ -69,6 +69,7 @@
     <rest-assured.version>4.4.0</rest-assured.version>
     <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
     <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
+    <hamcrest-date-matcher.version>2.0.7</hamcrest-date-matcher.version>
   </properties>
 
   <dependencies>
@@ -114,6 +115,12 @@
       <groupId>com.atlassian.oai</groupId>
       <artifactId>swagger-request-validator-restassured</artifactId>
       <version>${swagger-request-validator.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exparity</groupId>
+      <artifactId>hamcrest-date</artifactId>
+      <version>${hamcrest-date-matcher.version}</version>
     </dependency>
 
     <dependency>
@@ -307,9 +314,17 @@
               <generateSupportingFiles>true</generateSupportingFiles>
               <generateModelDocumentation>true</generateModelDocumentation>
               <configOptions>
-                <dateLibrary>java</dateLibrary>
+                <dateLibrary>custom</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>
               </configOptions>
+              <typeMappings>
+                <typeMapping>DateTime=Instant</typeMapping>
+                <typeMapping>Date=LocalDate</typeMapping>
+              </typeMappings>
+              <importMappings>
+                <importMapping>Instant=java.time.Instant</importMapping>
+                <importMapping>LocalDate=java.time.LocalDate</importMapping>
+              </importMappings>
             </configuration>
           </execution>
         </executions>
