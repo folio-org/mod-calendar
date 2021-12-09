@@ -1,0 +1,31 @@
+description: Opening information for a weekday
+type: object
+properties:
+  openingDay:
+    description: Open/closed information
+    $ref: "openingDayInfo.yaml"
+  weekdays:
+    description:
+      Weekday that this opening information applies to.  Despite the plurality, exactly one weekday
+      will be given here.
+    type: object
+    properties:
+      day:
+        $ref: "weekday.yaml"
+    required:
+      - day
+    additionalProperties: false
+additionalProperties: false
+required:
+  - openingDay
+  - date
+example:
+  openingDay:
+    openingHour:
+      - startTime: "04:00"
+        endTime: "12:30"
+      - startTime: "13:30"
+        endTime: "17:00"
+    allDay: false
+    open: true
+  weekday: MONDAY

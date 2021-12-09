@@ -77,8 +77,59 @@ paths:
                 $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/internalServerError"
+  /calendar/periods/{servicePointId}/period:
+    post:
+      operationId: addNewPeriod
+      description: Create a new period (calendar) for a service point
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - in: query
+          name: servicePointId
+          schema:
+            type: string
+            format: uuid
+          description: The UUID for the relevant service point
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/period"
+      responses:
+        "201":
+          description: The created period
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/period"
+        "400":
+          description: Invalid request (could not be understood)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidRequest"
+        "422":
+          description: Invalid data (for example, start date after end date)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidData"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/internalServerError"
 components:
   schemas:
+    period:
+      $ref: schemas/period.yaml
     greeting:
       $ref: schemas/greeting.yaml
     arithmetics: # put here as example of inline schema
@@ -174,3 +225,11 @@ components:
           - code: invalidParameter
             message: One of the parameters was of the incorrect type
       summary: A parameter was not of the correct type
+    invalidData:
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 422
+        errors:
+          - code: noName
+            message: The request included an empty name
+      summary: The request was understood, however, a parameter was invalid
