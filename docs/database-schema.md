@@ -50,5 +50,5 @@ above the previous change.
 
 This numbering system allows changes to be inserted between others later, for maximum flexibility.
 If possible, a changelog should be split into separate parts, which will then be in the form
-`####-LABEL-$$-sublabel.yaml` where `$$` is sequential within the specific changelog. See
+`####-LABEL-$$-sub-label.yaml` where `$$` is sequential within the specific changelog. See
 `0010-initial` for a good example of this.

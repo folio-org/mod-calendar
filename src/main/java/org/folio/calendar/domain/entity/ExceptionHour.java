@@ -1,15 +1,13 @@
 package org.folio.calendar.domain.entity;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.time.LocalTime;
 import java.util.UUID;
-import javax.persistence.CascadeType;
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,20 +15,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table(name = "calendars")
+@Table(name = "exception_hours")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Calendar {
+public class ExceptionHour {
 
   @Id
   @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "name")
-  private String name;
+  @Column(name = "exception_id")
+  private UUID exceptionId;
 
   @Column(name = "start_date")
   private LocalDate startDate;
@@ -38,15 +36,11 @@ public class Calendar {
   @Column(name = "end_date")
   private LocalDate endDate;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<ServicePointCalendarRelationship> servicePoints;
+  @Column(name = "open_start_time")
+  @Nullable
+  private LocalTime startTime;
 
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<NormalOpening> normalHours;
-
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<ExceptionRange> exceptions;
+  @Column(name = "open_end_time")
+  @Nullable
+  private LocalTime endTime;
 }

@@ -17,20 +17,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table(name = "calendars")
+@Table(name = "exceptions")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Calendar {
+public class ExceptionRange {
 
   @Id
   @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
-  @Column(name = "name")
-  private String name;
+  @Column(name = "calendar_id")
+  private UUID calendarId;
 
   @Column(name = "start_date")
   private LocalDate startDate;
@@ -39,14 +39,6 @@ public class Calendar {
   private LocalDate endDate;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<ServicePointCalendarRelationship> servicePoints;
-
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<NormalOpening> normalHours;
-
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "calendar_id")
-  private Set<ExceptionRange> exceptions;
+  @JoinColumn(name = "exception_id")
+  private Set<ExceptionHour> exceptions;
 }
