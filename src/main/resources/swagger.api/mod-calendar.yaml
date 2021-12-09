@@ -65,8 +65,9 @@ paths:
                   value:
                     timestamp: 2021-11-18T13:38.51-50:00
                     status: 400
-                    error_code: hello.post.bad_arithmetic
-                    error_message: Cannot divide by zero (parameter b = 0)
+                    errors:
+                      - code: hello.post.bad_arithmetic
+                        message: Cannot divide by zero (parameter b = 0)
                   summary: Division by zero error
         "500":
           description: Internal server error
@@ -137,11 +138,7 @@ components:
         - status
         - errors
       example:
-        timestamp: 2021-1118T13:38.51-05:00
-        status: 500
-        errors:
-          - error_code: internal_server_error
-            error_message: Internal Server Error
+        $ref: "#/components/examples/internalServerError"
     error:
       $ref: schemas/error.yaml
   parameters:
@@ -155,21 +152,25 @@ components:
   examples:
     internalServerError:
       value:
-        timestamp: 2021-11-18T13:38.51-50:00
+        timestamp: 2021-11-18T13:38.51-05:00
         status: 500
-        error_code: internal_server_error
-        error_message: Internal Server Error
+        errors:
+          - error_code: internalServerError
+            error_message: Internal Server Error
       summary: Any kind of internal error
     invalidRequest:
       value:
         timestamp: 2021-11-18T13:38.51-50:00
         status: 400
-        error_code: invalid_request
-        error_message: The request could not be parsed
+        errors:
+          - code: invalidRequest
+            message: The request could not be parsed
+      summary: The request could not be parsed/understood.
     invalidParameterError:
       value:
         timestamp: 2021-11-18T13:38.51-05:00
         status: 400
-        error_code: invalid_parameter
-        error_message: One of the parameters was of the incorrect type ()
+        errors:
+          - code: invalidParameter
+            message: One of the parameters was of the incorrect type
       summary: A parameter was not of the correct type
