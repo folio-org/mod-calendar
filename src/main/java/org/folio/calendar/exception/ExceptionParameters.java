@@ -13,6 +13,11 @@ public final class ExceptionParameters implements Serializable {
   protected final Map<String, Object> map = new HashMap<>();
 
   /**
+   * Create a new ExceptionParameters object
+   */
+  public ExceptionParameters() {}
+
+  /**
    * Create an ExceptionParameters object with the given parameters.  Primarily a convenience method.
    *
    * @param map Pairs of keys and values that reflect API parameters
