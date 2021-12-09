@@ -319,11 +319,13 @@
               </configOptions>
               <typeMappings>
                 <typeMapping>DateTime=Instant</typeMapping>
-                <typeMapping>Date=LocalDate</typeMapping>
+                <typeMapping>date=LocalDate</typeMapping>
+                <typeMapping>time=LocalTime</typeMapping>
               </typeMappings>
               <importMappings>
                 <importMapping>Instant=java.time.Instant</importMapping>
                 <importMapping>LocalDate=java.time.LocalDate</importMapping>
+                <importMapping>LocalTime=java.time.LocalTime</importMapping>
               </importMappings>
             </configuration>
           </execution>
