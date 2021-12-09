@@ -14,6 +14,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Models opening hours for an exception to the normal hours.
+ *
+ * @see ExceptionRange
+ */
 @Data
 @Table(name = "exception_hours")
 @Entity
@@ -22,24 +27,44 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ExceptionHour {
 
+  /**
+   * The exception hour's internal ID
+   */
   @Id
   @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
+  /**
+   * The corresponding main {@link ExceptionRange} that this opening corresponds to
+   */
   @Column(name = "exception_id")
   private UUID exceptionId;
 
+  /**
+   * The start (absolute, inclusive) date of the range which this opening corresponds to
+   */
   @Column(name = "start_date")
   private LocalDate startDate;
 
+  /**
+   * The end (absolute, inclusive) date of the range which this opening corresponds to
+   */
   @Column(name = "end_date")
   private LocalDate endDate;
 
+  /**
+   * If not null, the time which (with startDate) the service point opens exceptionally.
+   * If null, the library is closed for the range of startDate - endDate.
+   */
   @Column(name = "open_start_time")
   @Nullable
   private LocalTime startTime;
 
+  /**
+   * If not null, the time which (with startDate) the service point closes exceptionally.
+   * If null, the library is closed for the range of startDate - endDate.
+   */
   @Column(name = "open_end_time")
   @Nullable
   private LocalTime endTime;

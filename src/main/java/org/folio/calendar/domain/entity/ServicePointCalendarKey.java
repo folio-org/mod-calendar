@@ -20,10 +20,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ServicePointCalendarKey implements Serializable {
 
+  /**
+   * The service point ID to which the calendar applies
+   */
   @Column(name = "service_point_id")
   @GeneratedValue
   private UUID servicePointId;
 
+  /**
+   * The ID of the calendar to be applied
+   */
   @Column(name = "calendar_id")
   @GeneratedValue
   private UUID calendarId;
