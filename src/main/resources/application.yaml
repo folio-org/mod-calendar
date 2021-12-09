@@ -2,7 +2,7 @@ spring:
   cache:
     type: none
   application:
-    name: "@project.artifactId@"
+    name: mod-calendar
   jackson:
     default-property-inclusion: NON_NULL
   datasource:
@@ -13,7 +13,7 @@ spring:
     enabled: true
     change-log: classpath:db/changelog-master.yaml
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -36,6 +36,8 @@ logging:
     org:
       springframework:
         cache: OFF
+      hibernate:
+        type: TRACE
 
 server.port: 8080
 
