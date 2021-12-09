@@ -3,6 +3,7 @@ package org.folio.calendar.domain.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,7 +59,7 @@ public class ExceptionHour {
    * If null, the library is closed for the range of startDate - endDate.
    */
   @Column(name = "open_start_time")
-  @Nullable
+  @CheckForNull
   private LocalTime startTime;
 
   /**
@@ -66,6 +67,6 @@ public class ExceptionHour {
    * If null, the library is closed for the range of startDate - endDate.
    */
   @Column(name = "open_end_time")
-  @Nullable
+  @CheckForNull
   private LocalTime endTime;
 }
