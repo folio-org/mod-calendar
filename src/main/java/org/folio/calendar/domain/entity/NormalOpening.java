@@ -20,8 +20,6 @@ import lombok.With;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.TimeConstants;
 import org.folio.calendar.utils.WeekdayUtils;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 /**
  * A normal opening for a service point
@@ -32,7 +30,6 @@ import org.hibernate.annotations.TypeDef;
 @Entity
 @Builder
 @NoArgsConstructor
-// @TypeDef(name = "weekday", typeClass = Weekday.class)
 public class NormalOpening {
 
   /**
@@ -57,7 +54,6 @@ public class NormalOpening {
   @NotNull
   @Column(name = "start_day")
   @Enumerated(EnumType.STRING)
-  // @Type(type = "weekday")
   private Weekday startDay;
 
   /**
@@ -73,7 +69,6 @@ public class NormalOpening {
   @NotNull
   @Column(name = "end_day")
   @Enumerated(EnumType.STRING)
-  // @Type(type = "weekday")
   private Weekday endDay;
 
   /**
