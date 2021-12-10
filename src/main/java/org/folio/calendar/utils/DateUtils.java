@@ -1,9 +1,7 @@
 package org.folio.calendar.utils;
 
 import java.time.chrono.ChronoLocalDate;
-import java.util.List;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
@@ -90,7 +88,7 @@ public class DateUtils {
    * @param otherPeriods List of other periods
    * @return if they overlap
    */
-  public static boolean overlapsPeriodList(Period period, List<Period> otherPeriods) {
+  public static boolean overlapsPeriodList(Period period, Iterable<Period> otherPeriods) {
     for (Period other : otherPeriods) {
       if (overlaps(period, other)) {
         return true;
@@ -106,7 +104,7 @@ public class DateUtils {
    * @return the overlapped calendar
    */
   @CheckForNull
-  public static Calendar overlapsCalendarList(Period period, List<Calendar> calendars) {
+  public static Calendar overlapsCalendarList(Period period, Iterable<Calendar> calendars) {
     for (Calendar other : calendars) {
       if (overlaps(period, other)) {
         return other;
