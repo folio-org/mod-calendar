@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface CalendarRepository
   extends JpaRepository<Calendar, UUID>, JpaSpecificationExecutor<Calendar> {
   @Query(
-    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarRelationship r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId"
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId"
   )
   List<Calendar> findByServicePointId(@Param("servicePointId") UUID servicePointId);
 }
