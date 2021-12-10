@@ -5,18 +5,17 @@ spring:
     name: mod-calendar
   jackson:
     default-property-inclusion: NON_NULL
-  datasource:
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}
   liquibase:
     enabled: true
     change-log: classpath:db/changelog-master.yaml
+  datasource:
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}?stringtype=unspecified
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
   banner:
     location: classpath:/banner.txt
 
