@@ -11,6 +11,7 @@ properties:
     description: If this denotes an all-day opening or closing
   open:
     type: boolean
+    default: true
     description: Whether this is to indicate a closure (for exceptions)
   date:
     type: string
@@ -20,6 +21,7 @@ properties:
       is used; ref openingDayConcrete.yaml
   exceptional:
     type: boolean
+    default: false
     description:
       Denotes if this opening/closure is the result of an exception rather than a normal
       period/calendar
