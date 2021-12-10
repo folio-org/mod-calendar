@@ -7,30 +7,30 @@ databaseChangeLog:
         actual migration script"
       changes:
         - sql:
-            sql: DROP TABLE IF EXISTS actual_opening_hours;
+            sql: DROP TABLE IF EXISTS actual_opening_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS audit_actual_opening_hours;
+            sql: DROP TABLE IF EXISTS audit_actual_opening_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS audit_exceptional_hours;
+            sql: DROP TABLE IF EXISTS audit_exceptional_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS audit_exceptions;
+            sql: DROP TABLE IF EXISTS audit_exceptions CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS audit_openings;
+            sql: DROP TABLE IF EXISTS audit_openings CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS audit_regular_hours;
+            sql: DROP TABLE IF EXISTS audit_regular_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS exceptional_hours;
+            sql: DROP TABLE IF EXISTS exceptional_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS exceptions;
+            sql: DROP TABLE IF EXISTS exceptions CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS openings;
+            sql: DROP TABLE IF EXISTS openings CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS regular_hours;
+            sql: DROP TABLE IF EXISTS regular_hours CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS rmb_internal;
+            sql: DROP TABLE IF EXISTS rmb_internal CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS rmb_internal_analyze;
+            sql: DROP TABLE IF EXISTS rmb_internal_analyze CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS rmb_internal_index;
+            sql: DROP TABLE IF EXISTS rmb_internal_index CASCADE;
         - sql:
-            sql: DROP TABLE IF EXISTS rmb_job;
+            sql: DROP TABLE IF EXISTS rmb_job CASCADE;
