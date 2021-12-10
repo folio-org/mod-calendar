@@ -93,6 +93,8 @@ public final class CalendarController implements CalendarApi {
       );
     }
 
+    this.calendarService.createCalendarFromPeriod(period);
+
     return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
   }
 }
