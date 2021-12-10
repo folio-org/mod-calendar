@@ -152,11 +152,6 @@
       <version>${mapstruct.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>com.vladmihalcea</groupId>
-      <artifactId>hibernate-types-52</artifactId>
-      <version>${hibernate-types.version}</version>
-    </dependency>
   </dependencies>
   <repositories>
     <repository>
