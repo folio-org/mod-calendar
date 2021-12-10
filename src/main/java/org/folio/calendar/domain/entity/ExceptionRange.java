@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class ExceptionRange {
    * The exception's internal ID
    */
   @Id
+  @NotNull
   @GeneratedValue
   @Column(name = "id")
   private UUID id;
@@ -38,18 +40,21 @@ public class ExceptionRange {
   /**
    * The calendar that this is exceptional to
    */
+  @NotNull
   @Column(name = "calendar_id")
   private UUID calendarId;
 
   /**
    * The first date to which this exception is effective
    */
+  @NotNull
   @Column(name = "start_date")
   private LocalDate startDate;
 
   /**
    * The last date to which this exception is effective
    */
+  @NotNull
   @Column(name = "end_date")
   private LocalDate endDate;
 

@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.GeneratedValue;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,14 +23,14 @@ public class ServicePointCalendarKey implements Serializable {
   /**
    * The service point ID to which the calendar applies
    */
+  @NotNull
   @Column(name = "service_point_id")
-  @GeneratedValue
   private UUID servicePointId;
 
   /**
    * The ID of the calendar to be applied
    */
+  @NotNull
   @Column(name = "calendar_id")
-  @GeneratedValue
   private UUID calendarId;
 }

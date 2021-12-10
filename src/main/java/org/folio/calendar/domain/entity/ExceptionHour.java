@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +32,7 @@ public class ExceptionHour {
    * The exception hour's internal ID
    */
   @Id
+  @NotNull
   @GeneratedValue
   @Column(name = "id")
   private UUID id;
@@ -39,18 +40,21 @@ public class ExceptionHour {
   /**
    * The corresponding main {@link ExceptionRange} that this opening corresponds to
    */
+  @NotNull
   @Column(name = "exception_id")
   private UUID exceptionId;
 
   /**
    * The start (absolute, inclusive) date of the range which this opening corresponds to
    */
+  @NotNull
   @Column(name = "start_date")
   private LocalDate startDate;
 
   /**
    * The end (absolute, inclusive) date of the range which this opening corresponds to
    */
+  @NotNull
   @Column(name = "end_date")
   private LocalDate endDate;
 
