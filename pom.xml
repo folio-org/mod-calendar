@@ -323,6 +323,11 @@
                 <dateLibrary>custom</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>
                 <booleanGetterPrefix>is</booleanGetterPrefix>
+                <additionalModelTypeAnnotations>
+                  @lombok.Builder
+                  @lombok.NoArgsConstructor
+                  @lombok.AllArgsConstructor
+                </additionalModelTypeAnnotations>
               </configOptions>
               <typeMappings>
                 <typeMapping>DateTime=Instant</typeMapping>
