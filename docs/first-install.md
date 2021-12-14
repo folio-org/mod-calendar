@@ -17,6 +17,18 @@ curl -w '\n' -X POST -D - \
 
 This should return successfully (2xx) and echo back the newly defined module.
 
+## Build Module
+
+To build the image, use:
+
+```sh
+docker build $DOCKER_BUILD_ARGS -t docker.ci.folio.org/mod-calendar .
+```
+
+Please note that the `.` is part of the command.
+
+If your IDE does not do any compilation itself, you will likely need to run `mvn install` first.
+
 ## Deploy Module
 
 Before the module can be deployed, the name of the node must be known. The following will find it
@@ -47,12 +59,13 @@ are only found in its container.
 This is the step where things diverge from the base deployment instructions as, instead of just
 installing the module, we want to also disable the previous mod-calendar.
 
-This can be done using (where `2.0.0` is the new version, `1.12.0` is the old module, and `diku` is
-the tenant to enable the module on):
+This can be done using (where `2.0.0` is the new version, `1.12.0` is the
+[old module version](http://localhost:3000/settings/about), and `diku` is the tenant to enable the
+module on):
 
 ```sh
 curl -w '\n' -X POST -D - \
   -H "Content-type: application/json" \
-  -d '[{"id":"mod-calendar-2.0.0-SNAPSHOT","action":"enable"},{"id":"mod-calendar-1.12.0","action":"disable"}]' \
+  -d '[{"id":"mod-calendar-2.0.0-SNAPSHOT","action":"enable"},{"id":"mod-calendar-1.14.0-SNAPSHOT.123","action":"disable"}]' \
   http://localhost:9130/_/proxy/tenants/diku/install
 ```
