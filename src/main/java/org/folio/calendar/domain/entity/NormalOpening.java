@@ -2,6 +2,9 @@ package org.folio.calendar.domain.entity;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +20,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
+import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.TimeConstants;
 import org.folio.calendar.utils.WeekdayUtils;
@@ -155,6 +159,28 @@ public class NormalOpening {
     }
 
     return opening1.withEndDay(opening2.getEndDay()).withEndTime(opening2.getEndTime());
+  }
+
+  public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
+    List<Weekday> weekdays = WeekdayUtils.getRange(this.getStartDay(), this.getEndDay());
+
+    Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
+
+    for (Weekday day : weekdays) {
+      OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
+        .builder()
+        .startTime(TimeConstants.DAY_MIN)
+        .endTime(TimeConstants.DAY_MAX);
+      if (day == this.getStartDay()) {
+        builder = builder.startTime(this.getStartTime());
+      }
+      if (day == this.getEndDay()) {
+        builder = builder.endTime(this.getEndTime());
+      }
+      map.put(day, builder.build());
+    }
+
+    return map;
   }
 
   @PostLoad
