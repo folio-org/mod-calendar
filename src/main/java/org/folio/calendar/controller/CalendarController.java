@@ -9,6 +9,7 @@ import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
 import org.folio.calendar.utils.DateUtils;
+import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -93,8 +94,8 @@ public final class CalendarController implements CalendarApi {
       );
     }
 
-    this.calendarService.createCalendarFromPeriod(period);
+    Calendar calendar = this.calendarService.createCalendarFromPeriod(period);
 
-    return new ResponseEntity<>(null, HttpStatus.NOT_IMPLEMENTED);
+    return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.CREATED);
   }
 }
