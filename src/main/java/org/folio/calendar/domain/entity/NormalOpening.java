@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
 import org.folio.calendar.utils.WeekdayUtils;
 
@@ -131,8 +132,8 @@ public class NormalOpening {
 
     // former ends at midnight the day before latter
     if (
-      former.getEndTime().equals(TimeConstants.DAY_MAX) &&
-      latter.getStartTime().equals(TimeConstants.DAY_MIN) &&
+      former.getEndTime().equals(TimeConstants.TIME_MAX) &&
+      latter.getStartTime().equals(TimeConstants.TIME_MIN) &&
       WeekdayUtils.next(former.getEndDay()).equals(latter.getStartDay())
     ) {
       return true;
@@ -169,13 +170,13 @@ public class NormalOpening {
     for (Weekday day : weekdays) {
       OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
         .builder()
-        .startTime(TimeConstants.DAY_MIN)
-        .endTime(TimeConstants.DAY_MAX);
+        .startTime(TimeConstants.TIME_MIN_STRING)
+        .endTime(TimeConstants.TIME_MAX_STRING);
       if (day == this.getStartDay()) {
-        builder = builder.startTime(this.getStartTime());
+        builder = builder.startTime(DateUtils.toTimeString(this.getStartTime()));
       }
       if (day == this.getEndDay()) {
-        builder = builder.endTime(this.getEndTime());
+        builder = builder.endTime(DateUtils.toTimeString(this.getEndTime()));
       }
       map.put(day, builder.build());
     }

@@ -1,5 +1,6 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
 import javax.annotation.CheckForNull;
 import lombok.experimental.UtilityClass;
@@ -111,5 +112,23 @@ public class DateUtils {
       }
     }
     return null;
+  }
+
+  /**
+   * Convert a LocalTime to a string of the format HH:mm
+   * @param time
+   * @return
+   */
+  public static String toTimeString(LocalTime time) {
+    return time.format(TimeConstants.TIME_FORMATTER);
+  }
+
+  /**
+   * Convert a string of the format HH:mm to a LocalTime
+   * @param time
+   * @return
+   */
+  public static LocalTime fromTimeString(String time) {
+    return LocalTime.parse(time, TimeConstants.TIME_FORMATTER);
   }
 }

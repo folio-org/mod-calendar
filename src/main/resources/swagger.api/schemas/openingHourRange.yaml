@@ -3,13 +3,11 @@ type: object
 properties:
   startTime:
     type: string
-    format: time
-    # pattern: "^([01][0-9]|2[0-3]):([0-5][0-9])$"
+    pattern: "^([01][0-9]|2[0-3]):([0-5][0-9])$"
     description: When the opening starts, as a 24 hour time
   endTime:
     type: string
-    format: time
-    # pattern: "^([01][0-9]|2[0-3]):([0-5][0-9])$"
+    pattern: "^([01][0-9]|2[0-3]):([0-5][0-9])$"
     description: When the opening ends, as a 24 hour time
 required:
   - startTime
