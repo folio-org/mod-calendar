@@ -1,5 +1,7 @@
 package org.folio.calendar.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Weekday;
 
@@ -60,5 +62,28 @@ public class WeekdayUtils {
           "Weekday passed to WeekdayUtils::next somehow is not in the enum"
         );
     }
+  }
+
+  public static List<Weekday> getRange(Weekday start, Weekday end) {
+    List<Weekday> list = new ArrayList<>();
+
+    Weekday[] weekdays = Weekday.values();
+
+    boolean started = false;
+
+    // iterating twice to guarantee a start -> end range without wrapping
+    for (int i = 0; i < weekdays.length + weekdays.length; i++) {
+      if (weekdays[i % weekdays.length] == start) {
+        started = true;
+      }
+      if (started) {
+        list.add(weekdays[i % weekdays.length]);
+        if (weekdays[i] == end) {
+          break;
+        }
+      }
+    }
+
+    return list;
   }
 }
