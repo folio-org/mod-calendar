@@ -62,7 +62,7 @@
     <liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
     <!-- Mitigate CVE-2021-44228 before Spring Boot itself -->
     <!-- https://spring.io/blog/2021/12/10/log4j2-vulnerability-and-spring-boot -->
-    <log4j2.version>2.15.0</log4j2.version>
+    <log4j2.version>2.16.0</log4j2.version>
 
     <calendar-api-defintions-yaml-file>
       src/main/resources/swagger.api/mod-calendar.yaml
