@@ -46,10 +46,7 @@
       }
     },
     "env": [
-      {
-        "name": "JAVA_OPTIONS",
-        "value": "-XX:MaxRAMPercentage=66.0 -D=log4j2.formatMsgNoLookups=true"
-      },
+      { "name": "JAVA_OPTIONS", "value": "-XX:MaxRAMPercentage=66.0" },
       { "name": "DB_HOST", "value": "postgres" },
       { "name": "DB_PORT", "value": "5432" },
       { "name": "DB_USERNAME", "value": "folio_admin" },
