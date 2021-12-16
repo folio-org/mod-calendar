@@ -8,3 +8,13 @@ enum:
   - THURSDAY
   - FRIDAY
   - SATURDAY
+  - INVALID
+x-enum-descriptions:
+  - Sunday
+  - Monday
+  - Tuesday
+  - Wednesday
+  - Thursday
+  - Friday
+  - Saturday
+  - This should never be used.  It is only for unit testing coverage of invalid values.
