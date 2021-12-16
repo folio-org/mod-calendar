@@ -16,8 +16,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import lombok.With;
 
 @Data
+@With
 @Table(name = "calendars")
 @Entity
 @NoArgsConstructor
