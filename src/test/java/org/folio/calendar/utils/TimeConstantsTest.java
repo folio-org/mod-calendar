@@ -14,14 +14,20 @@ public class TimeConstantsTest {
 
   @Test
   void testMinTimeIsMidnight() {
-    assertThat(TimeConstants.TIME_MIN, is(equalTo(LocalTime.MIN)));
-    assertThat(TimeConstants.TIME_MIN, is(equalTo(Times.TIME_00_00)));
-    assertThat(TimeConstants.TIME_MIN_STRING, is(equalTo(Times.TIME_00_00_STRING_HH_mm)));
+    assertThat("TIME_MIN is LocalTime.MIN", TimeConstants.TIME_MIN, is(equalTo(LocalTime.MIN)));
+    assertThat("TIME_MIN is 00:00", TimeConstants.TIME_MIN, is(equalTo(Times.TIME_00_00)));
     assertThat(
+      "TIME_MIN_STRING is \"00:00\"",
+      TimeConstants.TIME_MIN_STRING,
+      is(equalTo(Times.TIME_00_00_STRING_HH_mm))
+    );
+    assertThat(
+      "TIME_MIN converts to String \"00:00\"",
       DateUtils.toTimeString(TimeConstants.TIME_MIN),
       is(equalTo(Times.TIME_00_00_STRING_HH_mm))
     );
     assertThat(
+      "TIME_MIN_STRING converts to LocalTime 00:00",
       DateUtils.fromTimeString(TimeConstants.TIME_MIN_STRING),
       is(equalTo(Times.TIME_00_00))
     );
@@ -29,14 +35,24 @@ public class TimeConstantsTest {
 
   @Test
   void testMaxTimeIs23Hours59Minutes() {
-    assertThat(TimeConstants.TIME_MAX, is(equalTo(LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES))));
-    assertThat(TimeConstants.TIME_MAX, is(equalTo(Times.TIME_23_59)));
-    assertThat(TimeConstants.TIME_MAX_STRING, is(equalTo(Times.TIME_23_59_STRING_HH_mm)));
     assertThat(
+      "TIME_MAX is LocalTime.MAX (ignoring seconds)",
+      TimeConstants.TIME_MAX,
+      is(equalTo(LocalTime.MAX.truncatedTo(ChronoUnit.MINUTES)))
+    );
+    assertThat("TIME_MAX is 23:59", TimeConstants.TIME_MAX, is(equalTo(Times.TIME_23_59)));
+    assertThat(
+      "TIME_MAX_STRING is \"23:59\"",
+      TimeConstants.TIME_MAX_STRING,
+      is(equalTo(Times.TIME_23_59_STRING_HH_mm))
+    );
+    assertThat(
+      "TIME_MAX converts to String \"23:59\"",
       DateUtils.toTimeString(TimeConstants.TIME_MAX),
       is(equalTo(Times.TIME_23_59_STRING_HH_mm))
     );
     assertThat(
+      "TIME_MAX_STRING converts to LocalTime 23:59",
       DateUtils.fromTimeString(TimeConstants.TIME_MAX_STRING),
       is(equalTo(Times.TIME_23_59))
     );
@@ -44,7 +60,15 @@ public class TimeConstantsTest {
 
   @Test
   void testAllDayRange() {
-    assertThat(TimeConstants.ALL_DAY.getStartTime(), is(equalTo(Times.TIME_00_00_STRING_HH_mm)));
-    assertThat(TimeConstants.ALL_DAY.getEndTime(), is(equalTo(Times.TIME_23_59_STRING_HH_mm)));
+    assertThat(
+      "ALL_DAY starts at \"00:00\"",
+      TimeConstants.ALL_DAY.getStartTime(),
+      is(equalTo(Times.TIME_00_00_STRING_HH_mm))
+    );
+    assertThat(
+      "ALL_DAY ends at \"23:59\"",
+      TimeConstants.ALL_DAY.getEndTime(),
+      is(equalTo(Times.TIME_23_59_STRING_HH_mm))
+    );
   }
 }
