@@ -173,7 +173,10 @@ public class PeriodUtils {
       if (entry.getValue().size() == 1 && entry.getValue().get(0).equals(TimeConstants.ALL_DAY)) {
         openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
       } else {
-        openingDayInfoBuilder = openingDayInfoBuilder.openingHour(entry.getValue());
+        List<OpeningHourRange> ranges = entry.getValue();
+        // ensure that the opening hours are in ascending order
+        ranges.sort((a, b) -> a.getStartTime().compareTo(b.getStartTime()));
+        openingDayInfoBuilder = openingDayInfoBuilder.openingHour(ranges);
       }
 
       openingDays.add(
