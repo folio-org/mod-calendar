@@ -1,5 +1,6 @@
 package org.folio.calendar.testconstants;
 
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
 
@@ -28,6 +29,11 @@ public class Periods {
     .builder()
     .startDate(Dates.DATE_2021_01_01)
     .endDate(Dates.DATE_2021_07_04)
+    .build();
+  public static final Period PERIOD_2021_01_01_TO_2021_12_31 = Period
+    .builder()
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_12_31)
     .build();
   public static final Period PERIOD_2021_01_02_TO_2021_01_02 = Period
     .builder()
@@ -69,4 +75,31 @@ public class Periods {
     .startDate(Dates.DATE_2021_07_04)
     .endDate(Dates.DATE_2021_09_22)
     .build();
+
+  public static final Period PERIOD_FULL_EXAMPLE_A = PERIOD_2021_01_01_TO_2021_12_31
+    .withId(UUIDs.UUID_A)
+    .withServicePointId(UUIDs.UUID_0)
+    .withName(Names.NAME_1)
+    .withOpeningDays(
+      Arrays.asList(
+        OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY,
+        OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
+        OpeningDayRelativeConstants.TUESDAY_OPEN_ALL_DAY,
+        OpeningDayRelativeConstants.WEDNESDAY_OPEN_23_00_TO_23_59,
+        OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY,
+        OpeningDayRelativeConstants.FRIDAY_OPEN_ALL_DAY,
+        OpeningDayRelativeConstants.SATURDAY_OPEN_ALL_DAY
+      )
+    );
+
+  public static final Period PERIOD_FULL_EXAMPLE_B = PERIOD_2021_01_01_TO_2021_12_31
+    .withId(UUIDs.UUID_B)
+    .withServicePointId(UUIDs.UUID_2)
+    .withName(Names.NAME_2)
+    .withOpeningDays(
+      Arrays.asList(
+        OpeningDayRelativeConstants.MONDAY_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59,
+        OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
+      )
+    );
 }

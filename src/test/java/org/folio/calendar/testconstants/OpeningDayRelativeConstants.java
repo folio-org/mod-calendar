@@ -21,6 +21,11 @@ public class OpeningDayRelativeConstants {
     .weekdays(OpeningDayRelativeWeekdaysConstants.MONDAY)
     .openingDay(OpeningDayInfoRelativeConstants.OPEN_ALL_DAY)
     .build();
+  public static final OpeningDayRelative MONDAY_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OpeningDayRelative
+    .builder()
+    .weekdays(OpeningDayRelativeWeekdaysConstants.MONDAY)
+    .openingDay(OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59)
+    .build();
   public static final OpeningDayRelative MONDAY_OPEN_04_00_TO_14_59 = OpeningDayRelative
     .builder()
     .weekdays(OpeningDayRelativeWeekdaysConstants.MONDAY)
@@ -30,6 +35,11 @@ public class OpeningDayRelativeConstants {
     .builder()
     .weekdays(OpeningDayRelativeWeekdaysConstants.MONDAY)
     .openingDay(OpeningDayInfoRelativeConstants.OPEN_15_00_TO_23_59)
+    .build();
+  public static final OpeningDayRelative TUESDAY_OPEN_ALL_DAY = OpeningDayRelative
+    .builder()
+    .weekdays(OpeningDayRelativeWeekdaysConstants.TUESDAY)
+    .openingDay(OpeningDayInfoRelativeConstants.OPEN_ALL_DAY)
     .build();
   public static final OpeningDayRelative TUESDAY_OPEN_00_00_TO_12_30 = OpeningDayRelative
     .builder()

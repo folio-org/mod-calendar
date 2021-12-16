@@ -17,6 +17,14 @@ public class OpeningDayInfoRelativeConstants {
     .open(true)
     .allDay(true)
     .build();
+  public static final OpeningDayInfo OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OpeningDayInfo
+    .builder()
+    .open(true)
+    .allDay(false)
+    .openingHour(
+      Arrays.asList(OpeningHourRanges.RANGE_00_00_TO_12_30, OpeningHourRanges.RANGE_23_00_TO_23_59)
+    )
+    .build();
   public static final OpeningDayInfo OPEN_00_00_TO_12_30 = OpeningDayInfo
     .builder()
     .open(true)
