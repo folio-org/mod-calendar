@@ -1,8 +1,12 @@
 package org.folio.calendar.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
+import java.util.Arrays;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.Dates;
@@ -1101,6 +1105,152 @@ public class DateUtilsTest {
         Periods.PERIOD_2021_01_01_TO_2021_04_30
       ),
       is(true)
+    );
+  }
+
+  @Test
+  void testNonOverlappingPeriodList() {
+    assertThat(
+      "A period should not overlap with a list of empty periods",
+      DateUtils.overlapsPeriodList(Periods.PERIOD_2021_01_01_TO_2021_04_30, Arrays.asList()),
+      is(nullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a single distinct period",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(Periods.PERIOD_2021_07_04_TO_2021_09_22)
+      ),
+      is(nullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a multiple, self-overlapping periods",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Periods.PERIOD_2021_07_04_TO_2021_09_22,
+          Periods.PERIOD_2021_05_01_TO_2021_09_22
+        )
+      ),
+      is(nullValue())
+    );
+  }
+
+  @Test
+  void testOverlappingPeriodList() {
+    assertThat(
+      "A period should overlap with a list of a single overlapping periods",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(Periods.PERIOD_2021_03_16_TO_2021_05_01)
+      ),
+      is(Periods.PERIOD_2021_03_16_TO_2021_05_01)
+    );
+    assertThat(
+      "A period should overlap with a list of a non-overlapping periods and one overlapping",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Periods.PERIOD_2021_07_04_TO_2021_09_22,
+          Periods.PERIOD_2021_03_16_TO_2021_05_01
+        )
+      ),
+      is(Periods.PERIOD_2021_03_16_TO_2021_05_01)
+    );
+    assertThat(
+      "A period should overlap with a list of multiple overlapping periods",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Periods.PERIOD_2021_01_01_TO_2021_01_01,
+          Periods.PERIOD_2021_03_16_TO_2021_03_16
+        )
+      ),
+      is(notNullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a multiple, self-overlapping periods",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Periods.PERIOD_2021_07_04_TO_2021_09_22,
+          Periods.PERIOD_2021_05_01_TO_2021_09_22
+        )
+      ),
+      is(nullValue())
+    );
+  }
+
+  @Test
+  void testNonOverlappingPeriodWithCalendarList() {
+    assertThat(
+      "A period should not overlap with a list of empty calendars",
+      DateUtils.overlapsCalendarList(Periods.PERIOD_2021_01_01_TO_2021_04_30, Arrays.asList()),
+      is(nullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a single distinct calendar",
+      DateUtils.overlapsCalendarList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(Calendars.CALENDAR_2021_07_04_TO_2021_09_22)
+      ),
+      is(nullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a multiple, self-overlapping calendars",
+      DateUtils.overlapsCalendarList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Calendars.CALENDAR_2021_07_04_TO_2021_09_22,
+          Calendars.CALENDAR_2021_05_01_TO_2021_09_22
+        )
+      ),
+      is(nullValue())
+    );
+  }
+
+  @Test
+  void testOverlappingPeriodWithCalendarList() {
+    assertThat(
+      "A period should overlap with a list of a single overlapping calendars",
+      DateUtils.overlapsCalendarList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(Calendars.CALENDAR_2021_03_16_TO_2021_05_01)
+      ),
+      is(Calendars.CALENDAR_2021_03_16_TO_2021_05_01)
+    );
+    assertThat(
+      "A period should overlap with a list of a non-overlapping calendars and one overlapping",
+      DateUtils.overlapsCalendarList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Calendars.CALENDAR_2021_07_04_TO_2021_09_22,
+          Calendars.CALENDAR_2021_03_16_TO_2021_05_01
+        )
+      ),
+      is(Calendars.CALENDAR_2021_03_16_TO_2021_05_01)
+    );
+    assertThat(
+      "A period should overlap with a list of multiple overlapping calendars",
+      DateUtils.overlapsCalendarList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Calendars.CALENDAR_2021_01_01_TO_2021_01_01,
+          Calendars.CALENDAR_2021_03_16_TO_2021_03_16
+        )
+      ),
+      is(notNullValue())
+    );
+    assertThat(
+      "A period should not overlap with a list of a multiple, self-overlapping periods",
+      DateUtils.overlapsPeriodList(
+        Periods.PERIOD_2021_01_01_TO_2021_04_30,
+        Arrays.asList(
+          Periods.PERIOD_2021_07_04_TO_2021_09_22,
+          Periods.PERIOD_2021_05_01_TO_2021_09_22
+        )
+      ),
+      is(nullValue())
     );
   }
 

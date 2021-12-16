@@ -87,22 +87,23 @@ public class DateUtils {
    * Check that the given period overlaps with a list of others.  Note that this does not check overlaps within otherPeriods.
    * @param period Period to check
    * @param otherPeriods List of other periods
-   * @return if they overlap
+   * @return the overlapped period, or null if no overlap
    */
-  public static boolean overlapsPeriodList(Period period, Iterable<Period> otherPeriods) {
+  @CheckForNull
+  public static Period overlapsPeriodList(Period period, Iterable<Period> otherPeriods) {
     for (Period other : otherPeriods) {
       if (overlaps(period, other)) {
-        return true;
+        return other;
       }
     }
-    return false;
+    return null;
   }
 
   /**
    * Check that the given period does not overlap with a list of Calendars
    * @param period Period to check
    * @param calendars Calendars
-   * @return the overlapped calendar
+   * @return the overlapped calendar, or null if no overlap
    */
   @CheckForNull
   public static Calendar overlapsCalendarList(Period period, Iterable<Calendar> calendars) {
