@@ -1,3 +1,6 @@
+## 1.13.1 2021-12-16
+* Upgrade to RMB to v33.0.4 and Log4j 2.16.0 (MODCAL-99)
+
 ## 1.13.0 2021-09-30
 * Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours` table (MODCAL-72)
 
