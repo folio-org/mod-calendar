@@ -325,6 +325,7 @@
                 <interfaceOnly>true</interfaceOnly>
                 <booleanGetterPrefix>is</booleanGetterPrefix>
                 <additionalModelTypeAnnotations>
+                  @lombok.With
                   @lombok.Builder
                   @lombok.NoArgsConstructor
                   @lombok.AllArgsConstructor
