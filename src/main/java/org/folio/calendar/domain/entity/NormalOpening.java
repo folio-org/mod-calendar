@@ -184,14 +184,6 @@ public class NormalOpening {
     return map;
   }
 
-  @PostLoad
-  @PrePersist
-  void fillTransient() {
-    // trigger truncation
-    this.setStartTime(this.startTime);
-    this.setEndTime(this.endTime);
-  }
-
   /**
    * The time (with startDay) that this opening begins
    */
