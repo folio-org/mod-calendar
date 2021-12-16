@@ -3,8 +3,8 @@ package org.folio.calendar.utils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import org.folio.calendar.testutils.Dates;
-import org.folio.calendar.testutils.Times;
+import org.folio.calendar.testconstants.Dates;
+import org.folio.calendar.testconstants.Times;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

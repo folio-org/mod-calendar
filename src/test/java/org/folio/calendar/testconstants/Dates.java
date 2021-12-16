@@ -1,9 +1,12 @@
-package org.folio.calendar.testutils;
+package org.folio.calendar.testconstants;
 
 import java.time.LocalDate;
 import java.time.Month;
 import lombok.experimental.UtilityClass;
 
+/**
+ * A series of LocalDates testing
+ */
 @UtilityClass
 public class Dates {
 

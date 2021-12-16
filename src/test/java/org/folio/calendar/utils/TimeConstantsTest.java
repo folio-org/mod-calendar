@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import org.folio.calendar.testutils.Times;
+import org.folio.calendar.testconstants.Times;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

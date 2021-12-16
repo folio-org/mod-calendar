@@ -1,10 +1,12 @@
-package org.folio.calendar.testutils;
+package org.folio.calendar.testconstants;
 
 import java.time.LocalTime;
+import lombok.experimental.UtilityClass;
 
 /**
- * A series of LocalTime and related conversions for testing
+ * A series of LocalTimes and related conversions for testing
  */
+@UtilityClass
 public class Times {
 
   public static final LocalTime TIME_00_00 = LocalTime.of(0, 0);
