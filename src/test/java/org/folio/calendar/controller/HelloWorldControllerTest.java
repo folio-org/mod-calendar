@@ -63,6 +63,10 @@ class HelloWorldControllerTest extends BaseApiTest {
 
     // pull body apart for timestamp only
     JsonPath body = JsonPath.from(response.asString());
-    assertThat(DateTimeHandler.parseTimestamp(body.get("timestamp")), isCurrentInstant());
+    assertThat(
+      "Error timestamp is current",
+      DateTimeHandler.parseTimestamp(body.get("timestamp")),
+      isCurrentInstant()
+    );
   }
 }

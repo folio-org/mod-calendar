@@ -14,6 +14,7 @@ import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.testutils.WireMockInitializer;
 import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
@@ -31,6 +32,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+@Log4j2
 @ActiveProfiles("test")
 @AutoConfigureEmbeddedDatabase
 @ContextConfiguration(initializers = { WireMockInitializer.class })
@@ -62,8 +64,10 @@ class BaseApiTest {
 
   @BeforeEach
   void beforeEach() {
-    // workaround for JUnit 5
+    // workaround for JUnit 5 as each test is idempotent
     if (!isInitialized()) {
+      log.info("Initializing database by posting to /_/tenant");
+
       ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(new TenantAttributes().moduleTo(""))
@@ -71,6 +75,7 @@ class BaseApiTest {
         .then()
         .statusCode(is(HttpStatus.OK.value()));
 
+      log.info("Configuring JSON to parse decimals as doubles, not floats");
       // allow comparison with doubles, not floats
       JsonConfig jsonConfig = JsonConfig
         .jsonConfig()
