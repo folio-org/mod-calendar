@@ -5,7 +5,7 @@ import java.time.Month;
 import lombok.experimental.UtilityClass;
 
 /**
- * A series of LocalDates testing
+ * A series of LocalDates for testing
  */
 @UtilityClass
 public class Dates {
