@@ -75,6 +75,7 @@
     <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
     <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
     <hamcrest-date-matcher.version>2.0.7</hamcrest-date-matcher.version>
+    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -352,6 +353,26 @@
           <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
           <changeLogFile>src/main/resources/db/changelog-master.yaml</changeLogFile>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
