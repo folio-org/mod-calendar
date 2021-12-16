@@ -1,24 +1,20 @@
 package org.folio.calendar.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThrows;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.dto.Weekday;
-import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.testconstants.NormalOpenings;
-import org.folio.calendar.testconstants.OpeningDayInfoRelativeConstants;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.testconstants.UUIDs;
-import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-public class PeriodUtilsTest {
+public class PeriodUtilsConsolidationTest {
 
   @Test
   void testNoOpeningDaysToNormalOpenings() {
