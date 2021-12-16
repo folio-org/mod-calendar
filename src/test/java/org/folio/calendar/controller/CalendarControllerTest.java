@@ -1,0 +1,90 @@
+package org.folio.calendar.controller;
+
+import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
+import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import org.folio.calendar.domain.dto.ArithmeticRequest;
+import org.folio.calendar.testconstants.Periods;
+import org.folio.calendar.testutils.DateTimeHandler;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+
+@ActiveProfiles("test")
+class CalendarControllerTest extends BaseApiTest {
+
+  public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";
+
+  @Test
+  void testCalendarCreation() {
+    ra(false)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(Periods.PERIOD_FULL_EXAMPLE_A)
+      .post(
+        getRequestUrl(
+          String.format(
+            CREATE_CALENDAR_API_ROUTE,
+            Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+          )
+        )
+      )
+      .then()
+      .statusCode(is(HttpStatus.CREATED.value()));
+  }
+  /*
+  @Test
+  void testDefaultSalutation() {
+    ra()
+      .get(getRequestUrl(HELLO_API_ROUTE))
+      .then()
+      .statusCode(is(HttpStatus.OK.value()))
+      .body("hello", is(equalTo(String.format("Welcome %s!", TENANT_ID))));
+  }
+
+  @Test
+  void testCustomSalutation() {
+    ra()
+      .queryParam("salutation", "Bonjour")
+      .get(getRequestUrl(HELLO_API_ROUTE))
+      .then()
+      .statusCode(is(HttpStatus.OK.value()))
+      .body("hello", is(equalTo(String.format("Bonjour %s!", TENANT_ID))));
+  }
+
+  @Test
+  void testArithmeticSuccess() {
+    ra()
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new ArithmeticRequest().a(3).b(4))
+      .post(getRequestUrl(HELLO_API_ROUTE))
+      .then()
+      .statusCode(is(HttpStatus.OK.value()))
+      .body("product", is(12))
+      .body("sum", is(7))
+      .body("quotient", is(closeTo(0.75, 0.1)));
+  }
+
+  @Test
+  void testArithmeticByZero() {
+    Response response = ra()
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new ArithmeticRequest().a(3).b(0))
+      .post(getRequestUrl(HELLO_API_ROUTE));
+
+    // check status code is 400
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
+
+    // pull body apart for timestamp only
+    JsonPath body = JsonPath.from(response.asString());
+    assertThat(
+      "Error timestamp is current",
+      DateTimeHandler.parseTimestamp(body.get("timestamp")),
+      isCurrentInstant()
+    );
+  }*/
+}

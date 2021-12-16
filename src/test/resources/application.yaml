@@ -15,6 +15,14 @@ spring:
   banner:
     location: classpath:/banner.txt
 
+zonky:
+  test:
+    database:
+      postgres:
+        client:
+          properties:
+            stringtype: unspecified
+
 management:
   endpoints:
     web:
