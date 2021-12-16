@@ -25,6 +25,7 @@ public class PeriodUtils {
    * @param calendarId
    * @return
    */
+  // allow multiple continue statements in for loop
   @SuppressWarnings("java:S135")
   public static List<NormalOpening> convertOpeningDayRelativeToNormalOpening(
     Iterable<OpeningDayRelative> openings,
