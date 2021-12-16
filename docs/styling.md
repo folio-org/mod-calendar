@@ -11,7 +11,7 @@ To use prettier on the codebase, you must have the following NPM modules globall
 your PATH:
 
 ```sh
-npm install -g --save-dev prettier prettier-xml prettier-plugin-sql
+npm install -g --save-dev prettier @prettier/plugin-xml prettier-plugin-sql
 ```
 
 ## React

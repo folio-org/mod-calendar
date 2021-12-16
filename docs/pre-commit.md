@@ -21,7 +21,7 @@ This script consists of a few main parts:
 ## Prettier
 
 The code formatter [Prettier](https://prettier.io/) is ran on changed code files using the main
-`.prettierrc`.
+`.prettierrc`.  More information is in [styling.md](styling.md)
 
 ## Liquibase
 
