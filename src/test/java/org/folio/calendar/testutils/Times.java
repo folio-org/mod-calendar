@@ -5,7 +5,7 @@ import java.time.LocalTime;
 /**
  * A series of LocalTime and related conversions for testing
  */
-public class TestTimeConstants {
+public class Times {
 
   public static final LocalTime TIME_00_00 = LocalTime.of(0, 0);
   public static final LocalTime TIME_04_00 = LocalTime.of(4, 0);
