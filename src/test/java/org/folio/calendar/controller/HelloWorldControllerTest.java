@@ -1,14 +1,14 @@
-package org.folio.calendar.api;
+package org.folio.calendar.controller;
 
-import static org.folio.calendar.utils.APITestUtils.TENANT_ID;
-import static org.folio.calendar.utils.DateTimeHandler.isCurrentInstant;
+import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
+import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.folio.calendar.domain.dto.ArithmeticRequest;
-import org.folio.calendar.utils.DateTimeHandler;
+import org.folio.calendar.testutils.DateTimeHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

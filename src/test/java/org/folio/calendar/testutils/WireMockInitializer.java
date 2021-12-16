@@ -1,4 +1,4 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.testutils;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -19,11 +19,13 @@ public class WireMockInitializer
       .getBeanFactory()
       .registerSingleton("wireMockServer", wireMockServer);
 
-    configurableApplicationContext.addApplicationListener(applicationEvent -> {
-      if (applicationEvent instanceof ContextClosedEvent) {
-        wireMockServer.stop();
+    configurableApplicationContext.addApplicationListener(
+      applicationEvent -> {
+        if (applicationEvent instanceof ContextClosedEvent) {
+          wireMockServer.stop();
+        }
       }
-    });
+    );
 
     TestPropertyValues
       .of("x-okapi-url:http://localhost:" + wireMockServer.port())

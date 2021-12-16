@@ -1,7 +1,7 @@
-package org.folio.calendar.api;
+package org.folio.calendar.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.folio.calendar.utils.APITestUtils.TENANT_ID;
+import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.hamcrest.Matchers.is;
 
 import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
@@ -14,7 +14,7 @@ import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import lombok.Getter;
 import lombok.Setter;
-import org.folio.calendar.utils.WireMockInitializer;
+import org.folio.calendar.testutils.WireMockInitializer;
 import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;

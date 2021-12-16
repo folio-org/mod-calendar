@@ -1,4 +1,4 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.testutils;
 
 import lombok.experimental.UtilityClass;
 

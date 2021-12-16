@@ -1,4 +1,4 @@
-package org.folio.calendar.api;
+package org.folio.calendar.controller;
 
 import static org.hamcrest.Matchers.*;
 
@@ -19,7 +19,7 @@ class OkapiHealthTest extends BaseApiTest {
   public static final String HEALTH_API_ROUTE = "/admin/health/";
 
   @Test
-  void testOkSTatusReport() {
+  void testOkStatusReport() {
     ra(false) // must not validate as /admin/health is not in our schema
       .get(getRequestUrl(HEALTH_API_ROUTE))
       .then()
