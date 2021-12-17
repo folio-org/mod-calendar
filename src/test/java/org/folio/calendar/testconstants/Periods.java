@@ -102,4 +102,37 @@ public class Periods {
         OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
       )
     );
+
+  public static final Period PERIOD_FULL_EXAMPLE_C = PERIOD_2021_01_01_TO_2021_07_04
+    .withId(UUIDs.UUID_C)
+    .withServicePointId(UUIDs.UUID_1)
+    .withName(Names.NAME_3)
+    .withOpeningDays(
+      Arrays.asList(
+        OpeningDayRelativeConstants.MONDAY_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59,
+        OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
+      )
+    );
+
+  public static final Period PERIOD_FULL_EXAMPLE_D = PERIOD_2021_05_01_TO_2021_09_22
+    .withId(UUIDs.UUID_D)
+    .withServicePointId(UUIDs.UUID_1)
+    .withName(Names.NAME_4)
+    .withOpeningDays(
+      Arrays.asList(
+        OpeningDayRelativeConstants.MONDAY_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59,
+        OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
+      )
+    );
+
+  public static final Period PERIOD_FULL_EXAMPLE_E = PERIOD_2021_03_16_TO_2021_04_30
+    .withId(UUIDs.UUID_E)
+    .withServicePointId(UUIDs.UUID_1)
+    .withName(Names.NAME_5)
+    .withOpeningDays(
+      Arrays.asList(
+        OpeningDayRelativeConstants.MONDAY_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59,
+        OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
+      )
+    );
 }

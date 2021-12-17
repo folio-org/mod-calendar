@@ -112,4 +112,40 @@ public class Calendars {
         NormalOpenings.THURSDAY_ALL_DAY
       )
     );
+
+  public static final Calendar CALENDAR_FULL_EXAMPLE_C = CALENDAR_2021_01_01_TO_2021_07_04
+    .withId(UUIDs.UUID_C)
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_1_TO_CAL_C))
+    .withName(Names.NAME_3)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    );
+
+  public static final Calendar CALENDAR_FULL_EXAMPLE_D = CALENDAR_2021_05_01_TO_2021_09_22
+    .withId(UUIDs.UUID_D)
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_1_TO_CAL_D))
+    .withName(Names.NAME_4)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    );
+
+  public static final Calendar CALENDAR_FULL_EXAMPLE_E = CALENDAR_2021_03_16_TO_2021_04_30
+    .withId(UUIDs.UUID_E)
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_1_TO_CAL_E))
+    .withName(Names.NAME_5)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    );
 }
