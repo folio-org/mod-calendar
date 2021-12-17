@@ -372,6 +372,7 @@
         <configuration>
           <excludes>
             <exclude>**/dto/*</exclude>
+            <exclude>**/rest/resource/*</exclude>
           </excludes>
         </configuration>
         <executions>
