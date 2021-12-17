@@ -1,15 +1,20 @@
 package org.folio.calendar.controller;
 
-import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.ArithmeticRequest;
+import java.util.UUID;
+import org.folio.calendar.domain.dto.Error;
+import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.testconstants.Periods;
-import org.folio.calendar.testutils.DateTimeHandler;
+import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,71 +25,82 @@ class CalendarControllerTest extends BaseApiTest {
 
   public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";
 
-  @Test
-  void testCalendarCreation() {
-    ra(false)
+  /**
+   * Send a Calendar creation request
+   * @param calendar calendar to create, as a legacy Period
+   * @param servicePointId service point to assign
+   * @return the Response
+   */
+  public Response sendCalendarCreationRequest(Period calendar, UUID servicePointId) {
+    return ra()
       .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(Periods.PERIOD_FULL_EXAMPLE_A)
-      .post(
-        getRequestUrl(
-          String.format(
-            CREATE_CALENDAR_API_ROUTE,
-            Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
-          )
+      .body(calendar)
+      .post(getRequestUrl(String.format(CREATE_CALENDAR_API_ROUTE, servicePointId)));
+  }
+
+  @Test
+  void testCalendarACreation() {
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_A,
+      Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+    );
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    Period result = response.getBody().as(Period.class);
+    assertThat(
+      "Returned period is the same as created one",
+      result,
+      is(equalTo(Periods.PERIOD_FULL_EXAMPLE_A))
+    );
+  }
+
+  @Test
+  void testCalendarBCreation() {
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_B,
+      Periods.PERIOD_FULL_EXAMPLE_B.getServicePointId()
+    );
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    Period result = response.getBody().as(Period.class);
+    assertThat(
+      "Returned period is the same as created one",
+      result,
+      is(equalTo(Periods.PERIOD_FULL_EXAMPLE_B))
+    );
+  }
+
+  @Test
+  void testInvalidServicePointId() {
+    Response response = sendCalendarCreationRequest(Periods.PERIOD_FULL_EXAMPLE_A, UUIDs.UUID_F);
+
+    response.then().statusCode(is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+
+    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+
+    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
+    assertThat(
+      "Error HTTP code is correct",
+      errorResponse.getStatus(),
+      is(HttpStatus.UNPROCESSABLE_ENTITY.value())
+    );
+    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
+
+    Error error = errorResponse.getErrors().get(0);
+
+    assertThat(
+      "Error reports an invalid request was made",
+      error.getCode(),
+      is(ErrorCode.INVALID_REQUEST)
+    );
+    assertThat(
+      "Error message specified service point mismatch",
+      error.getMessage(),
+      containsString(
+        String.format(
+          "The service point ID in the URL (%s) did not match the one in the payload (%s)",
+          UUIDs.UUID_F,
+          Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
         )
       )
-      .then()
-      .statusCode(is(HttpStatus.CREATED.value()));
-  }
-  /*
-  @Test
-  void testDefaultSalutation() {
-    ra()
-      .get(getRequestUrl(HELLO_API_ROUTE))
-      .then()
-      .statusCode(is(HttpStatus.OK.value()))
-      .body("hello", is(equalTo(String.format("Welcome %s!", TENANT_ID))));
-  }
-
-  @Test
-  void testCustomSalutation() {
-    ra()
-      .queryParam("salutation", "Bonjour")
-      .get(getRequestUrl(HELLO_API_ROUTE))
-      .then()
-      .statusCode(is(HttpStatus.OK.value()))
-      .body("hello", is(equalTo(String.format("Bonjour %s!", TENANT_ID))));
-  }
-
-  @Test
-  void testArithmeticSuccess() {
-    ra()
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new ArithmeticRequest().a(3).b(4))
-      .post(getRequestUrl(HELLO_API_ROUTE))
-      .then()
-      .statusCode(is(HttpStatus.OK.value()))
-      .body("product", is(12))
-      .body("sum", is(7))
-      .body("quotient", is(closeTo(0.75, 0.1)));
-  }
-
-  @Test
-  void testArithmeticByZero() {
-    Response response = ra()
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new ArithmeticRequest().a(3).b(0))
-      .post(getRequestUrl(HELLO_API_ROUTE));
-
-    // check status code is 400
-    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
-
-    // pull body apart for timestamp only
-    JsonPath body = JsonPath.from(response.asString());
-    assertThat(
-      "Error timestamp is current",
-      DateTimeHandler.parseTimestamp(body.get("timestamp")),
-      isCurrentInstant()
     );
-  }*/
+  }
 }
