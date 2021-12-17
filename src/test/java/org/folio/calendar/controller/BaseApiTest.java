@@ -1,43 +1,48 @@
 package org.folio.calendar.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
 import io.restassured.config.JsonConfig;
+import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.Header;
 import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.testutils.APITestUtils;
 import org.folio.calendar.testutils.WireMockInitializer;
 import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * Base abstract class for testing APIs.  Contains centralized APIs for Rest Assured, database initialization, etc
+ */
 @Log4j2
 @ActiveProfiles("test")
-@AutoConfigureEmbeddedDatabase
+@AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class BaseApiTest {
+abstract class BaseApiTest {
 
   @Getter
   @Setter
@@ -63,18 +68,20 @@ class BaseApiTest {
   );
 
   @BeforeEach
-  void beforeEach() {
-    // workaround for JUnit 5 as each test is idempotent
+  void createDatabase() {
+    log.info("Initializing database by posting to /_/tenant");
+    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new TenantAttributes().moduleTo(""))
+      .post(getRequestUrl("/_/tenant"))
+      .then()
+      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  }
+
+  @BeforeEach
+  void addJsonConfig() {
+    // workaround for JUnit 5 as each test is idempotent (no @Before) but we only need to do this once
     if (!isInitialized()) {
-      log.info("Initializing database by posting to /_/tenant");
-
-      ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new TenantAttributes().moduleTo(""))
-        .post(getRequestUrl("/_/tenant"))
-        .then()
-        .statusCode(is(HttpStatus.OK.value()));
-
       log.info("Configuring JSON to parse decimals as doubles, not floats");
       // allow comparison with doubles, not floats
       JsonConfig jsonConfig = JsonConfig
@@ -82,12 +89,34 @@ class BaseApiTest {
         .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
       RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
 
+      RestAssured.config =
+        RestAssured
+          .config()
+          .objectMapperConfig(
+            ObjectMapperConfig
+              .objectMapperConfig()
+              .jackson2ObjectMapperFactory((a, b) -> APITestUtils.MAPPER)
+          );
+
       setInitialized(true);
     }
   }
 
   @AfterEach
-  void afterEach() {
+  void cleanDatabase() {
+    log.info("Recreating database");
+
+    log.info("Deleting database by posting to /_/tenant");
+    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new TenantAttributes().moduleTo(""))
+      .delete(getRequestUrl("/_/tenant"))
+      .then()
+      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  }
+
+  @AfterEach
+  void resetWiremock() {
     this.wireMockServer.resetAll();
   }
 
