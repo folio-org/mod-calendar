@@ -168,7 +168,8 @@ public class PeriodUtils {
       OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
         .builder()
         .open(true)
-        .allDay(false);
+        .allDay(false)
+        .exceptional(false);
 
       if (entry.getValue().size() == 1 && entry.getValue().get(0).equals(TimeConstants.ALL_DAY)) {
         openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
