@@ -120,13 +120,6 @@ abstract class BaseApiTest {
     this.wireMockServer.resetAll();
   }
 
-  @Test
-  void testContextLoads() {
-    assertThat(metadata)
-      .as("Ensure application context starts and database can be initialized")
-      .isNotNull();
-  }
-
   /**
    * Create a RestAssured object with the proper headers for Okapi testing
    *
