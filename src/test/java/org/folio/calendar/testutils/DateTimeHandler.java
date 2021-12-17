@@ -1,11 +1,9 @@
 package org.folio.calendar.testutils;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static org.exparity.hamcrest.date.LocalDateTimeMatchers.within;
+import static org.exparity.hamcrest.date.InstantMatchers.within;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import lombok.experimental.UtilityClass;
 import org.exparity.hamcrest.date.core.TemporalMatcher;
@@ -22,36 +20,29 @@ public class DateTimeHandler {
   public static final DateTimeFormatter TIMESTAMP_FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
   /**
-   * Get the current date/time.  Contrary to the name, this does not return an Instant but instead
-   * an equivalent LocalDateTime in UTC due to lacking support in hamcrest-date.
+   * Get the current date/time as an Instant
    *
-   * @return the current date/time as a LocalDateTime
-   * @see https://github.com/eXparity/hamcrest-date/issues/37
+   * @return the current date/time as an Instant
    */
-  public static final LocalDateTime getCurrentInstant() {
-    return LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
+  public static Instant getCurrentInstant() {
+    return Instant.now();
   }
 
   /**
-   * Parse a timestamp, returning a LocalDateTime.  Instant would be preferred but is not implemented
-   * due to lacking support in hamcrest-date
+   * Parse a timestamp, returning an Instant
    *
-   * @return the current date/time as a LocalDateTime
-   * @see https://github.com/eXparity/hamcrest-date/issues/37
+   * @return the provided timestamp as an Instant
    */
-  public static LocalDateTime parseTimestamp(String input) {
-    Instant instant = Instant.from(TIMESTAMP_FORMATTER.parse(input));
-    return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
+  public static Instant parseTimestamp(String input) {
+    return Instant.from(TIMESTAMP_FORMATTER.parse(input));
   }
 
   /**
-   * Create a Matcher for a LocalDateTime to compare to the current instant.  Instant would be
-   * preferred but is not implemented due to lacking support in hamcrest-date
+   * Create a Matcher for an Instant to be compared to the current Instant
    *
-   * @return the current date/time as a LocalDateTime
-   * @see https://github.com/eXparity/hamcrest-date/issues/37
+   * @return a matcher for the current Instant, ± 1 minute
    */
-  public static TemporalMatcher<LocalDateTime> isCurrentInstant() {
+  public static TemporalMatcher<Instant> isCurrentInstant() {
     return within(1, MINUTES, getCurrentInstant());
   }
 }

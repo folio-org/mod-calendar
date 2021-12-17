@@ -60,6 +60,7 @@
     <json.version>20200518</json.version>
     <lombok.version>1.18.22</lombok.version>
     <liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
+    <!-- <javadoc-maven-plugin.version>3.3.1</javadoc-maven-plugin.version> -->
     <!-- Mitigate CVE-2021-44228 before Spring Boot itself -->
     <!-- https://spring.io/blog/2021/12/10/log4j2-vulnerability-and-spring-boot -->
     <log4j2.version>2.16.0</log4j2.version>
@@ -74,7 +75,7 @@
     <rest-assured.version>4.4.0</rest-assured.version>
     <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
     <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
-    <hamcrest-date-matcher.version>2.0.7</hamcrest-date-matcher.version>
+    <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
   </properties>
 
