@@ -1,6 +1,8 @@
 package org.folio.calendar.exception;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import lombok.Getter;
 import lombok.NonNull;
@@ -218,9 +220,11 @@ public abstract class AbstractCalendarException extends RuntimeException {
         error.addTraceItem(frame.toString());
       }
     }
+    Map<String, Object> errorParameters = new HashMap<>();
     for (Entry<String, Object> parameter : this.getParameters().getMap().entrySet()) {
-      error.putParametersItem(parameter.getKey(), parameter.getValue());
+      errorParameters.put(parameter.getKey(), parameter.getValue());
     }
+    error.setParameters(errorParameters);
 
     response.addErrorsItem(error);
 

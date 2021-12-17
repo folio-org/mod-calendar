@@ -10,8 +10,6 @@ properties:
     type: string
   _parameters:
     description: Parameters which may give insight into what caused the error
-    type: object
-    additionalProperties: {}
   _trace:
     description: A stack trace of the exception which may or may not be useful.
     type: array
