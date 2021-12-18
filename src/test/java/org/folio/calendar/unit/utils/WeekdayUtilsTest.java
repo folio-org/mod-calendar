@@ -1,4 +1,4 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThrows;
 
 import java.util.Arrays;
 import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.utils.WeekdayUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

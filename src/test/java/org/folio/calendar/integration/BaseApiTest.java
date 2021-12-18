@@ -1,4 +1,4 @@
-package org.folio.calendar.controller;
+package org.folio.calendar.integration;
 
 import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.hamcrest.Matchers.both;

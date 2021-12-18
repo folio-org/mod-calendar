@@ -1,4 +1,4 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.*;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import org.folio.calendar.testconstants.Times;
+import org.folio.calendar.utils.DateUtils;
+import org.folio.calendar.utils.TimeConstants;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

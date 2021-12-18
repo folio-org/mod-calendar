@@ -1,4 +1,4 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
@@ -10,6 +10,7 @@ import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.testconstants.UUIDs;
+import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 
