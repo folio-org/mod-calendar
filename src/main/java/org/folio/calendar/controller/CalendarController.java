@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Main Calendar API controller
+ */
 @RestController
 @RequestMapping(value = "/")
 public final class CalendarController implements CalendarApi {
@@ -26,6 +29,7 @@ public final class CalendarController implements CalendarApi {
   @Autowired
   private CalendarService calendarService;
 
+  /** {@inheritDoc} */
   @Override
   public ResponseEntity<Period> addNewPeriod(
     String xOkapiTenant,

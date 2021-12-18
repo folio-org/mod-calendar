@@ -18,6 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.With;
 
+/**
+ * Calendar entity
+ */
 @Data
 @With
 @Table(name = "calendars")

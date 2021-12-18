@@ -1,16 +1,13 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.controller.ApiExceptionHandler;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MissingRequestValueException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * An exception to be used whenever nothing more specific has been written. This
- * will primarily be used by {@link ApiExceptionHandler} for Spring exceptions
- * ({@link MethodArgumentTypeMismatchException},
- * {@link MissingRequestValueException}) and any otherwise unhandled {@link
+ * will primarily be used by {@link org.folio.calendar.controller.ApiExceptionHandler ApiExceptionHandler} for Spring exceptions
+ * ({@link org.springframework.web.method.annotation.MethodArgumentTypeMismatchException MethodArgumentTypeMismatchException},
+ * {@link org.springframework.web.bind.MissingRequestValueException MissingRequestValueException}) and any otherwise unhandled {@link
  * Exception}
  */
 public class NonspecificCalendarException extends AbstractCalendarException {
@@ -40,7 +37,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
    * code, message, and format.
    *
    * @param cause      The exception which caused this (should not be null due to the ambiguity of this exception)
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message

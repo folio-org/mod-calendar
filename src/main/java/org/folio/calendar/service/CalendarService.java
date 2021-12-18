@@ -12,6 +12,9 @@ import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * A Service class for calendar-related API calls
+ */
 @Service
 public final class CalendarService {
 
@@ -22,10 +25,22 @@ public final class CalendarService {
     this.calendarRepository = calendarRepository;
   }
 
+  /**
+   * Get all the calendars for a certain service point
+   *
+   * @param servicePointId the service point
+   * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s associated with the service point
+   */
   public List<Calendar> getAllCalendarsForServicePoint(UUID servicePointId) {
     return this.calendarRepository.findByServicePointId(servicePointId);
   }
 
+  /**
+   * Create a calendar from a given period
+   *
+   * @param period a {@link org.folio.calendar.domain.dto.Period Period}
+   * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
+   */
   public Calendar createCalendarFromPeriod(Period period) {
     if (this.calendarRepository.existsById(period.getId())) {
       throw new InvalidDataException(

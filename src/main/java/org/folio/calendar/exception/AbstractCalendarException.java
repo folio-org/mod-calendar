@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * Abstract calendar exception, to be implemented by more concrete exceptions thrown from our application.
- * {@link NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions.)
+ * {@link org.folio.calendar.exception.NonspecificCalendarException NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions).
  */
 public abstract class AbstractCalendarException extends RuntimeException {
 
@@ -109,7 +109,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * code, message, and format. This constructor assumes a HTTP code of 400 Bad
    * Request
    *
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message
@@ -130,7 +130,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * Request
    *
    * @param parameters The parameters causing the exception
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message
@@ -151,7 +151,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * code, message, and format.
    *
    * @param cause      The exception which caused this (may be null)
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message
@@ -173,7 +173,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    *
    * @param cause      The exception which caused this (may be null)
    * @param parameters The parameters causing the exception
-   * @param statusCode The Spring HTTP status code ({@link HttpStatus})
+   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message
@@ -234,7 +234,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
   /**
    * Get a ResponseEntity to be returned to the API
    *
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse} body.
    */
   public ResponseEntity<ErrorResponse> getErrorResponseEntity() {
     return new ResponseEntity<>(this.getErrorResponse(), this.getStatusCode());

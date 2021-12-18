@@ -5,8 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 
+/**
+ * Parameters for an exception, to reflect what caused an error
+ */
 public final class ExceptionParameters implements Serializable {
 
+  /** Needed for varargs constructor */
   public static final int NUM_IN_A_PAIR = 2;
 
   @Getter
@@ -36,6 +40,7 @@ public final class ExceptionParameters implements Serializable {
 
   /**
    * Add a parameter to this object
+   *
    * @param key The key
    * @param value The value of the parameter to add, of any type
    */

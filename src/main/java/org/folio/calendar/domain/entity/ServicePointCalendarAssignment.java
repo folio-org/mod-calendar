@@ -11,6 +11,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * The relationship between a service point and a calendar
+ */
 @Data
 @Table(name = "service_point_calendars")
 @Entity

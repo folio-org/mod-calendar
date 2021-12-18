@@ -16,14 +16,18 @@ import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 
+/**
+ * Utilities for acting on {@link Period} objects
+ */
 @UtilityClass
 public class PeriodUtils {
 
   /**
    * Convert period openings to normalized openings, consolidating as necessary
-   * @param openings
-   * @param calendarId
-   * @return
+   *
+   * @param openings a list of {@link OpeningDayRelative} objects
+   * @param calendarId the ID of a calendar which the created {@link NormalOpening} objects should be associated with
+   * @return a {@link List} object.
    */
   // allow multiple continue statements in for loop
   @SuppressWarnings("java:S135")
@@ -113,9 +117,10 @@ public class PeriodUtils {
   }
 
   /**
-   * Convert a modern calendar to a legacy period object
-   * @param calendar
-   * @return
+   * Convert a modern {@link org.folio.calendar.domain.entity.Calendar Calendar} to a legacy {@link org.folio.calendar.domain.dto.Period Period} object
+   *
+   * @param calendar the {@link org.folio.calendar.domain.entity.Calendar Calendar} to convert
+   * @return the equivalent {@link org.folio.calendar.domain.dto.Period Period}
    */
   public Period toPeriod(Calendar calendar) {
     Period.PeriodBuilder builder = Period

@@ -12,10 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Sample controller for example get/post requests
+ */
 @RestController
 @RequestMapping(value = "/")
 public class HelloWorldController implements HelloApi {
 
+  /** {@inheritDoc} */
   @Override
   public ResponseEntity<Greeting> getHelloWorld(String tenantId, String salutation) {
     Greeting sampleResponse = new Greeting();
@@ -23,6 +27,7 @@ public class HelloWorldController implements HelloApi {
     return new ResponseEntity<>(sampleResponse, HttpStatus.OK);
   }
 
+  /** {@inheritDoc} */
   @Override
   public ResponseEntity<Arithmetics> postHello(String xOkapiTenant, ArithmeticRequest request) {
     Arithmetics answers = new Arithmetics();

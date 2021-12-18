@@ -5,6 +5,9 @@ import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Weekday;
 
+/**
+ * Utilities for weekdays
+ */
 @UtilityClass
 public class WeekdayUtils {
 
@@ -23,6 +26,7 @@ public class WeekdayUtils {
 
   /**
    * Get the weekday before the provided one
+   *
    * @param w a weekday
    * @return the day of the week before w
    */
@@ -51,6 +55,7 @@ public class WeekdayUtils {
 
   /**
    * Get the weekday after the provided one
+   *
    * @param w a weekday
    * @return the day of the week after w
    */
@@ -77,6 +82,13 @@ public class WeekdayUtils {
     }
   }
 
+  /**
+   * Get the range of weekdays between two other weekdays, inclusive.
+   *
+   * @param start the start {@link org.folio.calendar.domain.dto.Weekday Weekday}
+   * @param end the end {@link org.folio.calendar.domain.dto.Weekday Weekday}
+   * @return a {@link java.util.List List} of weekdays between the start and end weekdays, inclusive
+   */
   public static List<Weekday> getRange(Weekday start, Weekday end) {
     List<Weekday> list = new ArrayList<>();
 

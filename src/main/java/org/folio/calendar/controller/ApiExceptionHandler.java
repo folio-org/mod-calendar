@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+/**
+ * Overall controller to handle exceptions and return proper API responses
+ */
 @Log4j2
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -24,9 +27,9 @@ public class ApiExceptionHandler {
   /**
    * Handles exceptions from our application
    *
-   * @param exception {@link AbstractCalendarException} object
+   * @param exception an {@link org.folio.calendar.exception.AbstractCalendarException AbstractCalendarException}
    * @see AbstractCalendarException
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
   @ExceptionHandler(AbstractCalendarException.class)
   public ResponseEntity<ErrorResponse> handleCalendarException(
@@ -40,7 +43,7 @@ public class ApiExceptionHandler {
    * Handles improperly typed parameters
    *
    * @param exception exception indicating that the request could not be parsed
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
   @ExceptionHandler(ServletException.class)
   public ResponseEntity<ErrorResponse> handleBadRequest(ServletException exception) {
@@ -58,7 +61,7 @@ public class ApiExceptionHandler {
    * Handles improperly typed parameters
    *
    * @param exception exception indicating that a method parameter type was incorrect
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
   public ResponseEntity<ErrorResponse> handleGenericInvalidParameter(
@@ -78,7 +81,7 @@ public class ApiExceptionHandler {
    * Handles entirely missing parameters
    *
    * @param exception exception indicating that a request value was missing
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
   @ExceptionHandler(MissingRequestValueException.class)
   public ResponseEntity<ErrorResponse> handleGenericMissingParameter(
@@ -98,7 +101,7 @@ public class ApiExceptionHandler {
    * Handles all uncaught exceptions.
    *
    * @param exception exceptions not otherwise caught
-   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception) {

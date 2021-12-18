@@ -7,11 +7,15 @@ import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
 
+/**
+ * Utilities for times, dates, and date ranges
+ */
 @UtilityClass
 public class DateUtils {
 
   /**
    * Check that two inclusive local date pairs overlap
+   *
    * @param start1 Start of date range 1
    * @param end1 End of date range 1
    * @param start2 Start of date range 2
@@ -30,6 +34,7 @@ public class DateUtils {
 
   /**
    * Check that two periods overlap
+   *
    * @param period1 Period 1
    * @param period2 Period 2
    * @return if they overlap
@@ -45,6 +50,7 @@ public class DateUtils {
 
   /**
    * Check that a period and calendar overlap
+   *
    * @param period Period
    * @param calendar Calendar
    * @return if they overlap
@@ -55,6 +61,7 @@ public class DateUtils {
 
   /**
    * Check that a calendar and period overlap
+   *
    * @param calendar Calendar
    * @param period Period
    * @return if they overlap
@@ -70,6 +77,7 @@ public class DateUtils {
 
   /**
    * Check that two periods overlap
+   *
    * @param calendar1 Calendar 1
    * @param calendar2 Calendar 2
    * @return if they overlap
@@ -85,6 +93,7 @@ public class DateUtils {
 
   /**
    * Check that the given period overlaps with a list of others.  Note that this does not check overlaps within otherPeriods.
+   *
    * @param period Period to check
    * @param otherPeriods List of other periods
    * @return the overlapped period, or null if no overlap
@@ -101,6 +110,7 @@ public class DateUtils {
 
   /**
    * Check that the given period does not overlap with a list of Calendars
+   *
    * @param period Period to check
    * @param calendars Calendars
    * @return the overlapped calendar, or null if no overlap
@@ -117,8 +127,9 @@ public class DateUtils {
 
   /**
    * Convert a LocalTime to a string of the format HH:mm
-   * @param time
-   * @return
+   *
+   * @param time the {@link java.time.LocalTime LocalTime} to convert
+   * @return the formatted String (HH:mm)
    */
   public static String toTimeString(LocalTime time) {
     return time.format(TimeConstants.TIME_FORMATTER);
@@ -126,8 +137,9 @@ public class DateUtils {
 
   /**
    * Convert a string of the format HH:mm to a LocalTime
-   * @param time
-   * @return
+   *
+   * @param time the formatted String (HH:mm)
+   * @return a parsed {@link java.time.LocalTime LocalTime}
    */
   public static LocalTime fromTimeString(String time) {
     return LocalTime.parse(time, TimeConstants.TIME_FORMATTER);

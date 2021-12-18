@@ -83,12 +83,13 @@ public class NormalOpening {
 
   /**
    * Create a NormalOpening object
-   * @param id
-   * @param calendarId
-   * @param startDay
-   * @param startTime
-   * @param endDay
-   * @param endTime
+   *
+   * @param id a {@link java.util.UUID UUID}
+   * @param calendarId a {@link java.util.UUID UUID}
+   * @param startDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
+   * @param startTime a {@link java.time.LocalTime LocalTime}
+   * @param endDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
+   * @param endTime a {@link java.time.LocalTime LocalTime}
    */
   public NormalOpening(
     final UUID id,
@@ -108,6 +109,7 @@ public class NormalOpening {
 
   /**
    * Determine if two NormalOpenings are adjacent to each other.  Small overlaps less than one weekday will be considered adjacent.
+   *
    * @param opening1 The first opening to compare
    * @param opening2 The second opening to compare
    * @return if they are adjacent
@@ -145,9 +147,10 @@ public class NormalOpening {
   }
 
   /**
-   * Merge two NormalOpenings into one range over both.  You most likely want to make sure they are {@link NormalOpening#adjacent} first.
-   * @param opening1
-   * @param opening2
+   * Merge two NormalOpenings into one range over both.  You most likely want to make sure they are {@link org.folio.calendar.domain.entity.NormalOpening#adjacent} first.
+   *
+   * @param opening1 a {@link org.folio.calendar.domain.entity.NormalOpening NormalOpening}
+   * @param opening2 a {@link org.folio.calendar.domain.entity.NormalOpening NormalOpening}
    * @return a NormalOpening which surrounds opening1 and opening2
    */
   public static NormalOpening merge(final NormalOpening opening1, final NormalOpening opening2) {
@@ -160,6 +163,11 @@ public class NormalOpening {
     return opening1.withEndDay(opening2.getEndDay()).withEndTime(opening2.getEndTime());
   }
 
+  /**
+   * Split this NormalOpening into weekdays (as a series of {@link OpeningHourRange}s)
+   *
+   * @return a Map of {@link Weekday}s to {@link OpeningHourRange}
+   */
   public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
     List<Weekday> weekdays = WeekdayUtils.getRange(this.getStartDay(), this.getEndDay());
 
@@ -183,28 +191,36 @@ public class NormalOpening {
   }
 
   /**
-   * The time (with startDay) that this opening begins
+   * Get the time (with startDay) that this opening begins
+   *
+   * @return a {@link LocalTime}, truncated to the minutes
    */
   public LocalTime getStartTime() {
     return this.startTime.truncatedTo(ChronoUnit.MINUTES);
   }
 
   /**
-   * The time (with endDay) that this opening ends
+   * Get the time (with endDay) that this opening ends
+   *
+   * @return a {@link LocalTime}, truncated to the minutes
    */
   public LocalTime getEndTime() {
     return this.endTime.truncatedTo(ChronoUnit.MINUTES);
   }
 
   /**
-   * The time (with startDay) that this opening begins
+   * Set the time (with startDay) that this opening begins
+
+   * @param startTime a {@link LocalTime} (will be truncated to the minutes)
    */
   public void setStartTime(final LocalTime startTime) {
     this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
   }
 
   /**
-   * The time (with endDay) that this opening ends
+   * Set the time (with endDay) that this opening ends
+   *
+   * @param endTime a {@link LocalTime} (will be truncated to the minutes)
    */
   public void setEndTime(final LocalTime endTime) {
     this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);
@@ -214,7 +230,9 @@ public class NormalOpening {
 
     /**
      * The time (with startDay) that this opening begins
-     * @return {@code this}.
+     *
+     * @param startTime a {@link LocalTime} (will be truncated to the minutes)
+     * @return {@code this}, for chaining
      */
     public NormalOpening.NormalOpeningBuilder startTime(final LocalTime startTime) {
       this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
@@ -223,7 +241,9 @@ public class NormalOpening {
 
     /**
      * The time (with endDay) that this opening ends
-     * @return {@code this}.
+     *
+     * @param endTime a {@link LocalTime} (will be truncated to the minutes)
+     * @return {@code this}, for chaining
      */
     public NormalOpening.NormalOpeningBuilder endTime(final LocalTime endTime) {
       this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);

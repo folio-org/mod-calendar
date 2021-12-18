@@ -5,6 +5,9 @@ import java.time.format.DateTimeFormatter;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 
+/**
+ * Assorted time-related constants
+ */
 @UtilityClass
 public class TimeConstants {
 
