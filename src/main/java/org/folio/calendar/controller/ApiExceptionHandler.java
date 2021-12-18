@@ -26,7 +26,7 @@ public class ApiExceptionHandler {
    *
    * @param exception {@link AbstractCalendarException} object
    * @see AbstractCalendarException
-   * @return ResponseEntity<ErrorResponse>
+   * @return {@link ResponseEntity} with {@link ErrorResponse} body.
    */
   @ExceptionHandler(AbstractCalendarException.class)
   public ResponseEntity<ErrorResponse> handleCalendarException(

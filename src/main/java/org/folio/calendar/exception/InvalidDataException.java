@@ -4,7 +4,7 @@ import org.folio.calendar.domain.dto.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 /**
- * An exception thrown whenever invalid data is presented (such as empty fields, start date > end date, etc)
+ * An exception thrown whenever invalid data is presented (such as empty fields, start date &gt; end date, etc)
  */
 public class InvalidDataException extends AbstractCalendarException {
 

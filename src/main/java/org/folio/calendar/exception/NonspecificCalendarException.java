@@ -1,12 +1,15 @@
 package org.folio.calendar.exception;
 
+import org.folio.calendar.controller.ApiExceptionHandler;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingRequestValueException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 /**
  * An exception to be used whenever nothing more specific has been written. This
  * will primarily be used by {@link ApiExceptionHandler} for Spring exceptions
- * ({@link MethodArgumentTypeMismatchException,
+ * ({@link MethodArgumentTypeMismatchException},
  * {@link MissingRequestValueException}) and any otherwise unhandled {@link
  * Exception}
  */
