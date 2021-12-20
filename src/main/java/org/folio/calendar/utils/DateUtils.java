@@ -22,7 +22,8 @@ public class DateUtils {
    * @param startDate the first date in the range
    * @param endDate the last date in the range
    * @return all dates between the start and end dates
-   * @see https://stackoverflow.com/questions/40671689/how-to-build-a-list-of-localdate-from-a-given-range
+   * @see <a href="https://stackoverflow.com/questions/40671689/how-to-build-a-list-of-localdate-from-a-given-range">
+   * Stack Overflow post regarding LocalDate/Stream solutions</a>
    */
   public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
     // the end date for datesUtil is exclusive; adding one makes it inclusive

@@ -220,6 +220,12 @@ public class PeriodUtils {
     return normalOpenings;
   }
 
+  /**
+   * Get a list of {@link OpeningDayRelative}s from {@link NormalOpening}s, for conversion to a legacy Period
+   *
+   * @param normalHours the list of normal hours to convert
+   * @return a list of OpeningDayRelative
+   */
   public List<OpeningDayRelative> getOpeningDayRelativeFromNormalOpenings(
     Iterable<NormalOpening> normalHours
   ) {
@@ -268,6 +274,12 @@ public class PeriodUtils {
     return openingDays;
   }
 
+  /**
+   * Get a list of {@link OpeningDayRelative}s from {@link NormalOpening}s, for conversion to a legacy Period
+   *
+   * @param exceptions the list of exceptions to convert (should only be one)
+   * @return the equivalent {@code OpeningDayRelative}
+   */
   public OpeningDayRelative getOpeningDayRelativeFromExceptionRanges(
     Set<ExceptionRange> exceptions
   ) {
