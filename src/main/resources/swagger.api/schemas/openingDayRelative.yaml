@@ -6,6 +6,7 @@ properties:
       Weekday that this opening information applies to.  Despite the plurality, exactly one weekday
       will be given here.
     type: object
+    # nullable: true
     properties:
       day:
         $ref: "weekday.yaml"
@@ -18,7 +19,6 @@ properties:
 additionalProperties: false
 required:
   - openingDay
-  - weekdays
 example:
   openingDay:
     openingHour:

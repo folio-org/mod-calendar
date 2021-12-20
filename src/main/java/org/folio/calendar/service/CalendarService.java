@@ -67,9 +67,23 @@ public final class CalendarService {
     calendarBuilder = calendarBuilder.servicePoint(servicePointAssignment);
 
     // create hours
-    calendarBuilder.normalHours(
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(period.getOpeningDays(), period.getId())
-    );
+    if (PeriodUtils.isOpeningExceptional(period.getOpeningDays())) {
+      calendarBuilder.exceptions(
+        PeriodUtils.convertOpeningDayRelativeToExceptions(
+          period.getStartDate(),
+          period.getEndDate(),
+          period.getOpeningDays(),
+          period.getId()
+        )
+      );
+    } else {
+      calendarBuilder.normalHours(
+        PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+          period.getOpeningDays(),
+          period.getId()
+        )
+      );
+    }
 
     Calendar calendar = calendarBuilder.build();
     this.calendarRepository.save(calendar);

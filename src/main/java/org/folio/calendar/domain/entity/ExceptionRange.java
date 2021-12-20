@@ -6,7 +6,6 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -16,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 
 /**
  * An overall exception to the normal hours of a calendar.  Multiple {@link ExceptionHour} objects can define specific behavior over this interval.
@@ -33,7 +33,6 @@ public class ExceptionRange {
    */
   @Id
   @NotNull
-  @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
@@ -61,6 +60,7 @@ public class ExceptionRange {
   /**
    * The corresponding openings/closures which relate to this exception
    */
+  @Singular
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "exception_id")
   private Set<ExceptionHour> openings;

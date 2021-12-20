@@ -1,7 +1,10 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.chrono.ChronoLocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
@@ -12,6 +15,19 @@ import org.folio.calendar.domain.entity.Calendar;
  */
 @UtilityClass
 public class DateUtils {
+
+  /**
+   * Get all LocalDates between two dates (inclusive)
+   *
+   * @param startDate the first date in the range
+   * @param endDate the last date in the range
+   * @return all dates between the start and end dates
+   * @see https://stackoverflow.com/questions/40671689/how-to-build-a-list-of-localdate-from-a-given-range
+   */
+  public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
+    // the end date for datesUtil is exclusive; adding one makes it inclusive
+    return startDate.datesUntil(endDate.plusDays(1)).collect(Collectors.toList());
+  }
 
   /**
    * Check that two inclusive local date pairs overlap
