@@ -186,7 +186,7 @@ public class PeriodUtils {
    * @param normalOpenings list of sorted and canonicalized openings to consolidate
    * @return consolidated openings
    */
-  private List<NormalOpening> consolidateNormalOpenings(List<NormalOpening> normalOpenings) {
+  private static List<NormalOpening> consolidateNormalOpenings(List<NormalOpening> normalOpenings) {
     // consolidation
     for (int i = normalOpenings.size() - 1; i >= 0; i--) {
       // no more to consolidate
@@ -226,7 +226,7 @@ public class PeriodUtils {
    * @param normalHours the list of normal hours to convert
    * @return a list of OpeningDayRelative
    */
-  public List<OpeningDayRelative> getOpeningDayRelativeFromNormalOpenings(
+  public static List<OpeningDayRelative> getOpeningDayRelativeFromNormalOpenings(
     Iterable<NormalOpening> normalHours
   ) {
     // convert contiguous NormalOpenings into single-weekday groups
@@ -280,7 +280,7 @@ public class PeriodUtils {
    * @param exceptions the list of exceptions to convert (should only be one)
    * @return the equivalent {@code OpeningDayRelative}
    */
-  public OpeningDayRelative getOpeningDayRelativeFromExceptionRanges(
+  public static OpeningDayRelative getOpeningDayRelativeFromExceptionRanges(
     Set<ExceptionRange> exceptions
   ) {
     // Set has no native get
@@ -334,7 +334,7 @@ public class PeriodUtils {
    * @param calendar the {@link org.folio.calendar.domain.entity.Calendar Calendar} to convert
    * @return the equivalent {@link org.folio.calendar.domain.dto.Period Period}
    */
-  public Period toPeriod(Calendar calendar) {
+  public static Period toPeriod(Calendar calendar) {
     Period.PeriodBuilder builder = Period
       .builder()
       .id(calendar.getId())
