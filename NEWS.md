@@ -1,3 +1,6 @@
+## 1.12.1 2021-12-21
+* Upgrade to RMB 33.0.4 and Log4j 2.16.0 (MODCAL-99)
+
 ## 1.12.0 2021-06-11
 * Upgrade to RMB 33.0.0 and Vertx 4.1.0 (MODCAL-90)
 
