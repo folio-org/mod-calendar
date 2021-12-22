@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.ToString;
 import org.folio.calendar.domain.dto.Error;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
@@ -16,9 +17,10 @@ import org.springframework.http.ResponseEntity;
  * Abstract calendar exception, to be implemented by more concrete exceptions thrown from our application.
  * {@link org.folio.calendar.exception.NonspecificCalendarException NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions).
  */
+@ToString
 public abstract class AbstractCalendarException extends RuntimeException {
 
-  private static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
+  public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
   @Getter
   protected final ErrorCode errorCode;
@@ -29,143 +31,6 @@ public abstract class AbstractCalendarException extends RuntimeException {
   @Getter
   @NonNull
   protected final ExceptionParameters parameters;
-
-  /**
-   * Create an AbstractCalendarException with the given error code, message, and
-   * format. This constructor assumes a HTTP code of 400 Bad Request
-   *
-   * @param errorCode An error code as described in the ErrorResponse API type
-   * @param message   A printf-style string for the error message
-   * @param format    Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(ErrorCode errorCode, String message, Object... format) {
-    this(null, null, DEFAULT_STATUS_CODE, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given error code, message, and
-   * format. This constructor assumes a HTTP code of 400 Bad Request
-   *
-   * @param errorCode An error code as described in the ErrorResponse API type
-   * @param parameters The parameters causing the exception
-   * @param message   A printf-style string for the error message
-   * @param format    Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    ErrorCode errorCode,
-    ExceptionParameters parameters,
-    String message,
-    Object... format
-  ) {
-    this(null, parameters, DEFAULT_STATUS_CODE, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given causing exception, error
-   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
-   * Request
-   *
-   * @param cause     The exception which caused this (may be null)
-   * @param errorCode An error code as described in the ErrorResponse API type
-   * @param message   A printf-style string for the error message
-   * @param format    Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    Throwable cause,
-    ErrorCode errorCode,
-    String message,
-    Object... format
-  ) {
-    this(cause, DEFAULT_STATUS_CODE, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given causing exception, error
-   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
-   * Request
-   *
-   * @param cause     The exception which caused this (may be null)
-   * @param parameters The parameters causing the exception
-   * @param errorCode An error code as described in the ErrorResponse API type
-   * @param message   A printf-style string for the error message
-   * @param format    Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    Throwable cause,
-    ExceptionParameters parameters,
-    ErrorCode errorCode,
-    String message,
-    Object... format
-  ) {
-    this(cause, parameters, DEFAULT_STATUS_CODE, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given causing exception, error
-   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
-   * Request
-   *
-   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
-   * @param errorCode  An error code as described in the ErrorResponse API type
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    HttpStatus statusCode,
-    ErrorCode errorCode,
-    String message,
-    Object... format
-  ) {
-    this(null, null, statusCode, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given causing exception, error
-   * code, message, and format. This constructor assumes a HTTP code of 400 Bad
-   * Request
-   *
-   * @param parameters The parameters causing the exception
-   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
-   * @param errorCode  An error code as described in the ErrorResponse API type
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    ExceptionParameters parameters,
-    HttpStatus statusCode,
-    ErrorCode errorCode,
-    String message,
-    Object... format
-  ) {
-    this(null, parameters, statusCode, errorCode, message, format);
-  }
-
-  /**
-   * Create an AbstractCalendarException with the given HTTP status code, error
-   * code, message, and format.
-   *
-   * @param cause      The exception which caused this (may be null)
-   * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
-   * @param errorCode  An error code as described in the ErrorResponse API type
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
-   */
-  protected AbstractCalendarException(
-    Throwable cause,
-    HttpStatus statusCode,
-    ErrorCode errorCode,
-    String message,
-    Object... format
-  ) {
-    this(cause, null, statusCode, errorCode, message, format);
-  }
 
   /**
    * Create an AbstractCalendarException with the given HTTP status code, error

@@ -29,7 +29,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
     String message,
     Object... format
   ) {
-    super(cause, errorCode, message, format);
+    this(cause, AbstractCalendarException.DEFAULT_STATUS_CODE, errorCode, message, format);
   }
 
   /**
@@ -44,12 +44,12 @@ public class NonspecificCalendarException extends AbstractCalendarException {
    * @see String#format
    */
   public NonspecificCalendarException(
-    Exception cause,
+    Throwable cause,
     HttpStatus statusCode,
     ErrorCode errorCode,
     String message,
     Object... format
   ) {
-    super(cause, statusCode, errorCode, message, format);
+    super(cause, null, statusCode, errorCode, message, format);
   }
 }

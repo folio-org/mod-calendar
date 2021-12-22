@@ -14,6 +14,12 @@ public class InvalidDivisionException extends AbstractCalendarException {
    * @param parameters the parameters (as {@link org.folio.calendar.exception.ExceptionParameters ExceptionParameters}) which caused the error
    */
   public InvalidDivisionException(ArithmeticException e, ExceptionParameters parameters) {
-    super(e, parameters, ErrorCode.BAD_ARITHMETIC, e.getMessage());
+    super(
+      e,
+      parameters,
+      AbstractCalendarException.DEFAULT_STATUS_CODE,
+      ErrorCode.BAD_ARITHMETIC,
+      e.getMessage()
+    );
   }
 }

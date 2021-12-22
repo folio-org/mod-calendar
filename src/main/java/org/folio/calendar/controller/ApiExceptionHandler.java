@@ -40,58 +40,24 @@ public class ApiExceptionHandler {
   }
 
   /**
-   * Handles improperly typed parameters
+   * Handles improperly typed parameters/requests
    *
    * @param exception exception indicating that the request could not be parsed
    * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
    */
-  @ExceptionHandler(ServletException.class)
+  @ExceptionHandler(
+    {
+      ServletException.class,
+      MethodArgumentTypeMismatchException.class,
+      MissingRequestValueException.class,
+    }
+  )
   public ResponseEntity<ErrorResponse> handleBadRequest(ServletException exception) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
       ErrorCode.INVALID_PARAMETER,
       "One of the parameters was of the incorrect type (%s)",
-      exception.getMessage()
-    )
-      .getErrorResponseEntity();
-  }
-
-  /**
-   * Handles improperly typed parameters
-   *
-   * @param exception exception indicating that a method parameter type was incorrect
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
-   */
-  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ResponseEntity<ErrorResponse> handleGenericInvalidParameter(
-    MethodArgumentTypeMismatchException exception
-  ) {
-    log.log(INFO, exception);
-    return new NonspecificCalendarException(
-      exception,
-      ErrorCode.INVALID_PARAMETER,
-      "One of the parameters was of the incorrect type (%s)",
-      exception.getMessage()
-    )
-      .getErrorResponseEntity();
-  }
-
-  /**
-   * Handles entirely missing parameters
-   *
-   * @param exception exception indicating that a request value was missing
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
-   */
-  @ExceptionHandler(MissingRequestValueException.class)
-  public ResponseEntity<ErrorResponse> handleGenericMissingParameter(
-    MissingRequestValueException exception
-  ) {
-    log.log(INFO, exception);
-    return new NonspecificCalendarException(
-      exception,
-      ErrorCode.INVALID_PARAMETER,
-      "One of the parameters was missing or null (%s)",
       exception.getMessage()
     )
       .getErrorResponseEntity();
