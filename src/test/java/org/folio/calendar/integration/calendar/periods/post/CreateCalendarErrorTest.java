@@ -13,6 +13,7 @@ import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
 
+  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidServicePointId() {
     Response response = sendCalendarCreationRequest(Periods.PERIOD_FULL_EXAMPLE_A, UUIDs.UUID_F);
@@ -56,6 +58,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
+  @Tag("DB_USAGE_NONE")
   @Test
   void testEmptyCalendarName() {
     Response response = sendCalendarCreationRequest(
@@ -85,6 +88,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
+  @Tag("DB_USAGE_NONE")
   @Test
   void testWhitespaceCalendarName() {
     Response response = sendCalendarCreationRequest(
@@ -114,6 +118,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
+  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidCalendarDates() {
     Response response = sendCalendarCreationRequest(

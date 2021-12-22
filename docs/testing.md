@@ -8,6 +8,16 @@ mvn test
 
 This will run all tests in the repository.
 
+## Integration Test Requirements
+
+Integration tests require a local Docker instance to run (a Postgres instance is spun up there).
+
+All integration tests should go within the `test/.../integration/` folder and extend `BaseApiTest`.
+For optimization, if a test is designed to not use the database or be idempotent, give it a `@Tag`
+with the proper `DatabaseUsage` value; this prevents the database from being re-initialized (slow!)
+every time a test completes. Failed tests will still cause a rebuild (as they may not have removed
+all traces of themselves).
+
 ## Coverage
 
 In order to view coverage reports in a human readable format, use `jacoco:report`:

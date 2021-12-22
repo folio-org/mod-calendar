@@ -25,6 +25,8 @@ import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,6 +41,7 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @Log4j2
 @ActiveProfiles("test")
+@ExtendWith(ApiTestWatcher.class)
 @AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,6 +50,10 @@ public abstract class BaseApiTest {
   @Getter
   @Setter
   protected static boolean initialized = false;
+
+  @Getter
+  @Setter
+  protected static boolean dbInitialized = false;
 
   @Autowired
   protected WireMockServer wireMockServer;
@@ -68,14 +75,18 @@ public abstract class BaseApiTest {
   );
 
   @BeforeEach
-  void createDatabase() {
-    log.info("Initializing database by posting to /_/tenant");
-    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new TenantAttributes().moduleTo(""))
-      .post(getRequestUrl("/_/tenant"))
-      .then()
-      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  void createDatabase(TestInfo testInfo) {
+    if (!testInfo.getTags().contains(DatabaseUsage.NONE.value) && !isDbInitialized()) {
+      log.info("Initializing database by posting to /_/tenant");
+      ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(new TenantAttributes().moduleTo(""))
+        .post(getRequestUrl("/_/tenant"))
+        .then()
+        .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+
+      setDbInitialized(true);
+    }
   }
 
   @BeforeEach
@@ -103,7 +114,13 @@ public abstract class BaseApiTest {
   }
 
   @AfterEach
-  void cleanDatabase() {
+  void cleanDatabase(TestInfo testInfo) {
+    if (
+      testInfo.getTags().contains(DatabaseUsage.NONE.value) ||
+      testInfo.getTags().contains(DatabaseUsage.IDEMPOTENT.value)
+    ) {
+      return;
+    }
     log.info("Recreating database");
 
     log.info("Deleting database by posting to /_/tenant");
@@ -113,6 +130,8 @@ public abstract class BaseApiTest {
       .delete(getRequestUrl("/_/tenant"))
       .then()
       .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+
+    setDbInitialized(false);
   }
 
   @AfterEach
