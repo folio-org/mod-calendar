@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 
 /**
  * Models opening hours for an exception to the normal hours.
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
  * @see ExceptionRange
  */
 @Data
+@With
 @Table(name = "exception_hours")
 @Entity
 @NoArgsConstructor

@@ -9,12 +9,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.With;
 
 /**
  * Composite key for service_point_calendars table
  */
 @Embeddable
 @Data
+@With
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
