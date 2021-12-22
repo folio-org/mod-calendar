@@ -67,9 +67,9 @@ public final class CalendarService {
     calendarBuilder = calendarBuilder.servicePoint(servicePointAssignment);
 
     // create hours
-    if (PeriodUtils.isOpeningExceptional(period.getOpeningDays())) {
+    if (PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
       calendarBuilder.exceptions(
-        PeriodUtils.convertOpeningDayRelativeToExceptions(
+        PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
           period.getStartDate(),
           period.getEndDate(),
           period.getOpeningDays(),

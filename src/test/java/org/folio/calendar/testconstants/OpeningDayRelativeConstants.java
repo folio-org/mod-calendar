@@ -71,4 +71,30 @@ public class OpeningDayRelativeConstants {
     .weekdays(OpeningDayRelativeWeekdaysConstants.SUNDAY)
     .openingDay(OpeningDayInfoRelativeConstants.OPEN_ALL_DAY)
     .build();
+
+  public static final OpeningDayRelative EXCEPTIONAL_CLOSED = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_CLOSED_ALL_DAY)
+    .build();
+  public static final OpeningDayRelative EXCEPTIONAL_OPEN_ALL_DAY = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY)
+    .build();
+  public static final OpeningDayRelative EXCEPTIONAL_OPEN_00_00_TO_14_59 = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_OPEN_00_00_TO_14_59)
+    .build();
+  public static final OpeningDayRelative EXCEPTIONAL_OPEN_04_00_TO_14_59 = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59)
+    .build();
+  public static final OpeningDayRelative EXCEPTIONAL_INVALID_MULTIPLE_OPENINGS = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59)
+    .build();
 }

@@ -14,6 +14,10 @@ public class OpeningHourRanges {
     Times.TIME_00_00_STRING_HH_mm,
     Times.TIME_12_30_STRING_HH_mm
   );
+  public static final OpeningHourRange RANGE_00_00_TO_14_59 = new OpeningHourRange(
+    Times.TIME_00_00_STRING_HH_mm,
+    Times.TIME_14_59_STRING_HH_mm
+  );
   public static final OpeningHourRange RANGE_04_00_TO_14_59 = new OpeningHourRange(
     Times.TIME_04_00_STRING_HH_mm,
     Times.TIME_14_59_STRING_HH_mm

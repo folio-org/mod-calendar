@@ -15,6 +15,11 @@ public class Periods {
     .startDate(Dates.DATE_2021_01_01)
     .endDate(Dates.DATE_2021_01_01)
     .build();
+  public static final Period PERIOD_2021_01_01_TO_2021_01_04 = Period
+    .builder()
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_01_04)
+    .build();
   public static final Period PERIOD_2021_01_01_TO_2021_04_30 = Period
     .builder()
     .startDate(Dates.DATE_2021_01_01)
@@ -135,4 +140,28 @@ public class Periods {
         OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY
       )
     );
+
+  public static final Period PERIOD_FULL_EXCEPTIONAL_A = PERIOD_2021_01_01_TO_2021_12_31
+    .withId(UUIDs.UUID_A)
+    .withServicePointId(UUIDs.UUID_0)
+    .withName(Names.NAME_1)
+    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED));
+
+  public static final Period PERIOD_FULL_EXCEPTIONAL_B = PERIOD_2021_01_01_TO_2021_01_04
+    .withId(UUIDs.UUID_B)
+    .withServicePointId(UUIDs.UUID_3)
+    .withName(Names.NAME_2)
+    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY));
+
+  public static final Period PERIOD_FULL_EXCEPTIONAL_C = PERIOD_2021_01_01_TO_2021_01_04
+    .withId(UUIDs.UUID_C)
+    .withServicePointId(UUIDs.UUID_5)
+    .withName(Names.NAME_3)
+    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59));
+
+  public static final Period PERIOD_FULL_EXCEPTIONAL_D = PERIOD_2021_01_01_TO_2021_01_01
+    .withId(UUIDs.UUID_D)
+    .withServicePointId(UUIDs.UUID_9)
+    .withName(Names.NAME_4)
+    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_00_00_TO_14_59));
 }
