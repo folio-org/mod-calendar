@@ -76,10 +76,22 @@ public final class CalendarController implements CalendarApi {
         period.getServicePointId()
       );
     }
-    Calendar overlapped = DateUtils.overlapsCalendarList(
-      period,
-      this.calendarService.getAllCalendarsForServicePoint(servicePointId)
-    );
+
+    Calendar overlapped = null;
+    if (!PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
+      overlapped =
+        DateUtils.overlapsCalendarList(
+          period,
+          this.calendarService.getCalendarsWithNormalHoursForServicePoint(servicePointId)
+        );
+    } else {
+      overlapped =
+        DateUtils.overlapsCalendarList(
+          period,
+          this.calendarService.getCalendarsWithExceptionsForServicePoint(servicePointId)
+        );
+    }
+
     if (overlapped != null) {
       throw new InvalidDataException(
         ErrorCode.OVERLAPPING_CALENDAR,

@@ -149,7 +149,7 @@ public class Periods {
 
   public static final Period PERIOD_FULL_EXCEPTIONAL_B = PERIOD_2021_01_01_TO_2021_01_04
     .withId(UUIDs.UUID_B)
-    .withServicePointId(UUIDs.UUID_3)
+    .withServicePointId(UUIDs.UUID_0)
     .withName(Names.NAME_2)
     .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY));
 

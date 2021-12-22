@@ -178,7 +178,7 @@ public class Calendars {
 
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_B = CALENDAR_2021_01_01_TO_2021_01_04
     .withId(UUIDs.UUID_B)
-    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_3_TO_CAL_B))
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0_TO_CAL_B))
     .withName(Names.NAME_2)
     .withNormalHours(Set.of())
     .withExceptions(

@@ -2,6 +2,7 @@ package org.folio.calendar.service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
@@ -26,13 +27,29 @@ public final class CalendarService {
   }
 
   /**
-   * Get all the calendars for a certain service point
+   * Get all the calendars for a certain service point with normal hours
    *
    * @param servicePointId the service point
    * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s associated with the service point
    */
-  public List<Calendar> getAllCalendarsForServicePoint(UUID servicePointId) {
-    return this.calendarRepository.findByServicePointId(servicePointId);
+  public List<Calendar> getCalendarsWithNormalHoursForServicePoint(UUID servicePointId) {
+    return this.calendarRepository.findByServicePointId(servicePointId)
+      .stream()
+      .filter(calendar -> !calendar.getNormalHours().isEmpty())
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * Get all the calendars for a certain service point with exceptions
+   *
+   * @param servicePointId the service point
+   * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s associated with the service point
+   */
+  public List<Calendar> getCalendarsWithExceptionsForServicePoint(UUID servicePointId) {
+    return this.calendarRepository.findByServicePointId(servicePointId)
+      .stream()
+      .filter(calendar -> !calendar.getExceptions().isEmpty())
+      .collect(Collectors.toList());
   }
 
   /**
