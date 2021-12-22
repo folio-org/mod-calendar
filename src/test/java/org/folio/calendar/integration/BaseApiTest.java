@@ -42,7 +42,7 @@ import org.springframework.test.context.ContextConfiguration;
 @AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class BaseApiTest {
+public abstract class BaseApiTest {
 
   @Getter
   @Setter
