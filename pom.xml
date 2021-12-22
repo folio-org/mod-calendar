@@ -373,6 +373,7 @@
           <excludes>
             <exclude>**/dto/*</exclude>
             <exclude>**/rest/resource/*</exclude>
+            <exclude>**/CalendarApplication.java</exclude>
           </excludes>
         </configuration>
         <executions>

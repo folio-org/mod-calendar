@@ -15,8 +15,11 @@ public class Times {
   public static final LocalTime TIME_14_00 = LocalTime.of(14, 0);
   public static final LocalTime TIME_14_59 = LocalTime.of(14, 59);
   public static final LocalTime TIME_15_00 = LocalTime.of(15, 0);
+  public static final LocalTime TIME_18_12 = LocalTime.of(18, 12);
   public static final LocalTime TIME_23_00 = LocalTime.of(23, 0);
   public static final LocalTime TIME_23_59 = LocalTime.of(23, 59);
+
+  public static final LocalTime TIME_18_12_20 = LocalTime.of(18, 12, 20);
 
   public static final String TIME_00_00_STRING_HH_mm = "00:00";
   public static final String TIME_04_00_STRING_HH_mm = "04:00";
