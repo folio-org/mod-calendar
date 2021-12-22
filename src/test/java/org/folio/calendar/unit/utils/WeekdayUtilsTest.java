@@ -8,9 +8,7 @@ import java.util.Arrays;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.WeekdayUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public class WeekdayUtilsTest {
 
   /**

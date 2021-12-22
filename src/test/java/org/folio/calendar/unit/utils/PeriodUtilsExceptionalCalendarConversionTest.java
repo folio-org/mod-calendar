@@ -8,9 +8,7 @@ import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public class PeriodUtilsExceptionalCalendarConversionTest {
 
   @Test

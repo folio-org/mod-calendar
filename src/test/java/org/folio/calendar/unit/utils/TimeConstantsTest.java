@@ -9,9 +9,7 @@ import org.folio.calendar.testconstants.Times;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public class TimeConstantsTest {
 
   @Test

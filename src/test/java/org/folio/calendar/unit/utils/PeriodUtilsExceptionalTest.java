@@ -18,9 +18,7 @@ import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.testconstants.UUIDs;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public class PeriodUtilsExceptionalTest {
 
   @Test

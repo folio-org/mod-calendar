@@ -6,9 +6,7 @@ import static org.hamcrest.Matchers.is;
 import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public class DateUtilsOverlapCalendarsTest {
 
   @Test
