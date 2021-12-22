@@ -1,6 +1,5 @@
 package org.folio.calendar.utils;
 
-import java.security.InvalidParameterException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +33,7 @@ public class PeriodUtils {
    * @param openings a list of {@link OpeningDayRelative} objects
    * @return if the list refers to an exception or normal opening
    */
-  public static boolean isOpeningExceptional(Iterable<OpeningDayRelative> openings) {
+  public static boolean areOpeningsExceptional(Iterable<OpeningDayRelative> openings) {
     for (OpeningDayRelative opening : openings) {
       if (opening.getWeekdays() == null) {
         return true;
@@ -53,7 +52,7 @@ public class PeriodUtils {
    * @param calendarId the ID of a calendar which the created {@link NormalOpening} objects should be associated with
    * @return a {@link List} of the corresponding {@code ExceptionRange}
    */
-  public static List<ExceptionRange> convertOpeningDayRelativeToExceptions(
+  public static List<ExceptionRange> convertOpeningDayRelativeToExceptionRanges(
     LocalDate startDate,
     LocalDate endDate,
     List<OpeningDayRelative> openings,
@@ -69,16 +68,16 @@ public class PeriodUtils {
       .endDate(endDate);
 
     if (openings.size() != 1) {
-      throw new InvalidParameterException(
-        "Provided legacy exception information had multiple openings"
+      throw new IllegalArgumentException(
+        "Provided legacy exception information must have exactly one opening"
       );
     }
 
     OpeningDayInfo opening = openings.get(0).getOpeningDay();
 
     if (opening.getOpeningHour().size() != 1) {
-      throw new InvalidParameterException(
-        "Provided legacy exception information has multiple opening hours"
+      throw new IllegalArgumentException(
+        "Provided legacy exception information must have exactly one set of opening hours"
       );
     }
 
@@ -254,7 +253,7 @@ public class PeriodUtils {
         .exceptional(false);
 
       if (entry.getValue().size() == 1 && entry.getValue().get(0).equals(TimeConstants.ALL_DAY)) {
-        openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
+        openingDayInfoBuilder = openingDayInfoBuilder.allDay(true).openingHour(entry.getValue());
       } else {
         List<OpeningHourRange> ranges = entry.getValue();
         // ensure that the opening hours are in ascending order
@@ -287,7 +286,9 @@ public class PeriodUtils {
     ExceptionRange exception = new ArrayList<ExceptionRange>(exceptions).get(0);
     ExceptionHour opening = new ArrayList<ExceptionHour>(exception.getOpenings()).get(0);
 
-    OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo.builder();
+    OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
+      .builder()
+      .exceptional(true);
 
     if (opening.getStartTime() == null) {
       openingDayInfoBuilder =
@@ -318,8 +319,8 @@ public class PeriodUtils {
             )
           );
       if (
-        opening.getStartTime() == TimeConstants.TIME_MIN &&
-        opening.getEndTime() == TimeConstants.TIME_MAX
+        TimeConstants.TIME_MIN.equals(opening.getStartTime()) &&
+        TimeConstants.TIME_MAX.equals(opening.getEndTime())
       ) {
         openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
       }
