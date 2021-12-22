@@ -3,17 +3,17 @@ package org.folio.calendar.exception;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
+import lombok.Value;
 
 /**
  * Parameters for an exception, to reflect what caused an error
  */
+@Value
 public final class ExceptionParameters implements Serializable {
 
   /** Needed for varargs constructor */
   public static final int NUM_IN_A_PAIR = 2;
 
-  @Getter
   protected final Map<String, Object> map = new HashMap<>();
 
   /**
