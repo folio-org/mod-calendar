@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import org.folio.calendar.domain.entity.NormalOpening;
-import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.testconstants.Times;
 import org.junit.jupiter.api.Test;
 
