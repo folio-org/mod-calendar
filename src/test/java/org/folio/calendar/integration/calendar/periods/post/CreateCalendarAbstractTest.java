@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-abstract class CreateCalendarAbstractTest extends BaseApiTest {
+public abstract class CreateCalendarAbstractTest extends BaseApiTest {
 
   public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";
 

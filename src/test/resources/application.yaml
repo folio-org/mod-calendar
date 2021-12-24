@@ -14,6 +14,10 @@ spring:
       ddl-auto: none
   banner:
     location: classpath:/banner.txt
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
 
 zonky:
   test:
@@ -40,7 +44,11 @@ logging:
       springframework:
         cache: OFF
 
-server.port: 8080
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
 
 folio:
   tenant:

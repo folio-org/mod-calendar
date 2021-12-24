@@ -12,10 +12,12 @@ import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * Overall controller to handle exceptions and return proper API responses
@@ -40,6 +42,48 @@ public class ApiExceptionHandler {
   }
 
   /**
+   * Handles requests to endpoints that do not exist
+   *
+   * @param exception exception indicating that no handler exists for an endpoint
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   */
+  @ExceptionHandler(NoHandlerFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException exception) {
+    log.log(INFO, exception);
+    return new NonspecificCalendarException(
+      exception,
+      HttpStatus.NOT_FOUND,
+      ErrorCode.INVALID_REQUEST,
+      "This application does not know how to handle a %s request to %s",
+      exception.getHttpMethod(),
+      exception.getRequestURL()
+    )
+      .getErrorResponseEntity();
+  }
+
+  /**
+   * Handles requests to endpoints with unknown methods
+   *
+   * @param exception exception indicating that no handler exists for an endpoint with this method
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   */
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ResponseEntity<ErrorResponse> handleBadMethod(
+    HttpRequestMethodNotSupportedException exception
+  ) {
+    log.log(INFO, exception);
+    return new NonspecificCalendarException(
+      exception,
+      HttpStatus.NOT_FOUND,
+      ErrorCode.INVALID_REQUEST,
+      "This endpoint does not accept %s requests to this endpoint (known are: %s)",
+      exception.getMethod(),
+      Arrays.toString(exception.getSupportedMethods())
+    )
+      .getErrorResponseEntity();
+  }
+
+  /**
    * Handles improperly typed parameters/requests
    *
    * @param exception exception indicating that the request could not be parsed
@@ -52,13 +96,14 @@ public class ApiExceptionHandler {
       MissingRequestValueException.class,
     }
   )
-  public ResponseEntity<ErrorResponse> handleBadRequest(ServletException exception) {
+  public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
       ErrorCode.INVALID_PARAMETER,
-      "One of the parameters was of the incorrect type (%s)",
-      exception.getMessage()
+      "One of the parameters was of the incorrect type (%s, %s)",
+      exception.getMessage(),
+      exception.getClass()
     )
       .getErrorResponseEntity();
   }
