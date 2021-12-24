@@ -111,6 +111,14 @@ paths:
                 $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/invalidRequest"
+        "409":
+          description: Request conflicts with existing data (duplicate ID, overlapping dates, etc)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidData"
         "422":
           description: Invalid data (for example, start date after end date)
           content:

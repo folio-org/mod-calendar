@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
-import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public final class CalendarService {
    */
   public Calendar createCalendarFromPeriod(Period period) {
     if (this.calendarRepository.existsById(period.getId())) {
-      throw new InvalidDataException(
+      throw new DataConflictException(
         new ExceptionParameters("period", period),
         "The period ID %s already exists",
         period.getId()

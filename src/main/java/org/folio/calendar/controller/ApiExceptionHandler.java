@@ -12,6 +12,7 @@ import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -94,6 +95,7 @@ public class ApiExceptionHandler {
       ServletException.class,
       MethodArgumentTypeMismatchException.class,
       MissingRequestValueException.class,
+      HttpMessageNotReadableException.class,
     }
   )
   public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
@@ -101,9 +103,8 @@ public class ApiExceptionHandler {
     return new NonspecificCalendarException(
       exception,
       ErrorCode.INVALID_PARAMETER,
-      "One of the parameters was of the incorrect type (%s, %s)",
-      exception.getMessage(),
-      exception.getClass()
+      "One of the parameters was of the incorrect type (%s)",
+      exception.getMessage()
     )
       .getErrorResponseEntity();
   }
@@ -118,21 +119,8 @@ public class ApiExceptionHandler {
   public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception) {
     log.log(ERROR, exception);
 
-    // NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
+    // As a note, NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
     // However, NPE is far too generic to catch and always attribute to bad input.
-    if (
-      exception instanceof NullPointerException &&
-      Arrays.toString(exception.getStackTrace()).indexOf("calendar") == -1
-    ) {
-      return new NonspecificCalendarException(
-        exception,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        ErrorCode.INTERNAL_SERVER_ERROR,
-        "NullPointerException that does not appear to have occurred without the Calendar application.  Check that your input is valid?  %s",
-        exception.getMessage()
-      )
-        .getErrorResponseEntity();
-    }
     return new NonspecificCalendarException(
       exception,
       HttpStatus.INTERNAL_SERVER_ERROR,

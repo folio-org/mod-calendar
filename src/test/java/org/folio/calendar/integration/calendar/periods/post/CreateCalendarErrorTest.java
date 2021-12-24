@@ -174,7 +174,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
       Periods.PERIOD_FULL_EXAMPLE_D.getServicePointId()
     );
 
-    response.then().statusCode(is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+    response.then().statusCode(is(HttpStatus.CONFLICT.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
 
@@ -182,7 +182,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     assertThat(
       "Error HTTP code is correct",
       errorResponse.getStatus(),
-      is(HttpStatus.UNPROCESSABLE_ENTITY.value())
+      is(HttpStatus.CONFLICT.value())
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
@@ -223,7 +223,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
       Periods.PERIOD_FULL_EXAMPLE_E.getServicePointId()
     );
 
-    response.then().statusCode(is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+    response.then().statusCode(is(HttpStatus.CONFLICT.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
 
@@ -231,7 +231,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     assertThat(
       "Error HTTP code is correct",
       errorResponse.getStatus(),
-      is(HttpStatus.UNPROCESSABLE_ENTITY.value())
+      is(HttpStatus.CONFLICT.value())
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 

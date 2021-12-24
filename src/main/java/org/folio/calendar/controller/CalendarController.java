@@ -4,6 +4,7 @@ import java.util.UUID;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.rest.resource.CalendarApi;
@@ -93,7 +94,7 @@ public final class CalendarController implements CalendarApi {
     }
 
     if (overlapped != null) {
-      throw new InvalidDataException(
+      throw new DataConflictException(
         ErrorCode.OVERLAPPING_CALENDAR,
         new ExceptionParameters(
           PARAMETER_NAME_SERVICE_POINT_ID,

@@ -25,4 +25,6 @@ public class UUIDs {
   public static final UUID UUID_D = UUID.fromString("dddddddd-dddd-dddd-dddd-dddddddddddd");
   public static final UUID UUID_E = UUID.fromString("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
   public static final UUID UUID_F = UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff");
+
+  public static final String UUID_INVALID = "abcd";
 }
