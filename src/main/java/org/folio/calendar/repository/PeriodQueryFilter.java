@@ -1,6 +1,5 @@
 package org.folio.calendar.repository;
 
-import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
 
 /**
