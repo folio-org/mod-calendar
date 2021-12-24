@@ -209,4 +209,33 @@ public class PeriodCollectionUtilsGetPeriodsFromCalendarListTest {
       is(empty())
     );
   }
+
+  @Test
+  void testInvalidConversionToEmptyPeriodCollection() {
+    PeriodCollection collection = PeriodCollectionUtils.getPeriodsFromCalendarList(
+      Arrays.asList(
+        Calendars.CALENDAR_WITH_MULTIPLE_EXCEPTIONS,
+        Calendars.CALENDAR_WITH_NORMAL_HOURS_AND_EXCEPTIONS,
+        Calendars.CALENDAR_WITH_NO_SERVICE_POINTS,
+        Calendars.CALENDAR_WITH_TWO_SERVICE_POINTS
+      ),
+      PeriodQueryFilter.EXCEPTIONS,
+      true
+    );
+    assertThat(
+      "The created collection has no elements",
+      collection.getOpeningPeriods(),
+      hasSize(0)
+    );
+    assertThat(
+      "The created collection has no records",
+      collection.getTotalRecords(),
+      is(equalTo(0))
+    );
+    assertThat(
+      "The created collection contains no periods",
+      collection.getOpeningPeriods(),
+      is(empty())
+    );
+  }
 }
