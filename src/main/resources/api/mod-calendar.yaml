@@ -174,8 +174,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
-              example:
-                $ref: "#/components/examples/invalidData"
         "422":
           description: Invalid data (for example, start date after end date)
           content:
@@ -270,34 +268,26 @@ components:
         type: string
   examples:
     internalServerError:
-      value:
-        timestamp: 2021-11-18T13:38.51-05:00
-        status: 500
-        errors:
-          - error_code: internalServerError
-            error_message: Internal Server Error
-      summary: Any kind of internal error
+      timestamp: 2021-11-18T13:38.51-05:00
+      status: 500
+      errors:
+        - error_code: internalServerError
+          error_message: Internal Server Error
     invalidRequest:
-      value:
-        timestamp: 2021-11-18T13:38.51-50:00
-        status: 422
-        errors:
-          - code: invalidRequest
-            message: The request could not be parsed
-      summary: The request could not be parsed/understood.
+      timestamp: 2021-11-18T13:38.51-50:00
+      status: 400
+      errors:
+        - code: invalidRequest
+          message: The request could not be parsed
     invalidParameterError:
-      value:
-        timestamp: 2021-11-18T13:38.51-05:00
-        status: 422
-        errors:
-          - code: invalidParameter
-            message: One of the parameters was of the incorrect type
-      summary: A parameter was not of the correct type
+      timestamp: 2021-11-18T13:38.51-05:00
+      status: 400
+      errors:
+        - code: invalidParameter
+          message: One of the parameters was of the incorrect type
     invalidData:
-      value:
-        timestamp: 2021-11-18T13:38.51-05:00
-        status: 422
-        errors:
-          - code: noName
-            message: The request included an empty name
-      summary: The request was understood, however, a parameter was invalid
+      timestamp: 2021-11-18T13:38.51-05:00
+      status: 422
+      errors:
+        - code: noName
+          message: The request included an empty name
