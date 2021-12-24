@@ -126,7 +126,7 @@ public final class CalendarController implements CalendarApi {
     Boolean showPast,
     Boolean showExceptional
   ) {
-    if (showExceptional) {
+    if (Boolean.TRUE.equals(showExceptional)) {
       return new ResponseEntity<>(
         this.calendarService.getExceptionalPeriods(showPast, withOpeningDays),
         HttpStatus.OK

@@ -1,9 +1,11 @@
 package org.folio.calendar.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
@@ -106,5 +108,13 @@ public final class CalendarService {
     this.calendarRepository.save(calendar);
 
     return calendar;
+  }
+
+  public PeriodCollection getExceptionalPeriods(boolean showPast, boolean withOpeningDays) {
+    return PeriodCollection.builder().openingPeriods(Arrays.asList()).totalRecords(0).build();
+  }
+
+  public PeriodCollection getOpeningPeriods(boolean showPast, boolean withOpeningDays) {
+    return PeriodCollection.builder().openingPeriods(Arrays.asList()).totalRecords(0).build();
   }
 }
