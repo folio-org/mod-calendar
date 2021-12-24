@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 /**
  * A Service class for calendar-related API calls
  */
+@Log4j2
 @Service
 public final class CalendarService {
 
@@ -160,13 +162,20 @@ public final class CalendarService {
         continue;
       }
 
-      Period period = PeriodUtils.toPeriod(calendar);
+      try {
+        Period period = PeriodUtils.toPeriod(calendar);
 
-      if (!withOpeningDays) {
-        period.setOpeningDays(new ArrayList<>());
+        if (!withOpeningDays) {
+          period.setOpeningDays(new ArrayList<>());
+        }
+
+        periods.add(period);
+      } catch (IllegalArgumentException e) {
+        // this is a best effort legacy conversion
+        // modern Calendars are not backwards compatible
+        log.info("Discarding period due to IllegalArgumentException");
+        log.info(e);
       }
-
-      periods.add(period);
     }
 
     return PeriodUtils.toCollection(periods);
