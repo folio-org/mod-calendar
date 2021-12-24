@@ -83,7 +83,7 @@ public class PeriodUtils {
 
     OpeningHourRange openingHours = opening.getOpeningHour().get(0);
 
-    if (!opening.isOpen()) {
+    if (!Boolean.TRUE.equals(opening.isOpen())) {
       // no time information implies closure
       builder =
         builder.opening(
@@ -94,7 +94,7 @@ public class PeriodUtils {
             .endDate(endDate)
             .build()
         );
-    } else if (opening.isAllDay()) {
+    } else if (Boolean.TRUE.equals(opening.isAllDay())) {
       builder =
         builder.opening(
           ExceptionHour
@@ -153,7 +153,7 @@ public class PeriodUtils {
         continue;
       }
 
-      if (openingInfo.isAllDay()) {
+      if (Boolean.TRUE.equals(openingInfo.isAllDay())) {
         normalizedOpenings.add(
           builder.startTime(TimeConstants.TIME_MIN).endTime(TimeConstants.TIME_MAX).build()
         );
