@@ -1,7 +1,8 @@
-package org.folio.calendar.integration;
+package org.folio.calendar.integration.health;
 
 import static org.hamcrest.Matchers.*;
 
+import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;

@@ -10,8 +10,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class APITestUtils {
 
-  public static final String TENANT_ID = "test";
-
   public static final ObjectMapper MAPPER = new ObjectMapper()
     .registerModule(new JavaTimeModule())
     .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)

@@ -1,7 +1,8 @@
-package org.folio.calendar.integration;
+package org.folio.calendar.integration.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
 

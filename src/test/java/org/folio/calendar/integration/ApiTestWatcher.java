@@ -10,11 +10,11 @@ public class ApiTestWatcher implements TestWatcher {
 
   @Override
   public void testAborted(ExtensionContext extensionContext, Throwable throwable) {
-    BaseApiTest.setDbInitialized(false);
+    BaseApiAutoDatabaseTest.setDbInitialized(false);
   }
 
   @Override
   public void testFailed(ExtensionContext extensionContext, Throwable throwable) {
-    BaseApiTest.setDbInitialized(false);
+    BaseApiAutoDatabaseTest.setDbInitialized(false);
   }
 }

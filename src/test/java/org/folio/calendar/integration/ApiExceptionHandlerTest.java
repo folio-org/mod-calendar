@@ -12,7 +12,6 @@ import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.integration.calendar.periods.post.CreateCalendarAbstractTest;
 import org.folio.calendar.testconstants.UUIDs;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +24,6 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   public static final String VALID_API_ROUTE = CreateCalendarAbstractTest.CREATE_CALENDAR_API_ROUTE;
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidGetApiRoute() {
     Response response = ra(false).get(getRequestUrl(BAD_API_ROUTE));
@@ -56,7 +54,6 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidPostApiRoute() {
     Response response = ra(false).post(getRequestUrl(BAD_API_ROUTE));
@@ -87,7 +84,6 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidMethodToValidApiRoute() {
     Response response = ra(false)
@@ -119,7 +115,6 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidParametersToValidApiRoute() {
     Response response = ra(false)
@@ -151,7 +146,6 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidRequestBody() {
     Response response = ra(false)

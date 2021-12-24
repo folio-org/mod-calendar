@@ -3,19 +3,14 @@ package org.folio.calendar.integration.calendar.periods.post;
 import io.restassured.response.Response;
 import java.util.UUID;
 import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.integration.BaseApiTest;
-import org.folio.calendar.repository.CalendarRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("test")
-public abstract class CreateCalendarAbstractTest extends BaseApiTest {
+public abstract class CreateCalendarAbstractTest extends BaseApiAutoDatabaseTest {
 
   public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";
-
-  @Autowired
-  protected CalendarRepository calendarRepository;
 
   /**
    * Send a Calendar creation request

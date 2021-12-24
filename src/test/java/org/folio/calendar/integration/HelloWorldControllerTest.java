@@ -1,6 +1,5 @@
 package org.folio.calendar.integration;
 
-import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;

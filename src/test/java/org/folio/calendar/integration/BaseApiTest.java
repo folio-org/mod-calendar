@@ -1,6 +1,5 @@
 package org.folio.calendar.integration;
 
-import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -25,8 +24,6 @@ import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,19 +38,16 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @Log4j2
 @ActiveProfiles("test")
-@ExtendWith(ApiTestWatcher.class)
 @AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseApiTest {
 
-  @Getter
-  @Setter
-  protected static boolean initialized = false;
+  public static final String TENANT_ID = "test";
 
   @Getter
   @Setter
-  protected static boolean dbInitialized = false;
+  protected static boolean initialized = false;
 
   @Autowired
   protected WireMockServer wireMockServer;
@@ -74,25 +68,32 @@ public abstract class BaseApiTest {
     "api/mod-calendar.yaml"
   );
 
-  @BeforeEach
-  void createDatabase(TestInfo testInfo) {
-    if (!testInfo.getTags().contains(DatabaseUsage.NONE.value) && !isDbInitialized()) {
-      log.info("Initializing database by posting to /_/tenant");
-      ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new TenantAttributes().moduleTo(""))
-        .post(getRequestUrl("/_/tenant"))
-        .then()
-        .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  public void createDatabase() {
+    log.info("Initializing database by posting to /_/tenant");
+    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new TenantAttributes().moduleTo(""))
+      .post(getRequestUrl("/_/tenant"))
+      .then()
+      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  }
 
-      setDbInitialized(true);
-    }
+  public void destroyDatabase() {
+    log.info("Deleting database by posting to /_/tenant");
+    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(new TenantAttributes().moduleTo(""))
+      .delete(getRequestUrl("/_/tenant"))
+      .then()
+      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
   }
 
   @BeforeEach
-  void addJsonConfig() {
+  void initialize() {
     // workaround for JUnit 5 as each test is idempotent (no @Before) but we only need to do this once
     if (!isInitialized()) {
+      createDatabase();
+
       log.info("Configuring JSON to parse decimals as doubles, not floats");
       // allow comparison with doubles, not floats
       JsonConfig jsonConfig = JsonConfig
@@ -114,27 +115,6 @@ public abstract class BaseApiTest {
   }
 
   @AfterEach
-  void cleanDatabase(TestInfo testInfo) {
-    if (
-      testInfo.getTags().contains(DatabaseUsage.NONE.value) ||
-      testInfo.getTags().contains(DatabaseUsage.IDEMPOTENT.value)
-    ) {
-      return;
-    }
-    log.info("Recreating database");
-
-    log.info("Deleting database by posting to /_/tenant");
-    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new TenantAttributes().moduleTo(""))
-      .delete(getRequestUrl("/_/tenant"))
-      .then()
-      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
-
-    setDbInitialized(false);
-  }
-
-  @AfterEach
   void resetWiremock() {
     this.wireMockServer.resetAll();
   }
@@ -146,7 +126,7 @@ public abstract class BaseApiTest {
    * @return a @link {RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
-  protected RequestSpecification ra(boolean validate) {
+  public RequestSpecification ra(boolean validate) {
     RequestSpecification ra = RestAssured.given();
     if (validate) {
       ra = ra.filter(validate ? validationFilter : null);
@@ -163,7 +143,7 @@ public abstract class BaseApiTest {
    * @return a {@link RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
-  protected RequestSpecification ra() {
+  public RequestSpecification ra() {
     return ra(true);
   }
 
@@ -174,7 +154,7 @@ public abstract class BaseApiTest {
    * @param path The API route's path
    * @return fully qualified URL
    */
-  protected String getRequestUrl(String path) {
+  public String getRequestUrl(String path) {
     return String.format("http://localhost:%d%s", port, path);
   }
 }
