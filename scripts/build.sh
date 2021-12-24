@@ -18,8 +18,8 @@ usage() {
   echo "           -F:  Fully build everything: implies -fda"
   echo "                  Note: This uses the default docs directory;"
   echo "                        specify -d separately after for a custom outdir"
-  echo "           -f:  Rebuild with \`mvn -e clean install\` (overrides -b)"
-  echo "           -b:  Rebuild with \`mvn install\`"
+  echo "           -f:  Rebuild with \`mvn -e clean install -Dmaven.test.skip=true\` (overrides -b)"
+  echo "           -b:  Rebuild with \`mvn install -Dmaven.test.skip=true\`"
   echo "           -d:  Generate docs with folio-tools api-doc (default ../folio-api-docs)"
   echo "           -a:  Redefine the module (needed for API/permission changes)"
   echo "           -o:  Do not rebuild the docker image (only interact with Okapi)"
@@ -44,16 +44,16 @@ while getopts ${optstring} arg; do
       exit 1
       ;;
     F)
-      MAVEN_BUILD_CMD="-e clean install"
+      MAVEN_BUILD_CMD="-e clean install -Dmaven.test.skip=true"
       REDEFINE="yes"
       DOCS_PATH="../folio-api-docs"
       ;;
     f)
-      MAVEN_BUILD_CMD="-e clean install"
+      MAVEN_BUILD_CMD="-e clean install -Dmaven.test.skip=true"
       ;;
     b)
       if [ "$MAVEN_BUILD_CMD" = "" ]; then
-        MAVEN_BUILD_CMD="install"
+        MAVEN_BUILD_CMD="install -Dmaven.test.skip=true"
       fi
       ;;
     a)

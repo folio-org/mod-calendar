@@ -1,0 +1,27 @@
+description: A collection of concrete opening days
+type: object
+properties:
+  openingPeriods:
+    description: Information for various date's openings
+    type: array
+    items:
+      $ref: "openingDayConcrete.yaml"
+  totalRecords:
+    type: integer
+    description: Number of openings returned
+additionalProperties: false
+required:
+  - openingPeriods
+  - totalRecords
+example:
+  openingPeriods:
+    - openingDay:
+        openingHour:
+          - startTime: "04:00"
+            endTime: "12:30"
+          - startTime: "13:30"
+            endTime: "17:00"
+        allDay: false
+        open: true
+      date: 2021-12-20
+  totalRecords: 1

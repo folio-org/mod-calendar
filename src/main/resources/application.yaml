@@ -2,38 +2,31 @@ spring:
   cache:
     type: none
   application:
-    name: @project.artifactId@
-    version: @project.version@
+    name: mod-calendar
   jackson:
-    default-property-inclusion: non_null
-  datasource:
-    continue-on-error: true
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}
+    default-property-inclusion: NON_NULL
   liquibase:
     enabled: true
     change-log: classpath:db/changelog-master.yaml
+  datasource:
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}?stringtype=unspecified
   jpa:
-    show-sql: false
+    show-sql: true
     hibernate:
       ddl-auto: none
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-  properties:
-    physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
-    implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
-    hibernate:
-      format_sql: true
+  banner:
+    location: classpath:/banner.txt
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
 
 management:
   endpoints:
     web:
       base-path: /admin
-    health:
-      defaults:
-        enabled: false
-      readinessstate:
-        enabled: true
 
 feign:
   client:
@@ -47,7 +40,11 @@ logging:
       springframework:
         cache: OFF
 
-server.port: 8082
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
 
 folio:
   tenant:

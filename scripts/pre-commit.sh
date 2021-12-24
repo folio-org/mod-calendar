@@ -1,7 +1,8 @@
 #!/bin/bash
 set -x
 
-files_to_pretty=$(git diff --cached --diff-filter=d --name-only | egrep '\.(java|md|xml|sql|json|yaml|yml)$')
+# We cannot pretty Swing Boot's application files as the parser pukes on @
+files_to_pretty=$(git diff --cached --diff-filter=d --name-only | egrep '\.(java|md|xml|sql|json|yaml|yml)$' | grep -v 'application.yaml')
 
 if [ -n "$files_to_pretty" ]; then
   set -euo pipefail # if this returns failure, stop

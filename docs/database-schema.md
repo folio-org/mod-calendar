@@ -50,5 +50,29 @@ above the previous change.
 
 This numbering system allows changes to be inserted between others later, for maximum flexibility.
 If possible, a changelog should be split into separate parts, which will then be in the form
-`####-LABEL-$$-sublabel.yaml` where `$$` is sequential within the specific changelog. See
+`####-LABEL-$$-sub-label.yaml` where `$$` is sequential within the specific changelog. See
 `0010-initial` for a good example of this.
+
+## Updating the Schema
+
+Liquibase will automatically be called to update the database whenever a `POST` request is sent to
+`/_/tenant`. This special route is used by Okapi whenever a module is installed for the first time
+or updated. Okapi/Spring Boot will _not_ attempt a liquibase update command otherwise.
+
+In a development environment, it may be useful to invoke a liquibase update directly and not deal
+with Okapi or the module's API. A particularly useful case of this is whenever a JPA query relies
+upon a table that has not been created; in this instance, the application will fail to start without
+that table, therefore, there is no chance of invoking the API.
+
+In order to invoke liquibase directly, you may use the Maven goal `liquibase:update`:
+`mvn liquibase:update`. The [`liquibase.properties`](src/main/resources/db/liquibase.properties)
+file specifies the default Okapi database credentials in order to upgrade `diku`'s installation;
+other tenants/setups can be specified by editing this, `pom.xml`, or adding command-line options to
+Maven.
+
+## Test Environment
+
+In the test environment, a real Postgres database is not used (to ensure this is fully separate from
+anything else). Instead, an
+[isolated test database](https://github.com/zonkyio/embedded-database-spring-test) is used, and the
+`/_/tenant` route is used to ensure this is initialized properly.

@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0020-capitalize-weekday-enum
+      author: university-of-alabama/ncovercash
+      comment: Capitalize the weekday type to be more consistent with the previous storage method.
+      changes:
+        - sql:
+            sql: |
+              ALTER TYPE "weekday" RENAME VALUE 'sunday' TO 'SUNDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'monday' TO 'MONDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'tuesday' TO 'TUESDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'wednesday' TO 'WEDNESDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'thursday' TO 'THURSDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'friday' TO 'FRIDAY';
+              ALTER TYPE "weekday" RENAME VALUE 'saturday' TO 'SATURDAY';
+      rollback:
+        - sql:
+            sql: |
+              ALTER TYPE "weekday" RENAME VALUE 'SUNDAY' TO 'sunday';
+              ALTER TYPE "weekday" RENAME VALUE 'MONDAY' TO 'monday';
+              ALTER TYPE "weekday" RENAME VALUE 'TUESDAY' TO 'tuesday';
+              ALTER TYPE "weekday" RENAME VALUE 'WEDNESDAY' TO 'wednesday';
+              ALTER TYPE "weekday" RENAME VALUE 'THURSDAY' TO 'thursday';
+              ALTER TYPE "weekday" RENAME VALUE 'FRIDAY' TO 'friday';
+              ALTER TYPE "weekday" RENAME VALUE 'SATURDAY' TO 'saturday';

@@ -1,0 +1,61 @@
+spring:
+  cache:
+    type: none
+  application:
+    name: mod-calendar
+  jackson:
+    default-property-inclusion: NON_NULL
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.yaml
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  banner:
+    location: classpath:/banner.txt
+  mvc:
+    throw-exception-if-no-handler-found: true
+  resources:
+    add-mappings: false
+
+zonky:
+  test:
+    database:
+      postgres:
+        client:
+          properties:
+            stringtype: unspecified
+
+management:
+  endpoints:
+    web:
+      base-path: /admin
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: OFF
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+folio:
+  tenant:
+    validation:
+      enabled: true
+  logging:
+    request:
+      enabled: true
+    feign:
+      enabled: true

@@ -1,0 +1,39 @@
+description: An entire day's opening time
+type: object
+properties:
+  openingHour:
+    type: array
+    items:
+      $ref: openingHourRange.yaml
+    description: All start/end time pairs for a day
+  allDay:
+    type: boolean
+    description: If this denotes an all-day opening or closing
+  open:
+    type: boolean
+    default: true
+    description: Whether this is to indicate a closure (for exceptions)
+  date:
+    type: string
+    format: date
+    description:
+      Concrete date that this corresponds to.  For exceptions/calculateOpening.  Not certain is this
+      is used; ref openingDayConcrete.yaml
+  exceptional:
+    type: boolean
+    default: false
+    description:
+      Denotes if this opening/closure is the result of an exception rather than a normal
+      period/calendar
+required:
+  - allDay
+  - open
+additionalProperties: false
+example:
+  openingHour:
+    - startTime: "04:00"
+      endTime: "12:30"
+    - startTime: "13:30"
+      endTime: "17:00"
+  allDay: false
+  open: true
