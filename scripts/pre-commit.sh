@@ -22,12 +22,12 @@ if [ -n "$liquibase_changes" ]; then
   set +euo pipefail
 fi
 
-api_changes=$(git diff --cached --diff-filter=d --name-only | grep 'src/main/resources/swagger.api')
+api_changes=$(git diff --cached --diff-filter=d --name-only | grep 'src/main/resources/api')
 
 if [ -n "$api_changes" ]; then
   set -euo pipefail # if this returns failure, stop
   # verify the API
-  swagger-cli validate src/main/resources/swagger.api/mod-calendar.yaml
+  swagger-cli validate src/main/resources/api/mod-calendar.yaml
   set +euo pipefail
 fi
 

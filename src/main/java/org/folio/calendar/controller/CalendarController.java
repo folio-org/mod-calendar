@@ -3,6 +3,7 @@ package org.folio.calendar.controller;
 import java.util.UUID;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
@@ -114,5 +115,27 @@ public final class CalendarController implements CalendarApi {
     Calendar calendar = this.calendarService.createCalendarFromPeriod(period);
 
     return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.CREATED);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<PeriodCollection> getPeriodsForServicePoint(
+    String xOkapiTenant,
+    UUID servicePointId,
+    Boolean withOpeningDays,
+    Boolean showPast,
+    Boolean showExceptional
+  ) {
+    if (showExceptional) {
+      return new ResponseEntity<>(
+        this.calendarService.getExceptionalPeriods(showPast, withOpeningDays),
+        HttpStatus.OK
+      );
+    } else {
+      return new ResponseEntity<>(
+        this.calendarService.getOpeningPeriods(showPast, withOpeningDays),
+        HttpStatus.OK
+      );
+    }
   }
 }

@@ -71,7 +71,7 @@ public abstract class BaseApiTest {
   protected Integer port;
 
   protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
-    "swagger.api/mod-calendar.yaml"
+    "api/mod-calendar.yaml"
   );
 
   @BeforeEach
