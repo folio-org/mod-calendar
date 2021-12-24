@@ -268,32 +268,42 @@ components:
         type: string
   examples:
     internalServerError:
-      timestamp: 2021-11-18T13:38.51-05:00
-      status: 500
-      errors:
-        - error_code: internalServerError
-          error_message: Internal Server Error
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 500
+        errors:
+          - error_code: internalServerError
+            error_message: Internal Server Error
+      summary: Any kind of internal error
     conflictError:
-      timestamp: 2021-11-18T13:38.51-05:00
-      status: 409
-      errors:
-        - error_code: invalidRequest
-          error_message: This ID already exists
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 409
+        errors:
+          - error_code: invalidRequest
+            error_message: This ID already exists
+      summary: A conflict between new and existing data
     invalidRequest:
-      timestamp: 2021-11-18T13:38.51-50:00
-      status: 400
-      errors:
-        - code: invalidRequest
-          message: The request could not be parsed
+      value:
+        timestamp: 2021-11-18T13:38.51-50:00
+        status: 400
+        errors:
+          - code: invalidRequest
+            message: The request could not be parsed
+      summary: The request could not be parsed/understood.
     invalidParameterError:
-      timestamp: 2021-11-18T13:38.51-05:00
-      status: 400
-      errors:
-        - code: invalidParameter
-          message: One of the parameters was of the incorrect type
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 400
+        errors:
+          - code: invalidParameter
+            message: One of the parameters was of the incorrect type
+      summary: A parameter was not of the correct type
     invalidData:
-      timestamp: 2021-11-18T13:38.51-05:00
-      status: 422
-      errors:
-        - code: noName
-          message: The request included an empty name
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 422
+        errors:
+          - code: noName
+            message: The request included an empty name
+      summary: The request was understood, however, a parameter was invalid
