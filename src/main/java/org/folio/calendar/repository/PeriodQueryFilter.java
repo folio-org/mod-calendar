@@ -13,6 +13,7 @@ public class PeriodQueryFilter {
   protected enum FilterType {
     NORMAL_HOURS,
     EXCEPTIONS,
+    INVALID,
   }
 
   /**
@@ -25,6 +26,11 @@ public class PeriodQueryFilter {
    * A filter which will return {@link org.folio.calendar.domain.dto.Period Period}s with exceptions
    */
   public static final PeriodQueryFilter EXCEPTIONS = new PeriodQueryFilter(FilterType.EXCEPTIONS);
+
+  /**
+   * An invalid use for testing invalid enum values
+   */
+  public static final PeriodQueryFilter INVALID = new PeriodQueryFilter(FilterType.INVALID);
 
   protected FilterType type;
 

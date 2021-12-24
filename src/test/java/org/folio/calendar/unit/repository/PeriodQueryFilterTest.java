@@ -3,6 +3,7 @@ package org.folio.calendar.unit.repository;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThrows;
 
 import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.testconstants.Calendars;
@@ -43,6 +44,15 @@ public class PeriodQueryFilterTest {
       "A Calendar of normal hours should not pass the exceptional hours filter",
       PeriodQueryFilter.EXCEPTIONS.passes(Calendars.CALENDAR_FULL_EXAMPLE_A),
       is(equalTo(false))
+    );
+  }
+
+  @Test
+  void testInvalidFilter() {
+    assertThrows(
+      "An invalid filter should throw an exception",
+      IllegalArgumentException.class,
+      () -> PeriodQueryFilter.INVALID.passes(Calendars.CALENDAR_FULL_EXAMPLE_A)
     );
   }
 }
