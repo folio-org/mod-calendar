@@ -1,5 +1,6 @@
 package org.folio.calendar.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import org.folio.calendar.domain.entity.Calendar;
@@ -25,4 +26,19 @@ public interface CalendarRepository
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId"
   )
   List<Calendar> findByServicePointId(@Param("servicePointId") UUID servicePointId);
+
+  /**
+   * Find calendars for a service point ID on or after (greater than or equal to) a certain date
+   *
+   * @param servicePointId the UUID of the service point
+   * @param date the date which returned results will be equal to or after
+   * @return a {@link java.util.List List} of {@link Calendar}s
+   */
+  @Query(
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
+  )
+  List<Calendar> findByServicePointIdOnOrAfterDate(
+    @Param("servicePointId") UUID servicePointId,
+    @Param("date") LocalDate date
+  );
 }

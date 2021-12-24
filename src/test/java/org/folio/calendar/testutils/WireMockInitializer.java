@@ -19,13 +19,11 @@ public class WireMockInitializer
       .getBeanFactory()
       .registerSingleton("wireMockServer", wireMockServer);
 
-    configurableApplicationContext.addApplicationListener(
-      applicationEvent -> {
-        if (applicationEvent instanceof ContextClosedEvent) {
-          wireMockServer.stop();
-        }
+    configurableApplicationContext.addApplicationListener(applicationEvent -> {
+      if (applicationEvent instanceof ContextClosedEvent) {
+        wireMockServer.stop();
       }
-    );
+    });
 
     TestPropertyValues
       .of("x-okapi-url:http://localhost:" + wireMockServer.port())

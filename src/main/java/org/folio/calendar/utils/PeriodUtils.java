@@ -14,6 +14,7 @@ import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionHour;
@@ -394,5 +395,15 @@ public class PeriodUtils {
     }
 
     return builder.build();
+  }
+
+  /**
+   * Convert a collection of periods to a PeriodCollection encapsulating object
+   *
+   * @param periods The periods to convert
+   * @return a {@link PeriodCollection}
+   */
+  public static PeriodCollection toCollection(List<Period> periods) {
+    return PeriodCollection.builder().openingPeriods(periods).totalRecords(periods.size()).build();
   }
 }

@@ -8,6 +8,7 @@ import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
+import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
 import org.folio.calendar.utils.DateUtils;
@@ -126,16 +127,21 @@ public final class CalendarController implements CalendarApi {
     Boolean showPast,
     Boolean showExceptional
   ) {
+    PeriodQueryFilter filter;
     if (Boolean.TRUE.equals(showExceptional)) {
-      return new ResponseEntity<>(
-        this.calendarService.getExceptionalPeriods(showPast, withOpeningDays),
-        HttpStatus.OK
-      );
+      filter = PeriodQueryFilter.EXCEPTIONS;
     } else {
-      return new ResponseEntity<>(
-        this.calendarService.getOpeningPeriods(showPast, withOpeningDays),
-        HttpStatus.OK
-      );
+      filter = PeriodQueryFilter.NORMAL_HOURS;
     }
+
+    return new ResponseEntity<>(
+      this.calendarService.getPeriods(
+          servicePointId,
+          filter,
+          Boolean.TRUE.equals(showPast),
+          Boolean.TRUE.equals(withOpeningDays)
+        ),
+      HttpStatus.OK
+    );
   }
 }
