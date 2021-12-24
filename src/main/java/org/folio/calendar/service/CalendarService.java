@@ -1,6 +1,5 @@
 package org.folio.calendar.service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
+import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.PeriodCollectionUtils;
 import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +135,10 @@ public final class CalendarService {
       calendars = this.calendarRepository.findByServicePointId(servicePointId);
     } else {
       calendars =
-        this.calendarRepository.findByServicePointIdOnOrAfterDate(servicePointId, LocalDate.now());
+        this.calendarRepository.findByServicePointIdOnOrAfterDate(
+            servicePointId,
+            DateUtils.getCurrentDate()
+          );
     }
     return PeriodCollectionUtils.getPeriodsFromCalendarList(calendars, filter, withOpeningDays);
   }

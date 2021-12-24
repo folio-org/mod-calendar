@@ -6,6 +6,8 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
@@ -15,6 +17,13 @@ import org.folio.calendar.domain.entity.Calendar;
  */
 @UtilityClass
 public class DateUtils {
+
+  /**
+   * Overrides the current date, as given by LocalDate.now() in getCurrentDate(), for testing purposes
+   */
+  @Getter
+  @Setter
+  protected static LocalDate currentDateOverride = null;
 
   /**
    * Get all LocalDates between two dates (inclusive)
@@ -160,5 +169,17 @@ public class DateUtils {
    */
   public static LocalTime fromTimeString(String time) {
     return LocalTime.parse(time, TimeConstants.TIME_FORMATTER);
+  }
+
+  /**
+   * Get the current date
+   * @return the current date
+   */
+  public static LocalDate getCurrentDate() {
+    if (getCurrentDateOverride() == null) {
+      return LocalDate.now();
+    } else {
+      return getCurrentDateOverride();
+    }
   }
 }

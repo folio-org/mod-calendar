@@ -19,6 +19,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.testutils.APITestUtils;
 import org.folio.calendar.testutils.WireMockInitializer;
+import org.folio.calendar.utils.DateUtils;
 import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
@@ -90,6 +91,7 @@ public abstract class BaseApiTest {
 
   @BeforeEach
   void initialize() {
+    DateUtils.setCurrentDateOverride(null);
     // workaround for JUnit 5 as each test is idempotent (no @Before) but we only need to do this once
     if (!isInitialized()) {
       createDatabase();
