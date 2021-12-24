@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 @ToString
 public abstract class AbstractCalendarException extends RuntimeException {
 
+  /** Constant <code>DEFAULT_STATUS_CODE</code> */
   public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
   @Getter

@@ -23,7 +23,7 @@ import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 
 /**
- * Utilities for acting on {@link Period} objects
+ * Utilities for acting on {@link org.folio.calendar.domain.dto.Period} objects
  */
 @UtilityClass
 public class PeriodUtils {
@@ -31,7 +31,7 @@ public class PeriodUtils {
   /**
    * Determine if a a list of OpeningDayRelative is intended for an exception or a calendar (distinct in legacy, although both use Periods)
    *
-   * @param openings a list of {@link OpeningDayRelative} objects
+   * @param openings a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative} objects
    * @return if the list refers to an exception or normal opening
    */
   public static boolean areOpeningsExceptional(Iterable<OpeningDayRelative> openings) {
@@ -45,13 +45,13 @@ public class PeriodUtils {
 
   /**
    * Convert period openings to exceptions.  Due to the simple nature of legacy exceptions,
-   * this will result in exactly one {@link ExceptionRange}.
+   * this will result in exactly one {@link org.folio.calendar.domain.entity.ExceptionRange}.
    *
    * @param startDate the first day of the exception
    * @param endDate the last day of the exception
-   * @param openings a list of {@link OpeningDayRelative} objects
-   * @param calendarId the ID of a calendar which the created {@link NormalOpening} objects should be associated with
-   * @return a {@link List} of the corresponding {@code ExceptionRange}
+   * @param openings a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative} objects
+   * @param calendarId the ID of a calendar which the created {@link org.folio.calendar.domain.entity.NormalOpening} objects should be associated with
+   * @return a {@link java.util.List} of the corresponding {@code ExceptionRange}
    */
   public static List<ExceptionRange> convertOpeningDayRelativeToExceptionRanges(
     LocalDate startDate,
@@ -129,9 +129,9 @@ public class PeriodUtils {
   /**
    * Convert period openings to normalized openings, consolidating as necessary
    *
-   * @param openings a list of {@link OpeningDayRelative} objects
-   * @param calendarId the ID of a calendar which the created {@link NormalOpening} objects should be associated with
-   * @return a {@link List} of {@code NormalOpening}s
+   * @param openings a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative} objects
+   * @param calendarId the ID of a calendar which the created {@link org.folio.calendar.domain.entity.NormalOpening} objects should be associated with
+   * @return a {@link java.util.List} of {@code NormalOpening}s
    */
   // allow multiple continue statements in for loop
   @SuppressWarnings("java:S135")
@@ -221,7 +221,7 @@ public class PeriodUtils {
   }
 
   /**
-   * Get a list of {@link OpeningDayRelative}s from {@link NormalOpening}s, for conversion to a legacy Period
+   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period
    *
    * @param normalHours the list of normal hours to convert
    * @return a list of OpeningDayRelative
@@ -275,7 +275,7 @@ public class PeriodUtils {
   }
 
   /**
-   * Get a list of {@link OpeningDayRelative}s from {@link NormalOpening}s, for conversion to a legacy Period
+   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period
    *
    * @param exceptions the list of exceptions to convert (should only be one)
    * @return the equivalent {@code OpeningDayRelative}
@@ -401,7 +401,7 @@ public class PeriodUtils {
    * Convert a collection of periods to a PeriodCollection encapsulating object
    *
    * @param periods The periods to convert
-   * @return a {@link PeriodCollection}
+   * @return a {@link org.folio.calendar.domain.dto.PeriodCollection}
    */
   public static PeriodCollection toCollection(List<Period> periods) {
     return PeriodCollection.builder().openingPeriods(periods).totalRecords(periods.size()).build();

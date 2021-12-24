@@ -164,9 +164,9 @@ public class NormalOpening {
   }
 
   /**
-   * Split this NormalOpening into weekdays (as a series of {@link OpeningHourRange}s)
+   * Split this NormalOpening into weekdays (as a series of {@link org.folio.calendar.domain.dto.OpeningHourRange}s)
    *
-   * @return a Map of {@link Weekday}s to {@link OpeningHourRange}
+   * @return a Map of {@link org.folio.calendar.domain.dto.Weekday}s to {@link org.folio.calendar.domain.dto.OpeningHourRange}
    */
   public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
     List<Weekday> weekdays = WeekdayUtils.getRange(this.getStartDay(), this.getEndDay());
@@ -193,7 +193,7 @@ public class NormalOpening {
   /**
    * Get the time (with startDay) that this opening begins
    *
-   * @return a {@link LocalTime}, truncated to the minutes
+   * @return a {@link java.time.LocalTime}, truncated to the minutes
    */
   public LocalTime getStartTime() {
     return this.startTime.truncatedTo(ChronoUnit.MINUTES);
@@ -202,7 +202,7 @@ public class NormalOpening {
   /**
    * Get the time (with endDay) that this opening ends
    *
-   * @return a {@link LocalTime}, truncated to the minutes
+   * @return a {@link java.time.LocalTime}, truncated to the minutes
    */
   public LocalTime getEndTime() {
     return this.endTime.truncatedTo(ChronoUnit.MINUTES);
@@ -210,8 +210,8 @@ public class NormalOpening {
 
   /**
    * Set the time (with startDay) that this opening begins
-
-   * @param startTime a {@link LocalTime} (will be truncated to the minutes)
+   *
+   * @param startTime a {@link java.time.LocalTime} (will be truncated to the minutes)
    */
   public void setStartTime(final LocalTime startTime) {
     this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
@@ -220,7 +220,7 @@ public class NormalOpening {
   /**
    * Set the time (with endDay) that this opening ends
    *
-   * @param endTime a {@link LocalTime} (will be truncated to the minutes)
+   * @param endTime a {@link java.time.LocalTime} (will be truncated to the minutes)
    */
   public void setEndTime(final LocalTime endTime) {
     this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);

@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * A {@link JpaRepository} of {@link Calendar} objects
+ * A {@link org.springframework.data.jpa.repository.JpaRepository} of {@link org.folio.calendar.domain.entity.Calendar} objects
  */
 @Repository
 public interface CalendarRepository
@@ -20,7 +20,7 @@ public interface CalendarRepository
    * Find calendars for a service point ID
    *
    * @param servicePointId the UUID of the service point
-   * @return a {@link java.util.List List} of {@link Calendar}s
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId"
@@ -32,7 +32,7 @@ public interface CalendarRepository
    *
    * @param servicePointId the UUID of the service point
    * @param date the date which returned results will be equal to or after
-   * @return a {@link java.util.List List} of {@link Calendar}s
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"

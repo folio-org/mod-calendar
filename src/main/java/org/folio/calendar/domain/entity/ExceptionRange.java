@@ -19,7 +19,7 @@ import lombok.Singular;
 import lombok.With;
 
 /**
- * An overall exception to the normal hours of a calendar.  Multiple {@link ExceptionHour} objects can define specific behavior over this interval.
+ * An overall exception to the normal hours of a calendar.  Multiple {@link org.folio.calendar.domain.entity.ExceptionHour} objects can define specific behavior over this interval.
  */
 @Data
 @With
