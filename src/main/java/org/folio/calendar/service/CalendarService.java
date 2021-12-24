@@ -1,11 +1,9 @@
 package org.folio.calendar.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
@@ -15,6 +13,7 @@ import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
+import org.folio.calendar.utils.PeriodCollectionUtils;
 import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 /**
  * A Service class for calendar-related API calls
  */
-@Log4j2
 @Service
 public final class CalendarService {
 
@@ -139,45 +137,6 @@ public final class CalendarService {
       calendars =
         this.calendarRepository.findByServicePointIdOnOrAfterDate(servicePointId, LocalDate.now());
     }
-    return getPeriodsFromCalendarList(calendars, filter, withOpeningDays);
-  }
-
-  /**
-   * Sift through of periods based on a filter (for exceptional/normal openings), optionally removing opening day information
-   *
-   * @param calendars the list of calendars to convert and filter
-   * @param filter a {@link PeriodQueryFilter PeriodQueryFilter} denoting how to filter these results
-   * @param withOpeningDays if {@link OpeningDayRelative OpeningDayRelative} information should be included
-   * @return a {@link PeriodCollection PeriodCollection} of matching periods
-   */
-  protected static PeriodCollection getPeriodsFromCalendarList(
-    List<Calendar> calendars,
-    PeriodQueryFilter filter,
-    boolean withOpeningDays
-  ) {
-    List<Period> periods = new ArrayList<>();
-
-    for (Calendar calendar : calendars) {
-      if (!filter.passes(calendar)) {
-        continue;
-      }
-
-      try {
-        Period period = PeriodUtils.toPeriod(calendar);
-
-        if (!withOpeningDays) {
-          period.setOpeningDays(new ArrayList<>());
-        }
-
-        periods.add(period);
-      } catch (IllegalArgumentException e) {
-        // this is a best effort legacy conversion
-        // modern Calendars are not backwards compatible
-        log.info("Discarding period due to IllegalArgumentException");
-        log.info(e);
-      }
-    }
-
-    return PeriodUtils.toCollection(periods);
+    return PeriodCollectionUtils.getPeriodsFromCalendarList(calendars, filter, withOpeningDays);
   }
 }

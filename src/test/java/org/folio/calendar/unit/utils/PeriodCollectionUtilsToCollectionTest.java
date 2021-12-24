@@ -9,14 +9,14 @@ import static org.hamcrest.Matchers.is;
 import java.util.Arrays;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.testconstants.Periods;
-import org.folio.calendar.utils.PeriodUtils;
+import org.folio.calendar.utils.PeriodCollectionUtils;
 import org.junit.jupiter.api.Test;
 
-public class PeriodUtilsToCollectionTest {
+public class PeriodCollectionUtilsToCollectionTest {
 
   @Test
   void testConversionToPeriodCollection() {
-    PeriodCollection collection = PeriodUtils.toCollection(
+    PeriodCollection collection = PeriodCollectionUtils.toCollection(
       Arrays.asList(
         Periods.PERIOD_FULL_EXAMPLE_A,
         Periods.PERIOD_FULL_EXAMPLE_B,
@@ -50,7 +50,7 @@ public class PeriodUtilsToCollectionTest {
 
   @Test
   void testConversionToEmptyPeriodCollection() {
-    PeriodCollection collection = PeriodUtils.toCollection(Arrays.asList());
+    PeriodCollection collection = PeriodCollectionUtils.toCollection(Arrays.asList());
     assertThat(
       "The created collection has no elements",
       collection.getOpeningPeriods(),
