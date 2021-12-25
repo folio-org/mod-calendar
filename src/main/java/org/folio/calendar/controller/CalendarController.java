@@ -6,6 +6,7 @@ import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.exception.DataConflictException;
+import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.repository.PeriodQueryFilter;
@@ -28,6 +29,7 @@ public final class CalendarController implements CalendarApi {
 
   private static final String PARAMETER_NAME_PERIOD = "period";
   private static final String PARAMETER_NAME_SERVICE_POINT_ID = "servicePointId";
+  private static final String PARAMETER_NAME_PERIOD_ID = "periodId";
 
   @Autowired
   private CalendarService calendarService;
@@ -143,5 +145,36 @@ public final class CalendarController implements CalendarApi {
         ),
       HttpStatus.OK
     );
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Period> getPeriodById(
+    String xOkapiTenant,
+    UUID servicePointId,
+    UUID periodId
+  ) {
+    Calendar calendar = this.calendarService.getCalendarById(periodId);
+
+    if (
+      calendar
+        .getServicePoints()
+        .stream()
+        .map(relationship -> relationship.getServicePointId())
+        .noneMatch(id -> id.equals(servicePointId))
+    ) {
+      throw new DataNotFoundException(
+        new ExceptionParameters(
+          PARAMETER_NAME_PERIOD_ID,
+          periodId,
+          PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId
+        ),
+        "The period requested does exist, however, is not assigned to service point %s",
+        servicePointId
+      );
+    }
+
+    return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.OK);
   }
 }
