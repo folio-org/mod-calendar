@@ -192,6 +192,65 @@ paths:
                 $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/internalServerError"
+  /calendar/periods/{servicePointId}/period/{periodId}:
+    get:
+      operationId: getPeriodById
+      description: Get a certain period's information
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - in: path
+          name: servicePointId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The UUID for the relevant service point
+        - in: path
+          name: periodId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The UUID for the relevant service point
+      responses:
+        "200":
+          description: The period information
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/period"
+        "400":
+          description: Invalid request (could not be understood)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidRequest"
+        "404":
+          description: No period was found with this ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/notFound"
+        "422":
+          description: Invalid data (calendar does not apply to service point)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidData"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/internalServerError"
 components:
   schemas:
     period:
@@ -272,16 +331,16 @@ components:
         timestamp: 2021-11-18T13:38.51-05:00
         status: 500
         errors:
-          - error_code: internalServerError
-            error_message: Internal Server Error
+          - code: internalServerError
+            message: Internal Server Error
       summary: Any kind of internal error
     conflictError:
       value:
         timestamp: 2021-11-18T13:38.51-05:00
         status: 409
         errors:
-          - error_code: invalidRequest
-            error_message: This ID already exists
+          - code: invalidRequest
+            message: This ID already exists
       summary: A conflict between new and existing data
     invalidRequest:
       value:
@@ -299,6 +358,14 @@ components:
           - code: invalidParameter
             message: One of the parameters was of the incorrect type
       summary: A parameter was not of the correct type
+    notFound:
+      value:
+        timestamp: 2021-11-18T13:38.51-50:00
+        status: 404
+        errors:
+          - code: notFound
+            message: The request could not be parsed
+      summary: Nothing could be found with the given parameters
     invalidData:
       value:
         timestamp: 2021-11-18T13:38.51-05:00
