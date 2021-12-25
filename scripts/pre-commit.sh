@@ -6,7 +6,7 @@ files_to_pretty=$(git diff --cached --diff-filter=d --name-only | egrep '\.(java
 
 if [ -n "$files_to_pretty" ]; then
   set -euo pipefail # if this returns failure, stop
-  prettier --config .prettierrc --write $files_to_pretty
+  npx prettier --config .prettierrc --write $files_to_pretty
   set +euo pipefail
 fi
 
@@ -27,7 +27,7 @@ api_changes=$(git diff --cached --diff-filter=d --name-only | grep 'src/main/res
 if [ -n "$api_changes" ]; then
   set -euo pipefail # if this returns failure, stop
   # verify the API
-  swagger-cli validate src/main/resources/api/mod-calendar.yaml
+  npx swagger-cli validate src/main/resources/api/mod-calendar.yaml
   set +euo pipefail
 fi
 
