@@ -5,6 +5,7 @@ import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
@@ -160,7 +161,7 @@ public final class CalendarController implements CalendarApi {
       calendar
         .getServicePoints()
         .stream()
-        .map(relationship -> relationship.getServicePointId())
+        .map(ServicePointCalendarAssignment::getServicePointId)
         .noneMatch(id -> id.equals(servicePointId))
     ) {
       throw new DataNotFoundException(
