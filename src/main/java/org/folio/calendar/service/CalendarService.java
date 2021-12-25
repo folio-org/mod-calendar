@@ -3,14 +3,12 @@ package org.folio.calendar.service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
-import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
@@ -150,13 +148,8 @@ public final class CalendarService {
    *
    * @param id UUID to search for
    * @return found {@link Calendar} object
-   * @throws DataNotFoundException if no calendar is found
    */
   public Calendar getCalendarById(UUID id) {
-    try {
-      return this.calendarRepository.getById(id);
-    } catch (EntityNotFoundException exception) {
-      throw new DataNotFoundException(exception, new ExceptionParameters("id", id), "");
-    }
+    return this.calendarRepository.getById(id);
   }
 }

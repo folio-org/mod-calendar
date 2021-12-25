@@ -1,6 +1,7 @@
 package org.folio.calendar.controller;
 
 import java.util.UUID;
+import javax.persistence.EntityNotFoundException;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
@@ -155,27 +156,36 @@ public final class CalendarController implements CalendarApi {
     UUID servicePointId,
     UUID periodId
   ) {
-    Calendar calendar = this.calendarService.getCalendarById(periodId);
+    try {
+      Calendar calendar = this.calendarService.getCalendarById(periodId);
 
-    if (
-      calendar
-        .getServicePoints()
-        .stream()
-        .map(ServicePointCalendarAssignment::getServicePointId)
-        .noneMatch(id -> id.equals(servicePointId))
-    ) {
-      throw new DataNotFoundException(
-        new ExceptionParameters(
-          PARAMETER_NAME_PERIOD_ID,
-          periodId,
-          PARAMETER_NAME_SERVICE_POINT_ID,
+      if (
+        calendar
+          .getServicePoints()
+          .stream()
+          .map(ServicePointCalendarAssignment::getServicePointId)
+          .noneMatch(id -> id.equals(servicePointId))
+      ) {
+        throw new DataNotFoundException(
+          new ExceptionParameters(
+            PARAMETER_NAME_PERIOD_ID,
+            periodId,
+            PARAMETER_NAME_SERVICE_POINT_ID,
+            servicePointId
+          ),
+          "The period requested does exist, however, is not assigned to service point %s",
           servicePointId
-        ),
-        "The period requested does exist, however, is not assigned to service point %s",
-        servicePointId
+        );
+      }
+
+      return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.OK);
+    } catch (EntityNotFoundException exception) {
+      throw new DataNotFoundException(
+        exception,
+        new ExceptionParameters(PARAMETER_NAME_PERIOD_ID, periodId),
+        "No calendar was found with ID %s",
+        periodId
       );
     }
-
-    return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.OK);
   }
 }
