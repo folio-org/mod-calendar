@@ -1,14 +1,11 @@
 package org.folio.calendar.controller;
 
 import java.util.UUID;
-import javax.persistence.EntityNotFoundException;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
-import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
-import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.repository.PeriodQueryFilter;
@@ -29,9 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/")
 public final class CalendarController implements CalendarApi {
 
-  private static final String PARAMETER_NAME_PERIOD = "period";
-  private static final String PARAMETER_NAME_SERVICE_POINT_ID = "servicePointId";
-  private static final String PARAMETER_NAME_PERIOD_ID = "periodId";
+  public static final String PARAMETER_NAME_PERIOD = "period";
+  public static final String PARAMETER_NAME_SERVICE_POINT_ID = "servicePointId";
+  public static final String PARAMETER_NAME_PERIOD_ID = "periodId";
 
   @Autowired
   private CalendarService calendarService;
@@ -156,36 +153,9 @@ public final class CalendarController implements CalendarApi {
     UUID servicePointId,
     UUID periodId
   ) {
-    try {
-      Calendar calendar = this.calendarService.getCalendarById(periodId);
-
-      if (
-        calendar
-          .getServicePoints()
-          .stream()
-          .map(ServicePointCalendarAssignment::getServicePointId)
-          .noneMatch(id -> id.equals(servicePointId))
-      ) {
-        throw new DataNotFoundException(
-          new ExceptionParameters(
-            PARAMETER_NAME_PERIOD_ID,
-            periodId,
-            PARAMETER_NAME_SERVICE_POINT_ID,
-            servicePointId
-          ),
-          "The period requested does exist, however, is not assigned to service point %s",
-          servicePointId
-        );
-      }
-
-      return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.OK);
-    } catch (EntityNotFoundException exception) {
-      throw new DataNotFoundException(
-        exception,
-        new ExceptionParameters(PARAMETER_NAME_PERIOD_ID, periodId),
-        "No calendar was found with ID %s",
-        periodId
-      );
-    }
+    return new ResponseEntity<>(
+      PeriodUtils.toPeriod(this.calendarService.getCalendarById(servicePointId, periodId)),
+      HttpStatus.OK
+    );
   }
 }

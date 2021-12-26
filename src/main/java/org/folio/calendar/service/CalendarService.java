@@ -3,12 +3,15 @@ package org.folio.calendar.service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
+import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
+import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
@@ -151,5 +154,46 @@ public final class CalendarService {
    */
   public Calendar getCalendarById(UUID id) {
     return this.calendarRepository.getById(id);
+  }
+
+  /**
+   * Get a calendar by a given UUID and service point
+   *
+   * @param servicePointId service point UUID that the calendar must apply to
+   * @param periodId ID to search for
+   * @return found {@link Calendar} object
+   */
+  public Calendar getCalendarById(UUID servicePointId, UUID periodId) {
+    try {
+      Calendar calendar = this.getCalendarById(periodId);
+
+      if (
+        calendar
+          .getServicePoints()
+          .stream()
+          .map(ServicePointCalendarAssignment::getServicePointId)
+          .noneMatch(id -> id.equals(servicePointId))
+      ) {
+        throw new DataNotFoundException(
+          new ExceptionParameters(
+            CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+            servicePointId,
+            CalendarController.PARAMETER_NAME_PERIOD_ID,
+            periodId
+          ),
+          "The period requested does exist, however, is not assigned to service point %s",
+          servicePointId
+        );
+      }
+
+      return calendar;
+    } catch (EntityNotFoundException exception) {
+      throw new DataNotFoundException(
+        exception,
+        new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, periodId),
+        "No calendar was found with ID %s",
+        periodId
+      );
+    }
   }
 }
