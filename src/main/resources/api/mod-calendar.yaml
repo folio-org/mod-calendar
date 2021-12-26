@@ -254,7 +254,9 @@ paths:
           schema:
             type: string
             format: uuid
-          description: The UUID for the relevant service point
+          description:
+            The UUID for the relevant service point.  The current calendar's service point be
+            ignored/overwritten in favor of this
         - in: path
           name: periodId
           required: true
