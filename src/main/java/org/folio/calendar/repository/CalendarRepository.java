@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.folio.calendar.domain.entity.Calendar;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -41,4 +42,14 @@ public interface CalendarRepository
     @Param("servicePointId") UUID servicePointId,
     @Param("date") LocalDate date
   );
+
+  /**
+   * Delete a calendar by its ID
+   * (Explicit query as Postgres cascading is not supported by default)
+   *
+   * @param calendarId the UUID of the calendar to delete
+   */
+  @Modifying
+  @Query("DELETE FROM Calendar c WHERE c.id = :calendarId")
+  void deleteById(@Param("calendarId") UUID calendarId);
 }

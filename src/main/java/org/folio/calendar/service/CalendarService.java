@@ -61,6 +61,15 @@ public final class CalendarService {
   }
 
   /**
+   * Delete a calendar by its ID
+   *
+   * @param calendarId the calendar to delete
+   */
+  public void deleteCalendarById(UUID calendarId) {
+    this.calendarRepository.deleteById(calendarId);
+  }
+
+  /**
    * Create a calendar from a given period
    *
    * @param period a {@link org.folio.calendar.domain.dto.Period Period}

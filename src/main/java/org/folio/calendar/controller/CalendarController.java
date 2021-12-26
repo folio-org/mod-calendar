@@ -158,4 +158,18 @@ public final class CalendarController implements CalendarApi {
       HttpStatus.OK
     );
   }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Void> deletePeriodById(
+    String xOkapiTenant,
+    UUID servicePointId,
+    UUID periodId
+  ) {
+    Calendar calendar = this.calendarService.getCalendarById(servicePointId, periodId);
+
+    this.calendarService.deleteCalendarById(calendar.getId());
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 }
