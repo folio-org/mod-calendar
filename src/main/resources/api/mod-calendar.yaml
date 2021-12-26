@@ -228,21 +228,59 @@ paths:
               example:
                 $ref: "#/components/examples/invalidRequest"
         "404":
-          description: No period was found with this ID
+          description: No period was found with these parameters
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/notFound"
-        "422":
-          description: Invalid data (calendar does not apply to service point)
+        "500":
+          description: Internal server error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
               example:
-                $ref: "#/components/examples/invalidData"
+                $ref: "#/components/examples/internalServerError"
+    delete:
+      operationId: deletePeriodById
+      description: Delete a certain period by its ID
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - in: path
+          name: servicePointId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The UUID for the relevant service point
+        - in: path
+          name: periodId
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The UUID for the relevant service point
+      responses:
+        "204":
+          description: Successful deletion (no content)
+        "400":
+          description: Invalid request (could not be understood)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidRequest"
+        "404":
+          description: No period was found with these parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/notFound"
         "500":
           description: Internal server error
           content:
