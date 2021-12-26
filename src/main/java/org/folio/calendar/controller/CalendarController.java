@@ -1,10 +1,12 @@
 package org.folio.calendar.controller;
 
 import java.util.UUID;
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
@@ -16,12 +18,14 @@ import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Main Calendar API controller
  */
+@Log4j2
 @RestController
 @RequestMapping(value = "/")
 public final class CalendarController implements CalendarApi {
@@ -169,6 +173,39 @@ public final class CalendarController implements CalendarApi {
     Calendar calendar = this.calendarService.getCalendarById(servicePointId, periodId);
 
     this.calendarService.deleteCalendarById(calendar.getId());
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  @SuppressWarnings("java:S1141")
+  public ResponseEntity<Void> updatePeriodById(
+    String xOkapiTenant,
+    UUID servicePointId,
+    UUID periodId,
+    Period period
+  ) {
+    try {
+      Calendar originalCalendar = this.calendarService.getCalendarById(periodId);
+
+      this.calendarService.deleteCalendarById(originalCalendar.getId());
+
+      // ensure new one can be added
+      try {
+        this.addNewPeriod(xOkapiTenant, servicePointId, period);
+      } catch (AbstractCalendarException exception) {
+        log.info("Could not add new calendar; restoring previous");
+
+        this.calendarService.insertCalendar(originalCalendar);
+        throw exception;
+      }
+    } catch (JpaObjectRetrievalFailureException exception) {
+      log.info("Current calendar does not exist; creating new one");
+      log.info(exception);
+
+      this.addNewPeriod(xOkapiTenant, servicePointId, period);
+    }
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

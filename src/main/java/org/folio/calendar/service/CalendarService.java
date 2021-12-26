@@ -70,6 +70,15 @@ public final class CalendarService {
   }
 
   /**
+   * Insert (or update) a calendar to the database
+   *
+   * @param calendar the calendar to insert
+   */
+  public void insertCalendar(Calendar calendar) {
+    this.calendarRepository.save(calendar);
+  }
+
+  /**
    * Create a calendar from a given period
    *
    * @param period a {@link org.folio.calendar.domain.dto.Period Period}
