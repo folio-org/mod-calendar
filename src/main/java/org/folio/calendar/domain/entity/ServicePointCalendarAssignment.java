@@ -13,7 +13,9 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.With;
 
 /**
@@ -50,5 +52,7 @@ public class ServicePointCalendarAssignment {
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "calendar_id")
+  @EqualsAndHashCode.Exclude
+  @ToString.Exclude
   private Calendar calendar;
 }

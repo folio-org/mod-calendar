@@ -16,12 +16,9 @@ import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
-import lombok.ToString;
 import lombok.With;
-import lombok.extern.log4j.Log4j2;
 
 /**
  * Calendar entity
@@ -74,8 +71,6 @@ public class Calendar {
     orphanRemoval = true,
     mappedBy = "calendar"
   )
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Set<ServicePointCalendarAssignment> servicePoints;
 
   /**
@@ -88,8 +83,6 @@ public class Calendar {
     orphanRemoval = true,
     mappedBy = "calendar"
   )
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Set<NormalOpening> normalHours;
 
   /**
@@ -102,8 +95,6 @@ public class Calendar {
     orphanRemoval = true,
     mappedBy = "calendar"
   )
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
   private Set<ExceptionRange> exceptions;
 
   @PrePersist

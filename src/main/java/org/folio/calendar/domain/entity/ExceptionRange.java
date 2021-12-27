@@ -73,9 +73,6 @@ public class ExceptionRange {
    */
   @Singular
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "exception")
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  // @JoinColumn(name = "exception_id", nullable = false)
   private Set<ExceptionHour> openings;
 
   @PrePersist
