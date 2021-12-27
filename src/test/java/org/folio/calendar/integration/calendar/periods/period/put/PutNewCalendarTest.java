@@ -10,7 +10,7 @@ import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class PutCalendarTest extends PutCalendarAbstractTest {
+class PutNewCalendarTest extends PutCalendarAbstractTest {
 
   @Test
   void testPutNewCalendar() {
