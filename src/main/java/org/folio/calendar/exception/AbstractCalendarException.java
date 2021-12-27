@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
  * Abstract calendar exception, to be implemented by more concrete exceptions thrown from our application.
  * {@link org.folio.calendar.exception.NonspecificCalendarException NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions).
  */
-@ToString
+@ToString(callSuper = true)
 public abstract class AbstractCalendarException extends RuntimeException {
 
   /** Constant <code>DEFAULT_STATUS_CODE</code> */
