@@ -28,7 +28,7 @@ import org.springframework.http.MediaType;
  *       <li>Calendar  2021-05-01 to 2021-09-22 ({@code PERIOD_FULL_EXAMPLE_D}, ID D)</li>
  *     </ul>
  *   </li>
- *   <li>On service point C:</li>
+ *   <li>On service point 5:</li>
  *   <li>
  *     <ul>
  *       <li>Exception 2021-01-01 to 2021-01-04 ({@code PERIOD_FULL_EXCEPTIONAL_C}, ID C)</li>
