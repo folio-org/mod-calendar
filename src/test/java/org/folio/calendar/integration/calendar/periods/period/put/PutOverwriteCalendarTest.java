@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
 import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.testconstants.Names;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
@@ -14,15 +15,6 @@ class PutOverwriteCalendarTest extends PutCalendarAbstractTest {
 
   @Test
   void testPutOverwriteCalendar() {
-    Response response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_D);
-    response.then().statusCode(is(HttpStatus.OK.value()));
-    Period period = response.getBody().as(Period.class);
-    assertThat(
-      "The current period is the original period",
-      period,
-      is(Periods.PERIOD_FULL_EXAMPLE_D)
-    );
-
     sendPutRequest(
       Periods.PERIOD_FULL_EXCEPTIONAL_D.withServicePointId(UUIDs.UUID_1),
       UUIDs.UUID_1,
@@ -31,9 +23,9 @@ class PutOverwriteCalendarTest extends PutCalendarAbstractTest {
       .then()
       .statusCode(is(HttpStatus.NO_CONTENT.value()));
 
-    response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_D);
+    Response response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_D);
     response.then().statusCode(is(HttpStatus.OK.value()));
-    period = response.getBody().as(Period.class);
+    Period period = response.getBody().as(Period.class);
     assertThat(
       "The newly overwritten period is the expected period",
       period,
@@ -42,16 +34,43 @@ class PutOverwriteCalendarTest extends PutCalendarAbstractTest {
   }
 
   @Test
-  void testPutOverwriteDifferentIdCalendar() {
+  void testPutOverwriteSameNormalCalendar() {
+    sendPutRequest(Periods.PERIOD_FULL_EXAMPLE_D.withName(Names.NAME_3), UUIDs.UUID_1, UUIDs.UUID_D)
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+
     Response response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_D);
     response.then().statusCode(is(HttpStatus.OK.value()));
     Period period = response.getBody().as(Period.class);
     assertThat(
-      "The current period is the original period",
+      "The newly overwritten period is the expected period",
       period,
-      is(Periods.PERIOD_FULL_EXAMPLE_D)
+      is(Periods.PERIOD_FULL_EXAMPLE_D.withName(Names.NAME_3))
     );
+  }
 
+  @Test
+  void testPutOverwriteSameExceptionalCalendar() {
+    sendPutRequest(
+      Periods.PERIOD_FULL_EXCEPTIONAL_C.withName(Names.NAME_2),
+      UUIDs.UUID_5,
+      UUIDs.UUID_C
+    )
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+
+    Response response = sendGetRequest(UUIDs.UUID_5, UUIDs.UUID_C);
+    response.then().statusCode(is(HttpStatus.OK.value()));
+    Period period = response.getBody().as(Period.class);
+    assertThat(
+      "The newly overwritten period is the expected period",
+      period,
+      is(Periods.PERIOD_FULL_EXCEPTIONAL_C.withName(Names.NAME_2))
+    );
+  }
+
+  @Test
+  void testPutOverwriteDifferentIdCalendar() {
     // change (1,D) to (1,3)
     sendPutRequest(
       Periods.PERIOD_FULL_EXCEPTIONAL_D.withServicePointId(UUIDs.UUID_1).withId(UUIDs.UUID_3),
@@ -61,9 +80,9 @@ class PutOverwriteCalendarTest extends PutCalendarAbstractTest {
       .then()
       .statusCode(is(HttpStatus.NO_CONTENT.value()));
 
-    response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_3);
+    Response response = sendGetRequest(UUIDs.UUID_1, UUIDs.UUID_3);
     response.then().statusCode(is(HttpStatus.OK.value()));
-    period = response.getBody().as(Period.class);
+    Period period = response.getBody().as(Period.class);
     assertThat(
       "The newly written period is the expected period",
       period,

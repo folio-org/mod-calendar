@@ -20,7 +20,7 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
   @Test
   void testPutInvalidCalendar() {
     Response response = sendPutRequest(
-      Periods.PERIOD_FULL_EXAMPLE_A.withName(""),
+      Periods.PERIOD_FULL_EXAMPLE_A.withId(UUIDs.UUID_4).withName(""),
       UUIDs.UUID_1,
       UUIDs.UUID_E
     );
