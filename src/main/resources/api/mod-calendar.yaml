@@ -272,7 +272,7 @@ paths:
               $ref: "#/components/schemas/period"
       responses:
         "204":
-          description: Successful deletion (no content)
+          description: Successful update or creation (no content)
         "400":
           description: Invalid request (could not be understood)
           content:
@@ -281,14 +281,22 @@ paths:
                 $ref: "#/components/schemas/errorResponse"
               example:
                 $ref: "#/components/examples/invalidRequest"
-        "404":
-          description: No period was found with these parameters
+        "409":
+          description: Request conflicts with existing data (duplicate ID, overlapping dates, etc)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/errorResponse"
               example:
-                $ref: "#/components/examples/notFound"
+                $ref: "#/components/examples/conflictError"
+        "422":
+          description: Invalid data (for example, start date after end date)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/invalidData"
         "500":
           description: Internal server error
           content:
