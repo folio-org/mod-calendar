@@ -49,7 +49,7 @@ public class ExceptionRange {
    */
   @NotNull
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "calendar_id") //, nullable = false, insertable = false, updatable = false)
+  @JoinColumn(name = "calendar_id")
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   private Calendar calendar;
