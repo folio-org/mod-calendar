@@ -1,5 +1,6 @@
 package org.folio.calendar.testconstants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
@@ -80,6 +81,12 @@ public class Periods {
     .startDate(Dates.DATE_2021_07_04)
     .endDate(Dates.DATE_2021_09_22)
     .build();
+
+  public static final Period PERIOD_WITH_NO_OPENINGS_NOR_EXCEPTIONS = PERIOD_2021_01_01_TO_2021_12_31
+    .withId(UUIDs.UUID_A)
+    .withServicePointId(UUIDs.UUID_0)
+    .withName(Names.NAME_1)
+    .withOpeningDays(new ArrayList<>());
 
   public static final Period PERIOD_FULL_EXAMPLE_A = PERIOD_2021_01_01_TO_2021_12_31
     .withId(UUIDs.UUID_A)

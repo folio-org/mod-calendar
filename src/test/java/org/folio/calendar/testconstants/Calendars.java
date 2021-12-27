@@ -94,6 +94,11 @@ public class Calendars {
       )
     );
 
+  public static final Calendar CALENDAR_WITH_NO_OPENINGS_NOR_EXCEPTIONS = CALENDAR_2021_01_01_TO_2021_12_31
+    .withId(UUIDs.UUID_A)
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
+    .withName(Names.NAME_1);
+
   public static final Calendar CALENDAR_FULL_EXAMPLE_A = CALENDAR_2021_01_01_TO_2021_12_31
     .withId(UUIDs.UUID_A)
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
