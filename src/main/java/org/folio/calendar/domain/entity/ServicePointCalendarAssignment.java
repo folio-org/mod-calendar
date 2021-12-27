@@ -45,9 +45,10 @@ public class ServicePointCalendarAssignment {
   private UUID servicePointId;
 
   /**
-   * The ID of the calendar to be applied
+   * The calendar being applied
    */
-  @Id
   @NotNull
-  private UUID calendarId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "calendar_id")
+  private Calendar calendar;
 }

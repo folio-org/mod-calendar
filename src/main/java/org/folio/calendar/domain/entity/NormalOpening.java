@@ -6,17 +6,23 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Weekday;
@@ -39,8 +45,8 @@ public class NormalOpening {
    * The opening's internal ID
    */
   @Id
-  @GeneratedValue
   @NotNull
+  @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
@@ -48,8 +54,11 @@ public class NormalOpening {
    * The calendar that this opening is a part of
    */
   @NotNull
-  @Column(name = "calendar_id")
-  private UUID calendarId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "calendar_id")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private Calendar calendar;
 
   /**
    * The (relative) weekday upon which this opening starts
@@ -85,7 +94,7 @@ public class NormalOpening {
    * Create a NormalOpening object
    *
    * @param id a {@link java.util.UUID UUID}
-   * @param calendarId a {@link java.util.UUID UUID}
+   * @param calendar a {@link org.folio.calendar.domain.entity.Calendar Calendar}
    * @param startDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
    * @param startTime a {@link java.time.LocalTime LocalTime}
    * @param endDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
@@ -93,14 +102,14 @@ public class NormalOpening {
    */
   public NormalOpening(
     final UUID id,
-    final UUID calendarId,
+    final Calendar calendar,
     final Weekday startDay,
     final LocalTime startTime,
     final Weekday endDay,
     final LocalTime endTime
   ) {
     this.id = id;
-    this.calendarId = calendarId;
+    this.calendar = calendar;
     this.startDay = startDay;
     this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
     this.endDay = endDay;
@@ -154,7 +163,7 @@ public class NormalOpening {
    * @return a NormalOpening which surrounds opening1 and opening2
    */
   public static NormalOpening merge(final NormalOpening opening1, final NormalOpening opening2) {
-    if (!opening1.getCalendarId().equals(opening2.getCalendarId())) {
+    if (opening1.getCalendar() != opening2.getCalendar()) {
       throw new IllegalArgumentException(
         "Cannot merge two NormalOpenings from different calendars!"
       );

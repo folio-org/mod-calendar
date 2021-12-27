@@ -5,18 +5,17 @@ import java.util.List;
 import java.util.UUID;
 import org.folio.calendar.domain.entity.Calendar;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A {@link org.springframework.data.jpa.repository.JpaRepository} of {@link org.folio.calendar.domain.entity.Calendar} objects
  */
 @Repository
-public interface CalendarRepository
-  extends JpaRepository<Calendar, UUID>, JpaSpecificationExecutor<Calendar> {
+public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   /**
    * Find calendars for a service point ID
    *
@@ -24,7 +23,7 @@ public interface CalendarRepository
    * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
-    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId"
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id WHERE r.servicePointId = :servicePointId"
   )
   List<Calendar> findByServicePointId(@Param("servicePointId") UUID servicePointId);
 
@@ -36,7 +35,7 @@ public interface CalendarRepository
    * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
-    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendarId WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
   )
   List<Calendar> findByServicePointIdOnOrAfterDate(
     @Param("servicePointId") UUID servicePointId,
@@ -44,12 +43,13 @@ public interface CalendarRepository
   );
 
   /**
-   * Delete a calendar by its ID
+   * Delete a calendar and child elements (hours, exceptions...) by its ID
    * (Explicit query as Postgres cascading is not supported by default)
    *
    * @param calendarId the UUID of the calendar to delete
    */
   @Modifying
+  @Transactional
   @Query("DELETE FROM Calendar c WHERE c.id = :calendarId")
-  void deleteById(@Param("calendarId") UUID calendarId);
+  void deleteCascadingById(@Param("calendarId") UUID calendarId);
 }
