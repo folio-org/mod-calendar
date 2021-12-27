@@ -3,7 +3,6 @@ package org.folio.calendar.service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
@@ -65,6 +64,7 @@ public class CalendarService {
 
   @Transactional
   public void replaceCalendar(Calendar old, Period replacement, UUID servicePointId) {
+    this.checkPeriod(replacement, servicePointId, old);
     if (!old.getId().equals(replacement.getId())) {
       this.deleteCalendar(old);
     }
@@ -209,37 +209,28 @@ public class CalendarService {
    * @return found {@link Calendar} object
    */
   public Calendar getCalendarById(UUID servicePointId, UUID periodId) {
-    try {
-      Calendar calendar = this.getCalendarById(periodId);
+    Calendar calendar = this.getCalendarById(periodId);
 
-      if (
-        calendar
-          .getServicePoints()
-          .stream()
-          .map(ServicePointCalendarAssignment::getServicePointId)
-          .noneMatch(id -> id.equals(servicePointId))
-      ) {
-        throw new DataNotFoundException(
-          new ExceptionParameters(
-            CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-            servicePointId,
-            CalendarController.PARAMETER_NAME_PERIOD_ID,
-            periodId
-          ),
-          "The period requested does exist, however, is not assigned to service point %s",
-          servicePointId
-        );
-      }
-
-      return calendar;
-    } catch (EntityNotFoundException exception) {
+    if (
+      calendar
+        .getServicePoints()
+        .stream()
+        .map(ServicePointCalendarAssignment::getServicePointId)
+        .noneMatch(id -> id.equals(servicePointId))
+    ) {
       throw new DataNotFoundException(
-        exception,
-        new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, periodId),
-        "No calendar was found with ID %s",
-        periodId
+        new ExceptionParameters(
+          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId,
+          CalendarController.PARAMETER_NAME_PERIOD_ID,
+          periodId
+        ),
+        "The period requested does exist, however, is not assigned to service point %s",
+        servicePointId
       );
     }
+
+    return calendar;
   }
 
   /**
@@ -322,7 +313,7 @@ public class CalendarService {
         );
     }
 
-    if (overlapped != null && !overlapped.equals(ignore)) {
+    if (overlapped != null) {
       throw new DataConflictException(
         ErrorCode.OVERLAPPING_CALENDAR,
         new ExceptionParameters(
