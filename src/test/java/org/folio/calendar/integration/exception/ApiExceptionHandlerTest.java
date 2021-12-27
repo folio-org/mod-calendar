@@ -1,4 +1,4 @@
-package org.folio.calendar.integration;
+package org.folio.calendar.integration.exception;
 
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import org.folio.calendar.domain.dto.Error;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.integration.BaseApiTest;
 import org.folio.calendar.integration.calendar.periods.post.CreateCalendarAbstractTest;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
