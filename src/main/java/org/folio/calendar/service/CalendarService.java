@@ -1,22 +1,15 @@
 package org.folio.calendar.service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
-import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
-import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
-import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
@@ -35,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
  * A Service class for calendar-related API calls
  */
 @Service
-@Log4j2
 public class CalendarService {
 
   private final CalendarRepository calendarRepository;
@@ -72,46 +64,11 @@ public class CalendarService {
   }
 
   @Transactional
-  public void replaceCalendar(Calendar old, Calendar replacement) {
-    this.deleteCalendar(old);
-    this.insertCalendar(replacement);
-  }
-
-  @Transactional
   public void replaceCalendar(Calendar old, Period replacement, UUID servicePointId) {
-    log.info("Deleting old");
-    this.deleteCalendar(old);
-    log.info("Creating new");
-    this.insertCalendar(
-        Calendar
-          .builder()
-          .startDate(LocalDate.of(2021, Month.JULY, 4))
-          .endDate(LocalDate.of(2021, Month.SEPTEMBER, 22))
-          .build()
-          .withId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
-          // .withServicePoints(
-          //   Set.of(
-          //     new ServicePointCalendarAssignment(
-          //       UUID.fromString("00000000-0000-0000-0000-000000000000"),
-          //       UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-          //     )
-          //   )
-          // )
-          .withName("screams")
-          .withNormalHours(
-            Set.of(
-              NormalOpening
-                .builder()
-                .startDay(Weekday.SUNDAY)
-                .startTime(LocalTime.of(0, 0))
-                .endDay(Weekday.MONDAY)
-                .endTime(LocalTime.of(23, 59))
-                .build()
-            )
-          )
-      );
-    // this.createCalendarFromPeriod(replacement, servicePointId);
-    log.info("done");
+    if (!old.getId().equals(replacement.getId())) {
+      this.deleteCalendar(old);
+    }
+    this.createCalendarFromValidPeriod(replacement);
   }
 
   /**
@@ -126,29 +83,19 @@ public class CalendarService {
   /**
    * Insert (or update) a calendar to the database
    *
-   * @param calendar the calendar to insert
+   * @param calendar the calendar to insert/update/save
    */
   public void insertCalendar(Calendar calendar) {
     this.calendarRepository.save(calendar);
   }
 
   /**
-   * Create a calendar from a given period
+   * Create a calendar from a given period (period is assumed to be valid)
    *
    * @param period a {@link org.folio.calendar.domain.dto.Period Period}
    * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
    */
-  public Calendar createCalendarFromPeriod(Period period, UUID servicePointId) {
-    this.checkPeriod(period, servicePointId);
-
-    if (this.calendarRepository.existsById(period.getId())) {
-      throw new DataConflictException(
-        new ExceptionParameters("period", period),
-        "The period ID %s already exists",
-        period.getId()
-      );
-    }
-
+  public Calendar createCalendarFromValidPeriod(Period period) {
     // basic info
     Calendar.CalendarBuilder calendarBuilder = Calendar
       .builder()
@@ -184,6 +131,27 @@ public class CalendarService {
     this.insertCalendar(calendar);
 
     return calendar;
+  }
+
+  /**
+   * Create a calendar from a given period, with verification checks
+   *
+   * @param period a {@link org.folio.calendar.domain.dto.Period Period}
+   * @param servicePointId the service point this period should be associated with
+   * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
+   */
+  public Calendar createCalendarFromPeriod(Period period, UUID servicePointId) {
+    if (this.calendarRepository.existsById(period.getId())) {
+      throw new DataConflictException(
+        new ExceptionParameters("period", period),
+        "The period ID %s already exists",
+        period.getId()
+      );
+    }
+
+    this.checkPeriod(period, servicePointId);
+
+    return this.createCalendarFromValidPeriod(period);
   }
 
   /**
@@ -278,9 +246,20 @@ public class CalendarService {
    * Check that a period is valid and insertable
    * @param period period to verify
    * @param servicePointId service point this calendar will be initially assigned to
-   * @throws org.folio.calendar.exception.AbstractCalendarException if it cannot be inserted
+   * @throws org.folio.calendar.exception.AbstractCalendarException if this period is not suitable for insertion
    */
   public void checkPeriod(Period period, UUID servicePointId) {
+    this.checkPeriod(period, servicePointId, null);
+  }
+
+  /**
+   * Check that a period is valid and insertable
+   * @param period period to verify
+   * @param servicePointId service point this calendar will be initially assigned to
+   * @param ignore A calendar to ignore for overlaps
+   * @throws org.folio.calendar.exception.AbstractCalendarException if this period is not suitable for insertion
+   */
+  public void checkPeriod(Period period, UUID servicePointId, Calendar ignore) {
     if (period.getName().trim().isEmpty()) {
       throw new InvalidDataException(
         ErrorCode.NO_NAME,
@@ -328,16 +307,22 @@ public class CalendarService {
         DateUtils.overlapsCalendarList(
           period,
           getCalendarsWithNormalHoursForServicePoint(servicePointId)
+            .stream()
+            .filter(calendar -> !calendar.equals(ignore))
+            .collect(Collectors.toList())
         );
     } else {
       overlapped =
         DateUtils.overlapsCalendarList(
           period,
           getCalendarsWithExceptionsForServicePoint(servicePointId)
+            .stream()
+            .filter(calendar -> !calendar.equals(ignore))
+            .collect(Collectors.toList())
         );
     }
 
-    if (overlapped != null) {
+    if (overlapped != null && !overlapped.equals(ignore)) {
       throw new DataConflictException(
         ErrorCode.OVERLAPPING_CALENDAR,
         new ExceptionParameters(
