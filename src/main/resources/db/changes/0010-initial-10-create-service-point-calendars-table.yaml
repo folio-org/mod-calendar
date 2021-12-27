@@ -17,4 +17,4 @@ databaseChangeLog:
                   name: calendar_id
                   type: UUID
                   constraints:
-                    nullable: false
+                    nullable: true
