@@ -18,8 +18,8 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
   protected static boolean dbInitialized = false;
 
   @BeforeEach
-  void recreateDatabase(TestInfo testInfo) {
-    if (!testInfo.getTags().contains(DatabaseUsage.NONE.value) && !isDbInitialized()) {
+  void recreateDatabase() {
+    if (!isDbInitialized()) {
       createDatabase();
 
       setDbInitialized(true);
