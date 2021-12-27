@@ -49,21 +49,18 @@ public class PeriodUtils {
    * @param startDate the first day of the exception
    * @param endDate the last day of the exception
    * @param openings a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative} objects
-   * @param calendarId the ID of a calendar which the created {@link org.folio.calendar.domain.entity.NormalOpening} objects should be associated with
    * @return a {@link java.util.List} of the corresponding {@code ExceptionRange}
    */
   public static List<ExceptionRange> convertOpeningDayRelativeToExceptionRanges(
     LocalDate startDate,
     LocalDate endDate,
-    List<OpeningDayRelative> openings,
-    UUID calendarId
+    List<OpeningDayRelative> openings
   ) {
     UUID exceptionId = UUID.randomUUID();
 
     ExceptionRange.ExceptionRangeBuilder builder = ExceptionRange
       .builder()
       .id(exceptionId)
-      .calendarId(calendarId)
       .startDate(startDate)
       .endDate(endDate);
 
@@ -86,20 +83,12 @@ public class PeriodUtils {
     if (!Boolean.TRUE.equals(opening.isOpen())) {
       // no time information implies closure
       builder =
-        builder.opening(
-          ExceptionHour
-            .builder()
-            .exceptionId(exceptionId)
-            .startDate(startDate)
-            .endDate(endDate)
-            .build()
-        );
+        builder.opening(ExceptionHour.builder().startDate(startDate).endDate(endDate).build());
     } else if (Boolean.TRUE.equals(opening.isAllDay())) {
       builder =
         builder.opening(
           ExceptionHour
             .builder()
-            .exceptionId(exceptionId)
             .startDate(startDate)
             .startTime(TimeConstants.TIME_MIN)
             .endDate(endDate)
@@ -112,7 +101,6 @@ public class PeriodUtils {
           builder.opening(
             ExceptionHour
               .builder()
-              .exceptionId(exceptionId)
               .startDate(date)
               .startTime(DateUtils.fromTimeString(openingHours.getStartTime()))
               .endDate(date)
@@ -129,18 +117,16 @@ public class PeriodUtils {
    * Convert period openings to normalized openings, consolidating as necessary
    *
    * @param openings a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative} objects
-   * @param calendarId the ID of a calendar which the created {@link org.folio.calendar.domain.entity.NormalOpening} objects should be associated with
    * @return a {@link java.util.List} of {@code NormalOpening}s
    */
   // allow multiple continue statements in for loop
   @SuppressWarnings("java:S135")
   public static List<NormalOpening> convertOpeningDayRelativeToNormalOpening(
-    Iterable<OpeningDayRelative> openings,
-    UUID calendarId
+    Iterable<OpeningDayRelative> openings
   ) {
     List<NormalOpening> normalizedOpenings = new ArrayList<>();
 
-    NormalOpening.NormalOpeningBuilder builder = NormalOpening.builder().calendarId(calendarId);
+    NormalOpening.NormalOpeningBuilder builder = NormalOpening.builder();
 
     for (OpeningDayRelative opening : openings) {
       OpeningDayInfo openingInfo = opening.getOpeningDay();
@@ -374,7 +360,9 @@ public class PeriodUtils {
       );
     }
 
-    if (!calendar.getNormalHours().isEmpty()) {
+    if (calendar.getNormalHours().isEmpty() && calendar.getExceptions().isEmpty()) {
+      builder.openingDays(new ArrayList<>());
+    } else if (!calendar.getNormalHours().isEmpty()) {
       builder =
         builder.openingDays(getOpeningDayRelativeFromNormalOpenings(calendar.getNormalHours()));
     } else {

@@ -1,18 +1,27 @@
 package org.folio.calendar.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.Month;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityNotFoundException;
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.controller.CalendarController;
+import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
+import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
+import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.utils.DateUtils;
@@ -20,12 +29,14 @@ import org.folio.calendar.utils.PeriodCollectionUtils;
 import org.folio.calendar.utils.PeriodUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A Service class for calendar-related API calls
  */
 @Service
-public final class CalendarService {
+@Log4j2
+public class CalendarService {
 
   private final CalendarRepository calendarRepository;
 
@@ -60,13 +71,56 @@ public final class CalendarService {
       .collect(Collectors.toList());
   }
 
+  @Transactional
+  public void replaceCalendar(Calendar old, Calendar replacement) {
+    this.deleteCalendar(old);
+    this.insertCalendar(replacement);
+  }
+
+  @Transactional
+  public void replaceCalendar(Calendar old, Period replacement, UUID servicePointId) {
+    log.info("Deleting old");
+    this.deleteCalendar(old);
+    log.info("Creating new");
+    this.insertCalendar(
+        Calendar
+          .builder()
+          .startDate(LocalDate.of(2021, Month.JULY, 4))
+          .endDate(LocalDate.of(2021, Month.SEPTEMBER, 22))
+          .build()
+          .withId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
+          // .withServicePoints(
+          //   Set.of(
+          //     new ServicePointCalendarAssignment(
+          //       UUID.fromString("00000000-0000-0000-0000-000000000000"),
+          //       UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+          //     )
+          //   )
+          // )
+          .withName("screams")
+          .withNormalHours(
+            Set.of(
+              NormalOpening
+                .builder()
+                .startDay(Weekday.SUNDAY)
+                .startTime(LocalTime.of(0, 0))
+                .endDay(Weekday.MONDAY)
+                .endTime(LocalTime.of(23, 59))
+                .build()
+            )
+          )
+      );
+    // this.createCalendarFromPeriod(replacement, servicePointId);
+    log.info("done");
+  }
+
   /**
    * Delete a calendar by its ID
    *
    * @param calendarId the calendar to delete
    */
-  public void deleteCalendarById(UUID calendarId) {
-    this.calendarRepository.deleteById(calendarId);
+  public void deleteCalendar(Calendar calendar) {
+    this.calendarRepository.deleteCascadingById(calendar.getId());
   }
 
   /**
@@ -84,7 +138,9 @@ public final class CalendarService {
    * @param period a {@link org.folio.calendar.domain.dto.Period Period}
    * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
    */
-  public Calendar createCalendarFromPeriod(Period period) {
+  public Calendar createCalendarFromPeriod(Period period, UUID servicePointId) {
+    this.checkPeriod(period, servicePointId);
+
     if (this.calendarRepository.existsById(period.getId())) {
       throw new DataConflictException(
         new ExceptionParameters("period", period),
@@ -104,7 +160,6 @@ public final class CalendarService {
     // assign starting service point
     ServicePointCalendarAssignment servicePointAssignment = ServicePointCalendarAssignment
       .builder()
-      .calendarId(period.getId())
       .servicePointId(period.getServicePointId())
       .build();
     calendarBuilder = calendarBuilder.servicePoint(servicePointAssignment);
@@ -115,21 +170,18 @@ public final class CalendarService {
         PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
           period.getStartDate(),
           period.getEndDate(),
-          period.getOpeningDays(),
-          period.getId()
+          period.getOpeningDays()
         )
       );
     } else {
       calendarBuilder.normalHours(
-        PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-          period.getOpeningDays(),
-          period.getId()
-        )
+        PeriodUtils.convertOpeningDayRelativeToNormalOpening(period.getOpeningDays())
       );
     }
 
     Calendar calendar = calendarBuilder.build();
-    this.calendarRepository.save(calendar);
+
+    this.insertCalendar(calendar);
 
     return calendar;
   }
@@ -171,7 +223,14 @@ public final class CalendarService {
    * @return found {@link Calendar} object
    */
   public Calendar getCalendarById(UUID id) {
-    return this.calendarRepository.getById(id);
+    return this.calendarRepository.findById(id)
+      .orElseThrow(() ->
+        new DataNotFoundException(
+          new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
+          "No calendar was found with ID %s",
+          id
+        )
+      );
   }
 
   /**
@@ -211,6 +270,88 @@ public final class CalendarService {
         new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, periodId),
         "No calendar was found with ID %s",
         periodId
+      );
+    }
+  }
+
+  /**
+   * Check that a period is valid and insertable
+   * @param period period to verify
+   * @param servicePointId service point this calendar will be initially assigned to
+   * @throws org.folio.calendar.exception.AbstractCalendarException if it cannot be inserted
+   */
+  public void checkPeriod(Period period, UUID servicePointId) {
+    if (period.getName().trim().isEmpty()) {
+      throw new InvalidDataException(
+        ErrorCode.NO_NAME,
+        new ExceptionParameters(
+          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId,
+          CalendarController.PARAMETER_NAME_PERIOD,
+          period
+        ),
+        "The provided name (\"%s\") was empty",
+        period.getName()
+      );
+    }
+    if (period.getStartDate().isAfter(period.getEndDate())) {
+      throw new InvalidDataException(
+        ErrorCode.INVALID_DATE_RANGE,
+        new ExceptionParameters(
+          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId,
+          CalendarController.PARAMETER_NAME_PERIOD,
+          period
+        ),
+        "The start date (%s) was after the end date (%s)",
+        period.getStartDate(),
+        period.getEndDate()
+      );
+    }
+    if (!servicePointId.equals(period.getServicePointId())) {
+      throw new InvalidDataException(
+        new ExceptionParameters(
+          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId,
+          CalendarController.PARAMETER_NAME_PERIOD,
+          period
+        ),
+        "The service point ID in the URL (%s) did not match the one in the payload (%s)",
+        servicePointId,
+        period.getServicePointId()
+      );
+    }
+
+    Calendar overlapped = null;
+    if (!PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
+      overlapped =
+        DateUtils.overlapsCalendarList(
+          period,
+          getCalendarsWithNormalHoursForServicePoint(servicePointId)
+        );
+    } else {
+      overlapped =
+        DateUtils.overlapsCalendarList(
+          period,
+          getCalendarsWithExceptionsForServicePoint(servicePointId)
+        );
+    }
+
+    if (overlapped != null) {
+      throw new DataConflictException(
+        ErrorCode.OVERLAPPING_CALENDAR,
+        new ExceptionParameters(
+          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
+          servicePointId,
+          CalendarController.PARAMETER_NAME_PERIOD,
+          period
+        ),
+        "This period (%s to %s) overlaps with another calendar (\"%s\" from %s to %s)",
+        period.getStartDate(),
+        period.getEndDate(),
+        overlapped.getName(),
+        overlapped.getStartDate(),
+        overlapped.getEndDate()
       );
     }
   }
