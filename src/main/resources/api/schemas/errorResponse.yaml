@@ -1,0 +1,20 @@
+description: A set of error(s) from a request
+type: object
+properties:
+  timestamp:
+    description: The time that the error occurred
+    type: string
+    format: date-time
+  status:
+    description: The HTTP response code
+    type: integer
+  errors:
+    type: array
+    minItems: 1
+    items:
+      $ref: error.yaml
+additionalProperties: false
+required:
+  - timestamp
+  - status
+  - errors

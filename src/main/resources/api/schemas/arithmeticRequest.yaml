@@ -1,0 +1,13 @@
+type: object
+properties:
+  a:
+    type: integer
+  b:
+    type: integer
+required:
+  - a
+  - b
+additionalProperties: false
+example:
+  a: 3
+  b: 5

@@ -1,0 +1,114 @@
+get:
+  operationId: getPeriodsForServicePoint
+  description: List all periods for a service point
+  parameters:
+    - $ref: ../../../../parameters/x-okapi-tenant.yaml
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant service point
+    - in: query
+      name: withOpeningDays
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description:
+        If opening should be included in the response (or just overall period information)
+    - in: query
+      name: showPast
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: If periods from the past should be included
+    - in: query
+      name: showExceptional
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: Whether to get regular periods or exceptions
+  responses:
+    "200":
+      description: The query results
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/periodCollection.yaml
+    "400":
+      description: Invalid request (could not be understood)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/invalidRequest.yaml
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/internalServerError.yaml
+post:
+  operationId: addNewPeriod
+  description: Create a new period (calendar) for a service point
+  parameters:
+    - $ref: ../../../../parameters/x-okapi-tenant.yaml
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant service point
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../../schemas/period.yaml
+  responses:
+    "201":
+      description: The created period
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/period.yaml
+    "400":
+      description: Invalid request (could not be understood)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/invalidRequest.yaml
+    "409":
+      description: Request conflicts with existing data (duplicate ID, overlapping dates, etc)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/conflictError.yaml
+    "422":
+      description: Invalid data (for example, start date after end date)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/invalidData.yaml
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../examples/internalServerError.yaml

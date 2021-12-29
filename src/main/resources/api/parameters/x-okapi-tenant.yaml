@@ -1,0 +1,6 @@
+name: x-okapi-tenant
+in: header
+description: X-Okapi-Tenant Value
+required: true
+schema:
+  type: string

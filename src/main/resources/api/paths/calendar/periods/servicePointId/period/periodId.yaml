@@ -1,0 +1,158 @@
+get:
+  operationId: getPeriodById
+  description: Get a certain period's information
+  parameters:
+    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant service point
+    - in: path
+      name: periodId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant period
+  responses:
+    "200":
+      description: The period information
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/period.yaml
+    "400":
+      description: Invalid request (could not be understood)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/invalidRequest.yaml
+    "404":
+      description: No period was found with these parameters
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/notFound.yaml
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/internalServerError.yaml
+put:
+  operationId: updatePeriodById
+  description: Overwrite a certain period by its ID, creating it if it does not exist
+  parameters:
+    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description:
+        The UUID for the relevant service point.  The current calendar's service point be
+        ignored/overwritten in favor of this
+    - in: path
+      name: periodId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant period
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../../../schemas/period.yaml
+  responses:
+    "204":
+      description: Successful update or creation (no content)
+    "400":
+      description: Invalid request (could not be understood)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/invalidRequest.yaml
+    "409":
+      description: Request conflicts with existing data (duplicate ID, overlapping dates, etc)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/conflictError.yaml
+    "422":
+      description: Invalid data (for example, start date after end date)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/invalidData.yaml
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/internalServerError.yaml
+delete:
+  operationId: deletePeriodById
+  description: Delete a certain period by its ID
+  parameters:
+    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant service point
+    - in: path
+      name: periodId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The UUID for the relevant period
+  responses:
+    "204":
+      description: Successful deletion (no content)
+    "400":
+      description: Invalid request (could not be understood)
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/invalidRequest.yaml
+    "404":
+      description: No period was found with these parameters
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/notFound.yaml
+    "500":
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: ../../../../../schemas/errorResponse.yaml
+          example:
+            $ref: ../../../../../examples/internalServerError.yaml
