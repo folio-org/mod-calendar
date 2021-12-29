@@ -7,6 +7,8 @@ servers:
 paths:
   /hello:
     $ref: paths/hello.yaml
+  /calendar/periods:
+    $ref: paths/calendar/periods.yaml
   /calendar/periods/{servicePointId}/period:
     $ref: paths/calendar/periods/servicePointId/period.yaml
   /calendar/periods/{servicePointId}/period/{periodId}:

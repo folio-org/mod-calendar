@@ -9,6 +9,7 @@ properties:
       $ref: "period.yaml"
   totalRecords:
     type: integer
+    minimum: 0
     description: Number of periods in the response
 additionalProperties: false
 required:
