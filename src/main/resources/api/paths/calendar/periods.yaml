@@ -1,6 +1,6 @@
 get:
-  operationId: getPeriodsForServicePoint
-  description: List all periods for a service point
+  operationId: getDateOpenings
+  description: List all information for each calendar day
   parameters:
     - $ref: ../../parameters/x-okapi-tenant.yaml
     - in: query
