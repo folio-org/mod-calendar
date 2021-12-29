@@ -1,42 +1,27 @@
 package org.folio.calendar.integration;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.junit.jupiter.api.AfterEach;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 
 /**
  * Base abstract class for testing APIs that need a clean database every run
  */
-@ExtendWith(ApiTestWatcher.class)
+@Log4j2
 public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
 
-  @Getter
-  @Setter
-  protected static boolean dbInitialized = false;
-
   @BeforeEach
-  void recreateDatabase() {
-    if (!isDbInitialized()) {
-      createDatabase();
-
-      setDbInitialized(true);
+  void cleanDatabase(@Autowired DataSource dataSource) {
+    log.info("Truncating database");
+    try (Connection conn = dataSource.getConnection()) {
+      ScriptUtils.executeSqlScript(conn, new ClassPathResource("database-clean.sql"));
+    } catch (SQLException e) {
+      log.error(e.getMessage(), e);
     }
-  }
-
-  @AfterEach
-  void cleanDatabase(TestInfo testInfo) {
-    if (
-      testInfo.getTags().contains(DatabaseUsage.NONE.value) ||
-      testInfo.getTags().contains(DatabaseUsage.IDEMPOTENT.value)
-    ) {
-      return;
-    }
-
-    destroyDatabase();
-
-    setDbInitialized(false);
   }
 }

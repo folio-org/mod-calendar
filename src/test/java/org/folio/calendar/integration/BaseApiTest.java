@@ -24,13 +24,15 @@ import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -39,6 +41,7 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @Log4j2
 @ActiveProfiles("test")
+@TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,9 +59,6 @@ public abstract class BaseApiTest {
   @Autowired
   protected FolioModuleMetadata metadata;
 
-  @Autowired
-  protected JdbcTemplate jdbcTemplate;
-
   @Value("${x-okapi-url}")
   protected String okapiUrl = null;
 
@@ -69,48 +69,41 @@ public abstract class BaseApiTest {
     "api/mod-calendar.yaml"
   );
 
-  public void createDatabase() {
-    log.info("Initializing database by posting to /_/tenant");
-    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new TenantAttributes().moduleTo(""))
-      .post(getRequestUrl("/_/tenant"))
-      .then()
-      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  @BeforeEach
+  void clearCurrentDateOverride() {
+    DateUtils.setCurrentDateOverride(null);
   }
 
-  public void destroyDatabase() {
-    log.info("Deleting database by posting to /_/tenant");
-    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new TenantAttributes().moduleTo(""))
-      .delete(getRequestUrl("/_/tenant"))
-      .then()
-      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+  @BeforeAll
+  static void initialize() {
+    log.info("Configuring JSON to parse decimals as doubles, not floats");
+    // allow comparison with doubles, not floats
+    JsonConfig jsonConfig = JsonConfig
+      .jsonConfig()
+      .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
+    RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
+
+    log.info("Configuring JSON date mapping");
+    RestAssured.config =
+      RestAssured
+        .config()
+        .objectMapperConfig(
+          ObjectMapperConfig
+            .objectMapperConfig()
+            .jackson2ObjectMapperFactory((a, b) -> APITestUtils.MAPPER)
+        );
   }
 
   @BeforeEach
-  void initialize() {
-    DateUtils.setCurrentDateOverride(null);
-    // workaround for JUnit 5 as each test is idempotent (no @Before) but we only need to do this once
+  void createDatabase() {
     if (!isInitialized()) {
-      createDatabase();
-
-      log.info("Configuring JSON to parse decimals as doubles, not floats");
-      // allow comparison with doubles, not floats
-      JsonConfig jsonConfig = JsonConfig
-        .jsonConfig()
-        .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
-      RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
-
-      RestAssured.config =
-        RestAssured
-          .config()
-          .objectMapperConfig(
-            ObjectMapperConfig
-              .objectMapperConfig()
-              .jackson2ObjectMapperFactory((a, b) -> APITestUtils.MAPPER)
-          );
+      log.info("Initializing database by posting to /_/tenant");
+      ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(new TenantAttributes().moduleTo(""))
+        .post(getRequestUrl("/_/tenant"))
+        .then()
+        .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
 
       setInitialized(true);
     }
