@@ -62,6 +62,12 @@ public class CalendarService {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Replace a given calendar with a new one (transactionally)
+   * @param old the calendar to replace
+   * @param replacement the new replacement, as a {@link Period}
+   * @param servicePointId the service point for the replacement to be assigned to
+   */
   @Transactional
   public void replaceCalendar(Calendar old, Period replacement, UUID servicePointId) {
     this.checkPeriod(replacement, servicePointId, old);
