@@ -1,0 +1,53 @@
+{
+  "id": "be3ddfc5-a092-4e74-bf1e-feb11e5104e2",
+  "servicePointId": "00000000-0000-0000-0000-000000000000",
+  "name": "December 5 through 31",
+  "startDate": "2021-12-05",
+  "endDate": "2021-12-31",
+  "openingDays": [
+    {
+      "weekdays": {
+        "day": "MONDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "09:00",
+            "endTime": "17:00"
+          }
+        ],
+        "allDay": false,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "WEDNESDAY"
+      },
+      "openingDay": {
+        "openingHour": [],
+        "allDay": true,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "FRIDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "07:00",
+            "endTime": "10:00"
+          },
+          {
+            "startTime": "13:00",
+            "endTime": "18:00"
+          }
+        ],
+        "allDay": false,
+        "open": true
+      }
+    }
+  ]
+}

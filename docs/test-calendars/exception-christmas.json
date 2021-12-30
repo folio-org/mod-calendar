@@ -1,0 +1,21 @@
+{
+  "id": "d1d0d843-f186-491d-9a3c-28220f08b82d",
+  "servicePointId": "00000000-0000-0000-0000-000000000000",
+  "name": "Christmas Closure",
+  "startDate": "2021-12-24",
+  "endDate": "2021-12-25",
+  "openingDays": [
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "00:00",
+            "endTime": "23:59"
+          }
+        ],
+        "allDay": true,
+        "open": false
+      }
+    }
+  ]
+}

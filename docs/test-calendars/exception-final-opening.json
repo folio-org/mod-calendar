@@ -1,0 +1,20 @@
+{
+  "id": "c0c3c948-c37b-4286-82da-eac52a8bbd60",
+  "servicePointId": "00000000-0000-0000-0000-000000000000",
+  "name": "Finals Extra Opening",
+  "startDate": "2021-12-11",
+  "endDate": "2021-12-17",
+  "openingDays": [
+    {
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "02:00",
+            "endTime": "23:00"
+          }
+        ],
+        "open": true
+      }
+    }
+  ]
+}
