@@ -410,7 +410,10 @@ public class PeriodUtils {
         if (!thisOpening.isOpen()) {
           current.put(entry.getKey(), entry.getValue());
         } else {
-          thisOpening.getOpeningHour().addAll(entry.getValue().getOpeningHour());
+          List<OpeningHourRange> newOpenings = new ArrayList<>(thisOpening.getOpeningHour());
+          newOpenings.addAll(entry.getValue().getOpeningHour());
+          thisOpening.setOpeningHour(newOpenings);
+
           thisOpening.setAllDay(thisOpening.isAllDay() || entry.getValue().isAllDay());
         }
       }
