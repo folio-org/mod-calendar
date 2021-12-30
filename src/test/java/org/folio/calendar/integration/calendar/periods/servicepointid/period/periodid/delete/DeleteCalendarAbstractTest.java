@@ -1,11 +1,11 @@
-package org.folio.calendar.integration.calendar.periods.period.get;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.delete;
 
 import io.restassured.response.Response;
 import java.util.UUID;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
 
 /**
- * Setup the following service points for use in tests which may rely on them (such as GET integration tests)
+ * Setup the following service points for use in tests which may rely on them
  * <ul>
  *   <li>On service point 0:</li>
  *   <li>
@@ -30,9 +30,15 @@ import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarT
  *   </li>
  * </ul>
  */
-public abstract class GetSpecificCalendarAbstractTest extends AbstractExistingCalendarTest {
+public abstract class DeleteCalendarAbstractTest extends AbstractExistingCalendarTest {
 
+  public static final String DELETE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period/%s";
   public static final String GET_CALENDAR_API_ROUTE = "/calendar/periods/%s/period/%s";
+
+  protected Response sendDeleteRequest(UUID servicePointId, UUID calendarId) {
+    return ra()
+      .delete(getRequestUrl(String.format(DELETE_CALENDAR_API_ROUTE, servicePointId, calendarId)));
+  }
 
   protected Response sendGetRequest(UUID servicePointId, UUID calendarId) {
     return ra()

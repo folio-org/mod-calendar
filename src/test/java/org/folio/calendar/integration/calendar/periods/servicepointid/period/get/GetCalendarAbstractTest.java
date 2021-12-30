@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.get;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.get;
 
 import io.restassured.response.Response;
 import java.util.UUID;

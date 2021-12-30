@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.period.put;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.put;
 
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;

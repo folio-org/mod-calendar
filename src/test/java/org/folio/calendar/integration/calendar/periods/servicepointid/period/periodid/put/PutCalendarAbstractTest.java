@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.period.put;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.put;
 
 import io.restassured.response.Response;
 import java.util.UUID;

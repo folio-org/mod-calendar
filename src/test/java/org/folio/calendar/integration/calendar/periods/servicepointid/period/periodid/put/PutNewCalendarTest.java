@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.period.put;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.put;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

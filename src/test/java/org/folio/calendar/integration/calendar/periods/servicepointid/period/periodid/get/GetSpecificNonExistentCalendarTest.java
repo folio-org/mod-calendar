@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.period.delete;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.get;
 
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,11 +14,11 @@ import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-class DeleteNonExistentCalendarTest extends DeleteCalendarAbstractTest {
+class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest {
 
   @Test
   void testNonExistentCalendar() {
-    Response response = sendDeleteRequest(UUIDs.UUID_0, UUIDs.UUID_2);
+    Response response = sendGetRequest(UUIDs.UUID_0, UUIDs.UUID_2);
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
@@ -47,7 +47,7 @@ class DeleteNonExistentCalendarTest extends DeleteCalendarAbstractTest {
 
   @Test
   void testCalendarOnWrongServicePoint() {
-    Response response = sendDeleteRequest(UUIDs.UUID_0, UUIDs.UUID_D);
+    Response response = sendGetRequest(UUIDs.UUID_0, UUIDs.UUID_D);
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);

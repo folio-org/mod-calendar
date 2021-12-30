@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.post;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.post;
 
 import static org.hamcrest.Matchers.is;
 

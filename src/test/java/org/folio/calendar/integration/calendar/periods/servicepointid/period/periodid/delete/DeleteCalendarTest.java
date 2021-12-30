@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.period.delete;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.delete;
 
 import static org.hamcrest.Matchers.is;
 

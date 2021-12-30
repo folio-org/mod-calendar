@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.is;
 
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
-import org.folio.calendar.integration.calendar.periods.post.CreateCalendarAbstractTest;
+import org.folio.calendar.integration.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
 import org.folio.calendar.testconstants.Periods;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.HttpStatus;

@@ -11,7 +11,7 @@ import org.folio.calendar.domain.dto.Error;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.integration.BaseApiTest;
-import org.folio.calendar.integration.calendar.periods.post.CreateCalendarAbstractTest;
+import org.folio.calendar.integration.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

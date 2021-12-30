@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.calendar.periods.get;
+package org.folio.calendar.integration.calendar.periods.servicepointid.period.get;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -16,12 +16,12 @@ import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
+public class GetCalendarNormalHoursTest extends GetCalendarAbstractTest {
 
   @Test
   void testPastWithOpeningDays() {
     DateUtils.setCurrentDateOverride(Dates.DATE_2021_07_04);
-    Response response = sendCalendarGetRequest(UUIDs.UUID_0, true, true, true);
+    Response response = sendCalendarGetRequest(UUIDs.UUID_0, true, true, false);
     response.then().statusCode(is(HttpStatus.OK.value()));
     PeriodCollection collection = response.getBody().as(PeriodCollection.class);
     assertThat(
@@ -37,14 +37,14 @@ public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
     assertThat(
       "The returned collection contains both periods",
       collection.getOpeningPeriods(),
-      is(Arrays.asList(Periods.PERIOD_FULL_EXCEPTIONAL_F, Periods.PERIOD_FULL_EXCEPTIONAL_G))
+      is(Arrays.asList(Periods.PERIOD_FULL_EXAMPLE_F, Periods.PERIOD_FULL_EXAMPLE_G))
     );
   }
 
   @Test
   void testPastWithoutOpeningDays() {
     DateUtils.setCurrentDateOverride(Dates.DATE_2021_07_04);
-    Response response = sendCalendarGetRequest(UUIDs.UUID_0, false, true, true);
+    Response response = sendCalendarGetRequest(UUIDs.UUID_0, false, true, false);
     response.then().statusCode(is(HttpStatus.OK.value()));
     PeriodCollection collection = response.getBody().as(PeriodCollection.class);
     assertThat(
@@ -62,8 +62,8 @@ public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
       collection.getOpeningPeriods(),
       is(
         Arrays.asList(
-          Periods.PERIOD_FULL_EXCEPTIONAL_F.withOpeningDays(new ArrayList<>()),
-          Periods.PERIOD_FULL_EXCEPTIONAL_G.withOpeningDays(new ArrayList<>())
+          Periods.PERIOD_FULL_EXAMPLE_F.withOpeningDays(new ArrayList<>()),
+          Periods.PERIOD_FULL_EXAMPLE_G.withOpeningDays(new ArrayList<>())
         )
       )
     );
@@ -72,7 +72,7 @@ public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
   @Test
   void testPresentWithOpeningDays() {
     DateUtils.setCurrentDateOverride(Dates.DATE_2021_07_04);
-    Response response = sendCalendarGetRequest(UUIDs.UUID_0, true, false, true);
+    Response response = sendCalendarGetRequest(UUIDs.UUID_0, true, false, false);
     response.then().statusCode(is(HttpStatus.OK.value()));
     PeriodCollection collection = response.getBody().as(PeriodCollection.class);
     assertThat(
@@ -88,14 +88,14 @@ public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
     assertThat(
       "The returned collection contains the single current periods",
       collection.getOpeningPeriods(),
-      is(Arrays.asList(Periods.PERIOD_FULL_EXCEPTIONAL_G))
+      is(Arrays.asList(Periods.PERIOD_FULL_EXAMPLE_G))
     );
   }
 
   @Test
   void testPresentWithoutOpeningDays() {
     DateUtils.setCurrentDateOverride(Dates.DATE_2021_07_04);
-    Response response = sendCalendarGetRequest(UUIDs.UUID_0, false, false, true);
+    Response response = sendCalendarGetRequest(UUIDs.UUID_0, false, false, false);
     response.then().statusCode(is(HttpStatus.OK.value()));
     PeriodCollection collection = response.getBody().as(PeriodCollection.class);
     assertThat(
@@ -111,7 +111,7 @@ public class GetCalendarExceptionalTest extends GetCalendarAbstractTest {
     assertThat(
       "The returned collection contains the current period without opening days",
       collection.getOpeningPeriods(),
-      is(Arrays.asList(Periods.PERIOD_FULL_EXCEPTIONAL_G.withOpeningDays(new ArrayList<>())))
+      is(Arrays.asList(Periods.PERIOD_FULL_EXAMPLE_G.withOpeningDays(new ArrayList<>())))
     );
   }
 }
