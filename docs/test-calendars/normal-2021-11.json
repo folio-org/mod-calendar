@@ -7,16 +7,46 @@
   "openingDays": [
     {
       "weekdays": {
-        "day": "SUNDAY"
+        "day": "MONDAY"
       },
       "openingDay": {
         "openingHour": [
           {
-            "startTime": "07:00",
-            "endTime": "10:00"
+            "startTime": "07:30",
+            "endTime": "17:30"
           }
         ],
         "allDay": false,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "TUESDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "07:30",
+            "endTime": "17:30"
+          }
+        ],
+        "allDay": false,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "WEDNESDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "00:00",
+            "endTime": "23:59"
+          }
+        ],
+        "allDay": true,
         "open": true
       }
     },
@@ -28,7 +58,41 @@
         "openingHour": [
           {
             "startTime": "07:30",
-            "endTime": "09:30"
+            "endTime": "17:30"
+          }
+        ],
+        "allDay": false,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "FRIDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "07:30",
+            "endTime": "17:30"
+          }
+        ],
+        "allDay": false,
+        "open": true
+      }
+    },
+    {
+      "weekdays": {
+        "day": "SATURDAY"
+      },
+      "openingDay": {
+        "openingHour": [
+          {
+            "startTime": "07:00",
+            "endTime": "12:00"
+          },
+          {
+            "startTime": "13:30",
+            "endTime": "20:00"
           }
         ],
         "allDay": false,
