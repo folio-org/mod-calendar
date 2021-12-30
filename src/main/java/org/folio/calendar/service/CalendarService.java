@@ -1,5 +1,6 @@
 package org.folio.calendar.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -336,5 +337,24 @@ public class CalendarService {
         overlapped.getEndDate()
       );
     }
+  }
+
+  /**
+   * Get calendars with the given parameters
+   * @param servicePointId the service point
+   * @param startDate the first date of the range to include
+   * @param endDate the last date of the range to include
+   * @return a list of matching calendars
+   */
+  public Iterable<Calendar> getCalendars(
+    UUID servicePointId,
+    LocalDate startDate,
+    LocalDate endDate
+  ) {
+    return this.calendarRepository.findWithServicePointAndDateRange(
+        servicePointId,
+        startDate,
+        endDate
+      );
   }
 }

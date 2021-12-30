@@ -23,7 +23,8 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
-    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id WHERE r.servicePointId = :servicePointId"
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
+    "WHERE r.servicePointId = :servicePointId"
   )
   List<Calendar> findByServicePointId(@Param("servicePointId") UUID servicePointId);
 
@@ -35,11 +36,32 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
    */
   @Query(
-    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
+    "WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
   )
   List<Calendar> findByServicePointIdOnOrAfterDate(
     @Param("servicePointId") UUID servicePointId,
     @Param("date") LocalDate date
+  );
+
+  /**
+   * Find calendars for a service point ID and in the given date range
+   *
+   * @param servicePointId the UUID of the service point
+   * @param startDate the date which returned results will end before
+   * @param endDate the date which returned results will not start after
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
+   */
+  @Query(
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
+    "WHERE (:servicePointId is null OR r.servicePointId = :servicePointId) AND " +
+    "(:startDate is null OR c.endDate >= :startDate) AND " +
+    "(:endDate is null OR c.startDate <= :endDate)"
+  )
+  List<Calendar> findWithServicePointAndDateRange(
+    @Param("servicePointId") UUID servicePointId,
+    @Param("startDate") LocalDate startDate,
+    @Param("endDate") LocalDate endDate
   );
 
   /**
