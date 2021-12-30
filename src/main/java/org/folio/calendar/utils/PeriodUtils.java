@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
@@ -206,7 +207,8 @@ public class PeriodUtils {
   }
 
   /**
-   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period
+   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period.
+   * Days which are fully closed will not be included.
    *
    * @param normalHours the list of normal hours to convert
    * @return a list of OpeningDayRelative
@@ -382,5 +384,34 @@ public class PeriodUtils {
     }
 
     return builder.build();
+  }
+
+  /**
+   * Merge a Map of OpeningDayInfo into another
+   * @param current the map to be merged into
+   * @param toAdd the map to be consumed
+   */
+  public static void mergeInto(
+    Map<LocalDate, OpeningDayInfo> current,
+    Map<LocalDate, OpeningDayInfo> toAdd
+  ) {
+    for (Entry<LocalDate, OpeningDayInfo> entry : toAdd.entrySet()) {
+      if (!current.containsKey(entry.getKey())) {
+        current.put(entry.getKey(), entry.getValue());
+      } else {
+        if (!entry.getValue().isOpen()) {
+          continue;
+        }
+
+        OpeningDayInfo thisOpening = current.get(entry.getKey());
+
+        if (!thisOpening.isOpen()) {
+          current.put(entry.getKey(), entry.getValue());
+        } else {
+          thisOpening.getOpeningHour().addAll(entry.getValue().getOpeningHour());
+          thisOpening.setAllDay(thisOpening.isAllDay() || entry.getValue().isAllDay());
+        }
+      }
+    }
   }
 }
