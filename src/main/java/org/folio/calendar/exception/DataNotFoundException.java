@@ -11,6 +11,7 @@ public class DataNotFoundException extends AbstractCalendarException {
   /**
    * Create an exception for when data is not found with a cause, message, and parameters.
    *
+   * @param cause      The cause of this exception
    * @param parameters Parameters which caused this issue
    * @param message    A printf-style string for the error message
    * @param format     Formatting for the printf style message

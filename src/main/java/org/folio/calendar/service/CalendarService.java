@@ -81,7 +81,7 @@ public class CalendarService {
   /**
    * Delete a calendar by its ID
    *
-   * @param calendarId the calendar to delete
+   * @param calendar the calendar to delete
    */
   public void deleteCalendar(Calendar calendar) {
     this.calendarRepository.deleteCascadingById(calendar.getId());
