@@ -439,6 +439,11 @@ public class PeriodUtils {
     boolean includeClosedDays,
     boolean actualOpening
   ) {
+    // no calendars were given
+    if (firstDate == null || lastDate == null) {
+      return new ArrayList<>();
+    }
+
     List<OpeningDayConcrete> result = new ArrayList<>();
 
     for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
