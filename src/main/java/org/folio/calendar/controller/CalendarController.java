@@ -164,8 +164,6 @@ public final class CalendarController implements CalendarApi {
       PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(startDate, endDate));
     }
 
-    boolean addClosedOpenings = startDate != null && endDate != null && includeClosedDays;
-
     List<OpeningDayConcrete> finalOpenings = new ArrayList<>();
     for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
       if (exceptions.containsKey(date)) {
@@ -181,7 +179,7 @@ public final class CalendarController implements CalendarApi {
         finalOpenings.add(
           OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
         );
-      } else if (addClosedOpenings) {
+      } else if (includeClosedDays) {
         finalOpenings.add(
           OpeningDayConcrete.builder().date(date).openingDay(TimeConstants.ALL_DAY_CLOSURE).build()
         );

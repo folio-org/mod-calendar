@@ -45,6 +45,7 @@ public class TimeConstants {
 
   public static final OpeningDayInfo ALL_DAY_CLOSURE = OpeningDayInfo
     .builder()
+    .open(false)
     .allDay(true)
     .exceptional(false)
     .openingHour(Arrays.asList(ALL_DAY))
