@@ -33,8 +33,8 @@ get:
         type: boolean
         default: true
       description:
-        If days not part of a calendar should be included.  This parameter will be treated as false
-        if either startDate or endDate are not included
+        If days not part of a calendar should be included.  When startDate and/or endDate are not
+        included, the first (or last, respectively) day of the found calendars are used
     - in: query
       name: actualOpening
       required: false
