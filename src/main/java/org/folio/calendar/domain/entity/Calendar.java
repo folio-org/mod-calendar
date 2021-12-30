@@ -1,6 +1,10 @@
 package org.folio.calendar.domain.entity;
 
 import java.time.LocalDate;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
@@ -19,6 +23,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.With;
+import org.folio.calendar.domain.dto.OpeningDayInfo;
+import org.folio.calendar.domain.dto.OpeningDayRelative;
+import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.utils.DateUtils;
+import org.folio.calendar.utils.PeriodUtils;
+import org.folio.calendar.utils.WeekdayUtils;
 
 /**
  * Calendar entity
@@ -109,5 +119,52 @@ public class Calendar {
     if (this.getExceptions() != null) {
       this.getExceptions().forEach(exception -> exception.setCalendar(this));
     }
+  }
+
+  /**
+   * Get all of the dates spanned by this calendar as OpeningDayInfo objects representing normal openings
+   * @return a map of date to OpeningDayInfo
+   */
+  public Map<LocalDate, OpeningDayInfo> getDailyNormalOpenings() {
+    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
+
+    List<OpeningDayRelative> openings = PeriodUtils.getOpeningDayRelativeFromNormalOpenings(
+      this.getNormalHours()
+    );
+    Map<Weekday, OpeningDayInfo> openingsByWeekday = new EnumMap<>(Weekday.class);
+    for (OpeningDayRelative opening : openings) {
+      openingsByWeekday.put(opening.getWeekdays().getDay(), opening.getOpeningDay());
+    }
+
+    List<LocalDate> dates = DateUtils.getDateRange(this.getStartDate(), this.getEndDate());
+
+    for (LocalDate date : dates) {
+      OpeningDayInfo opening = openingsByWeekday.get(WeekdayUtils.toWeekday(date));
+      if (opening != null) {
+        dateMap.put(date, opening);
+      }
+    }
+
+    return dateMap;
+  }
+
+  /**
+   * Get all of the dates spanned by the exception (singular, must be legacy calendar) as OpeningDayInfo objects
+   * @return a map of date to OpeningDayInfo
+   */
+  public Map<LocalDate, OpeningDayInfo> getDailyExceptionalOpenings() {
+    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
+
+    OpeningDayInfo exception = PeriodUtils
+      .getOpeningDayRelativeFromExceptionRanges(this.getExceptions())
+      .getOpeningDay();
+
+    List<LocalDate> dates = DateUtils.getDateRange(this.getStartDate(), this.getEndDate());
+
+    for (LocalDate date : dates) {
+      dateMap.put(date, exception);
+    }
+
+    return dateMap;
   }
 }
