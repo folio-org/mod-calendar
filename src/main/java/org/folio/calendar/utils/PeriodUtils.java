@@ -262,7 +262,8 @@ public class PeriodUtils {
   }
 
   /**
-   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period
+   * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period.
+   * There MUST be at least one exception in the set.
    *
    * @param exceptions the list of exceptions to convert (should only be one)
    * @return the equivalent {@code OpeningDayRelative}

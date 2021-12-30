@@ -168,6 +168,10 @@ public class Calendar {
   ) {
     Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
 
+    if (this.getExceptions().isEmpty()) {
+      return dateMap;
+    }
+
     OpeningDayInfo exception = PeriodUtils
       .getOpeningDayRelativeFromExceptionRanges(this.getExceptions())
       .getOpeningDay();
