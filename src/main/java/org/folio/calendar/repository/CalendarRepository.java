@@ -54,9 +54,9 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    */
   @Query(
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
-    "WHERE (:servicePointId is null OR r.servicePointId = :servicePointId) AND " +
-    "(:startDate is null OR c.endDate >= :startDate) AND " +
-    "(:endDate is null OR c.startDate <= :endDate)"
+    "WHERE (cast(:servicePointId as text) is null OR r.servicePointId = :servicePointId) AND " +
+    "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
+    "(cast(:endDate as date) is null OR c.startDate <= :endDate)"
   )
   List<Calendar> findWithServicePointAndDateRange(
     @Param("servicePointId") UUID servicePointId,
