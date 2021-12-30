@@ -160,8 +160,8 @@ public final class CalendarController implements CalendarApi {
         lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
       }
 
-      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings());
-      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings());
+      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings(startDate, endDate));
+      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(startDate, endDate));
     }
 
     boolean addClosedOpenings = startDate != null && endDate != null && includeClosedDays;

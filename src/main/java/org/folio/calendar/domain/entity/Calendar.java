@@ -123,9 +123,14 @@ public class Calendar {
 
   /**
    * Get all of the dates spanned by this calendar as OpeningDayInfo objects representing normal openings
+   * @param firstDate the first date to include, optional
+   * @param lastDate the last date to include, optional
    * @return a map of date to OpeningDayInfo
    */
-  public Map<LocalDate, OpeningDayInfo> getDailyNormalOpenings() {
+  public Map<LocalDate, OpeningDayInfo> getDailyNormalOpenings(
+    LocalDate firstDate,
+    LocalDate lastDate
+  ) {
     Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
 
     List<OpeningDayRelative> openings = PeriodUtils.getOpeningDayRelativeFromNormalOpenings(
@@ -136,7 +141,10 @@ public class Calendar {
       openingsByWeekday.put(opening.getWeekdays().getDay(), opening.getOpeningDay());
     }
 
-    List<LocalDate> dates = DateUtils.getDateRange(this.getStartDate(), this.getEndDate());
+    List<LocalDate> dates = DateUtils.getDateRange(
+      DateUtils.max(this.getStartDate(), firstDate),
+      DateUtils.min(this.getEndDate(), lastDate)
+    );
 
     for (LocalDate date : dates) {
       OpeningDayInfo opening = openingsByWeekday.get(WeekdayUtils.toWeekday(date));
@@ -150,16 +158,24 @@ public class Calendar {
 
   /**
    * Get all of the dates spanned by the exception (singular, must be legacy calendar) as OpeningDayInfo objects
+   * @param firstDate the first date to include, optional
+   * @param lastDate the last date to include, optional
    * @return a map of date to OpeningDayInfo
    */
-  public Map<LocalDate, OpeningDayInfo> getDailyExceptionalOpenings() {
+  public Map<LocalDate, OpeningDayInfo> getDailyExceptionalOpenings(
+    LocalDate firstDate,
+    LocalDate lastDate
+  ) {
     Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
 
     OpeningDayInfo exception = PeriodUtils
       .getOpeningDayRelativeFromExceptionRanges(this.getExceptions())
       .getOpeningDay();
 
-    List<LocalDate> dates = DateUtils.getDateRange(this.getStartDate(), this.getEndDate());
+    List<LocalDate> dates = DateUtils.getDateRange(
+      DateUtils.max(this.getStartDate(), firstDate),
+      DateUtils.min(this.getEndDate(), lastDate)
+    );
 
     for (LocalDate date : dates) {
       dateMap.put(date, exception);
