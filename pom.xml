@@ -335,7 +335,7 @@
                 <booleanGetterPrefix>is</booleanGetterPrefix>
                 <additionalModelTypeAnnotations>
                   @lombok.With
-                  @lombok.Builder
+                  @lombok.Builder(toBuilder = true)
                   @lombok.NoArgsConstructor
                   @lombok.AllArgsConstructor
                 </additionalModelTypeAnnotations>
