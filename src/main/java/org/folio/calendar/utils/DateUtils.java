@@ -182,4 +182,44 @@ public class DateUtils {
       return getCurrentDateOverride();
     }
   }
+
+  /**
+   * Get the smallest of two dates
+   * @param a the first date
+   * @param b the second date
+   * @return the smaller date of the two
+   */
+  public static LocalDate min(LocalDate a, LocalDate b) {
+    if (a == null) {
+      return b;
+    }
+    if (b == null) {
+      return a;
+    }
+    if (a.isBefore(b)) {
+      return a;
+    } else {
+      return b;
+    }
+  }
+
+  /**
+   * Get the largest of two dates
+   * @param a the first date
+   * @param b the second date
+   * @return the larger date of the two
+   */
+  public static LocalDate max(LocalDate a, LocalDate b) {
+    if (a == null) {
+      return b;
+    }
+    if (b == null) {
+      return a;
+    }
+    if (a.isAfter(b)) {
+      return a;
+    } else {
+      return b;
+    }
+  }
 }
