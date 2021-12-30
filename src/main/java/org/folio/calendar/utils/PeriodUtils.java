@@ -426,7 +426,7 @@ public class PeriodUtils {
    * @param includeClosedDays If closed days should be included
    * @param actualOpening If exceptions should override normal openings
    * @see org.folio.calendar.controller.CalendarController#getDateOpenings
-   * @return
+   * @return a list of concrete opening days
    */
   public List<OpeningDayConcrete> buildOpeningDayConcreteCollection(
     Map<LocalDate, OpeningDayInfo> normalOpenings,
