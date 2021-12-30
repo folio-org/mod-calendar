@@ -167,12 +167,12 @@ public final class CalendarController implements CalendarApi {
     boolean addClosedOpenings = startDate != null && endDate != null && includeClosedDays;
 
     List<OpeningDayConcrete> finalOpenings = new ArrayList<>();
-    for (LocalDate date : DateUtils.getDateRange(startDate, endDate)) {
+    for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
       if (exceptions.containsKey(date)) {
         finalOpenings.add(
           OpeningDayConcrete.builder().date(date).openingDay(exceptions.get(date)).build()
         );
-        if (Boolean.TRUE.equals(actualOpening)) {
+        if (Boolean.FALSE.equals(actualOpening) && normalOpenings.containsKey(date)) {
           finalOpenings.add(
             OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
           );
