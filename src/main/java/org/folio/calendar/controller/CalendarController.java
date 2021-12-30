@@ -1,7 +1,6 @@
 package org.folio.calendar.controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.PeriodUtils;
-import org.folio.calendar.utils.TimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -164,35 +162,20 @@ public final class CalendarController implements CalendarApi {
       PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(startDate, endDate));
     }
 
-    List<OpeningDayConcrete> finalOpenings = new ArrayList<>();
-    for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
-      if (exceptions.containsKey(date)) {
-        finalOpenings.add(
-          OpeningDayConcrete.builder().date(date).openingDay(exceptions.get(date)).build()
-        );
-        if (Boolean.FALSE.equals(actualOpening) && normalOpenings.containsKey(date)) {
-          finalOpenings.add(
-            OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
-          );
-        }
-      } else if (normalOpenings.containsKey(date)) {
-        finalOpenings.add(
-          OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
-        );
-      } else if (includeClosedDays) {
-        finalOpenings.add(
-          OpeningDayConcrete.builder().date(date).openingDay(TimeConstants.ALL_DAY_CLOSURE).build()
-        );
-      }
-    }
+    List<OpeningDayConcrete> collection = PeriodUtils.buildOpeningDayConcreteCollection(
+      normalOpenings,
+      exceptions,
+      firstDate,
+      lastDate,
+      includeClosedDays,
+      actualOpening
+    );
 
     return new ResponseEntity<>(
       OpeningDayConcreteCollection
         .builder()
-        .openingPeriods(
-          finalOpenings.stream().skip(offset).limit(limit).collect(Collectors.toList())
-        )
-        .totalRecords(finalOpenings.size())
+        .openingPeriods(collection.stream().skip(offset).limit(limit).collect(Collectors.toList()))
+        .totalRecords(collection.size())
         .build(),
       HttpStatus.OK
     );

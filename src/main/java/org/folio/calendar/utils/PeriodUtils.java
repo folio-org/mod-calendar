@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
@@ -414,5 +415,50 @@ public class PeriodUtils {
         }
       }
     }
+  }
+
+  /**
+   * Build a list of {@link OpeningDayConcrete OpeningDayConcrete} objects for the dates and openings provided, taking into account the boolean options
+   * @param normalOpenings The list of normal openings
+   * @param exceptions The list of any exceptional openings
+   * @param firstDate The first date to include
+   * @param lastDate The last date to include
+   * @param includeClosedDays If closed days should be included
+   * @param actualOpening If exceptions should override normal openings
+   * @see org.folio.calendar.controller.CalendarController#getDateOpenings
+   * @return
+   */
+  public List<OpeningDayConcrete> buildOpeningDayConcreteCollection(
+    Map<LocalDate, OpeningDayInfo> normalOpenings,
+    Map<LocalDate, OpeningDayInfo> exceptions,
+    LocalDate firstDate,
+    LocalDate lastDate,
+    boolean includeClosedDays,
+    boolean actualOpening
+  ) {
+    List<OpeningDayConcrete> result = new ArrayList<>();
+
+    for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
+      if (exceptions.containsKey(date)) {
+        result.add(
+          OpeningDayConcrete.builder().date(date).openingDay(exceptions.get(date)).build()
+        );
+        if (Boolean.FALSE.equals(actualOpening) && normalOpenings.containsKey(date)) {
+          result.add(
+            OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+          );
+        }
+      } else if (normalOpenings.containsKey(date)) {
+        result.add(
+          OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+        );
+      } else if (includeClosedDays) {
+        result.add(
+          OpeningDayConcrete.builder().date(date).openingDay(TimeConstants.ALL_DAY_CLOSURE).build()
+        );
+      }
+    }
+
+    return result;
   }
 }
