@@ -1,7 +1,16 @@
 package org.folio.calendar.controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.dto.OpeningDayConcrete;
+import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
+import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
@@ -9,7 +18,9 @@ import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
+import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.PeriodUtils;
+import org.folio.calendar.utils.TimeConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -118,5 +129,74 @@ public final class CalendarController implements CalendarApi {
     }
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<OpeningDayConcreteCollection> getDateOpenings(
+    String xOkapiTenant,
+    UUID servicePointId,
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosedDays,
+    Boolean actualOpening,
+    Integer offset,
+    Integer limit
+  ) {
+    Iterable<Calendar> calendars =
+      this.calendarService.getCalendars(servicePointId, startDate, endDate);
+
+    LocalDate firstDate = startDate;
+    LocalDate lastDate = endDate;
+
+    Map<LocalDate, OpeningDayInfo> normalOpenings = new HashMap<>();
+    Map<LocalDate, OpeningDayInfo> exceptions = new HashMap<>();
+
+    for (Calendar calendar : calendars) {
+      if (startDate == null) {
+        firstDate = DateUtils.min(calendar.getStartDate(), firstDate);
+      }
+      if (endDate == null) {
+        lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
+      }
+
+      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings());
+      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings());
+    }
+
+    boolean addClosedOpenings = startDate != null && endDate != null && includeClosedDays;
+
+    List<OpeningDayConcrete> finalOpenings = new ArrayList<>();
+    for (LocalDate date : DateUtils.getDateRange(startDate, endDate)) {
+      if (exceptions.containsKey(date)) {
+        finalOpenings.add(
+          OpeningDayConcrete.builder().date(date).openingDay(exceptions.get(date)).build()
+        );
+        if (Boolean.TRUE.equals(actualOpening)) {
+          finalOpenings.add(
+            OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+          );
+        }
+      } else if (normalOpenings.containsKey(date)) {
+        finalOpenings.add(
+          OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+        );
+      } else if (addClosedOpenings) {
+        finalOpenings.add(
+          OpeningDayConcrete.builder().date(date).openingDay(TimeConstants.ALL_DAY_CLOSURE).build()
+        );
+      }
+    }
+
+    return new ResponseEntity<>(
+      OpeningDayConcreteCollection
+        .builder()
+        .openingPeriods(
+          finalOpenings.stream().skip(offset).limit(limit).collect(Collectors.toList())
+        )
+        .totalRecords(finalOpenings.size())
+        .build(),
+      HttpStatus.OK
+    );
   }
 }
