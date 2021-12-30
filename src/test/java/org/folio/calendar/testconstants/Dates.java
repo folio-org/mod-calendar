@@ -21,5 +21,6 @@ public class Dates {
   public static final LocalDate DATE_2021_09_22 = LocalDate.of(2021, Month.SEPTEMBER, 22);
   public static final LocalDate DATE_2021_11_31 = LocalDate.of(2021, Month.NOVEMBER, 30);
   public static final LocalDate DATE_2021_12_07 = LocalDate.of(2021, Month.DECEMBER, 7);
+  public static final LocalDate DATE_2021_12_30 = LocalDate.of(2021, Month.DECEMBER, 30);
   public static final LocalDate DATE_2021_12_31 = LocalDate.of(2021, Month.DECEMBER, 31);
 }
