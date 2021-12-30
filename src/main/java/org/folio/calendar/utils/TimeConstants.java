@@ -2,7 +2,9 @@ package org.folio.calendar.utils;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 
 /**
@@ -40,4 +42,11 @@ public class TimeConstants {
     TIME_MIN_STRING,
     TIME_MAX_STRING
   );
+
+  public static final OpeningDayInfo ALL_DAY_CLOSURE = OpeningDayInfo
+    .builder()
+    .allDay(true)
+    .exceptional(false)
+    .openingHour(Arrays.asList(ALL_DAY))
+    .build();
 }
