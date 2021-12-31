@@ -5,7 +5,7 @@ import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import java.util.UUID;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.Tag;
 
 /**
  * Setup an environment for testing GET /calendar/periods.
@@ -34,7 +34,7 @@ import org.springframework.test.context.ActiveProfiles;
  *   </li>
  * </ul>
  */
-@ActiveProfiles("test")
+@Tag("idempotent")
 public abstract class GetPeriodAbstractTest extends AbstractExistingCalendarTest {
 
   public static final String GET_PERIOD_API_ROUTE = "/calendar/periods";

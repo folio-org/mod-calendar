@@ -13,9 +13,7 @@ import org.folio.calendar.testutils.DateTimeHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 class HelloWorldControllerTest extends BaseApiTest {
 
   public static final String HELLO_API_ROUTE = "/hello";

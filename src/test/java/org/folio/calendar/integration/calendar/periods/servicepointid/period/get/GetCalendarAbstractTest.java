@@ -3,12 +3,12 @@ package org.folio.calendar.integration.calendar.periods.servicepointid.period.ge
 import io.restassured.response.Response;
 import java.util.UUID;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.Tag;
 
 /**
  * Setup an environment for testing GET /calendar/periods/{servicePointId}/period.
  */
-@ActiveProfiles("test")
+@Tag("idempotent")
 public abstract class GetCalendarAbstractTest extends AbstractExistingCalendarTest {
 
   public static final String GET_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";

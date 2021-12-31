@@ -2,16 +2,20 @@ package org.folio.calendar.integration.calendar.periods;
 
 import static org.hamcrest.Matchers.is;
 
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
 import org.folio.calendar.integration.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
 import org.folio.calendar.testconstants.Periods;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 /**
- * Setup the following service points for use in tests which may rely on them (such as GET integration tests)
+ * Setup the following service points for use in tests which may rely on them (such as GET integration tests).
+ * Tags {@code "idempotent"} are supported <b>on classes only</b> to only create the calendars/delete them as needed.
  * <ul>
  *   <li>On service point 0:</li>
  *   <li>
@@ -36,19 +40,34 @@ import org.springframework.http.MediaType;
  *   </li>
  * </ul>
  */
+@Log4j2
 public abstract class AbstractExistingCalendarTest extends BaseApiAutoDatabaseTest {
 
   /**
    * Create all the calendars for these tests.
    */
-  @BeforeEach
   void createAllCalendars() {
+    log.info("Creating calendars to test against");
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_D);
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_F);
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_G);
     createCalendar(Periods.PERIOD_FULL_EXCEPTIONAL_C);
     createCalendar(Periods.PERIOD_FULL_EXCEPTIONAL_F);
     createCalendar(Periods.PERIOD_FULL_EXCEPTIONAL_G);
+  }
+
+  @BeforeAll
+  void beforeAll(TestInfo testInfo) {
+    if (testInfo.getTags().contains("idempotent")) {
+      createAllCalendars();
+    }
+  }
+
+  @BeforeEach
+  void beforeEach(TestInfo testInfo) {
+    if (!testInfo.getTags().contains("idempotent")) {
+      createAllCalendars();
+    }
   }
 
   /**

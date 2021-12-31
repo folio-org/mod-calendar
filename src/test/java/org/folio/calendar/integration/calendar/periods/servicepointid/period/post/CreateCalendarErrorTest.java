@@ -16,12 +16,10 @@ import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
+@Tag("idempotent")
 class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidServicePointId() {
     Response response = sendCalendarCreationRequest(Periods.PERIOD_FULL_EXAMPLE_A, UUIDs.UUID_F);
@@ -58,7 +56,6 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testEmptyCalendarName() {
     Response response = sendCalendarCreationRequest(
@@ -88,7 +85,6 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testWhitespaceCalendarName() {
     Response response = sendCalendarCreationRequest(
@@ -118,7 +114,6 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     );
   }
 
-  @Tag("DB_USAGE_NONE")
   @Test
   void testInvalidCalendarDates() {
     Response response = sendCalendarCreationRequest(
@@ -205,48 +200,6 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
           Periods.PERIOD_FULL_EXAMPLE_C.getStartDate(),
           Periods.PERIOD_FULL_EXAMPLE_C.getEndDate()
         )
-      )
-    );
-  }
-
-  @Test
-  void testSameIdCalendars() {
-    sendCalendarCreationRequest(
-      Periods.PERIOD_FULL_EXAMPLE_D,
-      Periods.PERIOD_FULL_EXAMPLE_D.getServicePointId()
-    )
-      .then()
-      .statusCode(is(HttpStatus.CREATED.value()));
-
-    Response response = sendCalendarCreationRequest(
-      Periods.PERIOD_FULL_EXAMPLE_E.withId(Periods.PERIOD_FULL_EXAMPLE_D.getId()),
-      Periods.PERIOD_FULL_EXAMPLE_E.getServicePointId()
-    );
-
-    response.then().statusCode(is(HttpStatus.CONFLICT.value()));
-
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
-
-    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
-    assertThat(
-      "Error HTTP code is correct",
-      errorResponse.getStatus(),
-      is(HttpStatus.CONFLICT.value())
-    );
-    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
-
-    Error error = errorResponse.getErrors().get(0);
-
-    assertThat(
-      "Error reports that the period with this ID already exists",
-      error.getCode(),
-      is(ErrorCode.INVALID_REQUEST)
-    );
-    assertThat(
-      "Error message specifies collision",
-      error.getMessage(),
-      containsString(
-        String.format("The period ID %s already exists", Periods.PERIOD_FULL_EXAMPLE_D.getId())
       )
     );
   }

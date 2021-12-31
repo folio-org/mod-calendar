@@ -3,6 +3,7 @@ package org.folio.calendar.integration.calendar.periods.servicepointid.period.pe
 import io.restassured.response.Response;
 import java.util.UUID;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
+import org.junit.jupiter.api.Tag;
 
 /**
  * Setup the following service points for use in tests which may rely on them (such as GET integration tests)
@@ -30,6 +31,7 @@ import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarT
  *   </li>
  * </ul>
  */
+@Tag("idempotent")
 public abstract class GetSpecificCalendarAbstractTest extends AbstractExistingCalendarTest {
 
   public static final String GET_CALENDAR_API_ROUTE = "/calendar/periods/%s/period/%s";

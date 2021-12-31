@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * A good example of a test class within the application.
@@ -14,7 +13,6 @@ import org.springframework.test.context.ActiveProfiles;
  * The only Okapi requirement for /admin/health is to respond with a 200 status code.
  * @see https://wiki.folio.org/display/DD/Back+End+Module+Health+Check+Protocol
  */
-@ActiveProfiles("test")
 class OkapiHealthTest extends BaseApiTest {
 
   public static final String HEALTH_API_ROUTE = "/admin/health/";

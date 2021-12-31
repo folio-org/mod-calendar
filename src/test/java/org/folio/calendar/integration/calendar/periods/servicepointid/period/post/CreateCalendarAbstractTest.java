@@ -5,9 +5,7 @@ import java.util.UUID;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 public abstract class CreateCalendarAbstractTest extends BaseApiAutoDatabaseTest {
 
   public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period";

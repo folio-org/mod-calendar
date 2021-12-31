@@ -9,9 +9,7 @@ import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.testconstants.Periods;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 class CreateExceptionalCalendarTest extends CreateCalendarAbstractTest {
 
   @Test

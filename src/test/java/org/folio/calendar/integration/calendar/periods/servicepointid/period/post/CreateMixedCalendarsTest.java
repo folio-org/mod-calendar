@@ -6,9 +6,7 @@ import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 class CreateMixedCalendarsTest extends CreateCalendarAbstractTest {
 
   @Test

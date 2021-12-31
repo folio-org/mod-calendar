@@ -16,9 +16,7 @@ import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 class ApiExceptionHandlerTest extends BaseApiTest {
 
   public static final String BAD_API_ROUTE = "/bad";

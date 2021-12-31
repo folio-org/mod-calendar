@@ -12,9 +12,11 @@ import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+@Tag("idempotent")
 class PutInvalidCalendarTest extends PutCalendarAbstractTest {
 
   @Test
