@@ -22,7 +22,11 @@ public class LegacyPeriodDate {
 
   @JsonCreator
   public LegacyPeriodDate(String input) {
-    this.value = LocalDate.parse(input.substring(0, ISO_DATE_LENGTH));
+    try {
+      this.value = LocalDate.parse(input.substring(0, ISO_DATE_LENGTH));
+    } catch (IndexOutOfBoundsException e) {
+      throw new IllegalArgumentException("String could not be parsed", e);
+    }
   }
 
   public LegacyPeriodDate(LocalDate date) {

@@ -17,7 +17,7 @@ import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.testutils.APITestUtils;
+import org.folio.calendar.testutils.MapperUtils;
 import org.folio.calendar.testutils.WireMockInitializer;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.spring.FolioModuleMetadata;
@@ -90,7 +90,7 @@ public abstract class BaseApiTest {
         .objectMapperConfig(
           ObjectMapperConfig
             .objectMapperConfig()
-            .jackson2ObjectMapperFactory((a, b) -> APITestUtils.MAPPER)
+            .jackson2ObjectMapperFactory((a, b) -> MapperUtils.MAPPER)
         );
   }
 
