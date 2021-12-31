@@ -67,10 +67,10 @@ public class DateUtils {
    */
   public static boolean overlaps(Period period1, Period period2) {
     return overlaps(
-      period1.getStartDate(),
-      period1.getEndDate(),
-      period2.getStartDate(),
-      period2.getEndDate()
+      period1.getStartDate().getValue(),
+      period1.getEndDate().getValue(),
+      period2.getStartDate().getValue(),
+      period2.getEndDate().getValue()
     );
   }
 
@@ -96,8 +96,8 @@ public class DateUtils {
     return overlaps(
       calendar.getStartDate(),
       calendar.getEndDate(),
-      period.getStartDate(),
-      period.getEndDate()
+      period.getStartDate().getValue(),
+      period.getEndDate().getValue()
     );
   }
 

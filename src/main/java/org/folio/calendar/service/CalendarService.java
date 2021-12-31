@@ -108,8 +108,8 @@ public class CalendarService {
       .builder()
       .id(period.getId())
       .name(period.getName())
-      .startDate(period.getStartDate())
-      .endDate(period.getEndDate());
+      .startDate(period.getStartDate().getValue())
+      .endDate(period.getEndDate().getValue());
 
     // assign starting service point
     ServicePointCalendarAssignment servicePointAssignment = ServicePointCalendarAssignment
@@ -122,8 +122,8 @@ public class CalendarService {
     if (PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
       calendarBuilder.exceptions(
         PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
-          period.getStartDate(),
-          period.getEndDate(),
+          period.getStartDate().getValue(),
+          period.getEndDate().getValue(),
           period.getOpeningDays()
         )
       );
@@ -271,7 +271,7 @@ public class CalendarService {
         period.getName()
       );
     }
-    if (period.getStartDate().isAfter(period.getEndDate())) {
+    if (period.getStartDate().getValue().isAfter(period.getEndDate().getValue())) {
       throw new InvalidDataException(
         ErrorCode.INVALID_DATE_RANGE,
         new ExceptionParameters(

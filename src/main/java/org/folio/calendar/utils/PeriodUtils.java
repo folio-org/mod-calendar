@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.dto.LegacyPeriodDate;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
@@ -330,8 +331,8 @@ public class PeriodUtils {
       .builder()
       .id(calendar.getId())
       .name(calendar.getName())
-      .startDate(calendar.getStartDate())
-      .endDate(calendar.getEndDate());
+      .startDate(LegacyPeriodDate.from(calendar.getStartDate()))
+      .endDate(LegacyPeriodDate.from(calendar.getEndDate()));
 
     // passing ServicePointCalendarAssignment[] to toArray causes cast
     ServicePointCalendarAssignment[] servicePoints = calendar
@@ -449,20 +450,36 @@ public class PeriodUtils {
     for (LocalDate date : DateUtils.getDateRange(firstDate, lastDate)) {
       if (exceptions.containsKey(date)) {
         result.add(
-          OpeningDayConcrete.builder().date(date).openingDay(exceptions.get(date)).build()
+          OpeningDayConcrete
+            .builder()
+            .date(LegacyPeriodDate.from(date))
+            .openingDay(exceptions.get(date))
+            .build()
         );
         if (Boolean.FALSE.equals(actualOpening) && normalOpenings.containsKey(date)) {
           result.add(
-            OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+            OpeningDayConcrete
+              .builder()
+              .date(LegacyPeriodDate.from(date))
+              .openingDay(normalOpenings.get(date))
+              .build()
           );
         }
       } else if (normalOpenings.containsKey(date)) {
         result.add(
-          OpeningDayConcrete.builder().date(date).openingDay(normalOpenings.get(date)).build()
+          OpeningDayConcrete
+            .builder()
+            .date(LegacyPeriodDate.from(date))
+            .openingDay(normalOpenings.get(date))
+            .build()
         );
       } else if (includeClosedDays) {
         result.add(
-          OpeningDayConcrete.builder().date(date).openingDay(TimeConstants.ALL_DAY_CLOSURE).build()
+          OpeningDayConcrete
+            .builder()
+            .date(LegacyPeriodDate.from(date))
+            .openingDay(TimeConstants.ALL_DAY_CLOSURE)
+            .build()
         );
       }
     }

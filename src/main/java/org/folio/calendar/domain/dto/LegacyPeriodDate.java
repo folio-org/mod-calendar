@@ -38,8 +38,12 @@ public class LegacyPeriodDate {
     return new LegacyPeriodDate(date);
   }
 
+  public String toString() {
+    return this.value.toString();
+  }
+
   @JsonValue
-  public String getValue() {
+  public String serialize() {
     return this.value.toString() + LEGACY_DATE_APPEND_STRING;
   }
 }

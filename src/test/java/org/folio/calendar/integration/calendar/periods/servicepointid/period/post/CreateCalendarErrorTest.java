@@ -123,8 +123,8 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
   void testInvalidCalendarDates() {
     Response response = sendCalendarCreationRequest(
       Periods.PERIOD_FULL_EXAMPLE_A
-        .withStartDate(Dates.DATE_2021_12_31)
-        .withEndDate(Dates.DATE_2021_01_01),
+        .withStartDate(Dates.LDATE_2021_12_31)
+        .withEndDate(Dates.LDATE_2021_01_01),
       Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
     );
 

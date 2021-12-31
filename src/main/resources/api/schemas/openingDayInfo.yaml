@@ -15,7 +15,7 @@ properties:
     description: Whether this is to indicate a closure (for exceptions)
   date:
     type: string
-    format: date
+    format: legacy-period-date
     description:
       Concrete date that this corresponds to.  For exceptions/calculateOpening.  Not certain is this
       is used; ref openingDayConcrete.yaml

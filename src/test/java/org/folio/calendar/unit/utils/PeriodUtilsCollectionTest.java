@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.folio.calendar.domain.dto.LegacyPeriodDate;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.testconstants.Dates;
@@ -48,21 +49,21 @@ class PeriodUtilsCollectionTest {
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_01)
+        .date(Dates.LDATE_2021_01_01)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_01))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_04)
+        .date(Dates.LDATE_2021_01_04)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_04))
         .build()
     );
@@ -87,28 +88,28 @@ class PeriodUtilsCollectionTest {
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_01)
+        .date(Dates.LDATE_2021_01_01)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_01))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_04)
+        .date(Dates.LDATE_2021_01_04)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_04))
         .build()
     );
@@ -133,28 +134,28 @@ class PeriodUtilsCollectionTest {
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_01)
+        .date(Dates.LDATE_2021_01_01)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_01))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_03)
+        .date(Dates.LDATE_2021_01_03)
         .openingDay(OpeningDayInfoRelativeConstants.CLOSED_ALL_DAY)
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_04)
+        .date(Dates.LDATE_2021_01_04)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_04))
         .build()
     );
@@ -179,35 +180,35 @@ class PeriodUtilsCollectionTest {
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_01)
+        .date(Dates.LDATE_2021_01_01)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_01))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_02))
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_03)
+        .date(Dates.LDATE_2021_01_03)
         .openingDay(OpeningDayInfoRelativeConstants.CLOSED_ALL_DAY)
         .build()
     );
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_04)
+        .date(Dates.LDATE_2021_01_04)
         .openingDay(TEST_NORMAL_OPENINGS.get(Dates.DATE_2021_01_04))
         .build()
     );
@@ -233,7 +234,7 @@ class PeriodUtilsCollectionTest {
       expected.add(
         OpeningDayConcrete
           .builder()
-          .date(date)
+          .date(LegacyPeriodDate.from(date))
           .openingDay(OpeningDayInfoRelativeConstants.CLOSED_ALL_DAY)
           .build()
       );
@@ -272,7 +273,7 @@ class PeriodUtilsCollectionTest {
     expected.add(
       OpeningDayConcrete
         .builder()
-        .date(Dates.DATE_2021_01_02)
+        .date(Dates.LDATE_2021_01_02)
         .openingDay(TEST_EXCEPTIONS.get(Dates.DATE_2021_01_02))
         .build()
     );
