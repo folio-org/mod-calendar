@@ -341,6 +341,9 @@
                 </additionalModelTypeAnnotations>
               </configOptions>
               <typeMappings>
+                <typeMapping>
+                  legacy-period-date=org.folio.calendar.domain.dto.LegacyPeriodDate
+                </typeMapping>
                 <typeMapping>DateTime=Instant</typeMapping>
                 <typeMapping>date=LocalDate</typeMapping>
                 <typeMapping>time=LocalTime</typeMapping>
