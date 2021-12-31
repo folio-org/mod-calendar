@@ -1,4 +1,4 @@
-package org.folio.calendar.domain.dto;
+package org.folio.calendar.domain.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

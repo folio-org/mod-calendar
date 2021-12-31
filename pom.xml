@@ -342,7 +342,7 @@
               </configOptions>
               <typeMappings>
                 <typeMapping>
-                  legacy-period-date=org.folio.calendar.domain.dto.LegacyPeriodDate
+                  legacy-period-date=org.folio.calendar.domain.types.LegacyPeriodDate
                 </typeMapping>
                 <typeMapping>DateTime=Instant</typeMapping>
                 <typeMapping>date=LocalDate</typeMapping>

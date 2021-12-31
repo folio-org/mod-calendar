@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.LegacyPeriodDate;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
@@ -23,6 +22,7 @@ import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.domain.types.LegacyPeriodDate;
 
 /**
  * Utilities for acting on {@link org.folio.calendar.domain.dto.Period} objects

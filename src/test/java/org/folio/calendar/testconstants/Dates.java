@@ -3,7 +3,7 @@ package org.folio.calendar.testconstants;
 import java.time.LocalDate;
 import java.time.Month;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.LegacyPeriodDate;
+import org.folio.calendar.domain.types.LegacyPeriodDate;
 
 /**
  * A series of LocalDates for testing
