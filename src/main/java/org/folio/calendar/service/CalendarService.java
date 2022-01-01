@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.CheckForNull;
 import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
@@ -348,8 +349,8 @@ public class CalendarService {
    */
   public Iterable<Calendar> getCalendars(
     UUID servicePointId,
-    LocalDate startDate,
-    LocalDate endDate
+    @CheckForNull LocalDate startDate,
+    @CheckForNull LocalDate endDate
   ) {
     return this.calendarRepository.findWithServicePointAndDateRange(
         servicePointId,

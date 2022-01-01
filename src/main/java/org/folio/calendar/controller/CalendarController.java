@@ -190,6 +190,7 @@ public final class CalendarController implements CalendarApi {
     UUID servicePointId,
     LegacyPeriodDate requestedDate
   ) {
+    Iterable<Calendar> calendars = this.calendarService.getCalendars(servicePointId, null, null);
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 }

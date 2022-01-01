@@ -3,6 +3,7 @@ package org.folio.calendar.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.CheckForNull;
 import org.folio.calendar.domain.entity.Calendar;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,7 +38,8 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    */
   @Query(
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
-    "WHERE r.servicePointId = :servicePointId AND c.endDate >= :date"
+    "WHERE r.servicePointId = :servicePointId AND c.endDate >= :date " +
+    "ORDER BY c.startDate"
   )
   List<Calendar> findByServicePointIdOnOrAfterDate(
     @Param("servicePointId") UUID servicePointId,
@@ -56,12 +58,13 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
     "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
     "WHERE (cast(:servicePointId as text) is null OR r.servicePointId = :servicePointId) AND " +
     "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
-    "(cast(:endDate as date) is null OR c.startDate <= :endDate)"
+    "(cast(:endDate as date) is null OR c.startDate <= :endDate) " +
+    "ORDER BY c.startDate"
   )
   List<Calendar> findWithServicePointAndDateRange(
     @Param("servicePointId") UUID servicePointId,
-    @Param("startDate") LocalDate startDate,
-    @Param("endDate") LocalDate endDate
+    @Param("startDate") @CheckForNull LocalDate startDate,
+    @Param("endDate") @CheckForNull LocalDate endDate
   );
 
   /**
