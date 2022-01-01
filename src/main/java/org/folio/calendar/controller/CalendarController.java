@@ -1,6 +1,8 @@
 package org.folio.calendar.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +192,91 @@ public final class CalendarController implements CalendarApi {
     UUID servicePointId,
     LegacyPeriodDate requestedDate
   ) {
+    LocalDate date = requestedDate.getValue();
     Iterable<Calendar> calendars = this.calendarService.getCalendars(servicePointId, null, null);
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    Map<LocalDate, OpeningDayInfo> normalOpenings = new HashMap<>();
+    Map<LocalDate, OpeningDayInfo> exceptions = new HashMap<>();
+
+    LocalDate firstDate = date;
+    LocalDate lastDate = date;
+
+    for (Calendar calendar : calendars) {
+      firstDate = DateUtils.min(calendar.getStartDate(), firstDate);
+      lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
+
+      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings(null, null));
+      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(null, null));
+    }
+
+    List<OpeningDayConcrete> allOpenings = PeriodUtils.buildOpeningDayConcreteCollection(
+      normalOpenings,
+      exceptions,
+      firstDate,
+      lastDate,
+      false,
+      true
+    );
+
+    int currentIndex = Arrays.binarySearch(
+      allOpenings.stream().map(opening -> opening.getDate().getValue()).toArray(),
+      date
+    );
+
+    OpeningDayInfo previous = null;
+    OpeningDayInfo current = null;
+    OpeningDayInfo next = null;
+
+    OpeningDayInfo empty = OpeningDayInfo
+      .builder()
+      .allDay(false)
+      .open(false)
+      .exceptional(false)
+      .openingHour(new ArrayList<>())
+      .build();
+
+    int prevIndex = -1;
+    int nextIndex = -1;
+
+    if (currentIndex >= 0) {
+      current = allOpenings.get(currentIndex).getOpeningDay().withDate(requestedDate);
+      prevIndex = currentIndex - 1;
+      nextIndex = currentIndex + 1;
+    } else {
+      // per Arrays.binarySearch: currentIndex = (-(insertion point) - 1)
+      // The insertion point is defined as the point at which the key would be inserted into
+      // the array: the index of the first element greater than the key, or a.length if all
+      // elements in the array are less than the specified key
+      current = empty.withAllDay(true).withDate(requestedDate);
+      nextIndex = (currentIndex + 1) * -1;
+      prevIndex = nextIndex - 1;
+    }
+
+    // ensure that previous and next do not refer to adjacent closures
+    while (prevIndex >= 0 && !allOpenings.get(prevIndex).getOpeningDay().isOpen()) {
+      prevIndex--;
+    }
+    while (nextIndex < allOpenings.size() && !allOpenings.get(nextIndex).getOpeningDay().isOpen()) {
+      nextIndex++;
+    }
+
+    if (prevIndex >= 0) {
+      OpeningDayConcrete concrete = allOpenings.get(prevIndex);
+      previous = concrete.getOpeningDay().withDate(concrete.getDate());
+    }
+
+    if (nextIndex < allOpenings.size()) {
+      OpeningDayConcrete concrete = allOpenings.get(nextIndex);
+      next = concrete.getOpeningDay().withDate(concrete.getDate());
+    }
+
+    if (previous == null) {
+      previous = empty;
+    }
+    if (next == null) {
+      next = empty;
+    }
+
+    return ResponseEntity.ok(new CalculatedOpenings(Arrays.asList(previous, current, next)));
   }
 }
