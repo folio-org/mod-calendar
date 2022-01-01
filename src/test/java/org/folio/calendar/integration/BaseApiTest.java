@@ -95,7 +95,7 @@ public abstract class BaseApiTest {
   }
 
   @BeforeEach
-  void createDatabase() {
+  public void createDatabase() {
     if (!isInitialized()) {
       log.info("Initializing database by posting to /_/tenant");
       ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled

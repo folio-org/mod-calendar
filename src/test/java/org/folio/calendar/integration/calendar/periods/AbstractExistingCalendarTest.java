@@ -58,6 +58,7 @@ public abstract class AbstractExistingCalendarTest extends BaseApiAutoDatabaseTe
 
   @BeforeAll
   void beforeAll(TestInfo testInfo) {
+    createDatabase();
     if (testInfo.getTags().contains("idempotent")) {
       createAllCalendars();
     }
@@ -65,6 +66,7 @@ public abstract class AbstractExistingCalendarTest extends BaseApiAutoDatabaseTe
 
   @BeforeEach
   void beforeEach(TestInfo testInfo) {
+    createDatabase();
     if (!testInfo.getTags().contains("idempotent")) {
       createAllCalendars();
     }
