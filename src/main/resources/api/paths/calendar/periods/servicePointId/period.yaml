@@ -3,13 +3,7 @@ get:
   description: List all periods for a service point
   parameters:
     - $ref: ../../../../parameters/x-okapi-tenant.yaml
-    - in: path
-      name: servicePointId
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The UUID for the relevant service point
+    - $ref: ../../../../parameters/servicePointId.yaml
     - in: query
       name: withOpeningDays
       required: false
@@ -60,13 +54,7 @@ post:
   description: Create a new period (calendar) for a service point
   parameters:
     - $ref: ../../../../parameters/x-okapi-tenant.yaml
-    - in: path
-      name: servicePointId
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The UUID for the relevant service point
+    - $ref: ../../../../parameters/servicePointId.yaml
   requestBody:
     required: true
     content:

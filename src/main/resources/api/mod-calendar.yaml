@@ -11,5 +11,7 @@ paths:
     $ref: paths/calendar/periods.yaml
   /calendar/periods/{servicePointId}/period:
     $ref: paths/calendar/periods/servicePointId/period.yaml
+  /calendar/periods/{servicePointId}/calculateopening:
+    $ref: paths/calendar/periods/servicePointId/calculateopening.yaml
   /calendar/periods/{servicePointId}/period/{periodId}:
     $ref: paths/calendar/periods/servicePointId/period/periodId.yaml

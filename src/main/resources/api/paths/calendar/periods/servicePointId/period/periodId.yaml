@@ -3,13 +3,7 @@ get:
   description: Get a certain period's information
   parameters:
     - $ref: ../../../../../parameters/x-okapi-tenant.yaml
-    - in: path
-      name: servicePointId
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The UUID for the relevant service point
+    - $ref: ../../../../../parameters/servicePointId.yaml
     - in: path
       name: periodId
       required: true
@@ -115,13 +109,7 @@ delete:
   description: Delete a certain period by its ID
   parameters:
     - $ref: ../../../../../parameters/x-okapi-tenant.yaml
-    - in: path
-      name: servicePointId
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The UUID for the relevant service point
+    - $ref: ../../../../../parameters/servicePointId.yaml
     - in: path
       name: periodId
       required: true

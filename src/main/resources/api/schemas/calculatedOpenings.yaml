@@ -1,0 +1,35 @@
+description: A set of openings, as calculated by the calculateopening endpoint
+type: object
+properties:
+  openingDays:
+    type: array
+    items:
+      $ref: openingDayInfo.yaml
+    minItems: 3
+    maxItems: 3
+required:
+  - openingDays
+additionalProperties: false
+example:
+  openingDays:
+    - openingDay:
+        openingHour:
+          - startTime: 07:30
+            endTime: 17:30
+        date: 2021-12-30T00:00:00.000+00:00
+        allDay: false
+        open: true
+        exceptional: false
+    - openingDay:
+        openingHour:
+          - startTime: 07:30
+            endTime: 17:30
+        date: 2021-12-31T00:00:00.000+00:00
+        allDay: false
+        open: true
+        exceptional: false
+    - openingDay:
+        openingHour: []
+        allDay: false
+        open: false
+        exceptional: false

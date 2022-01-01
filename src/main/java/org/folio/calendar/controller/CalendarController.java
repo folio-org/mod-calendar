@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.dto.CalculatedOpenings;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.types.LegacyPeriodDate;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.rest.resource.CalendarApi;
@@ -179,5 +181,15 @@ public final class CalendarController implements CalendarApi {
         .build(),
       HttpStatus.OK
     );
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<CalculatedOpenings> getNearestOpenings(
+    String xOkapiTenant,
+    UUID servicePointId,
+    LegacyPeriodDate requestedDate
+  ) {
+    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 }
