@@ -11,6 +11,7 @@ import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.Calendar.CalendarBuilder;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
@@ -105,7 +106,7 @@ public class CalendarService {
    */
   public Calendar createCalendarFromValidPeriod(Period period) {
     // basic info
-    Calendar.CalendarBuilder calendarBuilder = Calendar
+    CalendarBuilder calendarBuilder = Calendar
       .builder()
       .id(period.getId())
       .name(period.getName())
@@ -347,7 +348,7 @@ public class CalendarService {
    * @param endDate the last date of the range to include
    * @return a list of matching calendars
    */
-  public Iterable<Calendar> getCalendars(
+  public List<Calendar> getCalendars(
     UUID servicePointId,
     @CheckForNull LocalDate startDate,
     @CheckForNull LocalDate endDate

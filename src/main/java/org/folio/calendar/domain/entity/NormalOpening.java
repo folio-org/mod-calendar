@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
+import org.folio.calendar.domain.dto.OpeningHourRange.OpeningHourRangeBuilder;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
@@ -182,7 +183,7 @@ public class NormalOpening {
     Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
 
     for (Weekday day : weekdays) {
-      OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
+      OpeningHourRangeBuilder builder = OpeningHourRange
         .builder()
         .startTime(TimeConstants.TIME_MIN_STRING)
         .endTime(TimeConstants.TIME_MAX_STRING);
@@ -242,7 +243,7 @@ public class NormalOpening {
      * @param startTime a {@link LocalTime} (will be truncated to the minutes)
      * @return {@code this}, for chaining
      */
-    public NormalOpening.NormalOpeningBuilder startTime(final LocalTime startTime) {
+    public NormalOpeningBuilder startTime(final LocalTime startTime) {
       this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
       return this;
     }
@@ -253,7 +254,7 @@ public class NormalOpening {
      * @param endTime a {@link LocalTime} (will be truncated to the minutes)
      * @return {@code this}, for chaining
      */
-    public NormalOpening.NormalOpeningBuilder endTime(final LocalTime endTime) {
+    public NormalOpeningBuilder endTime(final LocalTime endTime) {
       this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);
       return this;
     }
