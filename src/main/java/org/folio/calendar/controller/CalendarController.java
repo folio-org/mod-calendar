@@ -240,6 +240,9 @@ public final class CalendarController implements CalendarApi {
 
     if (currentIndex >= 0) {
       current = allOpenings.get(currentIndex).getOpeningDay().withDate(requestedDate);
+      if (!current.isOpen()) {
+        current = empty.withAllDay(true).withDate(requestedDate);
+      }
       prevIndex = currentIndex - 1;
       nextIndex = currentIndex + 1;
     } else {

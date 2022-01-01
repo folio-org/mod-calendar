@@ -215,5 +215,5 @@ public class Periods {
     .withId(UUIDs.UUID_0)
     .withServicePointId(UUIDs.UUID_0)
     .withName(Names.NAME_3)
-    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59));
+    .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED));
 }
