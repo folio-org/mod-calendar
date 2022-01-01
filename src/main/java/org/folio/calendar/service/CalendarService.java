@@ -348,7 +348,7 @@ public class CalendarService {
    * @param endDate the last date of the range to include
    * @return a list of matching calendars
    */
-  public List<Calendar> getCalendars(
+  public Iterable<Calendar> getCalendars(
     UUID servicePointId,
     @CheckForNull LocalDate startDate,
     @CheckForNull LocalDate endDate
