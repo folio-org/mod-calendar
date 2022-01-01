@@ -5,8 +5,6 @@ info:
 servers:
   - url: /
 paths:
-  /hello:
-    $ref: paths/hello.yaml
   /calendar/periods:
     $ref: paths/calendar/periods.yaml
   /calendar/periods/{servicePointId}/period:
