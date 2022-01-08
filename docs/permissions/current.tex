@@ -1,0 +1,59 @@
+\documentclass{article}
+
+\usepackage[paperwidth=\maxdimen,paperheight=\maxdimen]{geometry}
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, calc}
+
+\usepackage[tightpage,active]{preview}
+\PreviewEnvironment{tikzpicture}
+
+\begin{document}
+
+\begin{tikzpicture}
+  [
+    ->,
+    >=stealth,
+    node distance=1cm and 4cm,
+    every text node part/.style={align=center}
+  ]
+  \node[rectangle, draw, fill=blue!30] (calendar-opening-hours-collection-get) {\texttt{calendar.opening-hours.collection.get} \\ List calendar opening hours};
+  \node[rectangle, draw, fill=blue!30, below=of calendar-opening-hours-collection-get] (calendar-periods-collection-get) {\texttt{calendar.periods.collection.get} \\ List calendar periods descriptions};
+  \node[rectangle, draw, fill=blue!30, below=of calendar-periods-collection-get] (calendar-periods-item-get) {\texttt{calendar.periods.item.get} \\ Get period description};
+  \node[rectangle, draw, fill=blue!30, below=of calendar-periods-item-get] (calendar-periods-item-post) {\texttt{calendar.periods.item.post} \\ Add new calendar period description};
+  \node[rectangle, draw, fill=blue!30, below=of calendar-periods-item-post] (calendar-periods-item-put) {\texttt{calendar.periods.item.put} \\ Update existing calendar period description};
+  \node[rectangle, draw, fill=blue!30, below=of calendar-periods-item-put] (calendar-periods-item-delete) {\texttt{calendar.periods.item.delete} \\ Remove calendar period description};
+
+  \node[rectangle, draw, left=1cm of calendar-periods-collection-get, fill=green!30] (ui-calendar-view) {\texttt{ui-calendar.view} \\ Can view calendar events};
+  \node[rectangle, draw, below left=1cm of ui-calendar-view, fill=green!30] (ui-calendar-edit) {\texttt{ui-calendar.edit} \\ Can edit calendar events (no removal)};
+  \node[rectangle, draw, below left=0.5cm and 1cm of ui-calendar-edit, fill=green!30] (ui-calendar-all) {\texttt{ui-calendar.all} \\ Can create, view, edit, and remove calendar events};
+
+  \draw [->] (ui-calendar-all) to [out=0, in=180] (ui-calendar-edit);
+  \draw [->] (ui-calendar-all) to [out=0, in=180] (calendar-periods-item-delete);
+  \draw [->] (ui-calendar-view) to [out=0, in=180] (calendar-opening-hours-collection-get);
+  \draw [->] (ui-calendar-view) to [out=0, in=180] (calendar-periods-collection-get);
+  \draw [->] (ui-calendar-view) to [out=0, in=180] (calendar-periods-item-get);
+  \draw [->] (ui-calendar-edit) to [out=0, in=180] (ui-calendar-view);
+  \draw [->] (ui-calendar-edit) to [out=0, in=180] (calendar-periods-item-post);
+  \draw [->] (ui-calendar-edit) to [out=0, in=180] (calendar-periods-item-put);
+
+  \node[rectangle, draw, below=of ui-calendar-all, node distance=4cm] (calendar-all) {\texttt{calendar.all} \\ All permission for mod-calendar module};
+  \node[below right=1cm and 1cm of calendar-periods-item-delete, draw=none] (routing) {};
+  \draw [->] (calendar-all) |- (routing) |- (calendar-opening-hours-collection-get);
+  \draw [->] (calendar-all) |- (routing) |- (calendar-periods-collection-get);
+  \draw [->] (calendar-all) |- (routing) |- (calendar-periods-item-get);
+  \draw [->] (calendar-all) |- (routing) |- (calendar-periods-item-post);
+  \draw [->] (calendar-all) |- (routing) |- (calendar-periods-item-put);
+  \draw [->] (calendar-all) |- (routing) |- (calendar-periods-item-delete);
+
+  \draw[red,very thick,dotted] ($(ui-calendar-all.south west)+(-0.3,-0.6)$)  rectangle ($(ui-calendar-view.north east)+(0.3,0.6)$);
+
+  \matrix [draw,left=1cm of current bounding box.north west] {
+    \node [shape=rectangle, draw=black,    fill=white, line width=1, label=right:Permission] {}; \\
+    \node [shape=rectangle, draw=black, fill=green!30, line width=1, label=right:Assignable Permission] {}; \\
+    \node [shape=rectangle, draw=black,  fill=blue!30, line width=1, label=right:Checked Permission] {}; \\
+    \node [shape=rectangle, draw=red,          dotted,   very thick, label=right:UI Permissions] {}; \\
+  };
+\end{tikzpicture}
+
+\end{document}
