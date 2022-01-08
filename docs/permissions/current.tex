@@ -38,7 +38,7 @@
   \draw [->] (ui-calendar-edit) to [out=0, in=180] (calendar-periods-item-put);
 
   \node[rectangle, draw, below=of ui-calendar-all, node distance=4cm] (calendar-all) {\texttt{calendar.all} \\ All permission for mod-calendar module};
-  \node[below right=1cm and 1cm of calendar-periods-item-delete, draw=none] (routing) {};
+  \coordinate[below right=1cm and 1cm of calendar-periods-item-delete] (routing) {};
   \draw [->] (calendar-all) |- (routing) |- (calendar-opening-hours-collection-get);
   \draw [->] (calendar-all) |- (routing) |- (calendar-periods-collection-get);
   \draw [->] (calendar-all) |- (routing) |- (calendar-periods-item-get);
@@ -48,7 +48,7 @@
 
   \draw[red,very thick,dotted] ($(ui-calendar-all.south west)+(-0.3,-0.6)$)  rectangle ($(ui-calendar-view.north east)+(0.3,0.6)$);
 
-  \matrix [draw,left=1cm of current bounding box.north west] {
+  \matrix [draw,left=-4cm of current bounding box.north west] {
     \node [shape=rectangle, draw=black,    fill=white, line width=1, label=right:Permission] {}; \\
     \node [shape=rectangle, draw=black, fill=green!30, line width=1, label=right:Assignable Permission] {}; \\
     \node [shape=rectangle, draw=black,  fill=blue!30, line width=1, label=right:Checked Permission] {}; \\
