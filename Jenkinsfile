@@ -8,6 +8,7 @@ buildMvn {
   doApiDoc = true
   apiTypes = 'OAS'
   apiDirectories = 'src/main/resources/api'
+  apiExcludes = 'paths parameters'
 
   doDocker = {
     buildDocker {
