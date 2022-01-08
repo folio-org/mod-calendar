@@ -22,9 +22,9 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
   @Test
   void testPutInvalidCalendar() {
     Response response = sendPutRequest(
-      Periods.PERIOD_FULL_EXAMPLE_A.withId(UUIDs.UUID_4).withName(""),
-      UUIDs.UUID_1,
-      UUIDs.UUID_E
+      Periods.PERIOD_FULL_EXAMPLE_A.withName(""),
+      UUIDs.UUID_0,
+      UUIDs.UUID_A
     );
 
     response.then().statusCode(is(HttpStatus.UNPROCESSABLE_ENTITY.value()));

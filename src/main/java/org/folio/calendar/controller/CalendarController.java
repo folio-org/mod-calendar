@@ -124,10 +124,10 @@ public final class CalendarController implements CalendarApi {
 
       this.calendarService.replaceCalendar(originalCalendar, period, servicePointId);
     } catch (DataNotFoundException exception) {
-      log.info("Current calendar does not exist; creating new one");
+      log.info("Current calendar does not exist; not doing anything and returning 204");
       log.info(exception);
 
-      this.calendarService.createCalendarFromPeriod(period, servicePointId);
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
