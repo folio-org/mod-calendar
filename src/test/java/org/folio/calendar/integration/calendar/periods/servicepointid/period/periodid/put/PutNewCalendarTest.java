@@ -1,10 +1,8 @@
 package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.put;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
