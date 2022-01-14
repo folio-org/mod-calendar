@@ -30,7 +30,13 @@ routed through a proxy:
 | PROXY_HOST   | `localhost`   | The host to proxy through                              |
 | PROXY_PORT   | `8888`        | The port on PROXY_HOST to proxy through                |
 
-Additionally, if `PROXY_ENABLE` is `true`, requests will be sent to `/_/database/truncating` every
-time the database is truncated (after most integration tests methods/classes). This endpoint does
-not exist (and will correspondingly generate `404` errors), however, will appear in any proxy logs,
-making it easy to isolate each test/action.
+Additionally, if `PROXY_ENABLE` is `true`, additional logging-only requests will be sent to a few
+endpoints:
+
+- `GET /_/tests/_/database-truncate` every time the database is truncated (after most modifying
+  integration tests methods/classes)
+- `GET /_/tests/class/method` before every test begins
+- `GET /_/tests/_/finish` after every test finishes (successful or otherwise)
+
+These endpoints do not exist (and will correspondingly generate `404` errors), however, will appear
+in any proxy logs, making it easy to isolate each test/action.

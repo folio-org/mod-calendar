@@ -35,7 +35,7 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
     log.info("Truncating database");
 
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-      ra(false).get(getRequestUrl("/_/database/truncating"));
+      ra(false).get(getRequestUrl("/_/tests/_/database-truncate"));
     }
 
     try (Connection conn = dataSource.getConnection()) {

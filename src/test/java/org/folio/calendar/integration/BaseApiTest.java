@@ -27,6 +27,7 @@ import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,31 @@ public abstract class BaseApiTest {
   @BeforeEach
   void clearCurrentDateOverride() {
     DateUtils.setCurrentDateOverride(null);
+  }
+
+  @BeforeEach
+  void proxyLogTestStart(TestInfo testInfo) {
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      String path = "/_/tests/";
+      if (testInfo.getTestClass().isPresent()) {
+        path += testInfo.getTestClass().get().getSimpleName() + "/";
+      } else {
+        path += "unknown/";
+      }
+      if (testInfo.getTestMethod().isPresent()) {
+        path += testInfo.getTestMethod().get().getName();
+      } else {
+        path += "unknown";
+      }
+      ra(false).get(getRequestUrl(path));
+    }
+  }
+
+  @AfterEach
+  void proxyLogTestFinish() {
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      ra(false).get(getRequestUrl("/_/tests/_/finish"));
+    }
   }
 
   @BeforeAll
