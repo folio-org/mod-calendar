@@ -33,6 +33,11 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
 
   protected void cleanDatabase(@Autowired DataSource dataSource) {
     log.info("Truncating database");
+
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      ra(false).get(getRequestUrl("/_/database/truncating"));
+    }
+
     try (Connection conn = dataSource.getConnection()) {
       ScriptUtils.executeSqlScript(conn, new ClassPathResource("database-clean.sql"));
     } catch (SQLException e) {

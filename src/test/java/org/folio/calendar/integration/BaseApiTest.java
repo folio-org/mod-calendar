@@ -11,6 +11,7 @@ import io.restassured.config.JsonConfig;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.Header;
 import io.restassured.path.json.config.JsonPathConfig;
+import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
@@ -92,6 +93,16 @@ public abstract class BaseApiTest {
             .objectMapperConfig()
             .jackson2ObjectMapperFactory((a, b) -> MapperUtils.MAPPER)
         );
+
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      String host = System.getenv().getOrDefault("PROXY_HOST", "localhost");
+      int port = Integer.parseInt(System.getenv().getOrDefault("PROXY_PORT", "8888"));
+      String scheme = System.getenv().getOrDefault("PROXY_SCHEME", "http");
+
+      log.info(String.format("Configuring proxy to %s://%s:%d", scheme, host, port));
+
+      RestAssured.proxy = new ProxySpecification(host, port, scheme);
+    }
   }
 
   @BeforeEach
