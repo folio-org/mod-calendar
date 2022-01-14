@@ -39,7 +39,7 @@
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
-          "permissionsRequired": ["calendar.opening-hours.collection.get"]
+          "permissionsRequired": ["modperms.calendar.view"]
         }
       ]
     },
