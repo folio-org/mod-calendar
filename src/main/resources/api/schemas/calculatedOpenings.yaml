@@ -4,7 +4,7 @@ properties:
   openingDays:
     type: array
     items:
-      $ref: openingDayInfo.yaml
+      $ref: openingDayRelative.yaml
     minItems: 3
     maxItems: 3
 required:

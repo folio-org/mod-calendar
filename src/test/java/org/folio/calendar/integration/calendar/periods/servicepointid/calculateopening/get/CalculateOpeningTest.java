@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import io.restassured.response.Response;
 import java.util.Arrays;
 import org.folio.calendar.domain.dto.CalculatedOpenings;
+import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.OpeningDayInfoConcreteConstants;
 import org.folio.calendar.testconstants.OpeningDayInfoRelativeConstants;
@@ -27,11 +28,22 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT,
-            OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
-              Dates.LDATE_2021_01_01
-            ),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT
+            OpeningDayRelative
+              .builder()
+              .openingDay(OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT)
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                  Dates.LDATE_2021_01_01
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT)
+              .build()
           )
         )
       )
@@ -49,13 +61,26 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT,
-            OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
-              Dates.LDATE_2021_01_01
-            ),
-            OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
-              Dates.LDATE_2021_05_03
-            )
+            OpeningDayRelative
+              .builder()
+              .openingDay(OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT)
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                  Dates.LDATE_2021_01_01
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
+                  Dates.LDATE_2021_05_03
+                )
+              )
+              .build()
           )
         )
       )
@@ -73,13 +98,26 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
-              Dates.LDATE_2021_09_20
-            ),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
-              Dates.LDATE_2021_12_31
-            ),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
+                  Dates.LDATE_2021_09_20
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                  Dates.LDATE_2021_12_31
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT)
+              .build()
           )
         )
       )
@@ -97,11 +135,26 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_12),
-            OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
-              Dates.LDATE_2021_08_16
-            ),
-            OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_19)
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_12)
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
+                  Dates.LDATE_2021_08_16
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_19)
+              )
+              .build()
           )
         )
       )
@@ -119,13 +172,28 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_12),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
-              Dates.LDATE_2021_08_15
-            ),
-            OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
-              Dates.LDATE_2021_08_16
-            )
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_08_12)
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                  Dates.LDATE_2021_08_15
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withDate(
+                  Dates.LDATE_2021_08_16
+                )
+              )
+              .build()
           )
         )
       )
@@ -143,11 +211,24 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
       is(
         equalTo(
           Arrays.asList(
-            OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_07_01),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
-              Dates.LDATE_2021_08_15
-            ),
-            OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withDate(Dates.LDATE_2021_07_01)
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(
+                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                  Dates.LDATE_2021_08_15
+                )
+              )
+              .build(),
+            OpeningDayRelative
+              .builder()
+              .openingDay(OpeningDayInfoConcreteConstants.NO_OPENING_ADJACENT)
+              .build()
           )
         )
       )

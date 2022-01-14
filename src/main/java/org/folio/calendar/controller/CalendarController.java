@@ -13,6 +13,7 @@ import org.folio.calendar.domain.dto.CalculatedOpenings;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
+import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
@@ -280,6 +281,14 @@ public final class CalendarController implements CalendarApi {
       next = empty;
     }
 
-    return ResponseEntity.ok(new CalculatedOpenings(Arrays.asList(previous, current, next)));
+    return ResponseEntity.ok(
+      new CalculatedOpenings(
+        Arrays.asList(
+          OpeningDayRelative.builder().openingDay(previous).build(),
+          OpeningDayRelative.builder().openingDay(current).build(),
+          OpeningDayRelative.builder().openingDay(next).build()
+        )
+      )
+    );
   }
 }
