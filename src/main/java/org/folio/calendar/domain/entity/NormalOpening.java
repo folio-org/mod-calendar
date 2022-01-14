@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
-import org.folio.calendar.domain.dto.OpeningHourRange.OpeningHourRangeBuilder;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
@@ -183,7 +182,7 @@ public class NormalOpening {
     Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
 
     for (Weekday day : weekdays) {
-      OpeningHourRangeBuilder builder = OpeningHourRange
+      OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
         .builder()
         .startTime(TimeConstants.TIME_MIN_STRING)
         .endTime(TimeConstants.TIME_MAX_STRING);

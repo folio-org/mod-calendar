@@ -12,12 +12,10 @@ import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.OpeningDayConcrete;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
-import org.folio.calendar.domain.dto.OpeningDayInfo.OpeningDayInfoBuilder;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.domain.dto.Period.PeriodBuilder;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionHour;
@@ -240,7 +238,7 @@ public class PeriodUtils {
     List<OpeningDayRelative> openingDays = new ArrayList<>();
 
     for (Map.Entry<Weekday, List<OpeningHourRange>> entry : openings.entrySet()) {
-      OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
+      OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
         .builder()
         .open(true)
         .allDay(false)
@@ -281,7 +279,9 @@ public class PeriodUtils {
     ExceptionRange exception = new ArrayList<ExceptionRange>(exceptions).get(0);
     ExceptionHour opening = new ArrayList<ExceptionHour>(exception.getOpenings()).get(0);
 
-    OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo.builder().exceptional(true);
+    OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
+      .builder()
+      .exceptional(true);
 
     if (opening.getStartTime() == null) {
       openingDayInfoBuilder =
@@ -329,7 +329,7 @@ public class PeriodUtils {
    * @return the equivalent {@link org.folio.calendar.domain.dto.Period Period}
    */
   public static Period toPeriod(Calendar calendar) {
-    PeriodBuilder builder = Period
+    Period.PeriodBuilder builder = Period
       .builder()
       .id(calendar.getId())
       .name(calendar.getName())

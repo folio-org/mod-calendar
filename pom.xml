@@ -59,6 +59,7 @@
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <json.version>20200518</json.version>
     <lombok.version>1.18.22</lombok.version>
+    <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
     <liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
     <javadoc-maven-plugin.version>3.3.1</javadoc-maven-plugin.version>
     <!-- Mitigate newest log4j vulnerability before Spring Boot itself -->
@@ -272,7 +273,7 @@
             </goals>
             <configuration>
               <sources>
-                <source>${project.build.directory}/generated-sources</source>
+                <source>${project.build.directory}/generated-sources/api</source>
               </sources>
             </configuration>
           </execution>
@@ -318,10 +319,11 @@
             </goals>
             <configuration>
               <inputSpec>${calendar-api-defintions-yaml-file}</inputSpec>
-              <output>${project.build.directory}/generated-sources</output>
+              <output>${project.build.directory}/generated-sources/api</output>
               <generatorName>spring</generatorName>
               <modelPackage>${project.groupId}.calendar.domain.dto</modelPackage>
               <apiPackage>${project.groupId}.calendar.rest.resource</apiPackage>
+              <templateDirectory>src/main/resources/templates</templateDirectory>
               <generateApis>true</generateApis>
               <generateApiTests>true</generateApiTests>
               <generateApiDocumentation>true</generateApiDocumentation>
@@ -332,13 +334,6 @@
               <configOptions>
                 <dateLibrary>custom</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>
-                <booleanGetterPrefix>is</booleanGetterPrefix>
-                <additionalModelTypeAnnotations>
-                  @lombok.With
-                  @lombok.Builder(toBuilder = true)
-                  @lombok.NoArgsConstructor
-                  @lombok.AllArgsConstructor
-                </additionalModelTypeAnnotations>
               </configOptions>
               <typeMappings>
                 <typeMapping>
@@ -394,12 +389,46 @@
           </execution>
         </executions>
       </plugin>
-
+      <!-- <plugin>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok-maven-plugin</artifactId>
+        <version>${lombok-maven-plugin.version}</version>
+        <configuration>
+          <addOutputDirectory>false</addOutputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>delombok-openapi</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>delombok</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.build.directory}/generated-sources/api</sourceDirectory>
+              <outputDirectory>${project.build.directory}/generated-sources/delombok</outputDirectory>
+            </configuration>
+          </execution>
+          <execution>
+            <id>delombok-main</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>delombok</goal>
+            </goals>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+              <outputDirectory>${project.build.directory}/generated-sources/delombok/src/main/java</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>${maven-javadoc-plugin.version}</version>
-      </plugin>
+        <configuration>
+          <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
+        </configuration>
+      </plugin> -->
     </plugins>
   </build>
 </project>

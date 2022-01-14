@@ -3,6 +3,7 @@ type: object
 properties:
   openingHour:
     type: array
+    x-singular-name: openingHourPair
     items:
       $ref: openingHourRange.yaml
     description: All start/end time pairs for a day

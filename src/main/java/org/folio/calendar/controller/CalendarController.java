@@ -241,7 +241,7 @@ public final class CalendarController implements CalendarApi {
 
     if (currentIndex >= 0) {
       current = allOpenings.get(currentIndex).getOpeningDay().withDate(requestedDate);
-      if (!current.isOpen()) {
+      if (Boolean.FALSE.equals(current.isOpen())) {
         current = empty.withAllDay(true).withDate(requestedDate);
       }
       prevIndex = currentIndex - 1;
@@ -257,10 +257,15 @@ public final class CalendarController implements CalendarApi {
     }
 
     // ensure that previous and next do not refer to adjacent closures
-    while (prevIndex >= 0 && !allOpenings.get(prevIndex).getOpeningDay().isOpen()) {
+    while (
+      prevIndex >= 0 && Boolean.TRUE.equals(!allOpenings.get(prevIndex).getOpeningDay().isOpen())
+    ) {
       prevIndex--;
     }
-    while (nextIndex < allOpenings.size() && !allOpenings.get(nextIndex).getOpeningDay().isOpen()) {
+    while (
+      nextIndex < allOpenings.size() &&
+      Boolean.TRUE.equals(!allOpenings.get(nextIndex).getOpeningDay().isOpen())
+    ) {
       nextIndex++;
     }
 
