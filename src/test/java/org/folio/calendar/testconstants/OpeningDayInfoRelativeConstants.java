@@ -80,7 +80,8 @@ public class OpeningDayInfoRelativeConstants {
     .open(true)
     .allDay(false)
     .exceptional(false)
-    .build();
+    .build()
+    .withOpeningHour(null);
 
   public static final OpeningDayInfo EXCEPTIONAL_CLOSED_ALL_DAY = CLOSED_ALL_DAY.withExceptional(
     true
