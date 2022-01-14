@@ -1,4 +1,4 @@
-import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class {{classname}} {{#parent}}extends {{{.}}}{{/parent}}{{^parent}}{{#ha
   @SerializedName("{{baseName}}")
   {{/gson}}
   {{^required}}
-  @CheckForNull
+  @Nullable
   {{/required}}
   {{#isContainer}}
   {{#useBeanValidation}}@Valid{{/useBeanValidation}}

@@ -75,6 +75,13 @@ public class OpeningDayInfoRelativeConstants {
     .exceptional(false)
     .build();
 
+  public static final OpeningDayInfo OPENING_NULL = OpeningDayInfo
+    .builder()
+    .open(true)
+    .allDay(false)
+    .exceptional(false)
+    .build();
+
   public static final OpeningDayInfo EXCEPTIONAL_CLOSED_ALL_DAY = CLOSED_ALL_DAY.withExceptional(
     true
   );

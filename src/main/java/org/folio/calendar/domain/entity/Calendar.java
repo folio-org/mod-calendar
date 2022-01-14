@@ -140,9 +140,6 @@ public class Calendar {
     Map<Weekday, OpeningDayInfo> openingsByWeekday = new EnumMap<>(Weekday.class);
     for (OpeningDayRelative opening : openings) {
       OpeningDayRelativeWeekdays weekdays = opening.getWeekdays();
-      if (weekdays == null) {
-        throw new IllegalArgumentException("getDailyNormalOpenings received null weekdays");
-      }
       openingsByWeekday.put(weekdays.getDay(), opening.getOpeningDay());
     }
 
