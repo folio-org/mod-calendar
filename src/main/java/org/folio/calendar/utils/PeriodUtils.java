@@ -77,13 +77,20 @@ public class PeriodUtils {
 
     OpeningDayInfo opening = openings.get(0).getOpeningDay();
 
-    if (opening.getOpeningHour().size() != 1) {
+    List<OpeningHourRange> openingHourList = opening.getOpeningHour();
+    if (openingHourList == null) {
+      throw new IllegalArgumentException(
+        "An opening was provided to convertOpeningDayRelativeToExceptionRanges with no opening days"
+      );
+    }
+
+    if (openingHourList.size() != 1) {
       throw new IllegalArgumentException(
         "Provided legacy exception information must have exactly one set of opening hours"
       );
     }
 
-    OpeningHourRange openingHours = opening.getOpeningHour().get(0);
+    OpeningHourRange openingHours = openingHourList.get(0);
 
     if (!Boolean.TRUE.equals(opening.isOpen())) {
       // no time information implies closure
@@ -136,11 +143,18 @@ public class PeriodUtils {
     for (OpeningDayRelative opening : openings) {
       OpeningDayInfo openingInfo = opening.getOpeningDay();
 
-      builder =
-        builder.startDay(opening.getWeekdays().getDay()).endDay(opening.getWeekdays().getDay());
+      OpeningDayRelativeWeekdays weekdays = opening.getWeekdays();
+
+      if (weekdays == null) {
+        throw new IllegalArgumentException(
+          "Invalid opening passed to convertOpeningDayRelativeToNormalOpening"
+        );
+      }
+
+      builder = builder.startDay(weekdays.getDay()).endDay(weekdays.getDay());
 
       // we do not create NormalOpenings for closures
-      if (!openingInfo.isOpen()) {
+      if (Boolean.FALSE.equals(openingInfo.isOpen())) {
         continue;
       }
 
@@ -404,13 +418,13 @@ public class PeriodUtils {
       if (!current.containsKey(entry.getKey())) {
         current.put(entry.getKey(), entry.getValue());
       } else {
-        if (!entry.getValue().isOpen()) {
+        if (Boolean.FALSE.equals(entry.getValue().isOpen())) {
           continue;
         }
 
         OpeningDayInfo thisOpening = current.get(entry.getKey());
 
-        if (!thisOpening.isOpen()) {
+        if (Boolean.FALSE.equals(thisOpening.isOpen())) {
           current.put(entry.getKey(), entry.getValue());
         } else {
           List<OpeningHourRange> newOpenings = new ArrayList<>(thisOpening.getOpeningHour());

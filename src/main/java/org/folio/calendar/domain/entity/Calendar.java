@@ -25,6 +25,7 @@ import lombok.Singular;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
+import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
 import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.PeriodUtils;
@@ -138,7 +139,11 @@ public class Calendar {
     );
     Map<Weekday, OpeningDayInfo> openingsByWeekday = new EnumMap<>(Weekday.class);
     for (OpeningDayRelative opening : openings) {
-      openingsByWeekday.put(opening.getWeekdays().getDay(), opening.getOpeningDay());
+      OpeningDayRelativeWeekdays weekdays = opening.getWeekdays();
+      if (weekdays == null) {
+        throw new IllegalArgumentException("getDailyNormalOpenings received null weekdays");
+      }
+      openingsByWeekday.put(weekdays.getDay(), opening.getOpeningDay());
     }
 
     List<LocalDate> dates = DateUtils.getDateRange(
