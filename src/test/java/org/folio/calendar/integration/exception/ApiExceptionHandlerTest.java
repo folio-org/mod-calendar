@@ -96,7 +96,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     assertThat(
       "Error HTTP code is correct",
       errorResponse.getStatus(),
-      is(HttpStatus.NOT_FOUND.value())
+      is(HttpStatus.METHOD_NOT_ALLOWED.value())
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 

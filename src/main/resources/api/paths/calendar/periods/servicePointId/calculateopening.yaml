@@ -19,7 +19,7 @@ get:
           schema:
             $ref: ../../../../schemas/calculatedOpenings.yaml
     "400":
-      description: Invalid request (could not be understood)
+      description: Invalid request or parameters
       content:
         application/json:
           schema:

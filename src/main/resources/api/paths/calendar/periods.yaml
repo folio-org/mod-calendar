@@ -70,7 +70,7 @@ get:
           schema:
             $ref: ../../schemas/openingDayConcreteCollection.yaml
     "400":
-      description: Invalid request (could not be understood)
+      description: Invalid request or parameters
       content:
         application/json:
           schema:

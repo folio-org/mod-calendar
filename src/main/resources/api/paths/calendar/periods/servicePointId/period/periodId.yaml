@@ -19,7 +19,7 @@ get:
           schema:
             $ref: ../../../../../schemas/period.yaml
     "400":
-      description: Invalid request (could not be understood)
+      description: Invalid request or parameters
       content:
         application/json:
           schema:
@@ -73,13 +73,13 @@ put:
     "204":
       description: Successful update or creation (no content)
     "400":
-      description: Invalid request (could not be understood)
+      description: Invalid request or parameters
       content:
         application/json:
           schema:
             $ref: ../../../../../schemas/errorResponse.yaml
           example:
-            $ref: ../../../../../examples/invalidRequest.yaml
+            $ref: ../../../../../examples/invalidData.yaml
     "409":
       description: Request conflicts with existing data (duplicate ID, overlapping dates, etc)
       content:
@@ -88,14 +88,6 @@ put:
             $ref: ../../../../../schemas/errorResponse.yaml
           example:
             $ref: ../../../../../examples/conflictError.yaml
-    "422":
-      description: Invalid data (for example, start date after end date)
-      content:
-        application/json:
-          schema:
-            $ref: ../../../../../schemas/errorResponse.yaml
-          example:
-            $ref: ../../../../../examples/invalidData.yaml
     "500":
       description: Internal server error
       content:
@@ -121,7 +113,7 @@ delete:
     "204":
       description: Successful deletion (no content)
     "400":
-      description: Invalid request (could not be understood)
+      description: Invalid request or parameters
       content:
         application/json:
           schema:

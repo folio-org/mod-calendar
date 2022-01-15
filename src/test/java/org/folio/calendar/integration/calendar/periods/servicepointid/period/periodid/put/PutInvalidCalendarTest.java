@@ -27,7 +27,7 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
       UUIDs.UUID_A
     );
 
-    response.then().statusCode(is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
 
@@ -35,7 +35,7 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
     assertThat(
       "Error HTTP code is correct",
       errorResponse.getStatus(),
-      is(HttpStatus.UNPROCESSABLE_ENTITY.value())
+      is(HttpStatus.BAD_REQUEST.value())
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
