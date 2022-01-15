@@ -88,7 +88,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     Response response = ra(false)
       .patch(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
 
-    response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
+    response.then().statusCode(is(HttpStatus.METHOD_NOT_ALLOWED.value()));
 
     ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
 

@@ -75,7 +75,7 @@ public class ApiExceptionHandler {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
-      HttpStatus.NOT_FOUND,
+      HttpStatus.METHOD_NOT_ALLOWED,
       ErrorCode.INVALID_REQUEST,
       "This endpoint does not accept %s requests to this endpoint (known are: %s)",
       exception.getMethod(),
