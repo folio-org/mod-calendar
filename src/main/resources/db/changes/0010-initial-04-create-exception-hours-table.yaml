@@ -21,7 +21,7 @@ databaseChangeLog:
                   name: exception_id
                   type: UUID
                   constraints:
-                    nullable: false
+                    nullable: true
               - column:
                   name: start_date
                   remarks: No TZ

@@ -23,8 +23,8 @@ databaseChangeLog:
             referencedColumnNames: id
             deferrable: false
             initiallyDeferred: false
-            onDelete: NO ACTION
-            onUpdate: NO ACTION
+            onDelete: CASCADE
+            onUpdate: CASCADE
             validate: true
         - addForeignKeyConstraint:
             constraintName: exception_hours_exception_id_fkey

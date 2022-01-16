@@ -8,6 +8,7 @@ properties:
       $ref: "openingDayConcrete.yaml"
   totalRecords:
     type: integer
+    minimum: 0
     description: Number of openings returned
 additionalProperties: false
 required:

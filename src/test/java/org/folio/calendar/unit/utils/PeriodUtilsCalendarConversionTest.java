@@ -46,4 +46,13 @@ public class PeriodUtilsCalendarConversionTest {
       is(Periods.PERIOD_FULL_EXAMPLE_B)
     );
   }
+
+  @Test
+  void testEmptyCalendarConversion() {
+    assertThat(
+      "A converted calendar with no openings nor exceptions represented equivalently as a legacy period",
+      PeriodUtils.toPeriod(Calendars.CALENDAR_WITH_NO_OPENINGS_NOR_EXCEPTIONS),
+      is(Periods.PERIOD_WITH_NO_OPENINGS_NOR_EXCEPTIONS)
+    );
+  }
 }

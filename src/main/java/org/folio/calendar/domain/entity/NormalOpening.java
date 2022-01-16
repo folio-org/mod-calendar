@@ -10,13 +10,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Weekday;
@@ -39,8 +44,8 @@ public class NormalOpening {
    * The opening's internal ID
    */
   @Id
-  @GeneratedValue
   @NotNull
+  @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
@@ -48,8 +53,11 @@ public class NormalOpening {
    * The calendar that this opening is a part of
    */
   @NotNull
-  @Column(name = "calendar_id")
-  private UUID calendarId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "calendar_id")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private Calendar calendar;
 
   /**
    * The (relative) weekday upon which this opening starts
@@ -85,7 +93,7 @@ public class NormalOpening {
    * Create a NormalOpening object
    *
    * @param id a {@link java.util.UUID UUID}
-   * @param calendarId a {@link java.util.UUID UUID}
+   * @param calendar a {@link org.folio.calendar.domain.entity.Calendar Calendar}
    * @param startDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
    * @param startTime a {@link java.time.LocalTime LocalTime}
    * @param endDay a {@link org.folio.calendar.domain.dto.Weekday Weekday}
@@ -93,14 +101,14 @@ public class NormalOpening {
    */
   public NormalOpening(
     final UUID id,
-    final UUID calendarId,
+    final Calendar calendar,
     final Weekday startDay,
     final LocalTime startTime,
     final Weekday endDay,
     final LocalTime endTime
   ) {
     this.id = id;
-    this.calendarId = calendarId;
+    this.calendar = calendar;
     this.startDay = startDay;
     this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
     this.endDay = endDay;
@@ -154,7 +162,7 @@ public class NormalOpening {
    * @return a NormalOpening which surrounds opening1 and opening2
    */
   public static NormalOpening merge(final NormalOpening opening1, final NormalOpening opening2) {
-    if (!opening1.getCalendarId().equals(opening2.getCalendarId())) {
+    if (opening1.getCalendar() != opening2.getCalendar()) {
       throw new IllegalArgumentException(
         "Cannot merge two NormalOpenings from different calendars!"
       );
@@ -164,9 +172,9 @@ public class NormalOpening {
   }
 
   /**
-   * Split this NormalOpening into weekdays (as a series of {@link OpeningHourRange}s)
+   * Split this NormalOpening into weekdays (as a series of {@link org.folio.calendar.domain.dto.OpeningHourRange}s)
    *
-   * @return a Map of {@link Weekday}s to {@link OpeningHourRange}
+   * @return a Map of {@link org.folio.calendar.domain.dto.Weekday}s to {@link org.folio.calendar.domain.dto.OpeningHourRange}
    */
   public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
     List<Weekday> weekdays = WeekdayUtils.getRange(this.getStartDay(), this.getEndDay());
@@ -193,7 +201,7 @@ public class NormalOpening {
   /**
    * Get the time (with startDay) that this opening begins
    *
-   * @return a {@link LocalTime}, truncated to the minutes
+   * @return a {@link java.time.LocalTime}, truncated to the minutes
    */
   public LocalTime getStartTime() {
     return this.startTime.truncatedTo(ChronoUnit.MINUTES);
@@ -202,7 +210,7 @@ public class NormalOpening {
   /**
    * Get the time (with endDay) that this opening ends
    *
-   * @return a {@link LocalTime}, truncated to the minutes
+   * @return a {@link java.time.LocalTime}, truncated to the minutes
    */
   public LocalTime getEndTime() {
     return this.endTime.truncatedTo(ChronoUnit.MINUTES);
@@ -210,8 +218,8 @@ public class NormalOpening {
 
   /**
    * Set the time (with startDay) that this opening begins
-
-   * @param startTime a {@link LocalTime} (will be truncated to the minutes)
+   *
+   * @param startTime a {@link java.time.LocalTime} (will be truncated to the minutes)
    */
   public void setStartTime(final LocalTime startTime) {
     this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
@@ -220,7 +228,7 @@ public class NormalOpening {
   /**
    * Set the time (with endDay) that this opening ends
    *
-   * @param endTime a {@link LocalTime} (will be truncated to the minutes)
+   * @param endTime a {@link java.time.LocalTime} (will be truncated to the minutes)
    */
   public void setEndTime(final LocalTime endTime) {
     this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);
@@ -234,7 +242,7 @@ public class NormalOpening {
      * @param startTime a {@link LocalTime} (will be truncated to the minutes)
      * @return {@code this}, for chaining
      */
-    public NormalOpening.NormalOpeningBuilder startTime(final LocalTime startTime) {
+    public NormalOpeningBuilder startTime(final LocalTime startTime) {
       this.startTime = startTime.truncatedTo(ChronoUnit.MINUTES);
       return this;
     }
@@ -245,7 +253,7 @@ public class NormalOpening {
      * @param endTime a {@link LocalTime} (will be truncated to the minutes)
      * @return {@code this}, for chaining
      */
-    public NormalOpening.NormalOpeningBuilder endTime(final LocalTime endTime) {
+    public NormalOpeningBuilder endTime(final LocalTime endTime) {
       this.endTime = endTime.truncatedTo(ChronoUnit.MINUTES);
       return this;
     }

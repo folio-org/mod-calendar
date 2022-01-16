@@ -18,6 +18,23 @@ with the proper `DatabaseUsage` value; this prevents the database from being re-
 every time a test completes. Failed tests will still cause a rebuild (as they may not have removed
 all traces of themselves).
 
+## Surefire Reports
+
+Before generating a report of all the test results, you must run:
+
+```sh
+mvn site -DgenerateReports=false
+```
+
+This will generate all of the CSS and images that accompany the report; without them, the report is
+quite bland and hard to read.
+
+Then, generate the report:
+
+```sh
+mvn surefire-report:report
+```
+
 ## Coverage
 
 In order to view coverage reports in a human readable format, use `jacoco:report`:

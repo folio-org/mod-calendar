@@ -13,6 +13,7 @@ properties:
   _trace:
     description: A stack trace of the exception which may or may not be useful.
     type: array
+    x-singular-name: traceItem
     items:
       type: string
 additionalProperties: false

@@ -8,13 +8,38 @@
       "handlers": [
         {
           "methods": ["GET"],
-          "pathPattern": "/hello",
-          "permissionsRequired": []
+          "pathPattern": "/calendar/periods",
+          "permissionsRequired": ["modperms.calendar.view"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/calendar/periods/{servicePointId}/period",
+          "permissionsRequired": ["modperms.calendar.view"]
         },
         {
           "methods": ["POST"],
-          "pathPattern": "/hello",
-          "permissionsRequired": []
+          "pathPattern": "/calendar/periods/{servicePointId}/period",
+          "permissionsRequired": ["modperms.calendar.create"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
+          "permissionsRequired": ["modperms.calendar.view"]
+        },
+        {
+          "methods": ["PUT"],
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
+          "permissionsRequired": ["modperms.calendar.edit"]
+        },
+        {
+          "methods": ["DELETE"],
+          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
+          "permissionsRequired": ["modperms.calendar.delete"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
+          "permissionsRequired": ["modperms.calendar.view"]
         }
       ]
     },
@@ -34,7 +59,39 @@
       ]
     }
   ],
-  "permissionSets": [],
+  "permissionSets": [
+    {
+      "permissionName": "modperms.calendar.view",
+      "displayName": "Access and query calendar information",
+      "description": "",
+      "replaces": [
+        "calendar.opening-hours.collection.get",
+        "calendar.periods.collection.get",
+        "calendar.periods.item.get"
+      ]
+    },
+    {
+      "permissionName": "modperms.calendar.create",
+      "displayName": "Create new calendars",
+      "description": "",
+      "replaces": ["calendar.periods.item.post"],
+      "subPermissions": ["modperms.calendar.view"]
+    },
+    {
+      "permissionName": "modperms.calendar.update",
+      "displayName": "Edit existing calendars",
+      "description": "",
+      "replaces": ["calendar.periods.item.put"],
+      "subPermissions": ["modperms.calendar.view"]
+    },
+    {
+      "permissionName": "modperms.calendar.delete",
+      "displayName": "Delete calendars",
+      "description": "",
+      "replaces": ["calendar.periods.item.delete"],
+      "subPermissions": ["modperms.calendar.view"]
+    }
+  ],
   "requires": [],
   "launchDescriptor": {
     "dockerImage": "@artifactId@",

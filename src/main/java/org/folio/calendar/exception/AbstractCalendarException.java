@@ -17,9 +17,10 @@ import org.springframework.http.ResponseEntity;
  * Abstract calendar exception, to be implemented by more concrete exceptions thrown from our application.
  * {@link org.folio.calendar.exception.NonspecificCalendarException NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions).
  */
-@ToString
+@ToString(callSuper = true)
 public abstract class AbstractCalendarException extends RuntimeException {
 
+  /** Constant <code>DEFAULT_STATUS_CODE</code> */
   public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
   @Getter
@@ -67,33 +68,36 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * @return An ErrorResponse for API return
    */
   protected ErrorResponse getErrorResponse() {
-    ErrorResponse response = new ErrorResponse();
-    response.setTimestamp(Instant.now());
-    response.setStatus(this.getStatusCode().value());
+    ErrorResponse.ErrorResponseBuilder responseBuilder = ErrorResponse.builder();
+    responseBuilder = responseBuilder.timestamp(Instant.now());
+    responseBuilder = responseBuilder.status(this.getStatusCode().value());
 
     // Can only have one exception at a time
-    Error error = new Error();
-    error.setCode(this.getErrorCode());
-    error.setMessage(String.format("%s: %s", this.getClass().getSimpleName(), this.getMessage()));
+    Error.ErrorBuilder errorBuilder = Error.builder();
+    errorBuilder = errorBuilder.code(this.getErrorCode());
+    errorBuilder =
+      errorBuilder.message(
+        String.format("%s: %s", this.getClass().getSimpleName(), this.getMessage())
+      );
     for (StackTraceElement frame : this.getStackTrace()) {
-      error.addTraceItem(frame.toString());
+      errorBuilder = errorBuilder.traceItem(frame.toString());
     }
     if (this.getCause() != null) {
-      error.addTraceItem("----------------- CAUSED BY -----------------");
-      error.addTraceItem(this.getCause().getMessage());
+      errorBuilder = errorBuilder.traceItem("----------------- CAUSED BY -----------------");
+      errorBuilder = errorBuilder.traceItem(this.getCause().getMessage());
       for (StackTraceElement frame : this.getCause().getStackTrace()) {
-        error.addTraceItem(frame.toString());
+        errorBuilder = errorBuilder.traceItem(frame.toString());
       }
     }
     Map<String, Object> errorParameters = new HashMap<>();
     for (Entry<String, Object> parameter : this.getParameters().getMap().entrySet()) {
       errorParameters.put(parameter.getKey(), parameter.getValue());
     }
-    error.setParameters(errorParameters);
+    errorBuilder = errorBuilder.parameters(errorParameters);
 
-    response.addErrorsItem(error);
+    responseBuilder.error(errorBuilder.build());
 
-    return response;
+    return responseBuilder.build();
   }
 
   /**

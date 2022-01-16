@@ -1,6 +1,5 @@
 package org.folio.calendar.integration;
 
-import static org.folio.calendar.testutils.APITestUtils.TENANT_ID;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
@@ -12,27 +11,30 @@ import io.restassured.config.JsonConfig;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.http.Header;
 import io.restassured.path.json.config.JsonPathConfig;
+import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.testutils.APITestUtils;
+import org.folio.calendar.testutils.MapperUtils;
 import org.folio.calendar.testutils.WireMockInitializer;
+import org.folio.calendar.utils.DateUtils;
 import org.folio.spring.FolioModuleMetadata;
 import org.folio.spring.integration.XOkapiHeaders;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -41,28 +43,23 @@ import org.springframework.test.context.ContextConfiguration;
  */
 @Log4j2
 @ActiveProfiles("test")
-@ExtendWith(ApiTestWatcher.class)
+@TestInstance(Lifecycle.PER_CLASS)
 @AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseApiTest {
 
-  @Getter
-  @Setter
-  protected static boolean initialized = false;
+  public static final String TENANT_ID = "test";
 
   @Getter
   @Setter
-  protected static boolean dbInitialized = false;
+  protected static boolean initialized = false;
 
   @Autowired
   protected WireMockServer wireMockServer;
 
   @Autowired
   protected FolioModuleMetadata metadata;
-
-  @Autowired
-  protected JdbcTemplate jdbcTemplate;
 
   @Value("${x-okapi-url}")
   protected String okapiUrl = null;
@@ -71,12 +68,72 @@ public abstract class BaseApiTest {
   protected Integer port;
 
   protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
-    "swagger.api/mod-calendar.yaml"
+    "api/mod-calendar.yaml"
   );
 
   @BeforeEach
-  void createDatabase(TestInfo testInfo) {
-    if (!testInfo.getTags().contains(DatabaseUsage.NONE.value) && !isDbInitialized()) {
+  void clearCurrentDateOverride() {
+    DateUtils.setCurrentDateOverride(null);
+  }
+
+  @BeforeEach
+  void proxyLogTestStart(TestInfo testInfo) {
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      String path = "/_/tests/";
+      if (testInfo.getTestClass().isPresent()) {
+        path += testInfo.getTestClass().get().getSimpleName() + "/";
+      } else {
+        path += "unknown/";
+      }
+      if (testInfo.getTestMethod().isPresent()) {
+        path += testInfo.getTestMethod().get().getName();
+      } else {
+        path += "unknown";
+      }
+      ra(false).get(getRequestUrl(path));
+    }
+  }
+
+  @AfterEach
+  void proxyLogTestFinish() {
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      ra(false).get(getRequestUrl("/_/tests/_/finish"));
+    }
+  }
+
+  @BeforeAll
+  static void initialize() {
+    log.info("Configuring JSON to parse decimals as doubles, not floats");
+    // allow comparison with doubles, not floats
+    JsonConfig jsonConfig = JsonConfig
+      .jsonConfig()
+      .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
+    RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
+
+    log.info("Configuring JSON date mapping");
+    RestAssured.config =
+      RestAssured
+        .config()
+        .objectMapperConfig(
+          ObjectMapperConfig
+            .objectMapperConfig()
+            .jackson2ObjectMapperFactory((a, b) -> MapperUtils.MAPPER)
+        );
+
+    if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
+      String host = System.getenv().getOrDefault("PROXY_HOST", "localhost");
+      int port = Integer.parseInt(System.getenv().getOrDefault("PROXY_PORT", "8888"));
+      String scheme = System.getenv().getOrDefault("PROXY_SCHEME", "http");
+
+      log.info(String.format("Configuring proxy to %s://%s:%d", scheme, host, port));
+
+      RestAssured.proxy = new ProxySpecification(host, port, scheme);
+    }
+  }
+
+  @BeforeEach
+  public void createDatabase() {
+    if (!isInitialized()) {
       log.info("Initializing database by posting to /_/tenant");
       ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -85,53 +142,8 @@ public abstract class BaseApiTest {
         .then()
         .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
 
-      setDbInitialized(true);
-    }
-  }
-
-  @BeforeEach
-  void addJsonConfig() {
-    // workaround for JUnit 5 as each test is idempotent (no @Before) but we only need to do this once
-    if (!isInitialized()) {
-      log.info("Configuring JSON to parse decimals as doubles, not floats");
-      // allow comparison with doubles, not floats
-      JsonConfig jsonConfig = JsonConfig
-        .jsonConfig()
-        .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
-      RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
-
-      RestAssured.config =
-        RestAssured
-          .config()
-          .objectMapperConfig(
-            ObjectMapperConfig
-              .objectMapperConfig()
-              .jackson2ObjectMapperFactory((a, b) -> APITestUtils.MAPPER)
-          );
-
       setInitialized(true);
     }
-  }
-
-  @AfterEach
-  void cleanDatabase(TestInfo testInfo) {
-    if (
-      testInfo.getTags().contains(DatabaseUsage.NONE.value) ||
-      testInfo.getTags().contains(DatabaseUsage.IDEMPOTENT.value)
-    ) {
-      return;
-    }
-    log.info("Recreating database");
-
-    log.info("Deleting database by posting to /_/tenant");
-    ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body(new TenantAttributes().moduleTo(""))
-      .delete(getRequestUrl("/_/tenant"))
-      .then()
-      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
-
-    setDbInitialized(false);
   }
 
   @AfterEach
@@ -146,7 +158,7 @@ public abstract class BaseApiTest {
    * @return a @link {RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
-  protected RequestSpecification ra(boolean validate) {
+  public RequestSpecification ra(boolean validate) {
     RequestSpecification ra = RestAssured.given();
     if (validate) {
       ra = ra.filter(validate ? validationFilter : null);
@@ -163,7 +175,7 @@ public abstract class BaseApiTest {
    * @return a {@link RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
-  protected RequestSpecification ra() {
+  public RequestSpecification ra() {
     return ra(true);
   }
 
@@ -174,7 +186,7 @@ public abstract class BaseApiTest {
    * @param path The API route's path
    * @return fully qualified URL
    */
-  protected String getRequestUrl(String path) {
+  public String getRequestUrl(String path) {
     return String.format("http://localhost:%d%s", port, path);
   }
 }

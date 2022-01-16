@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThrows;
 
 import java.util.Arrays;
 import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.utils.WeekdayUtils;
 import org.junit.jupiter.api.Test;
 
@@ -126,6 +127,45 @@ public class WeekdayUtilsTest {
           Weekday.TUESDAY
         )
       )
+    );
+  }
+
+  @Test
+  void testWeekdayConversion() {
+    assertThat(
+      "Jan 1 2021 is a Friday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_01_01),
+      is(Weekday.FRIDAY)
+    );
+    assertThat(
+      "Jan 2 2021 is a Saturday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_01_02),
+      is(Weekday.SATURDAY)
+    );
+    assertThat(
+      "Jan 3 2021 is a Sunday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_01_03),
+      is(Weekday.SUNDAY)
+    );
+    assertThat(
+      "Jan 4 2021 is a Monday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_01_04),
+      is(Weekday.MONDAY)
+    );
+    assertThat(
+      "Mar 16 2021 is a Tuesday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_03_16),
+      is(Weekday.TUESDAY)
+    );
+    assertThat(
+      "Sep 22 2021 is a Wednesday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_09_22),
+      is(Weekday.WEDNESDAY)
+    );
+    assertThat(
+      "Dec 30 2021 is a Thursday",
+      WeekdayUtils.toWeekday(Dates.DATE_2021_12_30),
+      is(Weekday.THURSDAY)
     );
   }
 }
