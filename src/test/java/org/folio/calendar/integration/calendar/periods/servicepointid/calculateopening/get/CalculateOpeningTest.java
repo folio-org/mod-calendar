@@ -220,7 +220,7 @@ class CalculateOpeningTest extends CalculateOpeningAbstractTest {
             OpeningDayRelative
               .builder()
               .openingDay(
-                OpeningDayInfoConcreteConstants.NO_OPENING_ON_REQUESTED_DAY.withDate(
+                OpeningDayInfoConcreteConstants.EXCEPTIONALLY_CLOSED_ON_REQUESTED_DAY.withDate(
                   Dates.LDATE_2021_08_15
                 )
               )

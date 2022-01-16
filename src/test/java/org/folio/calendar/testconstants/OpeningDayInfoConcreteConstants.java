@@ -1,6 +1,7 @@
 package org.folio.calendar.testconstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 
@@ -20,5 +21,12 @@ public class OpeningDayInfoConcreteConstants {
     .open(false)
     .allDay(true)
     .exceptional(false)
+    .build();
+  public static final OpeningDayInfo EXCEPTIONALLY_CLOSED_ON_REQUESTED_DAY = OpeningDayInfo
+    .builder()
+    .openingHour(Arrays.asList(OpeningHourRanges.ALL_DAY))
+    .open(false)
+    .allDay(true)
+    .exceptional(true)
     .build();
 }

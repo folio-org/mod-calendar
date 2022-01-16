@@ -242,7 +242,7 @@ class PeriodUtilsMergeTest {
       OpeningDayInfoRelativeConstants.OPEN_00_00_TO_12_30
         .withAllDay(true)
         .withOpeningHour(
-          Arrays.asList(OpeningHourRanges.RANGE_00_00_TO_12_30, OpeningHourRanges.ALL_DAY)
+          Arrays.asList(OpeningHourRanges.ALL_DAY, OpeningHourRanges.RANGE_00_00_TO_12_30)
         )
     );
 
@@ -267,14 +267,14 @@ class PeriodUtilsMergeTest {
     expected.put(
       Dates.DATE_2021_01_01,
       OpeningDayInfoRelativeConstants.OPEN_ALL_DAY.withOpeningHour(
-        Arrays.asList(OpeningHourRanges.ALL_DAY, OpeningHourRanges.ALL_DAY)
+        Arrays.asList(OpeningHourRanges.ALL_DAY)
       )
     );
 
     PeriodUtils.mergeInto(a, b);
 
     assertThat(
-      "Merging an all day opening into an all day opening creates a map indicating an all-day opening",
+      "Merging an all day opening into an all day opening creates a map indicating an all-day opening without duplicates",
       a,
       is(equalTo(expected))
     );

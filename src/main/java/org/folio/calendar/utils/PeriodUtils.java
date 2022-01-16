@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -427,9 +428,9 @@ public class PeriodUtils {
         if (Boolean.FALSE.equals(thisOpening.isOpen())) {
           current.put(entry.getKey(), entry.getValue());
         } else {
-          List<OpeningHourRange> newOpenings = new ArrayList<>(thisOpening.getOpeningHour());
+          Set<OpeningHourRange> newOpenings = new HashSet<>(thisOpening.getOpeningHour());
           newOpenings.addAll(entry.getValue().getOpeningHour());
-          thisOpening.setOpeningHour(newOpenings);
+          thisOpening.setOpeningHour(new ArrayList<>(newOpenings));
 
           thisOpening.setAllDay(thisOpening.isAllDay() || entry.getValue().isAllDay());
         }
