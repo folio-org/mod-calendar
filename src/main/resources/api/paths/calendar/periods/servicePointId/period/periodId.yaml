@@ -44,7 +44,9 @@ get:
             $ref: ../../../../../examples/internalServerError.yaml
 put:
   operationId: updatePeriodById
-  description: Overwrite a certain period by its ID.  No action (204) if it does not exist
+  description:
+    Overwrite a certain period by its ID.  Fails silently (204) if it does not exist (note that
+    creating is NOT supported)
   parameters:
     - $ref: ../../../../../parameters/x-okapi-tenant.yaml
     - in: path
