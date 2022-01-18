@@ -17,8 +17,6 @@ The current dependencies are:
 - `org.springframework.boot`, for the Spring framework itself;
 - `org.projectlombok.lombok`, a IDE assistance tool for debugging;
 - `org.postgresql`, to provide a Postgres interface;
-- `org.mapstruct`, a tool to move between object models (included in others, but not currently
-  used);
 - `maven-surefire-plugin` to integrate testing;
 - `maven-release-plugin` to add scripts for releasing new versions;
 - `org.codehaus.mojo` for better Maven scripting; and
