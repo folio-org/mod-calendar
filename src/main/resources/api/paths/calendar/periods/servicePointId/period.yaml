@@ -2,7 +2,6 @@ get:
   operationId: getPeriodsForServicePoint
   description: List all periods for a service point
   parameters:
-    - $ref: ../../../../parameters/x-okapi-tenant.yaml
     - $ref: ../../../../parameters/servicePointId.yaml
     - in: query
       name: withOpeningDays
@@ -53,7 +52,6 @@ post:
   operationId: addNewPeriod
   description: Create a new period (calendar) for a service point
   parameters:
-    - $ref: ../../../../parameters/x-okapi-tenant.yaml
     - $ref: ../../../../parameters/servicePointId.yaml
   requestBody:
     required: true

@@ -2,7 +2,6 @@ get:
   operationId: getPeriodById
   description: Get a certain period's information
   parameters:
-    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
     - $ref: ../../../../../parameters/servicePointId.yaml
     - in: path
       name: periodId
@@ -48,7 +47,6 @@ put:
     Overwrite a certain period by its ID.  Fails silently (204) if it does not exist (note that
     creating is NOT supported)
   parameters:
-    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
     - in: path
       name: servicePointId
       required: true
@@ -102,7 +100,6 @@ delete:
   operationId: deletePeriodById
   description: Delete a certain period by its ID
   parameters:
-    - $ref: ../../../../../parameters/x-okapi-tenant.yaml
     - $ref: ../../../../../parameters/servicePointId.yaml
     - in: path
       name: periodId

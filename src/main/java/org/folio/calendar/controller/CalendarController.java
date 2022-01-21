@@ -48,11 +48,7 @@ public final class CalendarController implements CalendarApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Period> addNewPeriod(
-    String xOkapiTenant,
-    UUID servicePointId,
-    Period period
-  ) {
+  public ResponseEntity<Period> addNewPeriod(UUID servicePointId, Period period) {
     Calendar calendar = this.calendarService.createCalendarFromPeriod(period, servicePointId);
 
     return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.CREATED);
@@ -61,7 +57,6 @@ public final class CalendarController implements CalendarApi {
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<PeriodCollection> getPeriodsForServicePoint(
-    String xOkapiTenant,
     UUID servicePointId,
     Boolean withOpeningDays,
     Boolean showPast,
@@ -87,11 +82,7 @@ public final class CalendarController implements CalendarApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Period> getPeriodById(
-    String xOkapiTenant,
-    UUID servicePointId,
-    UUID periodId
-  ) {
+  public ResponseEntity<Period> getPeriodById(UUID servicePointId, UUID periodId) {
     return new ResponseEntity<>(
       PeriodUtils.toPeriod(this.calendarService.getCalendarById(servicePointId, periodId)),
       HttpStatus.OK
@@ -100,11 +91,7 @@ public final class CalendarController implements CalendarApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Void> deletePeriodById(
-    String xOkapiTenant,
-    UUID servicePointId,
-    UUID periodId
-  ) {
+  public ResponseEntity<Void> deletePeriodById(UUID servicePointId, UUID periodId) {
     Calendar calendar = this.calendarService.getCalendarById(servicePointId, periodId);
 
     this.calendarService.deleteCalendar(calendar);
@@ -115,12 +102,7 @@ public final class CalendarController implements CalendarApi {
   /** {@inheritDoc} */
   @Override
   @SuppressWarnings("java:S1141")
-  public ResponseEntity<Void> updatePeriodById(
-    String xOkapiTenant,
-    UUID servicePointId,
-    UUID periodId,
-    Period period
-  ) {
+  public ResponseEntity<Void> updatePeriodById(UUID servicePointId, UUID periodId, Period period) {
     try {
       Calendar originalCalendar = this.calendarService.getCalendarById(periodId);
 
@@ -138,7 +120,6 @@ public final class CalendarController implements CalendarApi {
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<OpeningDayConcreteCollection> getDateOpenings(
-    String xOkapiTenant,
     UUID servicePointId,
     LocalDate startDate,
     LocalDate endDate,
@@ -190,7 +171,6 @@ public final class CalendarController implements CalendarApi {
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<CalculatedOpenings> getNearestOpenings(
-    String xOkapiTenant,
     UUID servicePointId,
     LegacyPeriodDate requestedDate
   ) {
