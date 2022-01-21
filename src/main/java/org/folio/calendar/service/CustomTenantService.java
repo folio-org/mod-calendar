@@ -75,27 +75,6 @@ public class CustomTenantService extends TenantService {
    */
   @Override
   public void createTenant() {
-    log.warn("AAAAAAAA1");
-    log.warn("AAAAAAAA2");
-    log.warn("AAAAAAAA3");
-    log.warn("AAAAAaAA4");
-    log.warn("AAAAAAAA5");
-    log.warn("AAAAAAAA6");
-    log.warn("AAAAAAAA7");
-    log.warn("AAAAAAAA8");
-    log.warn("AAAAAAAA9");
-    log.warn("AAAAAAAA10");
-    log.warn("AAAAAAAA11");
-    log.warn("AAAAAAAA12");
-    log.warn("AAAAAAAA13");
-    log.warn("AAAAAAAA14");
-    log.warn("AAAAAAAA15");
-    log.warn("AAAAAAAA16");
-    log.warn("AAAAAAAA17");
-    log.warn("AAAAAAAA18");
-    log.warn("AAAAAAAA19");
-    log.warn("AAAAAAAA20");
-    log.warn("AAAAAAAA21");
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
       (ResultSet resultSet) -> {
