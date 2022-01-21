@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Priority;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.legacymapper.RMBOpeningMapper;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
+@Priority(-10)
 public class CustomTenantService extends TenantService {
 
   public static final String IS_RMB_SQL =
