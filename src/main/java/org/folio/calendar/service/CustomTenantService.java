@@ -7,15 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Priority;
-import liquibase.exception.LiquibaseException;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.legacymapper.RMBOpeningMapper;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.spring.FolioExecutionContext;
-import org.folio.spring.exception.TenantUpgradeException;
 import org.folio.spring.liquibase.FolioSpringLiquibase;
 import org.folio.spring.service.TenantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
-@Priority(-10)
 public class CustomTenantService extends TenantService {
 
   public static final String IS_RMB_SQL =
@@ -101,18 +96,7 @@ public class CustomTenantService extends TenantService {
       log.debug(periodsToMigrate);
     }
 
-    // from original folio-spring-base
-    this.folioSpringLiquibase.setDefaultSchema(this.getDBSchemaName());
-    log.info("About to start liquibase update for tenant [{}]", context.getTenantId());
-
-    try {
-      this.folioSpringLiquibase.performLiquibaseUpdate();
-    } catch (LiquibaseException e) {
-      throw new TenantUpgradeException(e);
-    }
-
-    log.info("Liquibase update for tenant [{}] executed successfully", context.getTenantId());
-    // end original folio-spring-base
+    super.createTenant();
 
     for (Period period : periodsToMigrate) {
       try {
