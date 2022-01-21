@@ -1,16 +1,8 @@
--- Harvested from a mod-calendar 1.12.0 using the contents of /scripts/test-calendars/
+-- Harvested from a mod-calendar 1.12.0
 -- Indexes and foreign keys removed for simplicity, as well as certan internal/audit tables and data
 DROP SCHEMA IF EXISTS "test_mod_calendar" CASCADE;
 
 CREATE SCHEMA "test_mod_calendar";
-
-CREATE TABLE "test_mod_calendar"."actual_opening_hours" (
-  "id" uuid NOT NULL,
-  "jsonb" jsonb NOT NULL,
-  "creation_date" timestamp,
-  "created_by" text,
-  CONSTRAINT "actual_opening_hours_pkey" PRIMARY KEY ("id")
-);
 
 CREATE TABLE "test_mod_calendar"."exceptional_hours" (
   "id" uuid NOT NULL,
@@ -45,7 +37,7 @@ CREATE TABLE "test_mod_calendar"."regular_hours" (
 );
 
 CREATE TABLE "test_mod_calendar"."rmb_internal" (
-  "id" integer DEFAULT nextval('rmb_internal_id_seq') NOT NULL,
+  "id" integer NOT NULL,
   "jsonb" jsonb NOT NULL,
   CONSTRAINT "rmb_internal_pkey" PRIMARY KEY ("id")
 );

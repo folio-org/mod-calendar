@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Priority;
 import lombok.extern.log4j.Log4j2;
@@ -74,9 +75,33 @@ public class CustomTenantService extends TenantService {
    */
   @Override
   public void createTenant() {
+    log.warn("AAAAAAAA1");
+    log.warn("AAAAAAAA2");
+    log.warn("AAAAAAAA3");
+    log.warn("AAAAAaAA4");
+    log.warn("AAAAAAAA5");
+    log.warn("AAAAAAAA6");
+    log.warn("AAAAAAAA7");
+    log.warn("AAAAAAAA8");
+    log.warn("AAAAAAAA9");
+    log.warn("AAAAAAAA10");
+    log.warn("AAAAAAAA11");
+    log.warn("AAAAAAAA12");
+    log.warn("AAAAAAAA13");
+    log.warn("AAAAAAAA14");
+    log.warn("AAAAAAAA15");
+    log.warn("AAAAAAAA16");
+    log.warn("AAAAAAAA17");
+    log.warn("AAAAAAAA18");
+    log.warn("AAAAAAAA19");
+    log.warn("AAAAAAAA20");
+    log.warn("AAAAAAAA21");
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
-      (ResultSet resultSet) -> resultSet.next() && resultSet.getBoolean(1),
+      (ResultSet resultSet) -> {
+        resultSet.next();
+        return resultSet.getBoolean(1);
+      },
       this.getDBSchemaName(),
       RMB_INTERNAL
     );
@@ -93,6 +118,7 @@ public class CustomTenantService extends TenantService {
 
       periodsToMigrate =
         jdbcTemplate.query(GET_RMB_OPENINGS, new RMBOpeningMapper(jdbcTemplate, mapper));
+      periodsToMigrate.removeAll(Collections.singletonList(null));
 
       log.info(String.format("Found %d periods to migrate", periodsToMigrate.size()));
       log.debug(periodsToMigrate);

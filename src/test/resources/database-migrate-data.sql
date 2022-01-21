@@ -1,48 +1,17 @@
-INSERT INTO "regular_hours" (
-  "id", "jsonb", "creation_date", "created_by"
-)
-VALUES
-  (
-    'd6f6d367-9bc2-4339-8eee-9ab12956be7e',
-    '{"id": "d6f6d367-9bc2-4339-8eee-9ab12956be7e", "openingId": "00000000-0000-0000-0000-000000000000", "openingDays": [{"openingDay": {"open": false, "allDay": true, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',
-    NULL, NULL
-  ),
-  (
-    '8522afa4-3ecd-4ebc-ae19-7ce950ec45b3',
-    '{"id": "8522afa4-3ecd-4ebc-ae19-7ce950ec45b3", "openingId": "11111111-1111-1111-1111-111111111111", "openingDays": [{"openingDay": {"open": true, "openingHour": [{"endTime": "23:00", "startTime": "02:00"}]}}]}',
-    NULL, NULL
-  ),
-  (
-    '8d25d5d1-bc78-4876-a44d-7e901c49f579',
-    '{"id": "8d25d5d1-bc78-4876-a44d-7e901c49f579", "openingId": "22222222-2222-2222-2222-222222222222", "openingDays": [{"weekdays": {"day": "MONDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "TUESDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "WEDNESDAY"}, "openingDay": {"open": true, "allDay": true, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "THURSDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "FRIDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "SATURDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "12:00", "startTime": "07:00"}, {"endTime": "20:00", "startTime": "13:30"}]}}]}',
-    NULL, NULL
-  ),
-  (
-    '4a22c6e4-bd2c-48f6-8412-197eb38ad2b5',
-    '{"id": "4a22c6e4-bd2c-48f6-8412-197eb38ad2b5", "openingId": "33333333-3333-3333-3333-333333333333", "openingDays": [{"weekdays": {"day": "MONDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "TUESDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "WEDNESDAY"}, "openingDay": {"open": true, "allDay": true, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "THURSDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "FRIDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "17:30", "startTime": "07:30"}]}}, {"weekdays": {"day": "SATURDAY"}, "openingDay": {"open": true, "allDay": false, "openingHour": [{"endTime": "12:00", "startTime": "07:00"}, {"endTime": "20:00", "startTime": "13:30"}]}}]}',
-    NULL, NULL
-  );
-INSERT INTO "openings" (
-  "id", "jsonb", "creation_date", "created_by"
-)
-VALUES
-  (
-    '00000000-0000-0000-0000-000000000000',
-    '{"id": "00000000-0000-0000-0000-000000000000", "name": "Christmas Closure", "endDate": "2021-12-25T00:00:00.000+00:00", "startDate": "2021-12-24T00:00:00.000+00:00", "exceptional": true, "servicePointId": "3a40852d-49fd-4df2-a1f9-6e2641a6e91f"}',
-    NULL, NULL
-  ),
-  (
-    '11111111-1111-1111-1111-111111111111',
-    '{"id": "11111111-1111-1111-1111-111111111111", "name": "Finals Extra Opening", "endDate": "2021-12-17T00:00:00.000+00:00", "startDate": "2021-12-11T00:00:00.000+00:00", "exceptional": true, "servicePointId": "3a40852d-49fd-4df2-a1f9-6e2641a6e91f"}',
-    NULL, NULL
-  ),
-  (
-    '22222222-2222-2222-2222-222222222222',
-    '{"id": "22222222-2222-2222-2222-222222222222", "name": "November", "endDate": "2021-11-30T00:00:00.000+00:00", "startDate": "2021-11-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "3a40852d-49fd-4df2-a1f9-6e2641a6e91f"}',
-    NULL, NULL
-  ),
-  (
-    '33333333-3333-3333-3333-333333333333',
-    '{"id": "33333333-3333-3333-3333-333333333333", "name": "December 5 through 31", "endDate": "2021-12-31T00:00:00.000+00:00", "startDate": "2021-12-05T00:00:00.000+00:00", "exceptional": false, "servicePointId": "3a40852d-49fd-4df2-a1f9-6e2641a6e91f"}',
-    NULL, NULL
-  );
+-- Harvested from a mod-calendar 1.12.0 using the contents of AbstractExistingCalendarTest
+
+INSERT INTO "test_mod_calendar"."openings" ("id", "jsonb", "creation_date", "created_by") VALUES
+('cccccccc-cccc-cccc-cccc-cccccccccccc',	'{"id": "cccccccc-cccc-cccc-cccc-cccccccccccc", "name": "replay quake aloft routine", "endDate": "2021-01-04T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": true, "servicePointId": "55555555-5555-5555-5555-555555555555"}',	NULL,	NULL),
+('dddddddd-dddd-dddd-dddd-dddddddddddd',	'{"id": "dddddddd-dddd-dddd-dddd-dddddddddddd", "name": "supplier grouped bride lazily", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-05-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "11111111-1111-1111-1111-111111111111"}',	NULL,	NULL),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',	'{"id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "name": "comic sublime upscale utilize", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-05-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "00000000-0000-0000-0000-000000000000"}',	NULL,	NULL),
+('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',	'{"id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "name": "sectional proving blanching deputy", "endDate": "2021-04-30T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "00000000-0000-0000-0000-000000000000"}',	NULL,	NULL),
+('ffffffff-ffff-ffff-ffff-ffffffffffff',	'{"id": "ffffffff-ffff-ffff-ffff-ffffffffffff", "name": "comic sublime upscale utilize", "endDate": "2021-04-30T00:00:00.000+00:00", "startDate": "2021-03-16T00:00:00.000+00:00", "exceptional": true, "servicePointId": "00000000-0000-0000-0000-000000000000"}',	NULL,	NULL),
+('00000000-0000-0000-0000-000000000000',	'{"id": "00000000-0000-0000-0000-000000000000", "name": "replay quake aloft routine", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-07-04T00:00:00.000+00:00", "exceptional": true, "servicePointId": "00000000-0000-0000-0000-000000000000"}',	NULL,	NULL);
+
+INSERT INTO "test_mod_calendar"."regular_hours" ("id", "jsonb", "creation_date", "created_by") VALUES
+('59a398b0-ea5c-4c44-9d5e-ccaa5f3d914e',	'{"id": "59a398b0-ea5c-4c44-9d5e-ccaa5f3d914e", "openingId": "cccccccc-cccc-cccc-cccc-cccccccccccc", "openingDays": [{"openingDay": {"open": true, "allDay": false, "exceptional": true, "openingHour": [{"endTime": "14:59", "startTime": "04:00"}]}}]}',	NULL,	NULL),
+('f3ed575b-3cae-45d7-b31e-b5d766a5dabf',	'{"id": "f3ed575b-3cae-45d7-b31e-b5d766a5dabf", "openingId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "openingDays": [{"weekdays": {"day": "MONDAY"}, "openingDay": {"open": true, "allDay": false, "exceptional": false, "openingHour": [{"endTime": "12:30", "startTime": "00:00"}, {"endTime": "23:59", "startTime": "23:00"}]}}, {"weekdays": {"day": "THURSDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',	NULL,	NULL),
+('41c3367a-a6a8-42aa-8f59-168e93b923be',	'{"id": "41c3367a-a6a8-42aa-8f59-168e93b923be", "openingId": "dddddddd-dddd-dddd-dddd-dddddddddddd", "openingDays": [{"weekdays": {"day": "MONDAY"}, "openingDay": {"open": true, "allDay": false, "exceptional": false, "openingHour": [{"endTime": "12:30", "startTime": "00:00"}, {"endTime": "23:59", "startTime": "23:00"}]}}, {"weekdays": {"day": "THURSDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',	NULL,	NULL),
+('47f71658-f592-4197-8386-d551a5a5a8aa',	'{"id": "47f71658-f592-4197-8386-d551a5a5a8aa", "openingId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "openingDays": [{"weekdays": {"day": "SUNDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "MONDAY"}, "openingDay": {"open": true, "allDay": false, "exceptional": false, "openingHour": [{"endTime": "14:59", "startTime": "04:00"}]}}, {"weekdays": {"day": "TUESDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "WEDNESDAY"}, "openingDay": {"open": true, "allDay": false, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "23:00"}]}}, {"weekdays": {"day": "THURSDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "FRIDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}, {"weekdays": {"day": "SATURDAY"}, "openingDay": {"open": true, "allDay": true, "exceptional": false, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',	NULL,	NULL),
+('8df90aa8-a0de-4022-b353-bb69f80ac80d',	'{"id": "8df90aa8-a0de-4022-b353-bb69f80ac80d", "openingId": "ffffffff-ffff-ffff-ffff-ffffffffffff", "openingDays": [{"openingDay": {"open": true, "allDay": true, "exceptional": true, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',	NULL,	NULL),
+('71f194d5-98ee-417c-95f4-39ccb99c33f9',	'{"id": "71f194d5-98ee-417c-95f4-39ccb99c33f9", "openingId": "00000000-0000-0000-0000-000000000000", "openingDays": [{"openingDay": {"open": false, "allDay": true, "exceptional": true, "openingHour": [{"endTime": "23:59", "startTime": "00:00"}]}}]}',	NULL,	NULL);

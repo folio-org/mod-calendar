@@ -24,7 +24,7 @@ public class RMBHoursMapper implements RowMapper<List<OpeningDayRelative>> {
 
   protected final ObjectMapper mapper;
 
-  public List<OpeningDayRelative> mapRow(ResultSet result, int rowNum) {
+  public List<OpeningDayRelative> mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
       return Arrays.asList(
         mapper.treeToValue(
@@ -34,11 +34,6 @@ public class RMBHoursMapper implements RowMapper<List<OpeningDayRelative>> {
       );
     } catch (JsonProcessingException e) {
       log.error("Could not parse regular_hours JSON");
-      log.error(e);
-
-      return new ArrayList<>();
-    } catch (SQLException e) {
-      log.error("SQLException on parsing regular_hours");
       log.error(e);
 
       return new ArrayList<>();
