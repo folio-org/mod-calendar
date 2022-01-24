@@ -16,6 +16,7 @@ import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.spring.FolioExecutionContext;
 import org.folio.spring.liquibase.FolioSpringLiquibase;
 import org.folio.spring.service.TenantService;
+import org.folio.tenant.domain.dto.TenantAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -30,15 +31,9 @@ public class CustomTenantService extends TenantService {
   public static final String RMB_INTERNAL = "rmb_internal";
   public static final String GET_RMB_OPENINGS = "SELECT jsonb FROM openings";
 
-  // must be redeclared to change visibility
-  /** the JDBC template to use for database queries */
-  protected final JdbcTemplate jdbcTemplate;
-  /** information about the environment FOLIO is running in */
-  protected final FolioExecutionContext context;
-  /** a custom instance of {@link liquibase.integration.spring.SpringLiquibase SpringLiquibase} */
-  protected final FolioSpringLiquibase folioSpringLiquibase;
-
   protected final CalendarService calendarService;
+
+  protected List<Period> periodsToMigrate;
 
   /**
    * Constructor for a new CustomTenantService.  Directly wraps the original {@link TenantService TenantService} constructor.
@@ -55,37 +50,24 @@ public class CustomTenantService extends TenantService {
     CalendarService calendarService
   ) {
     super(jdbcTemplate, context, folioSpringLiquibase);
-    // initialized here in addition to super as super's fields are private
-    this.jdbcTemplate = jdbcTemplate;
-    this.context = context;
-    this.folioSpringLiquibase = folioSpringLiquibase;
     this.calendarService = calendarService;
+    this.periodsToMigrate = new ArrayList<>();
   }
 
   /**
-   * Get the name of the schema to create.  Re-defined from {@link TenantService#getSchemaName} due to visibility
-   * @return a name for the module's schema
-   */
-  protected String getDBSchemaName() {
-    return context.getFolioModuleMetadata().getDBSchemaName(context.getTenantId());
-  }
-
-  /**
-   * Perform all applicable transformations for a new tenant environment
+   * Parse all calendars from RMB-style database, if applicable
    */
   @Override
-  public void createTenant() {
+  protected void beforeLiquibaseUpdate(TenantAttributes attributes) {
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
       (ResultSet resultSet) -> {
         resultSet.next();
         return resultSet.getBoolean(1);
       },
-      this.getDBSchemaName(),
+      this.getSchemaName(),
       RMB_INTERNAL
     );
-
-    List<Period> periodsToMigrate = new ArrayList<>();
 
     if (shouldMigrate) {
       log.info("Existing RMB installation detected.  Attempting migration.");
@@ -95,17 +77,21 @@ public class CustomTenantService extends TenantService {
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         .setSerializationInclusion(Include.NON_NULL);
 
-      periodsToMigrate =
+      this.periodsToMigrate =
         jdbcTemplate.query(GET_RMB_OPENINGS, new RMBOpeningMapper(jdbcTemplate, mapper));
-      periodsToMigrate.removeAll(Collections.singletonList(null));
+      this.periodsToMigrate.removeAll(Collections.singletonList(null));
 
-      log.info(String.format("Found %d periods to migrate", periodsToMigrate.size()));
-      log.debug(periodsToMigrate);
+      log.info(String.format("Found %d periods to migrate", this.periodsToMigrate.size()));
+      log.debug(this.periodsToMigrate);
     }
+  }
 
-    super.createTenant();
-
-    for (Period period : periodsToMigrate) {
+  /**
+   * Add all periods from beforeLiquibaseUpdate and add them into the newly created schema
+   */
+  @Override
+  protected void afterLiquibaseUpdate(TenantAttributes attributes) {
+    for (Period period : this.periodsToMigrate) {
       try {
         log.info(String.format("Attempting to save calendar with ID %s", period.getId()));
         this.calendarService.createCalendarFromPeriod(period, period.getServicePointId());
