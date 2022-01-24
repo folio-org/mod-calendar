@@ -1,10 +1,8 @@
 databaseChangeLog:
   - changeSet:
-      id: 0005-drop-existing-calendar
+      id: 0005-drop-rmb-calendar
       author: university-of-alabama/ncovercash
-      comment:
-        "Delete all existing mod-calendar tables to make way for new schema. TODO: Make this an
-        actual migration script"
+      comment: "Delete all existing mod-calendar tables to make way for new schema."
       changes:
         - sql:
             sql: DROP TABLE IF EXISTS actual_opening_hours CASCADE;
