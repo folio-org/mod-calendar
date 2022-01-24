@@ -2,6 +2,7 @@ package org.folio.calendar.integration.calendar.periods;
 
 import static org.hamcrest.Matchers.is;
 
+import javax.sql.DataSource;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
@@ -10,6 +11,7 @@ import org.folio.calendar.testconstants.Periods;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -46,8 +48,12 @@ public abstract class AbstractExistingCalendarTest extends BaseApiAutoDatabaseTe
   /**
    * Create all the calendars for these tests.
    */
-  void createAllCalendars() {
+  void createAllCalendars(DataSource dataSource) {
     log.info("Creating calendars to test against");
+
+    cleanDatabase(dataSource);
+    this.hasCreated = true;
+
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_D);
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_F);
     createCalendar(Periods.PERIOD_FULL_EXAMPLE_G);
@@ -57,18 +63,18 @@ public abstract class AbstractExistingCalendarTest extends BaseApiAutoDatabaseTe
   }
 
   @BeforeAll
-  void beforeAll(TestInfo testInfo) {
+  void beforeAll(TestInfo testInfo, @Autowired DataSource dataSource) {
     createDatabase();
-    if (testInfo.getTags().contains("idempotent")) {
-      createAllCalendars();
+    if (!this.hasCreated || testInfo.getTags().contains("idempotent")) {
+      createAllCalendars(dataSource);
     }
   }
 
   @BeforeEach
-  void beforeEach(TestInfo testInfo) {
+  void beforeEach(TestInfo testInfo, @Autowired DataSource dataSource) {
     createDatabase();
-    if (!testInfo.getTags().contains("idempotent")) {
-      createAllCalendars();
+    if (!this.hasCreated || !testInfo.getTags().contains("idempotent")) {
+      createAllCalendars(dataSource);
     }
   }
 
