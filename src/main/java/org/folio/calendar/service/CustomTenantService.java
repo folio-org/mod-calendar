@@ -7,12 +7,17 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import javax.annotation.Priority;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.legacymapper.RMBOpeningMapper;
+import org.folio.calendar.domain.sample.SampleCalendars;
 import org.folio.calendar.exception.AbstractCalendarException;
+import org.folio.calendar.utils.PeriodUtils;
 import org.folio.spring.FolioExecutionContext;
 import org.folio.spring.liquibase.FolioSpringLiquibase;
 import org.folio.spring.service.TenantService;
@@ -100,5 +105,48 @@ public class CustomTenantService extends TenantService {
         log.error(e);
       }
     }
+  }
+
+  /**
+   * Load any applicable reference data.  This is for things which would likely
+   * be relevant in a production install; no pre-populated data makes sense for
+   * this module.  Therefore, nothing is done.
+   */
+  @Override
+  public void loadReferenceData() {
+    log.info("No reference data is applicable for mod-calendar");
+  }
+
+  /**
+   * Load sample data into the application.
+   */
+  @Override
+  public void loadSampleData() {
+    log.info(
+      "Assuming that mod-inventory-storage's default reference service points have been loaded..."
+    );
+
+    SampleCalendars
+      .getSampleCalendars()
+      .forEach((Calendar calendar) -> {
+        try {
+          this.calendarService.checkPeriod(
+              PeriodUtils.toPeriod(calendar.withExceptions(new HashSet<>())),
+              calendar
+                .getServicePoints()
+                .stream()
+                .map(ServicePointCalendarAssignment::getServicePointId)
+                .findFirst()
+                .get()
+            );
+          this.calendarService.insertCalendar(calendar);
+          log.info(String.format("Loaded calendar %s", calendar.getId()));
+        } catch (AbstractCalendarException e) {
+          log.error("Could not load sample calendar - skipping and continuing");
+          log.error(e);
+        }
+      });
+
+    log.info("Added sample calendars");
   }
 }
