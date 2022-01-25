@@ -1,6 +1,26 @@
 # Test Calendars
 
-This loads a series of four calendars into the application.
+## Dynamic Sample Data
+
+The recommended way to get sample data is to install this module on your Okapi tenant using the
+`loadSample` parameter.
+
+For example:
+
+```sh
+curl -d'[{"id":"mod-foo-1.0.0", "action":"enable"}]' \
+  http://localhost:9130/_/proxy/tenants/testlib/install?tenantParameters=loadReference%3Dtrue
+```
+
+Or, if running locally outside of Okapi (note that `true` is a string, not a normal boolean):
+
+```sh
+curl -d '{"module_to": "mod-foo-1.0.0", "parameters":["loadSample": "true"]}'
+```
+
+## Static Sample Data
+
+To load the hardcoded calendars in this directly, follow these instructions:
 
 You may manually specify an `OKAPI_HOST` and `OKAPI_TOKEN` through environment variables, if not
 testing locally (defaults to `http://localhost:8080`). For example:

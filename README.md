@@ -2,6 +2,15 @@
 
 [Kanban](https://github.com/orgs/ualibweb/projects/1)
 
+## Tenant Parameters
+
+When deploying to a module through Okapi, the following parameters are available:
+
+| Name          | Default Value | Description                                                                                                                                                                                                                                                                                                                   |
+| ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| loadReference | `"false"`     | Does not do anything, however, is supported per the [Okapi specification](https://github.com/folio-org/okapi/blob/master/doc/guide.md)                                                                                                                                                                                        |
+| loadSample    | `"false"`     | If `"true"`, a series of sample calendars will be added representing examples of exceptions and openings across multiple calendars and service points. This will use the same service points loaded by [mod-inventory-storage](https://github.com/folio-org/mod-inventory-storage/tree/master/reference-data/service-points). |
+
 ## Environment variables
 
 See `.env.sample` for example values.
