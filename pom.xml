@@ -377,7 +377,6 @@
           <excludes>
             <exclude>**/dto/*</exclude>
             <exclude>**/rest/resource/*</exclude>
-            <exclude>**/CalendarApplication.java</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -409,7 +408,7 @@
             <argument>delombok</argument>
             <argument>--verbose</argument>
             <argument>--nocopy</argument>
-            <argument>${project.build.directory}/generated-sources/api</argument>
+            <argument>${project.build.directory}/generated-sources/api/src/main/java</argument>
             <argument>${project.basedir}/src/main/java</argument>
             <argument>-d</argument>
             <argument>${project.build.directory}/generated-sources/delombok</argument>
@@ -431,6 +430,7 @@
         <version>${maven-javadoc-plugin.version}</version>
         <configuration>
           <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
+          <doclint>none</doclint>
         </configuration>
         <executions>
           <execution>
