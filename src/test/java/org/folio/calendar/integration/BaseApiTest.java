@@ -138,19 +138,23 @@ public abstract class BaseApiTest {
   @BeforeEach
   public void createDatabase() {
     if (!isInitialized()) {
-      log.info("Initializing database by posting to /_/tenant");
-      // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
-      // the v2.0 API of /_/tenant requires a non-empty moduleTo; without this, the module will not be initialized properly or enabled
-      // the string we use does not matter (as there will be no modules in the database)
-      ra(false)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new TenantAttributes().moduleTo("mod-calendar"))
-        .post(getRequestUrl("/_/tenant"))
-        .then()
-        .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
+      tenantInstall(new TenantAttributes().moduleTo("mod-calendar"));
 
       setInitialized(true);
     }
+  }
+
+  public void tenantInstall(TenantAttributes tenantAttributes) {
+    // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+    // the v2.0 API of /_/tenant requires a non-empty moduleTo; without this, the module will not be initialized properly or enabled
+    // the string we use does not matter (as there will be no modules in the database)
+    log.info(String.format("Initializing database by posting to /_/tenant %s", tenantAttributes));
+    ra(false)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(tenantAttributes)
+      .post(getRequestUrl("/_/tenant"))
+      .then()
+      .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
   }
 
   @AfterEach
