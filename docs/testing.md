@@ -3,10 +3,12 @@
 To run tests, you can use the Maven lifecycle `test`:
 
 ```sh
-mvn test
+mvn test integration-test
 ```
 
-This will run all tests in the repository.
+This will run all tests in the repository. If you only want to do unit tests, remove
+`integration-test`. Due to the Maven lifecycle, integration tests will generally cause unit tests to
+run regardless.
 
 ## Integration Test Requirements
 
