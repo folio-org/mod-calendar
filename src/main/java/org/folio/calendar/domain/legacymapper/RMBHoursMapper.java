@@ -13,7 +13,7 @@ import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * Conversion class for data from the regular_hours table to List<OpeningDayRelative>
+ * Conversion class for data from the regular_hours table to List&lt;OpeningDayRelative&gt;
  */
 @Data
 @Log4j2
