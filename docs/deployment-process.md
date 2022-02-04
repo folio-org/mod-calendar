@@ -11,19 +11,6 @@ As of now, this is largely based on other existing modules' `pom.xml`. There app
 efforts to standardize versioning of the sub-components (ref FOLSPRINGB-8, FOLSPRINGB-3), however,
 none have produced results.
 
-The current dependencies are:
-
-- `org.folio.folio-spring-base`, for the base FOLIO framework;
-- `org.springframework.boot`, for the Spring framework itself;
-- `org.projectlombok.lombok`, a IDE assistance tool for debugging;
-- `org.postgresql`, to provide a Postgres interface;
-- `org.mapstruct`, a tool to move between object models (included in others, but not currently
-  used);
-- `maven-surefire-plugin` to integrate testing;
-- `maven-release-plugin` to add scripts for releasing new versions;
-- `org.codehaus.mojo` for better Maven scripting; and
-- `com.coderplus.maven.plugins` for the same reason.
-
 ## Module Descriptor
 
 This is used by Okapi to get information about the module.

@@ -22,7 +22,7 @@ This should return successfully (2xx) and echo back the newly defined module.
 To build the image, use:
 
 ```sh
-docker build $DOCKER_BUILD_ARGS -t docker.ci.folio.org/mod-calendar .
+docker build -t docker.ci.folio.org/mod-calendar .
 ```
 
 Please note that the `.` is part of the command.

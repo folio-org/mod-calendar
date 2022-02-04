@@ -70,6 +70,6 @@ public abstract class GetPeriodAbstractTest extends AbstractExistingCalendarTest
     if (limit != null) {
       ra = ra.queryParam("limit", limit);
     }
-    return ra.get(getRequestUrl(String.format(GET_PERIOD_API_ROUTE, servicePointId)));
+    return ra.get(getRequestUrl(GET_PERIOD_API_ROUTE));
   }
 }

@@ -2,7 +2,6 @@ get:
   operationId: getDateOpenings
   description: List all information for each calendar day
   parameters:
-    - $ref: ../../parameters/x-okapi-tenant.yaml
     - in: query
       name: servicePointId
       required: false

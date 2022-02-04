@@ -135,9 +135,12 @@ public abstract class BaseApiTest {
   public void createDatabase() {
     if (!isInitialized()) {
       log.info("Initializing database by posting to /_/tenant");
-      ra(false) // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      // "/_/tenant" is not in Swagger schema, therefore, validation must be disabled
+      // the v2.0 API of /_/tenant requires a non-empty moduleTo; without this, the module will not be initialized properly or enabled
+      // the string we use does not matter (as there will be no modules in the database)
+      ra(false)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(new TenantAttributes().moduleTo(""))
+        .body(new TenantAttributes().moduleTo("mod-calendar"))
         .post(getRequestUrl("/_/tenant"))
         .then()
         .statusCode(both(greaterThanOrEqualTo(200)).and(lessThanOrEqualTo(299)));
