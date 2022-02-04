@@ -14,7 +14,7 @@ ln -s scripts/pre-commit.sh .git/hooks/pre-commit
 This method of installation will keep your hook up to date with any changes from this repo.
 
 In order to use this, all the NPM modules in [styling.md](styling.md) must be installed as well as
-`swagger-cli` (to test the schema). Additionally, `liquibase` will need to be installed.
+`swagger-cli` (to test the schema).
 
 This script consists of a few main parts:
 
