@@ -173,7 +173,8 @@
         <directory>src/main/resources</directory>
       </resource>
       <resource>
-        <directory>${project.basedir}/translations/mod-calendar</directory>
+        <directory>${project.basedir}/translations</directory>
+        <targetPath>translations</targetPath>
       </resource>
     </resources>
     <plugins>
