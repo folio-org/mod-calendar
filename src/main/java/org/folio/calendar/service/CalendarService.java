@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
+import lombok.AllArgsConstructor;
 import org.folio.calendar.controller.CalendarController;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
@@ -30,14 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
  * A Service class for calendar-related API calls
  */
 @Service
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class CalendarService {
 
   private final CalendarRepository calendarRepository;
-
-  @Autowired
-  CalendarService(CalendarRepository calendarRepository) {
-    this.calendarRepository = calendarRepository;
-  }
 
   /**
    * Get all the calendars for a certain service point with normal hours
