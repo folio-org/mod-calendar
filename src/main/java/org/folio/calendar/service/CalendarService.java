@@ -257,7 +257,7 @@ public class CalendarService {
    * @throws org.folio.calendar.exception.AbstractCalendarException if this period is not suitable for insertion
    */
   public void checkPeriod(Period period, UUID servicePointId, Calendar ignore) {
-    if (period.getName().trim().isEmpty()) {
+    if (period.getName().isBlank()) {
       throw new InvalidDataException(
         ErrorCode.NO_NAME,
         new ExceptionParameters(
