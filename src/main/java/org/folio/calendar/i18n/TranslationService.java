@@ -1,5 +1,6 @@
 package org.folio.calendar.i18n;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -147,10 +148,15 @@ public class TranslationService {
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
    */
   public List<Locale> getCurrentLocales() {
-    return Collections.list(
-      ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
-        .getLocales()
-    );
+    try {
+      return Collections.list(
+        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()
+          .getLocales()
+      );
+    } catch (IllegalStateException e) {
+      log.error(e);
+      return new ArrayList<>();
+    }
   }
 
   /**
