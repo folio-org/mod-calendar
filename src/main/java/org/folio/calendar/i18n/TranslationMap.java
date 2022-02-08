@@ -1,11 +1,13 @@
 package org.folio.calendar.i18n;
 
+import com.ibm.icu.text.MessageFormat;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.folio.calendar.utils.MapUtils;
 
 @ToString
 @EqualsAndHashCode
@@ -94,5 +96,16 @@ public class TranslationMap {
     } else {
       return key;
     }
+  }
+
+  /**
+   * Format an ICU format string (found by its key), supplying a series of named arguments as key
+   * value pairs.  For example: {@code format("Hello {name}", "name", parameterValue)}
+   * @param key the key of the format string
+   * @param args pairs of keys and values to interpolate
+   * @return the formatted string
+   */
+  public String format(String key, Object... args) {
+    return MessageFormat.format(this.get(key), MapUtils.buildMap(args));
   }
 }
