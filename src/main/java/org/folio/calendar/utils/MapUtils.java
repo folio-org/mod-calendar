@@ -11,9 +11,9 @@ public class MapUtils {
   public static final int NUM_IN_A_PAIR = 2;
 
   /**
-   * Get a Map&lt;String, Object&gt; from a set of String -> Object pairs
+   * Get a Map&lt;String, Object&gt; from a set of String -&gt; Object pairs
    * @param args pairs of elements, e.g. key1, value1, key2, value2, ...
-   * @return the map of each key => value
+   * @return the map of each key =&gt; value
    * @throws IllegalArgumentException if an odd number of parameters is passed
    */
   public static Map<String, Object> buildMap(Object... args) {
