@@ -7,8 +7,10 @@ import javax.annotation.CheckForNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.utils.MapUtils;
 
+@Log4j2
 @ToString
 @EqualsAndHashCode
 public class TranslationMap {
@@ -94,6 +96,7 @@ public class TranslationMap {
     } else if (this.fallback != null) {
       return this.fallback.get(key);
     } else {
+      log.warn("Could not resolve key " + key + " in any translation");
       return key;
     }
   }

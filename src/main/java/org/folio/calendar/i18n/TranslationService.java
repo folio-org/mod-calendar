@@ -171,4 +171,18 @@ public class TranslationService {
 
     return this.getDefaultTranslation();
   }
+
+  /**
+   * Wraps the {@link TranslationMap#format TranslationMap#format} method on the current translation.
+   * Equivalent to {@code getCurrentTranslation().format(...)}
+   *
+   * Format an ICU format string (found by its key), supplying a series of named arguments as key
+   * value pairs.  For example: {@code format("Hello {name}", "name", parameterValue)}
+   * @param key the key of the format string
+   * @param args pairs of keys and values to interpolate
+   * @return the formatted string
+   */
+  public String format(String key, Object... args) {
+    return this.getCurrentTranslation().format(key, args);
+  }
 }

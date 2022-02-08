@@ -18,6 +18,7 @@ import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
+import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.utils.DateUtils;
@@ -33,6 +34,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class CalendarService {
+
+  private final TranslationService translationService;
 
   private final CalendarRepository calendarRepository;
 
@@ -150,8 +153,7 @@ public class CalendarService {
     if (this.calendarRepository.existsById(period.getId())) {
       throw new DataConflictException(
         new ExceptionParameters("period", period),
-        "The period ID %s already exists",
-        period.getId()
+        translationService.format("error.periodIdConflict", "conflictingUuid", period.getId())
       );
     }
 
@@ -201,8 +203,7 @@ public class CalendarService {
       .orElseThrow(() ->
         new DataNotFoundException(
           new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
-          "No calendar was found with ID %s",
-          id
+          translationService.format("error.calendarNotFound", "requestedId", id)
         )
       );
   }
@@ -231,8 +232,11 @@ public class CalendarService {
           CalendarController.PARAMETER_NAME_PERIOD_ID,
           periodId
         ),
-        "The period requested does exist, however, is not assigned to service point %s",
-        servicePointId
+        translationService.format(
+          "error.servicePointExistingMismatch",
+          "requestedId",
+          servicePointId
+        )
       );
     }
 
@@ -266,8 +270,7 @@ public class CalendarService {
           CalendarController.PARAMETER_NAME_PERIOD,
           period
         ),
-        "The provided name (\"%s\") was empty",
-        period.getName()
+        translationService.format("error.nameEmpty")
       );
     }
     if (period.getStartDate().getValue().isAfter(period.getEndDate().getValue())) {
@@ -279,9 +282,13 @@ public class CalendarService {
           CalendarController.PARAMETER_NAME_PERIOD,
           period
         ),
-        "The start date (%s) was after the end date (%s)",
-        period.getStartDate(),
-        period.getEndDate()
+        translationService.format(
+          "error.dateRangeInvalid",
+          "startDate",
+          period.getStartDate(),
+          "endDate",
+          period.getEndDate()
+        )
       );
     }
     if (!servicePointId.equals(period.getServicePointId())) {
@@ -292,9 +299,13 @@ public class CalendarService {
           CalendarController.PARAMETER_NAME_PERIOD,
           period
         ),
-        "The service point ID in the URL (%s) did not match the one in the payload (%s)",
-        servicePointId,
-        period.getServicePointId()
+        translationService.format(
+          "servicePointUrlMismatch",
+          "uuid1",
+          servicePointId,
+          "uuid2",
+          period.getServicePointId()
+        )
       );
     }
 
@@ -328,12 +339,15 @@ public class CalendarService {
           CalendarController.PARAMETER_NAME_PERIOD,
           period
         ),
-        "This period (%s to %s) overlaps with another calendar (\"%s\" from %s to %s)",
-        period.getStartDate(),
-        period.getEndDate(),
-        overlapped.getName(),
-        overlapped.getStartDate(),
-        overlapped.getEndDate()
+        translationService.format(
+          "calendarOverlap",
+          "name",
+          overlapped.getName(),
+          "startDate",
+          overlapped.getStartDate(),
+          "endDate",
+          overlapped.getEndDate()
+        )
       );
     }
   }

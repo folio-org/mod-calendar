@@ -41,19 +41,16 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * @param parameters The parameters causing the exception
    * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
+   * @param message    A string for the error message
    */
   protected AbstractCalendarException(
     Throwable cause,
     ExceptionParameters parameters,
     HttpStatus statusCode,
     ErrorCode errorCode,
-    String message,
-    Object... format
+    String message
   ) {
-    super(String.format(message, format), cause);
+    super(message, cause);
     if (parameters == null) {
       parameters = new ExceptionParameters();
     }
