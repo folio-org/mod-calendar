@@ -10,8 +10,5 @@
   "error.servicePointUrlMismatch": "Service point ID in the URL ({uuid1}) does not match the payload ({uuid2})",
   "error.nameEmpty": "Name cannot be empty or only whitespace",
   "error.dateRangeInvalid": "Start date {startDate, date, medium} cannot be after end date {endDate, date, medium}",
-  "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})",
-  "error.internal.legacyConversionServicePointError": "Calendar with ID {uuid} must have exactly one service point to be converted to a period",
-  "error.internal.legacyConversionComplexError": "Calendar with ID {uuid} must have only normal openings or exactly one exception to be converted to a period",
-  "error.internal.trace.causedBySeparator": "----------------- CAUSED BY -----------------"
+  "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})"
 }

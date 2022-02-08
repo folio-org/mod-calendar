@@ -28,4 +28,15 @@ public class InvalidDataException extends AbstractCalendarException {
   public InvalidDataException(ExceptionParameters parameters, String message) {
     this(ErrorCode.INVALID_REQUEST, parameters, message);
   }
+
+  /**
+   * Create an exception for invalid data with a cause, message, and parameters.
+   *
+   * @param cause      The cause of the exception
+   * @param parameters Parameters which caused this issue
+   * @param message    A string for the error message
+   */
+  public InvalidDataException(Throwable cause, ExceptionParameters parameters, String message) {
+    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST, message);
+  }
 }

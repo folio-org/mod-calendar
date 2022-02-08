@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import org.folio.calendar.domain.types.LegacyPeriodDate;
+import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testutils.MapperUtils;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ public class LegacyPeriodDateTest {
   void testParseInvalidDate() throws JsonMappingException, JsonProcessingException {
     assertThrows(
       "An invalid small string cannot be parsed as a legacy date",
-      IllegalArgumentException.class,
+      InvalidDataException.class,
       () -> MapperUtils.MAPPER.readValue("\"invalid\"", LegacyPeriodDate.class)
     );
   }
@@ -53,7 +54,7 @@ public class LegacyPeriodDateTest {
   void testParseInvalidLongDate() throws JsonMappingException, JsonProcessingException {
     assertThrows(
       "An invalid long string cannot be parsed as a legacy date",
-      IllegalArgumentException.class,
+      InvalidDataException.class,
       () -> MapperUtils.MAPPER.readValue("\"invalid long string\"", LegacyPeriodDate.class)
     );
   }
