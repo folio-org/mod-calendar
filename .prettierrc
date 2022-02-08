@@ -7,5 +7,6 @@
   "trailingComma": "all",
   "quoteProps": "consistent",
   "bracketSameLine": false,
-  "xmlWhitespaceSensitivity": "ignore"
+  "xmlWhitespaceSensitivity": "ignore",
+  "language": "postgresql"
 }
