@@ -1,6 +1,9 @@
 package org.folio.calendar.i18n;
 
 import com.ibm.icu.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.CheckForNull;
@@ -8,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.types.LegacyPeriodDate;
 import org.folio.calendar.utils.MapUtils;
 
 @Log4j2
@@ -96,7 +100,7 @@ public class TranslationMap {
     } else if (this.fallback != null) {
       return this.fallback.get(key);
     } else {
-      log.warn("Could not resolve key " + key + " in any translation");
+      log.error("Could not resolve key " + key + " in any translation");
       return key;
     }
   }
@@ -109,6 +113,17 @@ public class TranslationMap {
    * @return the formatted string
    */
   public String format(String key, Object... args) {
+    for (int i = 0; i < args.length; i++) {
+      // Convert LegacyPeriodDate to LocalDate as needed
+      if (args[i] instanceof LegacyPeriodDate) {
+        args[i] = ((LegacyPeriodDate) args[i]).getValue();
+      }
+      // Convert LocalDate to Date
+      // Sadly, ICU formatting strings only support date formats with the old Date class :(
+      if (args[i] instanceof LocalDate) {
+        args[i] = Date.from(((LocalDate) args[i]).atStartOfDay(ZoneId.systemDefault()).toInstant());
+      }
+    }
     return MessageFormat.format(this.get(key), MapUtils.buildMap(args));
   }
 }

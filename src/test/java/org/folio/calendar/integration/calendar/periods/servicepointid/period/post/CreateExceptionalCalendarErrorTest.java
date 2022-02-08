@@ -54,12 +54,8 @@ class CreateExceptionalCalendarErrorTest extends CreateCalendarAbstractTest {
       error.getMessage(),
       containsString(
         String.format(
-          "This period (%s to %s) overlaps with another calendar (\"%s\" from %s to %s)",
-          Periods.PERIOD_FULL_EXCEPTIONAL_B.getStartDate(),
-          Periods.PERIOD_FULL_EXCEPTIONAL_B.getEndDate(),
-          Periods.PERIOD_FULL_EXCEPTIONAL_A.getName(),
-          Periods.PERIOD_FULL_EXCEPTIONAL_A.getStartDate(),
-          Periods.PERIOD_FULL_EXCEPTIONAL_A.getEndDate()
+          "This calendar overlaps with another calendar (“%s”",
+          Periods.PERIOD_FULL_EXCEPTIONAL_A.getName()
         )
       )
     );

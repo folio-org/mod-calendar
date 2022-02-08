@@ -2,6 +2,7 @@ package org.folio.calendar.integration.calendar.periods.servicepointid.period.pe
 
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -43,7 +44,7 @@ class DeleteNonExistentCalendarTest extends DeleteCalendarAbstractTest {
     assertThat(
       "Error message specified calendar not found error",
       error.getMessage(),
-      containsString(String.format("No calendar was found with ID"))
+      allOf(containsString("No calendar exists with ID " + UUIDs.UUID_2))
     );
   }
 

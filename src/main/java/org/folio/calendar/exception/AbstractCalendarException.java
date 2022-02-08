@@ -72,10 +72,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
     // Can only have one exception at a time
     Error.ErrorBuilder errorBuilder = Error.builder();
     errorBuilder = errorBuilder.code(this.getErrorCode());
-    errorBuilder =
-      errorBuilder.message(
-        String.format("%s: %s", this.getClass().getSimpleName(), this.getMessage())
-      );
+    errorBuilder = errorBuilder.message(this.getMessage());
     for (StackTraceElement frame : this.getStackTrace()) {
       errorBuilder = errorBuilder.traceItem(frame.toString());
     }

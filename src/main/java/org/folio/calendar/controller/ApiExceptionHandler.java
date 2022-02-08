@@ -142,7 +142,7 @@ public class ApiExceptionHandler {
       HttpStatus.INTERNAL_SERVER_ERROR,
       ErrorCode.INTERNAL_SERVER_ERROR,
       translationService.format(
-        "internalServerError",
+        "error.internalServerError",
         "className",
         exception.getClass().getSimpleName(),
         "errorMessage",

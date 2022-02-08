@@ -300,7 +300,7 @@ public class CalendarService {
           period
         ),
         translationService.format(
-          "servicePointUrlMismatch",
+          "error.servicePointUrlMismatch",
           "uuid1",
           servicePointId,
           "uuid2",
@@ -340,7 +340,7 @@ public class CalendarService {
           period
         ),
         translationService.format(
-          "calendarOverlap",
+          "error.calendarOverlap",
           "name",
           overlapped.getName(),
           "startDate",

@@ -18,6 +18,7 @@ import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.testutils.MapperUtils;
 import org.folio.calendar.testutils.WireMockInitializer;
 import org.folio.calendar.utils.DateUtils;
@@ -60,6 +61,9 @@ public abstract class BaseApiTest {
 
   @Autowired
   protected FolioModuleMetadata metadata;
+
+  @Autowired
+  protected TranslationService translationService;
 
   @Value("${x-okapi-url}")
   protected String okapiUrl = null;

@@ -48,7 +48,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
       error.getMessage(),
       containsString(
         String.format(
-          "The service point ID in the URL (%s) did not match the one in the payload (%s)",
+          "Service point ID in the URL (%s) does not match the payload (%s)",
           UUIDs.UUID_F,
           Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
         )
@@ -81,7 +81,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     assertThat(
       "Error message specified missing name error",
       error.getMessage(),
-      containsString(String.format("The provided name (\"%s\") was empty", ""))
+      containsString("Name cannot be empty or only whitespace")
     );
   }
 
@@ -110,7 +110,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     assertThat(
       "Error message specified missing name error",
       error.getMessage(),
-      containsString(String.format("The provided name (\"%s\") was empty", " \t "))
+      containsString("Name cannot be empty or only whitespace")
     );
   }
 
@@ -145,13 +145,7 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
     assertThat(
       "Error message specified invalid date range",
       error.getMessage(),
-      containsString(
-        String.format(
-          "The start date (%s) was after the end date (%s)",
-          Dates.DATE_2021_12_31,
-          Dates.DATE_2021_01_01
-        )
-      )
+      containsString("cannot be after end date")
     );
   }
 
@@ -193,12 +187,8 @@ class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
       error.getMessage(),
       containsString(
         String.format(
-          "This period (%s to %s) overlaps with another calendar (\"%s\" from %s to %s)",
-          Periods.PERIOD_FULL_EXAMPLE_D.getStartDate(),
-          Periods.PERIOD_FULL_EXAMPLE_D.getEndDate(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getName(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getStartDate(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getEndDate()
+          "This calendar overlaps with another calendar (“%s”",
+          Periods.PERIOD_FULL_EXAMPLE_C.getName()
         )
       )
     );
