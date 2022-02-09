@@ -7,10 +7,10 @@ import static org.hamcrest.Matchers.is;
 import org.folio.calendar.i18n.TranslationFile;
 import org.junit.jupiter.api.Test;
 
-public class TranslationFileTest {
+class TranslationFileTest {
 
   @Test
-  void testGetParts() {
+  void testFullPartsExtraction() {
     assertThat(
       "en_us.json parses to [en, us]",
       TranslationFile.getParts("en_us.json"),
@@ -26,17 +26,15 @@ public class TranslationFileTest {
       TranslationFile.getParts("EN_US"),
       is(arrayContaining("en", "us"))
     );
+  }
+
+  @Test
+  void testPartialPartsExtraction() {
     assertThat(
       "en.json parses to [en, *]",
       TranslationFile.getParts("en.json"),
       is(arrayContaining("en", "*"))
     );
-    assertThat(
-      "\"\" parses to [*, *]",
-      TranslationFile.getParts(""),
-      is(arrayContaining("*", "*"))
-    );
-    assertThat("_ parses to [*, *]", TranslationFile.getParts("_"), is(arrayContaining("*", "*")));
     assertThat(
       "en_us_extra parses to [en, us]",
       TranslationFile.getParts("en_us_extra"),
@@ -57,6 +55,15 @@ public class TranslationFileTest {
       TranslationFile.getParts("_us"),
       is(arrayContaining("*", "us"))
     );
+  }
+
+  void testEmptyPartsExtraction() {
+    assertThat(
+      "\"\" parses to [*, *]",
+      TranslationFile.getParts(""),
+      is(arrayContaining("*", "*"))
+    );
+    assertThat("_ parses to [*, *]", TranslationFile.getParts("_"), is(arrayContaining("*", "*")));
     assertThat(
       "null parses to [*, *]",
       TranslationFile.getParts(null),

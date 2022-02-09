@@ -28,19 +28,16 @@ public enum TranslationMatchQuality {
    * </ol>
    */
   public static TranslationMatchQuality getQuality(Locale locale, TranslationFile file) {
+    // certain this will be exactly size two
     String[] parts = file.getParts();
 
-    if (parts.length == 0) {
-      return NO_MATCH;
-    }
-
-    // language mismatch
+    // language mismatch (also handles empty filename)
     if (!locale.getLanguage().equalsIgnoreCase(parts[0])) {
       return NO_MATCH;
     }
 
     // no country from file
-    if (parts.length == 1 || parts[1].equalsIgnoreCase(TranslationFile.UNKNOWN_PART)) {
+    if (parts[1].equalsIgnoreCase(TranslationFile.UNKNOWN_PART)) {
       if ("".equals(locale.getCountry())) {
         return PERFECT_MATCH;
       } else {
