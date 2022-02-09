@@ -284,7 +284,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.0.0-M5</version>
         <configuration>
-          <argLine>${surefire.jacoco.args}</argLine>
+          <useSystemClassLoader>false</useSystemClassLoader>
           <includes>
             <include>**/unit/**/*.java</include>
           </includes>
@@ -295,7 +295,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <version>3.0.0-M5</version>
         <configuration>
-          <argLine>${failsafe.jacoco.args}</argLine>
           <includes>
             <include>**/integration/**/*.java</include>
           </includes>
@@ -379,6 +378,32 @@
       </plugin>
 
       <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <configuration>
+          <excludes>
+            <exclude>**/dto/*</exclude>
+            <exclude>**/rest/resource/*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.0.0</version>
@@ -407,92 +432,6 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${jacoco-maven-plugin.version}</version>
-        <configuration>
-          <excludes>
-            <exclude>**/dto/*</exclude>
-            <exclude>**/rest/resource/*</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>prepare-agent</id>
-            <phase>process-test-classes</phase>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-            <configuration>
-              <destFile>${project.build.directory}/site/jacoco/jacoco-unit.exec</destFile>
-              <propertyName>surefire.jacoco.args</propertyName>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>prepare-agent-integration</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>prepare-agent-integration</goal>
-            </goals>
-            <configuration>
-              <destFile>${project.build.directory}/site/jacoco/jacoco-integration.exec</destFile>
-              <propertyName>failsafe.jacoco.args</propertyName>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>report</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>merge</goal>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <!-- merge config -->
-              <destFile>${project.build.directory}/site/jacoco/jacoco.exec</destFile>
-              <fileSets>
-                <fileSet>
-                  <directory>${project.build.directory}/site/jacoco</directory>
-                  <includes>
-                    <include>jacoco-unit.exec</include>
-                    <include>jacoco-integration.exec</include>
-                  </includes>
-                </fileSet>
-              </fileSets>
-              <!-- report config -->
-              <dataFile>${project.build.directory}/site/jacoco/jacoco.exec</dataFile>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>reportu</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <dataFile>${project.build.directory}/site/jacoco/jacoco-unit.exec</dataFile>
-              <outputDirectory>${project.build.directory}/site/jacoco/unit/</outputDirectory>
-            </configuration>
-          </execution>
-
-          <execution>
-            <id>reporti</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <configuration>
-              <dataFile>${project.build.directory}/site/jacoco/jacoco-integration.exec</dataFile>
-              <outputDirectory>${project.build.directory}/site/jacoco/integration/</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>

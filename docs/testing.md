@@ -46,9 +46,7 @@ In order to view coverage reports in a human readable format, use `verify` (or
 mvn verify
 ```
 
-Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status. The
-`unit` and `integration` folders here will also include reports for just unit, or just integration,
-tests respectively.
+Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status.
 
 If you prefer more proactive coverage reports, there are a number of plugins for IDEs which will
 report this, such as
