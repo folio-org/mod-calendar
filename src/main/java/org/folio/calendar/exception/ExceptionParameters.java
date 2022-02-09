@@ -27,14 +27,4 @@ public final class ExceptionParameters implements Serializable {
   public ExceptionParameters(Object... args) {
     this.map.putAll(MapUtils.buildMap(args));
   }
-
-  /**
-   * Add a parameter to this object
-   *
-   * @param key The key
-   * @param value The value of the parameter to add, of any type
-   */
-  public void addParameter(String key, Object value) {
-    this.map.put(key, value);
-  }
 }
