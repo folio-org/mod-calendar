@@ -46,7 +46,9 @@ In order to view coverage reports in a human readable format, use `verify` (or
 mvn verify
 ```
 
-Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status.
+Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status. The
+`unit` and `integration` folders here will also include reports for just unit, or just integration,
+tests respectively.
 
 If you prefer more proactive coverage reports, there are a number of plugins for IDEs which will
 report this, such as
@@ -60,5 +62,9 @@ also run only certain methods themselves with `-Dtest=SomeClassTest#testSomeMeth
 
 ## Skipping Testing
 
-The unit tests can be annoyingly slow for certain development build processes. To skip them, add
-`-Dmaven.test.skip=true` to the command line.
+Some tests can be annoyingly slow for certain development build processes (particularly when
+debugging the build process itself). To skip unit tests, add `-DskipTests` to the command line. For
+integration tests, use `-DskipITs`.
+
+Please note, this is likely to produce strange (or entirely wrong) results from JaCoCo (for code
+coverage).

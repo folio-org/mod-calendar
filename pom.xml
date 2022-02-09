@@ -457,7 +457,8 @@
                 <fileSet>
                   <directory>${project.build.directory}/site/jacoco</directory>
                   <includes>
-                    <include>*.exec</include>
+                    <include>jacoco-unit.exec</include>
+                    <include>jacoco-integration.exec</include>
                   </includes>
                 </fileSet>
               </fileSets>
