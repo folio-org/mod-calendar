@@ -23,6 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class TranslationService {
 
   private final ResourcePatternResolver resourceResolver;
+  private final TranslationConfiguration translationConfiguration;
 
   /**
    * A map from language code -&gt; country -&gt; JSON resource containing {key -&gt; ICU format string}.
@@ -51,7 +52,10 @@ public class TranslationService {
   public Map<String, Map<String, TranslationFile>> getFileMap() {
     if (this.translationFileFromLanguageCountryMap == null) {
       this.translationFileFromLanguageCountryMap =
-        TranslationFile.buildLanguageCountryPatternMap(this.resourceResolver);
+        TranslationFile.buildLanguageCountryPatternMap(
+          this.translationConfiguration,
+          this.resourceResolver
+        );
     }
     return this.translationFileFromLanguageCountryMap;
   }

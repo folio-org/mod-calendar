@@ -52,6 +52,7 @@ server:
       enabled: false
 
 folio:
+  translationDirectory: /translations/mod-calendar/
   tenant:
     validation:
       enabled: true
