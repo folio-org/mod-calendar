@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -32,9 +31,6 @@ public class TranslationFile {
 
   private static final int MAX_FILENAME_PARTS = 2;
   private static final String JSON_FILE_SUFFIX = ".json";
-
-  @Autowired
-  private TranslationConfiguration translationConfiguration;
 
   /**
    * The resource backing this translation file
@@ -92,7 +88,7 @@ public class TranslationFile {
         )
         .stream()
         .filter(Resource::isReadable)
-        .map(resource -> new TranslationFile(translationConfiguration, resource))
+        .map(TranslationFile::new)
         .collect(Collectors.toList());
 
       if (files.isEmpty()) {

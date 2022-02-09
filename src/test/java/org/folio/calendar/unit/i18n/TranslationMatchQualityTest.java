@@ -11,16 +11,9 @@ import org.springframework.core.io.FileSystemResource;
 
 class TranslationMatchQualityTest {
 
-  protected static TranslationFile FILE_NO_NAME = new TranslationFile(
-    null,
-    new FileSystemResource("")
-  );
-  protected static TranslationFile FILE_EN = new TranslationFile(
-    null,
-    new FileSystemResource("en.json")
-  );
+  protected static TranslationFile FILE_NO_NAME = new TranslationFile(new FileSystemResource(""));
+  protected static TranslationFile FILE_EN = new TranslationFile(new FileSystemResource("en.json"));
   protected static TranslationFile FILE_EN_US = new TranslationFile(
-    null,
     new FileSystemResource("en_us.json")
   );
 
