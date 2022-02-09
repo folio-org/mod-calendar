@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.i18n;
+package org.folio.calendar.integration.types;
 
 import static org.junit.Assert.assertThrows;
 
