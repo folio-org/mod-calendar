@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
@@ -23,12 +24,17 @@ public class TranslationFile {
   public static final String UNKNOWN_PART = "*";
 
   /**
-   * The location of all translations in the classpath
+   * The location of all translations in the classpath.  Will be interpolated with
+   * {@link TranslationConfiguration TranslationConfiguration}.translationDirectory, as read from
+   * {@code folio.translationDirectory} in application.properties (unless otherwise overridden)
    */
-  public static final String TRANSLATIONS_CLASSPATH = "classpath:/translations/mod-calendar/*";
+  public static final String TRANSLATIONS_CLASSPATH = "classpath:%s*";
 
   private static final int MAX_FILENAME_PARTS = 2;
   private static final String JSON_FILE_SUFFIX = ".json";
+
+  @Autowired
+  private TranslationConfiguration translationConfiguration;
 
   /**
    * The resource backing this translation file
@@ -71,14 +77,22 @@ public class TranslationFile {
    * @throws IllegalStateException if the translation files cannot be found
    */
   public static List<TranslationFile> getAvailableTranslationFiles(
+    TranslationConfiguration translationConfiguration,
     ResourcePatternResolver resourceResolver
   ) {
     try {
       List<TranslationFile> files = Arrays
-        .asList(resourceResolver.getResources(TRANSLATIONS_CLASSPATH))
+        .asList(
+          resourceResolver.getResources(
+            String.format(
+              TRANSLATIONS_CLASSPATH,
+              translationConfiguration.getTranslationDirectory()
+            )
+          )
+        )
         .stream()
         .filter(Resource::isReadable)
-        .map(TranslationFile::new)
+        .map(resource -> new TranslationFile(translationConfiguration, resource))
         .collect(Collectors.toList());
 
       if (files.isEmpty()) {
@@ -114,7 +128,7 @@ public class TranslationFile {
     }
     String[] parts = filename.split("_");
 
-    if (parts.length > MAX_FILENAME_PARTS || parts.length <= 0) {
+    if (parts.length > MAX_FILENAME_PARTS) {
       log.warn(
         String.format(
           "Potentially incorrect parsing of translation filename %s into %s: ",
@@ -124,10 +138,19 @@ public class TranslationFile {
       );
     }
 
-    if (parts.length >= 1 && !parts[0].isEmpty()) {
+    if (parts.length == 0) {
+      return result;
+    }
+
+    if (!parts[0].isEmpty()) {
       result[0] = parts[0].toLowerCase();
     }
-    if (parts.length >= MAX_FILENAME_PARTS && !parts[1].isEmpty()) {
+
+    if (parts.length == 1) {
+      return result;
+    }
+
+    if (!parts[1].isEmpty()) {
       result[1] = parts[1].toLowerCase();
     }
 
@@ -139,13 +162,14 @@ public class TranslationFile {
    * @return the map of languages to countries to pattern resources
    */
   public static Map<String, Map<String, TranslationFile>> buildLanguageCountryPatternMap(
+    TranslationConfiguration translationConfiguration,
     ResourcePatternResolver resourceResolver
   ) {
     log.info("Building translation file map");
 
     Map<String, Map<String, TranslationFile>> map = new HashMap<>();
 
-    getAvailableTranslationFiles(resourceResolver)
+    getAvailableTranslationFiles(translationConfiguration, resourceResolver)
       .forEach((TranslationFile file) -> {
         String[] parts = file.getParts();
         map
