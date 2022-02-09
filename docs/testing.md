@@ -39,11 +39,10 @@ mvn verify
 
 ## Coverage
 
-In order to view coverage reports in a human readable format, use `verify` (or
-`post-integration-test`):
+In order to view coverage reports in a human readable format, use the following:
 
 ```sh
-mvn verify
+mvn clean jacoco:prepare-agent test jacoco:report
 ```
 
 Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status.
