@@ -195,4 +195,13 @@ public class TranslationService {
   public String format(String key, Object... args) {
     return this.getCurrentTranslation().format(key, args);
   }
+
+  /**
+   * Clear the cache of any previously-read translation files.  Primarily useful for testing as the
+   * translation files should not change during normal execution.
+   */
+  public void clearCache() {
+    this.translationFileFromLanguageCountryMap = new HashMap<>();
+    this.localeTranslations = new HashMap<>();
+  }
 }
