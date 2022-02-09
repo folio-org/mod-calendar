@@ -2,10 +2,13 @@ package org.folio.calendar.unit.i18n;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import org.folio.calendar.i18n.TranslationFile;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.FileSystemResource;
 
 class TranslationFileTest {
 
@@ -57,6 +60,7 @@ class TranslationFileTest {
     );
   }
 
+  @Test
   void testEmptyPartsExtraction() {
     assertThat(
       "\"\" parses to [*, *]",
@@ -68,6 +72,23 @@ class TranslationFileTest {
       "null parses to [*, *]",
       TranslationFile.getParts(null),
       is(arrayContaining("*", "*"))
+    );
+  }
+
+  @Test
+  void testInstancePartsExtraction() {
+    assertThat(
+      "en_us.json parses as an instance the same as statically",
+      new TranslationFile(new FileSystemResource("en_us.json")).getParts(),
+      is(equalTo(TranslationFile.getParts("en_us.json")))
+    );
+  }
+
+  @Test
+  void testGetMap() {
+    assertThat(
+      new TranslationFile(new FileSystemResource("invalid.json")).getMap().values(),
+      is(empty())
     );
   }
 }
