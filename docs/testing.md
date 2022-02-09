@@ -58,11 +58,13 @@ for Visual Studio Code.
 If you only want to run certain test classes, use the `-Dtest=SomeClassTest` flag on Maven. You can
 also run only certain methods themselves with `-Dtest=SomeClassTest#testSomeMethod`.
 
+Please note, this is likely to produce strange (or entirely wrong) results from JaCoCo (for code
+coverage).
+
 ## Skipping Testing
 
 Some tests can be annoyingly slow for certain development build processes (particularly when
-debugging the build process itself). To skip unit tests, add `-DskipTests` to the command line. For
-integration tests, use `-DskipITs`.
+debugging the build process itself). To skip tests, add `-DskipTests` to the command line.
 
 Please note, this is likely to produce strange (or entirely wrong) results from JaCoCo (for code
 coverage).
