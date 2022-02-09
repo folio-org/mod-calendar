@@ -34,15 +34,16 @@ quite bland and hard to read.
 Then, generate the report:
 
 ```sh
-mvn surefire-report:report
+mvn verify
 ```
 
 ## Coverage
 
-In order to view coverage reports in a human readable format, use `jacoco:report`:
+In order to view coverage reports in a human readable format, use `verify` (or
+`post-integration-test`):
 
 ```sh
-mvn jacoco:report
+mvn verify
 ```
 
 Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status.
