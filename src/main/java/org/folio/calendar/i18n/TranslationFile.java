@@ -27,7 +27,7 @@ public class TranslationFile {
    * {@link TranslationConfiguration TranslationConfiguration}.translationDirectory, as read from
    * {@code folio.translationDirectory} in application.properties (unless otherwise overridden)
    */
-  public static final String TRANSLATIONS_CLASSPATH = "classpath:%s*";
+  public static final String TRANSLATIONS_CLASSPATH = "classpath:%s*.json";
 
   private static final int MAX_FILENAME_PARTS = 2;
   private static final String JSON_FILE_SUFFIX = ".json";
