@@ -1,6 +1,6 @@
 package org.folio.calendar.i18n;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -121,6 +121,7 @@ public class TranslationService {
       foundDefault = getTranslation(Locale.ENGLISH, null);
     }
     if (foundDefault == null) {
+      log.error(this.translationFileFromLanguageCountryMap);
       log.error(
         String.format(
           "No translations are sufficient for the server's default locale %s nor %s",
@@ -165,8 +166,9 @@ public class TranslationService {
           .getLocales()
       );
     } catch (IllegalStateException e) {
+      log.error("Could not find current locales.  Returning {default, english}");
       log.error(e);
-      return new ArrayList<>();
+      return Arrays.asList(Locale.getDefault(), Locale.ENGLISH);
     }
   }
 
