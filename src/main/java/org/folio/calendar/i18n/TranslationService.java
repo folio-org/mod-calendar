@@ -1,6 +1,6 @@
 package org.folio.calendar.i18n;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -111,9 +110,9 @@ public class TranslationService {
 
   /**
    * Find a TranslationMap for the default locale -- used to initialize for
-   * {@code getDefaultTranslations}.  If none can be found, a safe empty map
-   * will be used instead.
+   * {@code getDefaultTranslations}
    * @return the best applicable translation
+   * @throws IllegalStateException if no translation can be found
    */
   protected TranslationMap resolveDefaultLocale() {
     TranslationMap foundDefault = getTranslation(Locale.getDefault(), null);
@@ -121,20 +120,13 @@ public class TranslationService {
       foundDefault = getTranslation(Locale.ENGLISH, null);
     }
     if (foundDefault == null) {
-      log.error(this.translationFileFromLanguageCountryMap);
-      log.error(
+      throw new IllegalStateException(
         String.format(
           "No translations are sufficient for the server's default locale %s nor %s",
           Locale.getDefault(),
           Locale.ENGLISH
         )
       );
-      foundDefault =
-        new TranslationMap(
-          Locale.getDefault(),
-          new TranslationFile(new FileSystemResource("invalid.json")),
-          null
-        );
     }
     return foundDefault;
   }
@@ -166,9 +158,8 @@ public class TranslationService {
           .getLocales()
       );
     } catch (IllegalStateException e) {
-      log.error("Could not find current locales.  Returning {default, english}");
       log.error(e);
-      return Arrays.asList(Locale.getDefault(), Locale.ENGLISH);
+      return new ArrayList<>();
     }
   }
 
