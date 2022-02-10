@@ -91,6 +91,9 @@ public class TranslationFile {
         .map(TranslationFile::new)
         .collect(Collectors.toList());
 
+      log.info(files);
+      log.info(Arrays.toString(resourceResolver.getResources("classpath:*")));
+
       if (files.isEmpty()) {
         throw new IOException("No translation files exist");
       }

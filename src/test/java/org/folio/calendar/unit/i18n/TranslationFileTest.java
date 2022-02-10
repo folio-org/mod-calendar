@@ -78,7 +78,7 @@ class TranslationFileTest {
   @Test
   void testInstancePartsExtraction() {
     assertThat(
-      "en_us.json parses as an instance the same as statically",
+      "Regular en_us.json parses as an instance the same as statically",
       new TranslationFile(new FileSystemResource("en_us.json")).getParts(),
       is(equalTo(TranslationFile.getParts("en_us.json")))
     );

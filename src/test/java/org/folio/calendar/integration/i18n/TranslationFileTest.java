@@ -16,7 +16,7 @@ class TranslationFileTest extends BaseTranslationTest {
 
   @Test
   void testSingleFileGetMap() {
-    translationConfiguration.setTranslationDirectory("/translations/test-normal/");
+    translationConfiguration.setTranslationDirectory("/test-translations/test-normal/");
 
     List<TranslationFile> files = TranslationFile.getAvailableTranslationFiles(
       translationConfiguration,
@@ -32,7 +32,7 @@ class TranslationFileTest extends BaseTranslationTest {
 
   @Test
   void testEmptyFileList() {
-    translationConfiguration.setTranslationDirectory("/translations/test-empty/");
+    translationConfiguration.setTranslationDirectory("/test-translations/test-empty/");
 
     assertThrows(
       IllegalStateException.class,
@@ -44,7 +44,7 @@ class TranslationFileTest extends BaseTranslationTest {
 
   @Test
   void testLanguageCountryMap() {
-    translationConfiguration.setTranslationDirectory("/translations/test-multiple/");
+    translationConfiguration.setTranslationDirectory("/test-translations/test-multiple/");
 
     Map<String, Map<String, TranslationFile>> map = TranslationFile.buildLanguageCountryPatternMap(
       translationConfiguration,
