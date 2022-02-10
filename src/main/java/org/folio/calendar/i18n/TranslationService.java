@@ -213,7 +213,7 @@ public class TranslationService {
    * translation files should not change during normal execution.
    */
   public void clearCache() {
-    this.translationFileFromLanguageCountryMap = new HashMap<>();
+    this.translationFileFromLanguageCountryMap = null;
     this.localeTranslations = new HashMap<>();
   }
 }
