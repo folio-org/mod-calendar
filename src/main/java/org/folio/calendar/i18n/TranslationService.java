@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -110,9 +111,9 @@ public class TranslationService {
 
   /**
    * Find a TranslationMap for the default locale -- used to initialize for
-   * {@code getDefaultTranslations}
+   * {@code getDefaultTranslations}.  If none can be found, a safe empty map
+   * will be used instead.
    * @return the best applicable translation
-   * @throws IllegalStateException if no translation can be found
    */
   protected TranslationMap resolveDefaultLocale() {
     TranslationMap foundDefault = getTranslation(Locale.getDefault(), null);
@@ -120,13 +121,19 @@ public class TranslationService {
       foundDefault = getTranslation(Locale.ENGLISH, null);
     }
     if (foundDefault == null) {
-      throw new IllegalStateException(
+      log.error(
         String.format(
           "No translations are sufficient for the server's default locale %s nor %s",
           Locale.getDefault(),
           Locale.ENGLISH
         )
       );
+      foundDefault =
+        new TranslationMap(
+          Locale.getDefault(),
+          new TranslationFile(new FileSystemResource("invalid.json")),
+          null
+        );
     }
     return foundDefault;
   }
@@ -171,8 +178,20 @@ public class TranslationService {
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
    */
   public TranslationMap getCurrentTranslation() {
+    return this.getBestTranslation(this.getCurrentLocales());
+  }
+
+  /**
+   * Get the best {@link TranslationMap TranslationMap} for the provides list of Locales.
+   * This will return the first one that matches on at least language or, if none match,
+   * the default TranslationMap.
+   *
+   * @param locales the ordered list of locales to consider
+   * @return the best TranslationMap
+   */
+  public TranslationMap getBestTranslation(Iterable<Locale> locales) {
     // return the first one that is a good match
-    for (Locale locale : this.getCurrentLocales()) {
+    for (Locale locale : locales) {
       TranslationMap correspondingMap = this.getTranslation(locale);
       if (correspondingMap.getQuality() != TranslationMatchQuality.NO_MATCH) {
         return correspondingMap;
