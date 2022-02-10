@@ -85,7 +85,7 @@ class TranslationFileTest {
   }
 
   @Test
-  void testGetMap() {
+  void testEmptyGetMap() {
     assertThat(
       new TranslationFile(new FileSystemResource("invalid.json")).getMap().values(),
       is(empty())
