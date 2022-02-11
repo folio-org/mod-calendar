@@ -30,6 +30,7 @@ public class TranslationMap {
 
   protected final Map<String, String> patterns;
 
+  @Getter
   @CheckForNull
   protected final TranslationMap fallback;
 
@@ -78,6 +79,13 @@ public class TranslationMap {
     this(locale, file, null);
   }
 
+  /**
+   * Create a new TranslationMap for a given locale.  This is primarily used when cloning
+   * existing TranslationMaps for use as fallbacks for another (for caching reasons, this
+   * makes more sense than re-reading files each time)
+   * @param newLocale the locale for the new TranslationMap to use
+   * @return the TranslationMap with {@code newLocale}
+   */
   public TranslationMap withLocale(Locale newLocale) {
     return new TranslationMap(newLocale, this.file, this.patterns, this.fallback);
   }
