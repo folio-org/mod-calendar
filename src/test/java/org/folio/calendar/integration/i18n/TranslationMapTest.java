@@ -2,22 +2,16 @@ package org.folio.calendar.integration.i18n;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import org.folio.calendar.i18n.TranslationFile;
 import org.folio.calendar.i18n.TranslationMap;
 import org.folio.calendar.i18n.TranslationMatchQuality;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 class TranslationMapTest extends BaseTranslationTest {
