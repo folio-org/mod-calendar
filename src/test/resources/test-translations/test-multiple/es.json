@@ -1,3 +1,4 @@
 {
-  "foo": "es {test}"
+  "foo": "es {test}",
+  "es_only": "In es base!"
 }
