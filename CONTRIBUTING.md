@@ -1,4 +1,3 @@
 # Contribution guidelines
 
-Guidelines for Contributing Code:
-[dev.folio.org/guidelines/contributing](https://dev.folio.org/guidelines/contributing)
+Interested in contributing? Please check out channel `#bama` in the Slack to learn how you can help!
