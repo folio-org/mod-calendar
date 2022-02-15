@@ -10,7 +10,7 @@ import static org.hamcrest.Matchers.not;
 import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
 import org.junit.jupiter.api.Test;
 
-public class SampleCreationTest extends AbstractSampleTest {
+public class SampleDataCreationTest extends AbstractSampleTest {
 
   @Test
   void testLoadSample() {
