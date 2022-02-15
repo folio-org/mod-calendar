@@ -1,6 +1,6 @@
 # mod-calendar
 
-[Kanban](https://github.com/orgs/ualibweb/projects/1)
+[JIRA MOD-CAL](https://issues.folio.org/projects/MODCAL)
 
 ## Tenant Parameters
 
