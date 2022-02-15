@@ -106,40 +106,42 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <version>${spring-boot-starter-test.version}</version>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-jre8</artifactId>
       <version>${wiremock.version}</version>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>${rest-assured.version}</version>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.atlassian.oai</groupId>
       <artifactId>swagger-request-validator-restassured</artifactId>
       <version>${swagger-request-validator.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.exparity</groupId>
       <artifactId>hamcrest-date</artifactId>
       <version>${hamcrest-date-matcher.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.zonky.test</groupId>
       <artifactId>embedded-database-spring-test</artifactId>
       <version>${embedded-database-spring-test.version}</version>
-      <!-- <scope>test</scope> -->
+      <scope>test</scope>
     </dependency>
 
     <dependency>
