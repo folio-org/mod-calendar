@@ -9,7 +9,7 @@ import org.folio.calendar.repository.PeriodQueryFilter;
 import org.folio.calendar.testconstants.Calendars;
 import org.junit.jupiter.api.Test;
 
-public class PeriodQueryFilterTest {
+class PeriodQueryFilterTest {
 
   @Test
   void testNormalHoursFilterValid() {

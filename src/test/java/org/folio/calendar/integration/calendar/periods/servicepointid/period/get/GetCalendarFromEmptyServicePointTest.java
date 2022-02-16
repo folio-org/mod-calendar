@@ -14,7 +14,7 @@ import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class GetCalendarFromEmptyServicePointTest extends GetCalendarAbstractTest {
+class GetCalendarFromEmptyServicePointTest extends GetCalendarAbstractTest {
 
   @Test
   void testEmptyServicePoint() {

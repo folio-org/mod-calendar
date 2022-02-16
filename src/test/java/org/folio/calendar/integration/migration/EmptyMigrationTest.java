@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.hasSize;
 import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
 import org.junit.jupiter.api.Test;
 
-public class EmptyMigrationTest extends AbstractMigrationTest {
+class EmptyMigrationTest extends AbstractMigrationTest {
 
   @Test
   void testEmptyMigration() {

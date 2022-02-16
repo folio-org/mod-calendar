@@ -1,11 +1,32 @@
 # mod-calendar
 
-Copyright (C) 2017-2021 The Open Library Foundation
+Copyright (C) 2017-2022 The Open Library Foundation
 
 This software is distributed under the terms of the Apache License, Version 2.0. See the file
 "[LICENSE](LICENSE)" for more information.
 
-## Environment variables
+[JIRA MOD-CAL](https://issues.folio.org/projects/MODCAL)
+
+## Introduction
+
+Module to provide calendar functionalities for FOLIO systems.
+
+## Module Descriptor
+
+See the built `target/ModuleDescriptor.json` or the template
+`descriptors/ModuleDescriptor-template.json` for the interfaces that this module requires and
+provides, the permissions, and the additional module metadata.
+
+### Tenant Parameters
+
+When deploying to a module through Okapi, the following parameters are available:
+
+| Name          | Default Value | Description                                                                                                                                                                                                                                                                                                                   |
+| ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| loadReference | `"false"`     | Does not do anything, however, is supported per the [Okapi specification](https://github.com/folio-org/okapi/blob/master/doc/guide.md)                                                                                                                                                                                        |
+| loadSample    | `"false"`     | If `"true"`, a series of sample calendars will be added representing examples of exceptions and openings across multiple calendars and service points. This will use the same service points loaded by [mod-inventory-storage](https://github.com/folio-org/mod-inventory-storage/tree/master/reference-data/service-points). |
+
+### Environment variables
 
 See `.env.sample` for example values.
 
@@ -21,7 +42,7 @@ See `.env.sample` for example values.
 | DB_CHARSET      | `UTF-8`                    | Postgres charset                                                                      |
 | DB_MAXPOOLSIZE  | `5`                        | Postgres max pool size                                                                |
 
-### Integration Tests
+#### Integration Tests
 
 Integration tests have special environment variables that control whether or not API requests are
 routed through a proxy:
@@ -43,3 +64,17 @@ endpoints:
 
 These endpoints do not exist (and will correspondingly generate `404` errors), however, will appear
 in any proxy logs, making it easy to isolate each test/action.
+
+## API documentation
+
+This module's [API documentation](https://dev.folio.org/reference/api/#mod-calendar).
+
+## Code analysis
+
+[SonarQube analysis](https://sonarcloud.io/dashboard?id=org.folio%3Amod-calendar).
+
+## Download and configuration
+
+The built artifacts for this module are available. See
+[configuration](https://dev.folio.org/download/artifacts) for repository access, and the
+[Docker image](https://hub.docker.com/r/folioorg/mod-calendar/).
