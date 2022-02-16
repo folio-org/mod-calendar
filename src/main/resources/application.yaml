@@ -9,9 +9,9 @@ spring:
     enabled: true
     change-log: classpath:db/changelog-master.yaml
   datasource:
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
-    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}?stringtype=unspecified
+    username: ${DB_USERNAME:folio_admin}
+    password: ${DB_PASSWORD:folio_admin}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}?stringtype=unspecified
   jpa:
     show-sql: true
     hibernate:
