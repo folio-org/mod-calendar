@@ -10,7 +10,7 @@ import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testutils.MapperUtils;
 import org.junit.jupiter.api.Test;
 
-public class LegacyPeriodDateTest {
+class LegacyPeriodDateTest {
 
   @Test
   void testParseNormalDate() throws JsonMappingException, JsonProcessingException {

@@ -10,7 +10,7 @@ import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class DateUtilsGetCurrentDateTest {
+class DateUtilsGetCurrentDateTest {
 
   @BeforeEach
   void clearOverride() {

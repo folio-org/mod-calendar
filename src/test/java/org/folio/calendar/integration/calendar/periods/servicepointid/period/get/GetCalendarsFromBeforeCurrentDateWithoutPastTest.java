@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 /**
  * Attempt getting periods from before the current date without the past included
  */
-public class GetCalendarsFromBeforeCurrentDateWithoutPastTest extends GetCalendarAbstractTest {
+class GetCalendarsFromBeforeCurrentDateWithoutPastTest extends GetCalendarAbstractTest {
 
   @Test
   void testNormalHours() {

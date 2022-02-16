@@ -16,7 +16,7 @@ import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class GetCalendarNormalHoursTest extends GetCalendarAbstractTest {
+class GetCalendarNormalHoursTest extends GetCalendarAbstractTest {
 
   @Test
   void testPastWithOpeningDays() {

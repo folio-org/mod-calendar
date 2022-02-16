@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-public class NormalMigrationTest extends AbstractMigrationTest {
+class NormalMigrationTest extends AbstractMigrationTest {
 
   @BeforeAll
   void migrate() {

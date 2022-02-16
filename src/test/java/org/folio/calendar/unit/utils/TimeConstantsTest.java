@@ -11,7 +11,7 @@ import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
 import org.junit.jupiter.api.Test;
 
-public class TimeConstantsTest {
+class TimeConstantsTest {
 
   @Test
   void testMinTimeIsMidnight() {

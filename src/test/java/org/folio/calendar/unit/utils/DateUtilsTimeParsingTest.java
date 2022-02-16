@@ -8,7 +8,7 @@ import org.folio.calendar.testconstants.Times;
 import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 
-public class DateUtilsTimeParsingTest {
+class DateUtilsTimeParsingTest {
 
   @Test
   void testHourMinutesFormatting() {
