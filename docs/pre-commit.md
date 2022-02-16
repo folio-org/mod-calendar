@@ -23,12 +23,6 @@ This script consists of a few main parts:
 The code formatter [Prettier](https://prettier.io/) is ran on changed code files using the main
 `.prettierrc`. More information is in [styling.md](styling.md)
 
-## Liquibase
-
-The `liquibase validate` command is used to ensure that any applied changes can actually be
-performed against the database (assuming Okapi's PostgreSQL database is on port `5432` with default
-credentials). It will also verify rollbacks work as expected, making this idempotent.
-
 ## Swagger Validation
 
 This uses [swagger-cli](https://apitools.dev/swagger-cli/) to verify that the OpenAPI schema is up

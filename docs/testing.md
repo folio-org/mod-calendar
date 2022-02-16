@@ -34,15 +34,15 @@ quite bland and hard to read.
 Then, generate the report:
 
 ```sh
-mvn surefire-report:report
+mvn verify
 ```
 
 ## Coverage
 
-In order to view coverage reports in a human readable format, use `jacoco:report`:
+In order to view coverage reports in a human readable format, use the following:
 
 ```sh
-mvn jacoco:report
+mvn clean jacoco:prepare-agent test jacoco:report
 ```
 
 Then, `target/site/jacoco/index.html` will provide a nice interface showing the coverage status.
@@ -57,7 +57,13 @@ for Visual Studio Code.
 If you only want to run certain test classes, use the `-Dtest=SomeClassTest` flag on Maven. You can
 also run only certain methods themselves with `-Dtest=SomeClassTest#testSomeMethod`.
 
+Please note, this is likely to produce strange (or entirely wrong) results from JaCoCo (for code
+coverage).
+
 ## Skipping Testing
 
-The unit tests can be annoyingly slow for certain development build processes. To skip them, add
-`-Dmaven.test.skip=true` to the command line.
+Some tests can be annoyingly slow for certain development build processes (particularly when
+debugging the build process itself). To skip tests, add `-DskipTests` to the command line.
+
+Please note, this is likely to produce strange (or entirely wrong) results from JaCoCo (for code
+coverage).

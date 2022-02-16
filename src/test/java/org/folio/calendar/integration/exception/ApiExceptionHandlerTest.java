@@ -141,7 +141,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     assertThat(
       "Error message specified that a parameter was not understood",
       error.getMessage(),
-      containsString("One of the parameters was of the incorrect type")
+      containsString("One of the parameters was the incorrect type")
     );
   }
 
@@ -173,9 +173,9 @@ class ApiExceptionHandlerTest extends BaseApiTest {
       is(ErrorCode.INTERNAL_SERVER_ERROR)
     );
     assertThat(
-      "Error message specifies that an internal server error",
+      "Error reports proper",
       error.getMessage(),
-      containsString("Internal server error")
+      containsString("An internal server error occurred")
     );
   }
 }

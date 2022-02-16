@@ -45,7 +45,7 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
     assertThat(
       "Error message specified missing name error",
       error.getMessage(),
-      containsString(String.format("The provided name (\"%s\") was empty", ""))
+      containsString("Name cannot be empty or only whitespace")
     );
   }
 }
