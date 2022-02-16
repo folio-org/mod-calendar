@@ -434,7 +434,7 @@
         <executions>
           <execution>
             <id>javadoc</id>
-            <phase>prepare-package</phase>
+            <phase>pre-site</phase>
             <goals>
               <goal>javadoc</goal>
             </goals>
