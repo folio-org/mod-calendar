@@ -9,14 +9,13 @@ buildMvn {
   doApiLint = true
   doApiDoc = true
   apiTypes = 'RAML'
-  apiDirectories = 'ramls'
+  apiDirectories = 'fake-dir'
 
   doDocker = {
     buildJavaDocker {
       publishMaster = 'yes'
       healthChk = 'yes'
-      healthChkCmd = 'curl -sS --fail -o /dev/null  http://localhost:8081/apidocs/ || exit 1'
+      healthChkCmd = 'curl -sS --fail -o /dev/null  http://localhost:8081/TEST-HEALTH-CMD/ || exit 1'
     }
   }
 }
-
