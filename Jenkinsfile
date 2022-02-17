@@ -13,8 +13,7 @@ buildMvn {
   doDocker = {
     buildDocker {
       publishMaster = 'yes'
-      healthChk = 'yes'
-      healthChkCmd = 'curl -sS --fail -o /dev/null http://localhost:8080/admin/health || exit 1'
+      // health check in org.folio.calendar.integration.health.OkapiHealthTest
     }
   }
 }
