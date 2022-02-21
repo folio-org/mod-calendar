@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: Calendar API
+  version: v4.1
+servers:
+  - url: /
+paths:
+  /hello:
+    get:
+      description: Request the server to greet you
+      operationId: getHelloWorld
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - name: salutation
+          in: query
+          schema:
+            type: string
+            default: "Welcome"
+          example: "Greetings"
+          description: The requested salutation
+          required: false
+      responses:
+        "200":
+          description: A hello-related message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/greeting"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/internalServerError"
+    post:
+      description: Parameter consumption example
+      operationId: postHello
+      parameters:
+        - $ref: "#/components/parameters/x-okapi-tenant"
+        - name: a
+          in: query
+          schema:
+            type: integer
+          required: true
+          example: 3
+        - name: b
+          in: query
+          schema:
+            type: integer
+          required: true
+          example: 5
+      responses:
+        "200":
+          description: Basic maths
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/arithmetics"
+        "400":
+          description: Invalid parameter (cannot divide by zero)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              examples:
+                invalidParameterError:
+                  $ref: "#/components/examples/invalidParameterError"
+                divideByZeroError:
+                  value:
+                    timestamp: 2021-11-18T13:38.51-50:00
+                    status: 400
+                    error_code: hello.post.bad_arithmetic
+                    error_message: Cannot divide by zero (parameter b = 0)
+                  summary: Division by zero error
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/errorResponse"
+              example:
+                $ref: "#/components/examples/internalServerError"
+components:
+  schemas:
+    greeting:
+      $ref: schemas/greeting.yaml
+    arithmetics: # put here as example of inline schema
+      type: object
+      properties:
+        product:
+          description: a times b
+          type: integer
+        sum:
+          description: a plus b
+          type: integer
+        quotient:
+          description: a divided by b
+          type: number
+      required:
+        - product
+        - sum
+        - quotient
+      additionalProperties: false
+      example:
+        product: 15
+        sum: 8
+        quotient: 0.6
+    errorResponse:
+      $ref: schemas/errorResponse.yaml
+  parameters:
+    x-okapi-tenant:
+      name: x-okapi-tenant
+      in: header
+      description: X-Okapi-Tenant Value
+      required: true
+      schema:
+        type: string
+  examples:
+    internalServerError:
+      value:
+        timestamp: 2021-11-18T13:38.51-50:00
+        status: 500
+        error_code: internal_server_error
+        error_message: Internal Server Error
+      summary: Any kind of internal error
+    invalidParameterError:
+      value:
+        timestamp: 2021-11-18T13:38.51-05:00
+        status: 400
+        error_code: invalid_parameter
+        error_message: Cannot divide by zero (parameter b = 0)
+      summary: A parameter was not of the correct type

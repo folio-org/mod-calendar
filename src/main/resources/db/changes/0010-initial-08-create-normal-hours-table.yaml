@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-08-create-normal-hours-table
+      author: university-of-alabama/ncovercash
+      comment: Create normal_hours table
+      changes:
+        - createTable:
+            tableName: normal_hours
+            remarks: Holds relative opening information for each calendar
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: normal_hours_id
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: calendar_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: start_day
+                  remarks: no TZ
+                  type: WEEKDAY
+              - column:
+                  constraints:
+                    nullable: false
+                  name: start_time
+                  type: TIME WITHOUT TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: end_day
+                  remarks: no TZ
+                  type: WEEKDAY
+              - column:
+                  constraints:
+                    nullable: false
+                  name: end_time
+                  type: TIME WITHOUT TIME ZONE

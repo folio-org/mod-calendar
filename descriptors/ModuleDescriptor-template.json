@@ -1,149 +1,52 @@
 {
-  "id": "${artifactId}-${version}",
-  "name": "Calendar module",
-  "requires": [],
+  "id": "@artifactId@-@version@",
+  "name": "Calendar for Service Point Opening Hours",
   "provides": [
     {
       "id": "calendar",
-      "version": "4.0",
+      "version": "4.1",
       "handlers": [
         {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/periods",
-          "permissionsRequired": [
-            "calendar.opening-hours.collection.get"
-          ]
+          "methods": ["GET"],
+          "pathPattern": "/hello",
+          "permissionsRequired": []
         },
         {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/period",
-          "permissionsRequired": [
-            "calendar.periods.collection.get"
-          ]
-        },
-        {
-          "methods": [
-            "POST"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/period",
-          "permissionsRequired": [
-            "calendar.periods.item.post"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": [
-            "calendar.periods.item.get"
-          ]
-        },
-        {
-          "methods": [
-            "PUT"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": [
-            "calendar.periods.item.put"
-          ]
-        },
-        {
-          "methods": [
-            "DELETE"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": [
-            "calendar.periods.item.delete"
-          ]
-        },
-        {
-          "methods": [
-            "GET"
-          ],
-          "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
-          "permissionsRequired": [
-            "calendar.opening-hours.collection.get"
-          ]
+          "methods": ["POST"],
+          "pathPattern": "/hello",
+          "permissionsRequired": []
         }
       ]
     },
     {
-      "id" : "_tenant",
-      "version" : "2.0",
-      "interfaceType" : "system",
-      "handlers" : [ {
-        "methods" : [ "POST" ],
-        "pathPattern" : "/_/tenant"
-      }, {
-        "methods" : [ "GET", "DELETE" ],
-        "pathPattern" : "/_/tenant/{id}"
-      } ]
+      "id": "_tenant",
+      "version": "1.2",
+      "interfaceType": "system",
+      "handlers": [
+        {
+          "methods": ["POST"],
+          "pathPattern": "/_/tenant"
+        },
+        {
+          "methods": ["DELETE"],
+          "pathPattern": "/_/tenant"
+        }
+      ]
     }
   ],
-  "permissionSets": [
-    {
-      "permissionName": "calendar.opening-hours.collection.get",
-      "displayName": "List calendar opening hours",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.periods.collection.get",
-      "displayName": "List calendar periods descriptions",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.periods.item.get",
-      "displayName": "Get period description",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.periods.item.post",
-      "displayName": "Add new calendar period description",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.periods.item.put",
-      "displayName": "Update existing calendar period description",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.periods.item.delete",
-      "displayName": "Remove calendar period description",
-      "description": ""
-    },
-    {
-      "permissionName": "calendar.all",
-      "displayName": "Calendar - all permissions",
-      "description": "All permission for mod-calendar module",
-      "subPermissions": [
-        "calendar.opening-hours.collection.get",
-        "calendar.periods.collection.get",
-        "calendar.periods.item.post",
-        "calendar.periods.item.get",
-        "calendar.periods.item.put",
-        "calendar.periods.item.delete"
-      ],
-      "visible": false
-    }
-  ],
+  "permissionSets": [],
+  "requires": [],
   "launchDescriptor": {
-    "dockerImage": "${artifactId}:${version}",
+    "dockerImage": "@artifactId@",
     "dockerPull": false,
     "dockerArgs": {
       "HostConfig": {
         "Memory": 357913941,
-        "PortBindings": { "8081/tcp": [ { "HostPort": "%p" } ] }
+        "PortBindings": { "8082/tcp": [{ "HostPort": "%p" }] }
       }
     },
     "env": [
-      { "name": "JAVA_OPTIONS",
-        "value": "-XX:MaxRAMPercentage=66.0"
-      },
+      { "name": "JAVA_OPTIONS", "value": "-XX:MaxRAMPercentage=66.0" },
       { "name": "DB_HOST", "value": "postgres" },
       { "name": "DB_PORT", "value": "5432" },
       { "name": "DB_USERNAME", "value": "folio_admin" },

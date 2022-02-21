@@ -1,0 +1,11 @@
+{
+  "printWidth": 100,
+  "useTabs": false,
+  "tabWidth": 2,
+  "semi": true,
+  "proseWrap": "always",
+  "trailingComma": "all",
+  "quoteProps": "consistent",
+  "bracketSameLine": false,
+  "xmlWhitespaceSensitivity": "ignore"
+}

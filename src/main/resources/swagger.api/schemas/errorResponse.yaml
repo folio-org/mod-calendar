@@ -1,0 +1,33 @@
+description: Any kind of error coming from an endpoint
+type: object
+properties:
+  timestamp:
+    description: The time that the error occurred
+    type: string
+    format: date-time
+  status:
+    description: The HTTP response code
+    type: integer
+  error_code:
+    description: A code describing the error, namespaced when applicable
+    type: string
+    enum:
+      - internal_server_error
+      - invalid_parameter
+      - hello.post.bad_arithmetic
+  error_message:
+    description:
+      A description of the error, primarily for internal use.  Only error codes should be used
+      (which must be specific and localized for the frontend).
+    type: string
+additionalProperties: false
+required:
+  - timestamp
+  - status
+  - error_code
+  - error_message
+example:
+  timestamp: 2021-1118T13:38.51-05:00
+  status: 500
+  error_code: internal_server_error
+  error_message: Internal Server Error
