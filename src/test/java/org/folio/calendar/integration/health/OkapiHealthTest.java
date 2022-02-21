@@ -1,6 +1,6 @@
 package org.folio.calendar.integration.health;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;

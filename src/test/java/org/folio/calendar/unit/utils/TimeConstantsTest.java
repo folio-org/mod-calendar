@@ -1,7 +1,8 @@
 package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;

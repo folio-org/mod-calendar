@@ -10,6 +10,8 @@ import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
+import org.folio.calendar.i18n.TranslationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,6 +28,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Log4j2
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+  @Autowired
+  private TranslationService translationService;
 
   /**
    * Handles exceptions from our application
@@ -55,9 +60,13 @@ public class ApiExceptionHandler {
       exception,
       HttpStatus.NOT_FOUND,
       ErrorCode.INVALID_REQUEST,
-      "This application does not know how to handle a %s request to %s",
-      exception.getHttpMethod(),
-      exception.getRequestURL()
+      translationService.format(
+        "error.endpointNotFound",
+        "method",
+        exception.getHttpMethod(),
+        "url",
+        exception.getRequestURL()
+      )
     )
       .getErrorResponseEntity();
   }
@@ -77,9 +86,13 @@ public class ApiExceptionHandler {
       exception,
       HttpStatus.METHOD_NOT_ALLOWED,
       ErrorCode.INVALID_REQUEST,
-      "This endpoint does not accept %s requests to this endpoint (known are: %s)",
-      exception.getMethod(),
-      Arrays.toString(exception.getSupportedMethods())
+      translationService.format(
+        "error.endpointMethodInvalid",
+        "method",
+        exception.getMethod(),
+        "urlList",
+        Arrays.toString(exception.getSupportedMethods())
+      )
     )
       .getErrorResponseEntity();
   }
@@ -103,8 +116,11 @@ public class ApiExceptionHandler {
     return new NonspecificCalendarException(
       exception,
       ErrorCode.INVALID_PARAMETER,
-      "One of the parameters was of the incorrect type (%s)",
-      exception.getMessage()
+      translationService.format(
+        "error.unparsableData",
+        "unLocalizedErrorMessage",
+        exception.getMessage()
+      )
     )
       .getErrorResponseEntity();
   }
@@ -125,9 +141,13 @@ public class ApiExceptionHandler {
       exception,
       HttpStatus.INTERNAL_SERVER_ERROR,
       ErrorCode.INTERNAL_SERVER_ERROR,
-      "Internal server error (%s): %s",
-      exception.getClass().getSimpleName(),
-      exception.getMessage()
+      translationService.format(
+        "error.internalServerError",
+        "className",
+        exception.getClass().getSimpleName(),
+        "errorMessage",
+        exception.getMessage()
+      )
     )
       .getErrorResponseEntity();
   }

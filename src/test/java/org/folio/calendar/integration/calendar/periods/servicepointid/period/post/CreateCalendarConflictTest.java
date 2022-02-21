@@ -54,12 +54,8 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
       error.getMessage(),
       containsString(
         String.format(
-          "This period (%s to %s) overlaps with another calendar (\"%s\" from %s to %s)",
-          Periods.PERIOD_FULL_EXAMPLE_D.getStartDate(),
-          Periods.PERIOD_FULL_EXAMPLE_D.getEndDate(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getName(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getStartDate(),
-          Periods.PERIOD_FULL_EXAMPLE_C.getEndDate()
+          "This calendar overlaps with another calendar (“%s” from",
+          Periods.PERIOD_FULL_EXAMPLE_C.getName()
         )
       )
     );
@@ -102,7 +98,7 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
       "Error message specifies collision",
       error.getMessage(),
       containsString(
-        String.format("The period ID %s already exists", Periods.PERIOD_FULL_EXAMPLE_D.getId())
+        String.format("A period with ID %s already exists", Periods.PERIOD_FULL_EXAMPLE_D.getId())
       )
     );
   }

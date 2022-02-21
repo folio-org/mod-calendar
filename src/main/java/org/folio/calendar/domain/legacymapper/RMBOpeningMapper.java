@@ -11,6 +11,8 @@ import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.types.LegacyPeriodDate;
+import org.folio.calendar.i18n.TranslationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -26,6 +28,9 @@ public class RMBOpeningMapper implements RowMapper<Period> {
 
   protected final JdbcTemplate jdbcTemplate;
   protected final ObjectMapper mapper;
+
+  @Autowired
+  private TranslationService translationService;
 
   public Period mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
@@ -48,8 +53,8 @@ public class RMBOpeningMapper implements RowMapper<Period> {
         .id(openingId)
         .servicePointId(UUID.fromString(json.get("servicePointId").asText()))
         .name(json.get("name").asText())
-        .startDate(new LegacyPeriodDate(json.get("startDate").asText()))
-        .endDate(new LegacyPeriodDate(json.get("endDate").asText()))
+        .startDate(new LegacyPeriodDate(translationService, json.get("startDate").asText()))
+        .endDate(new LegacyPeriodDate(translationService, json.get("endDate").asText()))
         .openingDays(openings)
         .build();
     } catch (Exception e) {

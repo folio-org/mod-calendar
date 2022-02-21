@@ -1,7 +1,7 @@
 package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 
 import java.util.Arrays;

@@ -13,28 +13,30 @@ public class InvalidDataException extends AbstractCalendarException {
    *
    * @param errorCode  The error code to report (defined by ErrorResponse)
    * @param parameters Parameters which caused this issue
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
+   * @param message    A string for the error message
    */
-  public InvalidDataException(
-    ErrorCode errorCode,
-    ExceptionParameters parameters,
-    String message,
-    Object... format
-  ) {
-    super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message, format);
+  public InvalidDataException(ErrorCode errorCode, ExceptionParameters parameters, String message) {
+    super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message);
   }
 
   /**
    * Create an exception for invalid data with a message and parameters.
    *
    * @param parameters Parameters which caused this issue
-   * @param message    A printf-style string for the error message
-   * @param format     Formatting for the printf style message
-   * @see String#format
+   * @param message    A string for the error message
    */
-  public InvalidDataException(ExceptionParameters parameters, String message, Object... format) {
-    this(ErrorCode.INVALID_REQUEST, parameters, message, format);
+  public InvalidDataException(ExceptionParameters parameters, String message) {
+    this(ErrorCode.INVALID_REQUEST, parameters, message);
+  }
+
+  /**
+   * Create an exception for invalid data with a cause, message, and parameters.
+   *
+   * @param cause      The cause of the exception
+   * @param parameters Parameters which caused this issue
+   * @param message    A string for the error message
+   */
+  public InvalidDataException(Throwable cause, ExceptionParameters parameters, String message) {
+    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST, message);
   }
 }
