@@ -23,7 +23,7 @@ public class InvalidDataException extends AbstractCalendarException {
     String message,
     Object... format
   ) {
-    super(null, parameters, HttpStatus.UNPROCESSABLE_ENTITY, errorCode, message, format);
+    super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message, format);
   }
 
   /**

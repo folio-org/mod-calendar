@@ -10,12 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.ExceptionRanges;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
-import org.folio.calendar.testconstants.UUIDs;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
@@ -73,8 +71,7 @@ public class PeriodUtilsExceptionalTest {
         PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
-          list,
-          UUIDs.UUID_0
+          list
         )
     );
   }
@@ -92,8 +89,7 @@ public class PeriodUtilsExceptionalTest {
         PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
-          list,
-          UUIDs.UUID_0
+          list
         )
     );
   }
@@ -110,8 +106,7 @@ public class PeriodUtilsExceptionalTest {
         PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
-          list,
-          UUIDs.UUID_0
+          list
         )
     );
   }
@@ -121,8 +116,7 @@ public class PeriodUtilsExceptionalTest {
     List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_12_31,
-      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED),
-      UUIDs.UUID_0
+      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED)
     );
     assertThat(
       "An exceptional closure produces exactly one equivalent ExceptionRange",
@@ -137,18 +131,12 @@ public class PeriodUtilsExceptionalTest {
       result.get(0).getOpenings(),
       hasSize(1)
     );
-    for (ExceptionHour hours : result.get(0).getOpenings()) {
-      hours.setExceptionId(null);
-    }
 
     assertThat(
       "An exceptional closure can be equivalently represented as an ExceptionRange",
       result,
       hasItem(
-        ExceptionRanges.withExceptionId(
-          ExceptionRanges.CLOSED_ALL_YEAR_CALENDAR_0,
-          result.get(0).getId()
-        )
+        ExceptionRanges.withExceptionId(ExceptionRanges.CLOSED_ALL_YEAR, result.get(0).getId())
       )
     );
   }
@@ -158,8 +146,7 @@ public class PeriodUtilsExceptionalTest {
     List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_01_04,
-      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY),
-      UUIDs.UUID_A
+      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY)
     );
     assertThat(
       "An exceptional all-day opening produces exactly one equivalent ExceptionRange",
@@ -174,16 +161,13 @@ public class PeriodUtilsExceptionalTest {
       result.get(0).getOpenings(),
       hasSize(1)
     );
-    for (ExceptionHour hours : result.get(0).getOpenings()) {
-      hours.setExceptionId(null);
-    }
 
     assertThat(
       "An exceptional all-day opening can be equivalently represented as an ExceptionRange",
       result,
       hasItem(
         ExceptionRanges.withExceptionId(
-          ExceptionRanges.OPEN_ALL_DAY_JAN_1_THRU_JAN_4_CALENDAR_A,
+          ExceptionRanges.OPEN_ALL_DAY_JAN_1_THRU_JAN_4,
           result.get(0).getId()
         )
       )
@@ -195,8 +179,7 @@ public class PeriodUtilsExceptionalTest {
     List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_01_04,
-      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59),
-      UUIDs.UUID_B
+      Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59)
     );
 
     assertThat(
@@ -215,7 +198,7 @@ public class PeriodUtilsExceptionalTest {
       result,
       hasItem(
         ExceptionRanges.withExceptionId(
-          ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4_CALENDAR_B,
+          ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4,
           result.get(0).getId()
         )
       )

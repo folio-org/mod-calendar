@@ -6,14 +6,19 @@ import java.util.UUID;
 import javax.annotation.CheckForNull;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.With;
 
 /**
@@ -40,11 +45,14 @@ public class ExceptionHour {
   private UUID id;
 
   /**
-   * The corresponding main {@link ExceptionRange} that this opening corresponds to
+   * The calendar that this is exceptional to
    */
   @NotNull
-  @Column(name = "exception_id")
-  private UUID exceptionId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "exception_id")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private ExceptionRange exception;
 
   /**
    * The start (absolute, inclusive) date of the range which this opening corresponds to

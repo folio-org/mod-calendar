@@ -6,6 +6,8 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
@@ -15,6 +17,13 @@ import org.folio.calendar.domain.entity.Calendar;
  */
 @UtilityClass
 public class DateUtils {
+
+  /**
+   * Overrides the current date, as given by LocalDate.now() in getCurrentDate(), for testing purposes
+   */
+  @Getter
+  @Setter
+  protected static LocalDate currentDateOverride = null;
 
   /**
    * Get all LocalDates between two dates (inclusive)
@@ -28,6 +37,17 @@ public class DateUtils {
   public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
     // the end date for datesUtil is exclusive; adding one makes it inclusive
     return startDate.datesUntil(endDate.plusDays(1)).collect(Collectors.toList());
+  }
+
+  /**
+   * Check if a date is contained within a range
+   * @param date the date to test
+   * @param start the first date of the range, inclusive
+   * @param end the last date of the range, inclusive
+   * @return if the date is contained in the range
+   */
+  public static boolean contains(ChronoLocalDate date, ChronoLocalDate start, ChronoLocalDate end) {
+    return !start.isAfter(date) && !end.isBefore(date);
   }
 
   /**
@@ -58,10 +78,10 @@ public class DateUtils {
    */
   public static boolean overlaps(Period period1, Period period2) {
     return overlaps(
-      period1.getStartDate(),
-      period1.getEndDate(),
-      period2.getStartDate(),
-      period2.getEndDate()
+      period1.getStartDate().getValue(),
+      period1.getEndDate().getValue(),
+      period2.getStartDate().getValue(),
+      period2.getEndDate().getValue()
     );
   }
 
@@ -87,8 +107,8 @@ public class DateUtils {
     return overlaps(
       calendar.getStartDate(),
       calendar.getEndDate(),
-      period.getStartDate(),
-      period.getEndDate()
+      period.getStartDate().getValue(),
+      period.getEndDate().getValue()
     );
   }
 
@@ -160,5 +180,57 @@ public class DateUtils {
    */
   public static LocalTime fromTimeString(String time) {
     return LocalTime.parse(time, TimeConstants.TIME_FORMATTER);
+  }
+
+  /**
+   * Get the current date
+   * @return the current date
+   */
+  public static LocalDate getCurrentDate() {
+    if (getCurrentDateOverride() == null) {
+      return LocalDate.now();
+    } else {
+      return getCurrentDateOverride();
+    }
+  }
+
+  /**
+   * Get the smallest of two dates
+   * @param a the first date
+   * @param b the second date
+   * @return the smaller date of the two
+   */
+  public static LocalDate min(LocalDate a, LocalDate b) {
+    if (a == null) {
+      return b;
+    }
+    if (b == null) {
+      return a;
+    }
+    if (a.isBefore(b)) {
+      return a;
+    } else {
+      return b;
+    }
+  }
+
+  /**
+   * Get the largest of two dates
+   * @param a the first date
+   * @param b the second date
+   * @return the larger date of the two
+   */
+  public static LocalDate max(LocalDate a, LocalDate b) {
+    if (a == null) {
+      return b;
+    }
+    if (b == null) {
+      return a;
+    }
+    if (a.isAfter(b)) {
+      return a;
+    } else {
+      return b;
+    }
   }
 }

@@ -1,5 +1,6 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.experimental.UtilityClass;
@@ -108,5 +109,25 @@ public class WeekdayUtils {
     }
 
     return list;
+  }
+
+  public static Weekday toWeekday(LocalDate date) {
+    switch (date.getDayOfWeek()) {
+      case SUNDAY:
+        return Weekday.SUNDAY;
+      case MONDAY:
+        return Weekday.MONDAY;
+      case TUESDAY:
+        return Weekday.TUESDAY;
+      case WEDNESDAY:
+        return Weekday.WEDNESDAY;
+      case THURSDAY:
+        return Weekday.THURSDAY;
+      case FRIDAY:
+        return Weekday.FRIDAY;
+      case SATURDAY:
+      default:
+        return Weekday.SATURDAY;
+    }
   }
 }

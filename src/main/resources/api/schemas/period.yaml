@@ -14,11 +14,11 @@ properties:
     description: The calendar's name
   startDate:
     type: string
-    format: date
+    format: legacy-period-date
     description: The first effective date (inclusive) of this calendar
   endDate:
     type: string
-    format: date
+    format: legacy-period-date
     description: The last effective date (inclusive) of this calendar
   openingDays:
     type: array

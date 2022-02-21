@@ -9,6 +9,13 @@ databaseChangeLog:
             remarks: Relates service points to calendars
             columns:
               - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: service_point_calendars_assignment_row_id
+              - column:
                   name: service_point_id
                   type: UUID
                   constraints:
@@ -17,4 +24,4 @@ databaseChangeLog:
                   name: calendar_id
                   type: UUID
                   constraints:
-                    nullable: false
+                    nullable: true

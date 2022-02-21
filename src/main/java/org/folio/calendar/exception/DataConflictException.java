@@ -27,7 +27,7 @@ public class DataConflictException extends AbstractCalendarException {
   }
 
   /**
-   * Create an exception for data conflict with a message, error code, and parameters.
+   * Create an exception for data conflict with a message and parameters.
    *
    * @param parameters Parameters which caused this issue
    * @param message    A printf-style string for the error message

@@ -6,7 +6,7 @@ properties:
     $ref: "openingDayInfo.yaml"
   date:
     type: string
-    format: date
+    format: legacy-period-date
     description: Date this object applies to
 additionalProperties: false
 required:

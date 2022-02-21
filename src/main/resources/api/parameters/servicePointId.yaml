@@ -1,0 +1,7 @@
+in: path
+name: servicePointId
+description: The UUID for the relevant service point
+required: true
+schema:
+  type: string
+  format: uuid

@@ -205,5 +205,6 @@ if [ -n "$DOCS_PATH" ]; then
   green "Generating HTML API documentation"
   ~/folio-tools/api-doc/api_doc.py $API_DOC_ARGS \
     -o $DOCS_PATH \
-    -t OAS -d src/main/resources/swagger.api
+    -t OAS -d src/main/resources/api \
+    -e paths parameters
 fi

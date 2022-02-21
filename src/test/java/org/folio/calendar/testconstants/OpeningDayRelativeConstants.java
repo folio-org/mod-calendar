@@ -97,4 +97,9 @@ public class OpeningDayRelativeConstants {
     .weekdays(null)
     .openingDay(OpeningDayInfoRelativeConstants.EXCEPTIONAL_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59)
     .build();
+  public static final OpeningDayRelative EXCEPTIONAL_INVALID_NULL_OPENING = OpeningDayRelative
+    .builder()
+    .weekdays(null)
+    .openingDay(OpeningDayInfoRelativeConstants.OPENING_NULL)
+    .build();
 }

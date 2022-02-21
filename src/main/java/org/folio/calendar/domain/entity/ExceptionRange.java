@@ -6,20 +6,26 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
+import lombok.ToString;
 import lombok.With;
 
 /**
- * An overall exception to the normal hours of a calendar.  Multiple {@link ExceptionHour} objects can define specific behavior over this interval.
+ * An overall exception to the normal hours of a calendar.  Multiple {@link org.folio.calendar.domain.entity.ExceptionHour} objects can define specific behavior over this interval.
  */
 @Data
 @With
@@ -42,8 +48,11 @@ public class ExceptionRange {
    * The calendar that this is exceptional to
    */
   @NotNull
-  @Column(name = "calendar_id")
-  private UUID calendarId;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "calendar_id")
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  private Calendar calendar;
 
   /**
    * The first date to which this exception is effective
@@ -63,7 +72,14 @@ public class ExceptionRange {
    * The corresponding openings/closures which relate to this exception
    */
   @Singular
-  @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "exception_id")
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "exception")
   private Set<ExceptionHour> openings;
+
+  @PrePersist
+  @PreUpdate
+  private void prePersist() {
+    if (this.getOpenings() != null) {
+      this.getOpenings().forEach(assignment -> assignment.setException(this));
+    }
+  }
 }

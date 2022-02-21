@@ -9,7 +9,6 @@ import java.util.Arrays;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
-import org.folio.calendar.testconstants.UUIDs;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
@@ -19,10 +18,7 @@ public class PeriodUtilsConsolidationTest {
   void testNoOpeningDaysToNormalOpenings() {
     assertThat(
       "No openings should be consolidated to nothing",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-        new ArrayList<OpeningDayRelative>(),
-        UUIDs.UUID_0
-      ),
+      PeriodUtils.convertOpeningDayRelativeToNormalOpening(new ArrayList<OpeningDayRelative>()),
       is(empty())
     );
   }
@@ -32,8 +28,7 @@ public class PeriodUtilsConsolidationTest {
     assertThat(
       "A closed \"Opening\" (OpeningDayRelative) should be consolidated to nothing",
       PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-        Arrays.asList(OpeningDayRelativeConstants.MONDAY_CLOSED),
-        UUIDs.UUID_0
+        Arrays.asList(OpeningDayRelativeConstants.MONDAY_CLOSED)
       ),
       is(empty())
     );
@@ -44,8 +39,7 @@ public class PeriodUtilsConsolidationTest {
     assertThat(
       "An invalid (end time before start time) \"Opening\" (OpeningDayRelative) should be consolidated to nothing",
       PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-        Arrays.asList(OpeningDayRelativeConstants.MONDAY_INVALID),
-        UUIDs.UUID_0
+        Arrays.asList(OpeningDayRelativeConstants.MONDAY_INVALID)
       ),
       is(empty())
     );
@@ -56,10 +50,9 @@ public class PeriodUtilsConsolidationTest {
     assertThat(
       "A single all day legacy opening is equivalent to a 00:00 to 23:59 NormalOpening",
       PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-        Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY),
-        UUIDs.UUID_0
+        Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY)
       ),
-      is(Arrays.asList(NormalOpenings.MONDAY_ALL_DAY.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.MONDAY_ALL_DAY))
     );
   }
 
@@ -68,10 +61,9 @@ public class PeriodUtilsConsolidationTest {
     assertThat(
       "A single partial (04:00 to 14:59) day legacy opening is equivalent to a 04:00 to 14:59 NormalOpening",
       PeriodUtils.convertOpeningDayRelativeToNormalOpening(
-        Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59),
-        UUIDs.UUID_0
+        Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59)
       ),
-      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_14_59.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_14_59))
     );
   }
 
@@ -83,10 +75,9 @@ public class PeriodUtilsConsolidationTest {
         Arrays.asList(
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY
-        ),
-        UUIDs.UUID_0
+        )
       ),
-      is(Arrays.asList(NormalOpenings.SUNDAY_MONDAY_ALL_DAY.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.SUNDAY_MONDAY_ALL_DAY))
     );
   }
 
@@ -98,10 +89,9 @@ public class PeriodUtilsConsolidationTest {
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.MONDAY_OPEN_15_00_TO_23_59
-        ),
-        UUIDs.UUID_0
+        )
       ),
-      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_23_59.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_23_59))
     );
   }
 
@@ -114,10 +104,9 @@ public class PeriodUtilsConsolidationTest {
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.MONDAY_OPEN_15_00_TO_23_59,
           OpeningDayRelativeConstants.TUESDAY_OPEN_00_00_TO_12_30
-        ),
-        UUIDs.UUID_0
+        )
       ),
-      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30))
     );
   }
 
@@ -129,10 +118,9 @@ public class PeriodUtilsConsolidationTest {
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY
-        ),
-        UUIDs.UUID_0
+        )
       ),
-      is(Arrays.asList(NormalOpenings.SUNDAY_MONDAY_ALL_DAY.withCalendarId(UUIDs.UUID_0)))
+      is(Arrays.asList(NormalOpenings.SUNDAY_MONDAY_ALL_DAY))
     );
   }
 
@@ -144,15 +132,9 @@ public class PeriodUtilsConsolidationTest {
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.TUESDAY_OPEN_00_00_TO_12_30
-        ),
-        UUIDs.UUID_0
-      ),
-      is(
-        Arrays.asList(
-          NormalOpenings.MONDAY_04_00_TO_14_59.withCalendarId(UUIDs.UUID_0),
-          NormalOpenings.TUESDAY_00_00_TO_12_30.withCalendarId(UUIDs.UUID_0)
         )
-      )
+      ),
+      is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_14_59, NormalOpenings.TUESDAY_00_00_TO_12_30))
     );
   }
 
@@ -170,13 +152,12 @@ public class PeriodUtilsConsolidationTest {
           OpeningDayRelativeConstants.FRIDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.SATURDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY
-        ),
-        UUIDs.UUID_0
+        )
       ),
       is(
         Arrays.asList(
-          NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30.withCalendarId(UUIDs.UUID_0),
-          NormalOpenings.WEDNESDAY_23_00_TO_SUNDAY_23_59.withCalendarId(UUIDs.UUID_0)
+          NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30,
+          NormalOpenings.WEDNESDAY_23_00_TO_SUNDAY_23_59
         )
       )
     );
@@ -196,13 +177,12 @@ public class PeriodUtilsConsolidationTest {
           OpeningDayRelativeConstants.WEDNESDAY_OPEN_23_00_TO_23_59,
           OpeningDayRelativeConstants.THURSDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.FRIDAY_OPEN_ALL_DAY
-        ),
-        UUIDs.UUID_0
+        )
       ),
       is(
         Arrays.asList(
-          NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30.withCalendarId(UUIDs.UUID_0),
-          NormalOpenings.WEDNESDAY_23_00_TO_SUNDAY_23_59.withCalendarId(UUIDs.UUID_0)
+          NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30,
+          NormalOpenings.WEDNESDAY_23_00_TO_SUNDAY_23_59
         )
       )
     );

@@ -3,9 +3,16 @@ type: object
 properties:
   openingHour:
     type: array
+    x-singular-name: openingHourPair
     items:
       $ref: openingHourRange.yaml
     description: All start/end time pairs for a day
+  date:
+    type: string
+    format: legacy-period-date
+    description:
+      Concrete date that this corresponds to.  For calculateOpening only, use openingDayConcrete for
+      other circumstances
   allDay:
     type: boolean
     description: If this denotes an all-day opening or closing
@@ -13,12 +20,6 @@ properties:
     type: boolean
     default: true
     description: Whether this is to indicate a closure (for exceptions)
-  date:
-    type: string
-    format: date
-    description:
-      Concrete date that this corresponds to.  For exceptions/calculateOpening.  Not certain is this
-      is used; ref openingDayConcrete.yaml
   exceptional:
     type: boolean
     default: false
@@ -26,7 +27,6 @@ properties:
       Denotes if this opening/closure is the result of an exception rather than a normal
       period/calendar
 required:
-  - allDay
   - open
 additionalProperties: false
 example:

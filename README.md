@@ -17,3 +17,26 @@ See `.env.sample` for example values.
 | DB_QUERYTIMEOUT | `60000`                    | Postgres query time out. Default is 6s                                                |
 | DB_CHARSET      | `UTF-8`                    | Postgres charset                                                                      |
 | DB_MAXPOOLSIZE  | `5`                        | Postgres max pool size                                                                |
+
+### Integration Tests
+
+Integration tests have special environment variables that control whether or not API requests are
+routed through a proxy:
+
+| Name         | Default Value | Description                                            |
+| ------------ | ------------- | ------------------------------------------------------ |
+| PROXY_ENABLE | `false`       | If requests should be proxied (`true` or `false` only) |
+| PROXY_SCHEME | `http`        | The protocol to use for a proxy                        |
+| PROXY_HOST   | `localhost`   | The host to proxy through                              |
+| PROXY_PORT   | `8888`        | The port on PROXY_HOST to proxy through                |
+
+Additionally, if `PROXY_ENABLE` is `true`, additional logging-only requests will be sent to a few
+endpoints:
+
+- `GET /_/tests/_/database-truncate` every time the database is truncated (after most modifying
+  integration tests methods/classes)
+- `GET /_/tests/class/method` before every test begins
+- `GET /_/tests/_/finish` after every test finishes (successful or otherwise)
+
+These endpoints do not exist (and will correspondingly generate `404` errors), however, will appear
+in any proxy logs, making it easy to isolate each test/action.

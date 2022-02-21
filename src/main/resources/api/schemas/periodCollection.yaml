@@ -1,0 +1,64 @@
+description: Collection of openings
+type: object
+properties:
+  openingPeriods:
+    type: array
+    description: Each period returned in the response
+    items:
+      type: object
+      $ref: "period.yaml"
+  totalRecords:
+    type: integer
+    minimum: 0
+    description: Number of periods in the response
+additionalProperties: false
+required:
+  - openingPeriods
+  - totalRecords
+example:
+  openingPeriods:
+    - id: 296332ec-6e40-46b6-8064-10f7e1238b9d
+      servicePointId: c4c90014-c8c9-4ade-8f24-b5e313319f4b
+      name: October hours
+      startDate: "2021-10-01"
+      endDate: "2021-10-31"
+      openingDays:
+        - weekdays:
+            day: MONDAY
+          openingDay:
+            openingHour:
+              - startTime: "07:30"
+                endTime: "17:00"
+            allDay: false
+            open: true
+        - weekdays:
+            day: TUESDAY
+          openingDay:
+            openingHour:
+              - startTime: "02:00"
+                endTime: "17:00"
+            allDay: false
+            open: true
+        - weekdays:
+            day: WEDNESDAY
+          openingDay:
+            openingHour:
+              - startTime: "02:00"
+                endTime: "17:00"
+            allDay: false
+            open: true
+        - weekdays:
+            day: THURSDAY
+          openingDay:
+            openingHour:
+              - startTime: "02:00"
+                endTime: "17:00"
+            allDay: false
+            open: true
+        - weekdays:
+            day: FRIDAY
+          openingDay:
+            openingHour: []
+            allDay: true
+            open: true
+  totalRecords: 1
