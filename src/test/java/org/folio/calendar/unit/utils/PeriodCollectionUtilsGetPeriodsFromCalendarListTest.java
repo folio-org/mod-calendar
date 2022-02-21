@@ -15,7 +15,7 @@ import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.utils.PeriodCollectionUtils;
 import org.junit.jupiter.api.Test;
 
-public class PeriodCollectionUtilsGetPeriodsFromCalendarListTest {
+class PeriodCollectionUtilsGetPeriodsFromCalendarListTest {
 
   @Test
   void testConversionWithNormalHoursAndOpeningDays() {

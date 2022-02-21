@@ -7,7 +7,7 @@ import static org.junit.Assert.assertThrows;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.junit.jupiter.api.Test;
 
-public class ExceptionParametersTest {
+class ExceptionParametersTest {
 
   @Test
   void testDefaultConstructor() {

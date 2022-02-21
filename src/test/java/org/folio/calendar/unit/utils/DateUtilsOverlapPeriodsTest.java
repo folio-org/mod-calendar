@@ -9,7 +9,7 @@ import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 
-public class DateUtilsOverlapPeriodsTest {
+class DateUtilsOverlapPeriodsTest {
 
   @Test
   void testNonOverlappingMultiDayPeriods() {

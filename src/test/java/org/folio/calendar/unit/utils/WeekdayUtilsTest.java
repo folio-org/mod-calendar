@@ -10,7 +10,7 @@ import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.utils.WeekdayUtils;
 import org.junit.jupiter.api.Test;
 
-public class WeekdayUtilsTest {
+class WeekdayUtilsTest {
 
   /**
    * Exhaustively test previous weekdays (due to the small cases and the switch usage in the code)

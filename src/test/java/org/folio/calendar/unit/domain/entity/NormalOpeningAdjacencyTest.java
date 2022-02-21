@@ -7,7 +7,7 @@ import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.junit.jupiter.api.Test;
 
-public class NormalOpeningAdjacencyTest {
+class NormalOpeningAdjacencyTest {
 
   @Test
   void testAdjacentAllDays() {

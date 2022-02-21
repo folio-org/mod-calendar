@@ -17,7 +17,7 @@ import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
-public class PeriodUtilsExceptionalTest {
+class PeriodUtilsExceptionalTest {
 
   @Test
   void testRegularClosureIsNotExceptional() {

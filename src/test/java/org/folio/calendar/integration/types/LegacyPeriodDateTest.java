@@ -9,7 +9,7 @@ import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;
 
-public class LegacyPeriodDateTest extends BaseApiTest {
+class LegacyPeriodDateTest extends BaseApiTest {
 
   @Test
   void testParseInvalidDate() throws JsonMappingException, JsonProcessingException {

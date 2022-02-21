@@ -9,7 +9,7 @@ import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
-public class PeriodUtilsCalendarConversionTest {
+class PeriodUtilsCalendarConversionTest {
 
   @Test
   void testCalendarWithNoServicePoints() {

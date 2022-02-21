@@ -8,7 +8,7 @@ import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.testconstants.Times;
 import org.junit.jupiter.api.Test;
 
-public class NormalOpeningTruncationTest {
+class NormalOpeningTruncationTest {
 
   @Test
   void testSetSecondPrecision() {

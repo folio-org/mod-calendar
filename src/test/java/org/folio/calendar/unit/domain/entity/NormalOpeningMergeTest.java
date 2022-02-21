@@ -7,7 +7,7 @@ import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.junit.jupiter.api.Test;
 
-public class NormalOpeningMergeTest {
+class NormalOpeningMergeTest {
 
   @Test
   void testInabilityToMergeDifferentCalendarOpenings() {
