@@ -3,17 +3,13 @@
 The API routing, parameters, etc., are all managed through Swagger. This is done through the main
 `mod-calendar.yaml` in `main/resources/api` folder. This should be entirely up to the OpenAPI spec.
 
-Other FOLIO projects seem to aggressively prefer abstracting every parameter, response, etc., into
-separate schemas. For the provided `examples`, it is a fair bit looser -- it seems to be an example
-response for each endpoint, but I have yet to find anywhere that these are actually referenced?
-
 It seems that the error
 
 ```
 [INFO] 'host' (OAS 2.0) or 'servers' (OAS 3.0) not defined in the spec. Default to [http://localhost] for server URL [http://localhost/{endpoint}/]
 ```
 
-cannot be fixed.
+cannot be fixed due to the dynamic nature of Okapi deployments and environments.
 
 ## Api Documentation Generation
 
@@ -29,4 +25,5 @@ When in a Vagrant VM, the following will build the docs (assuming you are workin
 
 If you have not used `api-doc` before, the commands `yarn install` and
 `pip3 install -r requirements.txt` must be ran in its directory in order to install all of its
-dependencies.
+dependencies, per the
+[`api-doc` documentation](https://github.com/folio-org/folio-tools/tree/master/api-doc).

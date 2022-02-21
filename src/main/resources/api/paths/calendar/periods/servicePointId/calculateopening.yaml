@@ -2,7 +2,6 @@ get:
   operationId: getNearestOpenings
   description: Calculate openings nearest to a given date
   parameters:
-    - $ref: ../../../../parameters/x-okapi-tenant.yaml
     - $ref: ../../../../parameters/servicePointId.yaml
     - in: query
       name: requestedDate

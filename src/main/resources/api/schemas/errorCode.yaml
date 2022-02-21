@@ -5,7 +5,6 @@ enum: # from en.json in ui-calendar translations
   - internalServerError
   - invalidRequest
   - invalidParameter
-  - badArithmetic
   - noName
   - settings.error.invalidDateRange
   - duplication
@@ -14,7 +13,6 @@ x-enum-varnames:
   - INTERNAL_SERVER_ERROR
   - INVALID_REQUEST
   - INVALID_PARAMETER
-  - BAD_ARITHMETIC
   - NO_NAME
   - INVALID_DATE_RANGE
   - OVERLAPPING_CALENDAR
@@ -23,7 +21,6 @@ x-enum-descriptions:
   - Catch-all for any other unhandled exceptions
   - Catch-all for unparsable requests (bad JSON, etc)
   - Catch-all for missing or wrongly-typed parameters
-  - Sample response based on /hello when b=0, causing impossible division
   - The request did not include a name (or used an empty name) for the object
   - The start date was after the end date
   - The new calendar would overlap with another calendar for this service point!  Please change the

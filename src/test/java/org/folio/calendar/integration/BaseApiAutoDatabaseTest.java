@@ -17,6 +17,8 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 @Log4j2
 public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
 
+  protected boolean hasCreated = false;
+
   @AfterAll
   void afterAll(TestInfo testInfo, @Autowired DataSource dataSource) {
     if (testInfo.getTags().contains("idempotent")) {
@@ -33,6 +35,7 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
 
   protected void cleanDatabase(@Autowired DataSource dataSource) {
     log.info("Truncating database");
+    hasCreated = false;
 
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
       ra(false).get(getRequestUrl("/_/tests/_/database-truncate"));
