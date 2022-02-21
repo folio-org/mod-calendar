@@ -13,10 +13,10 @@
   </parent>
   <groupId>org.folio</groupId>
   <artifactId>mod-calendar</artifactId>
-  <name>mod-calendar</name>
   <version>2.0.0-SNAPSHOT</version>
-  <description>FOLIO calendar module for service point openings</description>
   <packaging>jar</packaging>
+  <name>mod-calendar</name>
+  <description>FOLIO calendar module for service point openings</description>
 
   <licenses>
     <license>
@@ -24,19 +24,60 @@
       <url>https://spdx.org/licenses/Apache-2.0</url>
     </license>
   </licenses>
+  <scm>
+    <url>https://github.com/folio-org/${project.artifactId}</url>
+    <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
+    <developerConnection>
+      scm:git:git@github.com:folio-org/${project.artifactId}.git
+    </developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>folio-nexus</id>
+      <name>FOLIO Release Repository</name>
+      <url>https://repository.folio.org/repository/maven-releases/</url>
+      <uniqueVersion>false</uniqueVersion>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <id>folio-nexus</id>
+      <name>FOLIO Snapshot Repository</name>
+      <uniqueVersion>true</uniqueVersion>
+      <url>https://repository.folio.org/repository/maven-snapshots/</url>
+      <layout>default</layout>
+    </snapshotRepository>
+  </distributionManagement>
 
   <properties>
     <java.version>11</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <folio-spring-base.version>2.0.0</folio-spring-base.version>
     <openapi-generator.version>5.3.0</openapi-generator.version>
     <mapstruct.version>1.4.2.Final</mapstruct.version>
     <json.version>20200518</json.version>
+    <lombok.version>1.18.22</lombok.version>
+    <liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
+    <!-- <javadoc-maven-plugin.version>3.3.1</javadoc-maven-plugin.version> -->
+    <!-- Mitigate CVE-2021-44228 before Spring Boot itself -->
+    <!-- https://spring.io/blog/2021/12/10/log4j2-vulnerability-and-spring-boot -->
+    <log4j2.version>2.16.0</log4j2.version>
 
     <calendar-api-defintions-yaml-file>
-      src/main/resources/swagger.api/mod-calendar.yaml
+      src/main/resources/api/mod-calendar.yaml
     </calendar-api-defintions-yaml-file>
+
+    <!-- Test Properties-->
+    <spring-boot-starter-test.version>2.6.0</spring-boot-starter-test.version>
+    <wiremock.version>2.31.0</wiremock.version>
+    <rest-assured.version>4.4.0</rest-assured.version>
+    <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
+    <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
+    <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
+    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+    <jackson-datatype-jsr310.version>2.13.0</jackson-datatype-jsr310.version>
   </properties>
 
   <dependencies>
@@ -58,9 +99,50 @@
     </dependency>
 
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <version>${spring-boot-starter-test.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock-jre8</artifactId>
+      <version>${wiremock.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>${rest-assured.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+
+    <dependency>
+      <groupId>com.atlassian.oai</groupId>
+      <artifactId>swagger-request-validator-restassured</artifactId>
+      <version>${swagger-request-validator.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.exparity</groupId>
+      <artifactId>hamcrest-date</artifactId>
+      <version>${hamcrest-date-matcher.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.zonky.test</groupId>
+      <artifactId>embedded-database-spring-test</artifactId>
+      <version>${embedded-database-spring-test.version}</version>
+      <!-- <scope>test</scope> -->
+    </dependency>
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <optional>true</optional>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -73,15 +155,34 @@
       <artifactId>mapstruct</artifactId>
       <version>${mapstruct.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct-processor</artifactId>
       <version>${mapstruct.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson-datatype-jsr310.version}</version>
+    </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>folio-nexus</id>
+      <name>FOLIO Maven repository</name>
+      <url>https://repository.folio.org/repository/maven-folio</url>
+    </repository>
+  </repositories>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -225,52 +326,77 @@
               <generateApiTests>true</generateApiTests>
               <generateApiDocumentation>true</generateApiDocumentation>
               <generateModels>true</generateModels>
-              <generateModelTests>false</generateModelTests>
+              <generateModelTests>true</generateModelTests>
               <generateSupportingFiles>true</generateSupportingFiles>
-              <supportingFilesToGenerate>ApiUtil.java</supportingFilesToGenerate>
               <generateModelDocumentation>true</generateModelDocumentation>
               <configOptions>
-                <dateLibrary>java</dateLibrary>
+                <dateLibrary>custom</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>
+                <booleanGetterPrefix>is</booleanGetterPrefix>
+                <additionalModelTypeAnnotations>
+                  @lombok.With
+                  @lombok.Builder
+                  @lombok.NoArgsConstructor
+                  @lombok.AllArgsConstructor
+                </additionalModelTypeAnnotations>
               </configOptions>
+              <typeMappings>
+                <typeMapping>DateTime=Instant</typeMapping>
+                <typeMapping>date=LocalDate</typeMapping>
+                <typeMapping>time=LocalTime</typeMapping>
+              </typeMappings>
+              <importMappings>
+                <importMapping>Instant=java.time.Instant</importMapping>
+                <importMapping>LocalDate=java.time.LocalDate</importMapping>
+                <importMapping>LocalTime=java.time.LocalTime</importMapping>
+              </importMappings>
             </configuration>
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.liquibase</groupId>
+        <artifactId>liquibase-maven-plugin</artifactId>
+        <version>${liquibase-maven-plugin.version}</version>
+        <configuration>
+          <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
+          <changeLogFile>src/main/resources/db/changelog-master.yaml</changeLogFile>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco-maven-plugin.version}</version>
+        <configuration>
+          <excludes>
+            <exclude>**/dto/*</exclude>
+            <exclude>**/rest/resource/*</exclude>
+            <exclude>**/CalendarApplication.java</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>${maven-javadoc-plugin.version}</version>
+      </plugin>
     </plugins>
   </build>
-
-  <repositories>
-    <repository>
-      <id>folio-nexus</id>
-      <name>FOLIO Maven repository</name>
-      <url>https://repository.folio.org/repository/maven-folio</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <repository>
-      <id>folio-nexus</id>
-      <name>FOLIO Release Repository</name>
-      <url>https://repository.folio.org/repository/maven-releases/</url>
-      <uniqueVersion>false</uniqueVersion>
-      <layout>default</layout>
-    </repository>
-    <snapshotRepository>
-      <id>folio-nexus</id>
-      <name>FOLIO Snapshot Repository</name>
-      <uniqueVersion>true</uniqueVersion>
-      <url>https://repository.folio.org/repository/maven-snapshots/</url>
-      <layout>default</layout>
-    </snapshotRepository>
-  </distributionManagement>
-
-  <scm>
-    <url>https://github.com/folio-org/${project.artifactId}</url>
-    <connection>scm:git:git://github.com/folio-org/${project.artifactId}.git</connection>
-    <developerConnection>
-      scm:git:git@github.com:folio-org/${project.artifactId}.git
-    </developerConnection>
-    <tag>HEAD</tag>
-  </scm>
 </project>

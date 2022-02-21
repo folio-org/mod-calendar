@@ -1,0 +1,80 @@
+description: A single period for a service point
+type: object
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Internal calendar UUID
+  servicePointId:
+    type: string
+    format: uuid
+    description: The UUID for the relevant service point
+  name:
+    type: string
+    description: The calendar's name
+  startDate:
+    type: string
+    format: date
+    description: The first effective date (inclusive) of this calendar
+  endDate:
+    type: string
+    format: date
+    description: The last effective date (inclusive) of this calendar
+  openingDays:
+    type: array
+    items:
+      $ref: "openingDayRelative.yaml"
+    description: All opening information for each weekday in this period.
+additionalProperties: false
+required:
+  - id
+  - servicePointId
+  - name
+  - startDate
+  - endDate
+  - openingDays
+example:
+  id: 296332ec-6e40-46b6-8064-10f7e1238b9d
+  servicePointId: c4c90014-c8c9-4ade-8f24-b5e313319f4b
+  name: October hours
+  startDate: "2021-10-01"
+  endDate: "2021-10-31"
+  openingDays:
+    - weekdays:
+        day: MONDAY
+      openingDay:
+        openingHour:
+          - startTime: "07:30"
+            endTime: "17:00"
+        allDay: false
+        open: true
+    - weekdays:
+        day: TUESDAY
+      openingDay:
+        openingHour:
+          - startTime: "02:00"
+            endTime: "17:00"
+        allDay: false
+        open: true
+    - weekdays:
+        day: WEDNESDAY
+      openingDay:
+        openingHour:
+          - startTime: "02:00"
+            endTime: "17:00"
+        allDay: false
+        open: true
+    - weekdays:
+        day: THURSDAY
+      openingDay:
+        openingHour:
+          - startTime: "02:00"
+            endTime: "17:00"
+        allDay: false
+        open: true
+    - weekdays:
+        day: FRIDAY
+      openingDay:
+        openingHour: []
+        allDay: true
+        open: true

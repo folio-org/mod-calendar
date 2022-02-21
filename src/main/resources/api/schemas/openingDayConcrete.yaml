@@ -1,0 +1,24 @@
+description: Opening information for a concrete date
+type: object
+properties:
+  openingDay:
+    description: Open/closed information
+    $ref: "openingDayInfo.yaml"
+  date:
+    type: string
+    format: date
+    description: Date this object applies to
+additionalProperties: false
+required:
+  - openingDay
+  - date
+example:
+  openingDay:
+    openingHour:
+      - startTime: "04:00"
+        endTime: "12:30"
+      - startTime: "13:30"
+        endTime: "17:00"
+    allDay: false
+    open: true
+  date: 2021-12-20

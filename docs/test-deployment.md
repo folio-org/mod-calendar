@@ -4,9 +4,10 @@ This is similar to the
 [sample deployment for the RMB-based modules](https://github.com/folio-org/folio-sample-modules/tree/master/hello-vertx).
 
 First, the module is built with Maven and Docker per the process defined in `build-process.md`. This
-docker module can then be ran with `docker run -t -i -p 8082:8082 mod-calendar`, exposing the
-container's 8082 as local 8082. Please note that environment variables must be provided or this will
-likely fail (due to lack of a database connection).
+docker module can then be ran with `docker run -t -i -p 8080:8080 mod-calendar`, exposing the
+container's 8080 as local 8080. Please note that environment variables must be provided or this will
+likely fail (due to lack of a database connection); see `.env.sample` if you are not sure what these
+should be. Okapi will provide these if deployed through its API.
 
 If Okapi is running in a Vagrant box (likely), the build process should be performed in the VM.
 Using shared folders is recommended (by default, the folder with the Vagrantfile is mounted in
@@ -83,3 +84,15 @@ Produces output:
 ```json
 { "hello": "heya!" }
 ```
+
+### Running Locally
+
+Please note that the module can be ran locally. It is recommended to do this _on top of/alongside_
+an existing Okapi environment (a la Vagrant) where the module has been deployed the first time
+(which will create the permissions/databases/etc. needed) with the database exposed. Once the
+environment is ready to go (and defined in a `.env` file -- an example is provided in
+`.env.sample`), Java can execute the application normally. A sample launch configuration for VS code
+is in `.vscode/launch.json`.
+
+Running it this way does not allow testing any of the features of Okapi (permissions, deployments,
+tenants, etc), however, it makes testing things much quicker.
