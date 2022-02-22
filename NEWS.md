@@ -1,3 +1,6 @@
+## 1.14.0 2022-02-22
+* Update RMB to v33.2.4 (MODCAL-102)
+
 ## 1.13.0 2021-09-30
 * Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours` table (MODCAL-72)
 
