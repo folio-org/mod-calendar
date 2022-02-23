@@ -13,6 +13,13 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+/**
+ * A class to represent a file that contains translation information.  This file will have a name
+ * identifying its associated locale with its contents being an ICU dictionary.
+ *
+ * This class also contains several utility methods for parsing filenames and aggregating
+ * {@code TranslationFile} objects.
+ */
 @Value
 @Log4j2
 public class TranslationFile {

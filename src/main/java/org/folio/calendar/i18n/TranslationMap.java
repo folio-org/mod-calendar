@@ -14,6 +14,13 @@ import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.types.LegacyPeriodDate;
 import org.folio.calendar.utils.MapUtils;
 
+/**
+ * This object represents the relationship between a locale and a
+ * {@link TranslationFile TranslationFile}.  The quality of this relationship is determined by how
+ * well the file's locale matches up with the one in use.  This object will also contain fallbacks,
+ * such as alternative languages for the user, or the server's default locale, to provide more
+ * seamless support for missing translations.
+ */
 @Log4j2
 @ToString
 @EqualsAndHashCode

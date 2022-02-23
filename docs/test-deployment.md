@@ -13,10 +13,6 @@ If Okapi is running in a Vagrant box (likely), the build process should be perfo
 Using shared folders is recommended (by default, the folder with the Vagrantfile is mounted in
 `/vagrant`).
 
-All of the steps in this file, as well as those in the [build-process.md](build-process.md), are
-executed as part of [`scripts/build.sh`](/scripts/build.sh) script. See `./scripts/build.sh -h` for
-usage information.
-
 ## Declare Module
 
 The module descriptor will convey the information about the module to Okapi, as described in

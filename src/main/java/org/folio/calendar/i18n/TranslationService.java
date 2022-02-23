@@ -17,6 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+/**
+ * A {@link Service Service} to manage translations as a whole.  In reality, the most important
+ * method is simply the format method which will do all of the heavy lifting as needed.  This
+ * service will keep track of translation files and locales, caching as possible, in order to
+ * serve the user the best possible translation.
+ */
 @Log4j2
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
