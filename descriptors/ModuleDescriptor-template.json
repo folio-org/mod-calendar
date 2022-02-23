@@ -9,37 +9,37 @@
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/periods",
-          "permissionsRequired": ["modperms.calendar.view"]
+          "permissionsRequired": ["calendar.periods.collection.get"]
         },
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/periods/{servicePointId}/period",
-          "permissionsRequired": ["modperms.calendar.view"]
+          "permissionsRequired": ["calendar.periods.collection.get"]
         },
         {
           "methods": ["POST"],
           "pathPattern": "/calendar/periods/{servicePointId}/period",
-          "permissionsRequired": ["modperms.calendar.create"]
+          "permissionsRequired": ["calendar.periods.item.post"]
         },
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": ["modperms.calendar.view"]
+          "permissionsRequired": ["calendar.periods.item.get"]
         },
         {
           "methods": ["PUT"],
           "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": ["modperms.calendar.edit"]
+          "permissionsRequired": ["calendar.periods.item.put"]
         },
         {
           "methods": ["DELETE"],
           "pathPattern": "/calendar/periods/{servicePointId}/period/{periodId}",
-          "permissionsRequired": ["modperms.calendar.delete"]
+          "permissionsRequired": ["calendar.periods.item.delete"]
         },
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
-          "permissionsRequired": ["modperms.calendar.view"]
+          "permissionsRequired": ["calendar.opening-hours.collection.get"]
         }
       ]
     },
@@ -61,35 +61,69 @@
   ],
   "permissionSets": [
     {
-      "permissionName": "modperms.calendar.view",
+      "permissionName": "calendar.view",
       "displayName": "Access and query calendar information",
       "description": "",
-      "replaces": [
+      "subPermissions": [
         "calendar.opening-hours.collection.get",
         "calendar.periods.collection.get",
         "calendar.periods.item.get"
       ]
     },
     {
-      "permissionName": "modperms.calendar.create",
+      "permissionName": "calendar.create",
       "displayName": "Create new calendars",
       "description": "",
-      "replaces": ["calendar.periods.item.post"],
-      "subPermissions": ["modperms.calendar.view"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.post"]
     },
     {
-      "permissionName": "modperms.calendar.update",
+      "permissionName": "calendar.update",
       "displayName": "Edit existing calendars",
       "description": "",
-      "replaces": ["calendar.periods.item.put"],
-      "subPermissions": ["modperms.calendar.view"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.put"]
     },
     {
-      "permissionName": "modperms.calendar.delete",
+      "permissionName": "calendar.delete",
       "displayName": "Delete calendars",
       "description": "",
-      "replaces": ["calendar.periods.item.delete"],
-      "subPermissions": ["modperms.calendar.view"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.delete"]
+    },
+
+    {
+      "permissionName": "calendar.opening-hours.collection.get",
+      "displayName": "List calendar opening hours (GET /periods/{servicePointId}/calculateopening)",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.periods.collection.get",
+      "displayName": "List all calendar periods (GET /periods/{servicePointId}/period and GET /periods)",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.periods.item.get",
+      "displayName": "Get the details of a certain period (GET /periods/{servicePointId}/period/{periodId})",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.periods.item.post",
+      "displayName": "Add a new calendar period (POST /periods/{servicePointId}/period)",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.periods.item.put",
+      "displayName": "Update existing calendar period (PUT /periods/{servicePointId}/period/{periodId})",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.periods.item.delete",
+      "displayName": "Delete calendar periods (DELETE /periods/{servicePointId}/period/{periodId})",
+      "description": "",
+      "visible": false
     }
   ],
   "requires": [],
