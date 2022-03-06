@@ -1,7 +1,9 @@
 package org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.delete;
 
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import java.util.UUID;
+import java.util.function.Function;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
 
 /**
@@ -35,9 +37,22 @@ public abstract class DeleteCalendarAbstractTest extends AbstractExistingCalenda
   public static final String DELETE_CALENDAR_API_ROUTE = "/calendar/periods/%s/period/%s";
   public static final String GET_CALENDAR_API_ROUTE = "/calendar/periods/%s/period/%s";
 
-  protected Response sendDeleteRequest(UUID servicePointId, UUID calendarId) {
-    return ra()
+  /**
+   * Send a delete request, with additional support to alter the headers/other request details
+   */
+  protected Response sendDeleteRequest(
+    UUID servicePointId,
+    UUID calendarId,
+    boolean validate,
+    Function<RequestSpecification, RequestSpecification> requestAlterer
+  ) {
+    return requestAlterer
+      .apply(ra(validate))
       .delete(getRequestUrl(String.format(DELETE_CALENDAR_API_ROUTE, servicePointId, calendarId)));
+  }
+
+  protected Response sendDeleteRequest(UUID servicePointId, UUID calendarId) {
+    return sendDeleteRequest(servicePointId, calendarId, true, ra -> ra);
   }
 
   protected Response sendGetRequest(UUID servicePointId, UUID calendarId) {

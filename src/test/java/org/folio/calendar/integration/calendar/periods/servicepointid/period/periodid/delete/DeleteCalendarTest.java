@@ -25,4 +25,19 @@ class DeleteCalendarTest extends DeleteCalendarAbstractTest {
 
     sendGetRequest(UUIDs.UUID_0, UUIDs.UUID_F).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
   }
+
+  @Test
+  void testDeleteAcceptHeaders() {
+    sendDeleteRequest(UUIDs.UUID_0, UUIDs.UUID_A, false, ra -> ra.header("accept", "text/plain"))
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+    sendDeleteRequest(
+      UUIDs.UUID_0,
+      UUIDs.UUID_F,
+      false,
+      ra -> ra.header("accept", "application/json")
+    )
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+  }
 }
