@@ -68,25 +68,29 @@
         "calendar.opening-hours.collection.get",
         "calendar.periods.collection.get",
         "calendar.periods.item.get"
-      ]
+      ],
+      "visible": false
     },
     {
       "permissionName": "calendar.create",
       "displayName": "Create new calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.post"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.post"],
+      "visible": false
     },
     {
       "permissionName": "calendar.update",
       "displayName": "Edit existing calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.put"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.put"],
+      "visible": false
     },
     {
       "permissionName": "calendar.delete",
       "displayName": "Delete calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.delete"]
+      "subPermissions": ["calendar.view", "calendar.periods.item.delete"],
+      "visible": false
     },
 
     {
