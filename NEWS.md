@@ -8,6 +8,11 @@
 - Provide sensible API error messages
 - Rename permissions to new `modperms` schema
 
+## 1.14.0 2022-02-22
+* Upgrade RMB to v33.2.4 (MODCAL-102)
+* Upgrade RMB to v33.0.4 and Log4j 2.16.0 (MODCAL-99)
+* Use new api-lint and api-doc CI facilities (FOLIO-3231)
+
 ## 1.13.0 2021-09-30
 
 - Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours`
