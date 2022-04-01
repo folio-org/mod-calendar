@@ -66,14 +66,14 @@
     </calendar-api-defintions-yaml-file>
 
     <!-- Test Properties-->
-    <spring-boot-starter-test.version>2.6.0</spring-boot-starter-test.version>
-    <wiremock.version>2.31.0</wiremock.version>
+    <spring-boot-starter-test.version>2.6.6</spring-boot-starter-test.version>
+    <wiremock.version>2.32.0</wiremock.version>
     <rest-assured.version>4.4.0</rest-assured.version>
-    <embedded-database-spring-test.version>2.1.0</embedded-database-spring-test.version>
-    <swagger-request-validator.version>2.22.0</swagger-request-validator.version>
+    <embedded-database-spring-test.version>2.1.1</embedded-database-spring-test.version>
+    <swagger-request-validator.version>2.27.1</swagger-request-validator.version>
     <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-    <jackson-datatype-jsr310.version>2.13.0</jackson-datatype-jsr310.version>
+    <jackson-datatype-jsr310.version>2.13.2</jackson-datatype-jsr310.version>
   </properties>
 
   <dependencies>
