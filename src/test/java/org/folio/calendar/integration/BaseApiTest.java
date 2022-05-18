@@ -71,8 +71,11 @@ public abstract class BaseApiTest {
   @LocalServerPort
   protected Integer port;
 
-  protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
-    "api/mod-calendar.yaml"
+  protected final OpenApiValidationFilter legacyValidationFilter = new OpenApiValidationFilter(
+    "api/legacy/mod-calendar.yaml"
+  );
+  protected final OpenApiValidationFilter newValidationFilter = new OpenApiValidationFilter(
+    "api/opening-hours.yaml"
   );
 
   @BeforeEach
@@ -94,14 +97,14 @@ public abstract class BaseApiTest {
       } else {
         path += "unknown";
       }
-      ra(false).get(getRequestUrl(path));
+      ra(ValidationSchema.NONE).get(getRequestUrl(path));
     }
   }
 
   @AfterEach
   void proxyLogTestFinish() {
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-      ra(false).get(getRequestUrl("/_/tests/_/finish"));
+      ra(ValidationSchema.NONE).get(getRequestUrl("/_/tests/_/finish"));
     }
   }
 
@@ -149,7 +152,7 @@ public abstract class BaseApiTest {
     // the v2.0 API of /_/tenant requires a non-empty moduleTo; without this, the module will not be initialized properly or enabled
     // the string we use does not matter (as there will be no modules in the database)
     log.info(String.format("Initializing database by posting to /_/tenant %s", tenantAttributes));
-    ra(false)
+    ra(ValidationSchema.NONE)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(tenantAttributes)
       .post(getRequestUrl("/_/tenant"))
@@ -165,14 +168,21 @@ public abstract class BaseApiTest {
   /**
    * Create a RestAssured object with the proper headers for Okapi testing
    *
-   * @param validate Whether or not the request/response must match the schema
+   * @param validate What schema the response must match
    * @return a @link {RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
-  public RequestSpecification ra(boolean validate) {
+  public RequestSpecification ra(ValidationSchema validation) {
     RequestSpecification ra = RestAssured.given();
-    if (validate) {
-      ra = ra.filter(validate ? validationFilter : null);
+    switch (validation) {
+      case LEGACY:
+        ra = ra.filter(legacyValidationFilter);
+        break;
+      case OPENING_HOURS:
+        ra = ra.filter(newValidationFilter);
+        break;
+      case NONE:
+      default:
     }
     return ra
       .header(new Header(XOkapiHeaders.URL, okapiUrl))
@@ -187,7 +197,7 @@ public abstract class BaseApiTest {
    *         RestAssured library methods
    */
   public RequestSpecification ra() {
-    return ra(true);
+    return ra(ValidationSchema.NONE);
   }
 
   /**

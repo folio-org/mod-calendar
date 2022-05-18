@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.integration.BaseApiTest;
+import org.folio.calendar.integration.ValidationSchema;
 import org.folio.tenant.domain.dto.Parameter;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ public abstract class AbstractSampleTest extends BaseApiTest {
     log.info("Truncating database");
 
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-      ra(false).get(getRequestUrl("/_/tests/_/database-truncate"));
+      ra(ValidationSchema.NONE).get(getRequestUrl("/_/tests/_/database-truncate"));
     }
 
     try (Connection conn = dataSource.getConnection()) {

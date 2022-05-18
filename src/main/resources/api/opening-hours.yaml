@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: Calendar Opening Hours API
+  version: v5.0
+servers:
+  - url: /
+paths: {}

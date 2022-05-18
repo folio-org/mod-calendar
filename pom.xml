@@ -64,8 +64,11 @@
     <icu4j.version>70.1</icu4j.version>
 
     <calendar-api-defintions-yaml-file>
-      src/main/resources/api/mod-calendar.yaml
+      src/main/resources/api/legacy/mod-calendar.yaml
     </calendar-api-defintions-yaml-file>
+    <opening-hours-api-defintions-yaml-file>
+      src/main/resources/api/opening-hours.yaml
+    </opening-hours-api-defintions-yaml-file>
 
     <!-- Test Properties-->
     <spring-boot-starter-test.version>2.6.6</spring-boot-starter-test.version>
@@ -317,12 +320,50 @@
         <version>${openapi-generator.version}</version>
         <executions>
           <execution>
-            <id>calendar</id>
+            <id>legacy-calendar</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
               <inputSpec>${calendar-api-defintions-yaml-file}</inputSpec>
+              <output>${project.build.directory}/generated-sources/api</output>
+              <generatorName>spring</generatorName>
+              <modelPackage>${project.groupId}.calendar.domain.dto</modelPackage>
+              <apiPackage>${project.groupId}.calendar.rest.resource</apiPackage>
+              <templateDirectory>src/main/resources/templates</templateDirectory>
+              <generateApis>true</generateApis>
+              <generateApiTests>true</generateApiTests>
+              <generateApiDocumentation>true</generateApiDocumentation>
+              <generateModels>true</generateModels>
+              <generateModelTests>true</generateModelTests>
+              <generateSupportingFiles>true</generateSupportingFiles>
+              <generateModelDocumentation>true</generateModelDocumentation>
+              <configOptions>
+                <dateLibrary>custom</dateLibrary>
+                <interfaceOnly>true</interfaceOnly>
+              </configOptions>
+              <typeMappings>
+                <typeMapping>
+                  legacy-period-date=org.folio.calendar.domain.types.LegacyPeriodDate
+                </typeMapping>
+                <typeMapping>DateTime=Instant</typeMapping>
+                <typeMapping>date=LocalDate</typeMapping>
+                <typeMapping>time=LocalTime</typeMapping>
+              </typeMappings>
+              <importMappings>
+                <importMapping>Instant=java.time.Instant</importMapping>
+                <importMapping>LocalDate=java.time.LocalDate</importMapping>
+                <importMapping>LocalTime=java.time.LocalTime</importMapping>
+              </importMappings>
+            </configuration>
+          </execution>
+          <execution>
+            <id>opening-hours</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${opening-hours-api-defintions-yaml-file}</inputSpec>
               <output>${project.build.directory}/generated-sources/api</output>
               <generatorName>spring</generatorName>
               <modelPackage>${project.groupId}.calendar.domain.dto</modelPackage>

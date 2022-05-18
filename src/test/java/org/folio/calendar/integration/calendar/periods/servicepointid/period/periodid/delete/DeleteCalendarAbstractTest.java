@@ -4,6 +4,7 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import java.util.UUID;
 import java.util.function.Function;
+import org.folio.calendar.integration.ValidationSchema;
 import org.folio.calendar.integration.calendar.periods.AbstractExistingCalendarTest;
 
 /**
@@ -47,7 +48,7 @@ public abstract class DeleteCalendarAbstractTest extends AbstractExistingCalenda
     Function<RequestSpecification, RequestSpecification> requestAlterer
   ) {
     return requestAlterer
-      .apply(ra(validate))
+      .apply(ra(validate ? ValidationSchema.LEGACY : ValidationSchema.NONE))
       .delete(getRequestUrl(String.format(DELETE_CALENDAR_API_ROUTE, servicePointId, calendarId)));
   }
 

@@ -38,7 +38,7 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
     hasCreated = false;
 
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-      ra(false).get(getRequestUrl("/_/tests/_/database-truncate"));
+      ra(ValidationSchema.NONE).get(getRequestUrl("/_/tests/_/database-truncate"));
     }
 
     try (Connection conn = dataSource.getConnection()) {

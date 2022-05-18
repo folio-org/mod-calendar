@@ -20,7 +20,7 @@ This is used by Okapi to get information about the module.
 The main block (besides the meta `_tenant` present in all module) is the `mod-calendar` block
 (`@artifactId@`). This block contains the schema of what API calls are allowed and all the
 information about them. API versioning here is inconsistent with the package version itself,
-however, should be consistent with the Swagger YAML in `mod-calendar.yaml`.
+however, should be consistent with the OpenAPI YAML in `src/resources/api`.
 
 ### `permissionSets`
 

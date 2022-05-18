@@ -8,6 +8,7 @@ import java.util.List;
 import javax.sql.DataSource;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.integration.BaseApiTest;
+import org.folio.calendar.integration.ValidationSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -41,7 +42,7 @@ public abstract class AbstractMigrationTest extends BaseApiTest {
       log.info(String.format("Running SQL %s", filename));
 
       if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-        ra(false).get(getRequestUrl(String.format("/_/tests/_/%s", filename)));
+        ra(ValidationSchema.NONE).get(getRequestUrl(String.format("/_/tests/_/%s", filename)));
       }
 
       try (Connection conn = dataSource.getConnection()) {
