@@ -4,10 +4,11 @@ properties:
   code:
     $ref: "errorCode.yaml"
   message:
-    description:
-      A description of the error, primarily for internal use.  Only error codes should be used
-      (which must be specific and localized for the frontend).
     type: string
+    description: A description of the error, properly localized.
+  data:
+    type: object
+    description: Additional data that may be used for rich error display in the UI
   _parameters:
     description: Parameters which may give insight into what caused the error
   _trace:

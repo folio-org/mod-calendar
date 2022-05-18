@@ -1,0 +1,38 @@
+description: An opening as part of an exception
+type: object
+properties:
+  id:
+    description: A unique UUID identifying this exceptional opening
+    type: string
+    format: uuid
+  exceptionId:
+    description: The UUID of the exception which this opening is for
+    type: string
+    format: uuid
+  startDate:
+    description: The first effective date (inclusive) of this opening
+    type: string
+    format: date
+  startTime:
+    description: The first opening time (inclusive) of this opening
+    type: string
+    format: time
+  endDate:
+    description: The first effective date (inclusive) of this opening
+    type: string
+    format: date
+  endTime:
+    description: The last open time (inclusive) of this opening
+    type: string
+    format: time
+additionalProperties: false
+required:
+  - startDate
+  - startTime
+  - endDate
+  - endTime
+example:
+  startDate: "2022-05-01"
+  startTime: "07:00:00"
+  endDate: "2022-05-01"
+  endTime: "22:00:00"

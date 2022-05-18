@@ -1,31 +1,30 @@
-description:
-  A code describing the error.  Typically will have a corresponding translation in UI module
+description: A code describing the error.
 type: string
 enum: # from en.json in ui-calendar translations
   - internalServerError
   - invalidRequest
   - invalidParameter
-  - noName
-  - settings.error.invalidDateRange
-  - duplication
-  - notFound
+  - noName # LEGACY
+  - settings.error.invalidDateRange # LEGACY
+  - duplication # LEGACY
+  - notFound # LEGACY
 x-enum-varnames:
   - INTERNAL_SERVER_ERROR
   - INVALID_REQUEST
   - INVALID_PARAMETER
-  - NO_NAME
-  - INVALID_DATE_RANGE
-  - OVERLAPPING_CALENDAR
-  - NOT_FOUND
+  - NO_NAME # LEGACY
+  - INVALID_DATE_RANGE # LEGACY
+  - OVERLAPPING_CALENDAR # LEGACY
+  - NOT_FOUND # LEGACY
 x-enum-descriptions:
   - Catch-all for any other unhandled exceptions
   - Catch-all for unparsable requests (bad JSON, etc)
   - Catch-all for missing or wrongly-typed parameters
-  - The request did not include a name (or used an empty name) for the object
-  - The start date was after the end date
+  - The request did not include a name (or used an empty name) for the object # LEGACY
+  - The start date was after the end date # LEGACY
   - The new calendar would overlap with another calendar for this service point!  Please change the
-    dates or add an exception.
-  - No calendar/period was found with this ID
+    dates or add an exception. # LEGACY
+  - No calendar/period was found with this ID # LEGACY
 example:
   code: internalServerError
   message: Internal Server Error

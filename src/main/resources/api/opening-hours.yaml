@@ -4,4 +4,10 @@ info:
   version: v5.0
 servers:
   - url: /
-paths: {}
+paths:
+  /opening-hours/calendars:
+    $ref: paths/opening-hours/calendars.yaml
+  # /opening-hours/calendars/{calendarId*}:
+  #   $ref: paths/opening-hours/calendars/calendarId.yaml
+  # /opening-hours/adjacent-openings:
+  #   $ref: paths/opening-hours/adjacent-openings.yaml

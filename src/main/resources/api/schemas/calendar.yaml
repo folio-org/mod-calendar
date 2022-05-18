@@ -1,0 +1,71 @@
+description: A single calendar
+type: object
+properties:
+  id:
+    description: A unique UUID identifying this calendar
+    type: string
+    format: uuid
+  name:
+    description: A user-provided name used to label this calendar
+    type: string
+  startDate:
+    type: string
+    format: date
+    description: The first effective date (inclusive) of this calendar
+  endDate:
+    type: string
+    format: date
+    description: The first effective date (inclusive) of this calendar
+  assignments:
+    description: A list of all service points that this calendar is assigned to
+    type: array
+    items:
+      $ref: servicePointId.yaml
+  normalHours:
+    description: A list of objects describing when the calendar is normally open
+    type: array
+    items:
+      $ref: normalHours.yaml
+  exceptions:
+    description: A list of objects describing exceptions to the normal hours
+    type: array
+    items:
+      $ref: exceptionRange.yaml
+additionalProperties: false
+required:
+  - name
+  - startDate
+  - endDate
+  - assignments
+  - normalHours
+  - exceptions
+example:
+  name: Sample Spring Calendar
+  startDate: "2022-01-08"
+  endDate: "2022-05-09"
+  assignments:
+    - 44444444-4444-4444-4444-444444444444
+    - bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb
+    - dddddddd-dddd-dddd-dddd-dddddddddddd
+  normalHours:
+    - startDay: MONDAY
+      startTime: "07:00:00"
+      endDay: FRIDAY
+      endTime: "22:00:00"
+    - startDay: SATURDAY
+      startTime: "07:00:00"
+      endDay: SATURDAY
+      endTime: "22:00:00"
+  exceptions:
+    - name: Spring break (closed)
+      startDate: "2022-03-01"
+      endDate: "2022-03-05"
+      openings: []
+    - name: Early closure
+      startDate: "2022-04-01"
+      endDate: "2022-04-01"
+      openings:
+        - startDate: "2022-04-01"
+          startTime: "07:00:00"
+          endDate: "2022-04-01"
+          endTime: "12:00:00"
