@@ -54,6 +54,11 @@ public class ExceptionRange {
   @EqualsAndHashCode.Exclude
   private Calendar calendar;
 
+  @NotNull
+  @Builder.Default
+  @Column(name = "name")
+  private String name = "Untitled exception";
+
   /**
    * The first date to which this exception is effective
    */
