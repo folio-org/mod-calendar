@@ -114,15 +114,6 @@ public class SampleCalendars {
           .id(UUID.randomUUID())
           .startDate(lastMonthStart.plusDays(1))
           .endDate(lastMonthStart.plusDays(1))
-          .opening(
-            ExceptionHour
-              .builder()
-              .startDate(lastMonthStart.plusDays(1))
-              .startTime(null)
-              .endDate(lastMonthStart.plusDays(1))
-              .endTime(null)
-              .build()
-          )
           .build()
       )
       .build();

@@ -6,13 +6,6 @@ import org.folio.calendar.domain.entity.ExceptionHour;
 @UtilityClass
 public class ExceptionHours {
 
-  public static final ExceptionHour CLOSED_ALL_YEAR = ExceptionHour
-    .builder()
-    .startDate(Dates.DATE_2021_01_01)
-    .endDate(Dates.DATE_2021_12_31)
-    .startTime(null)
-    .endTime(null)
-    .build();
   public static final ExceptionHour OPEN_ALL_DAY_JAN_1_THRU_JAN_4 = ExceptionHour
     .builder()
     .startDate(Dates.DATE_2021_01_01)

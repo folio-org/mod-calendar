@@ -74,7 +74,7 @@ public class ExceptionRange {
   private LocalDate endDate;
 
   /**
-   * The corresponding openings/closures which relate to this exception
+   * The corresponding openings which relate to this exception
    */
   @Singular
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "exception")

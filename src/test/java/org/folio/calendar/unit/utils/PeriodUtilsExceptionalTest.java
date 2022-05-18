@@ -127,9 +127,9 @@ class PeriodUtilsExceptionalTest {
     // override default ID
     result.get(0).setId(null);
     assertThat(
-      "An exceptional closure produces exactly one equivalent ExceptionRange",
+      "An exceptional closure produces exactly one equivalent ExceptionRange with no openings",
       result.get(0).getOpenings(),
-      hasSize(1)
+      hasSize(0)
     );
 
     assertThat(

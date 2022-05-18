@@ -95,9 +95,12 @@ public class PeriodUtils {
 
     if (!Boolean.TRUE.equals(opening.isOpen())) {
       // no time information implies closure
-      builder =
-        builder.opening(ExceptionHour.builder().startDate(startDate).endDate(endDate).build());
-    } else if (Boolean.TRUE.equals(opening.isAllDay())) {
+      // therefore, we want no openings
+      return Arrays.asList(builder.build());
+    }
+
+    // open all day
+    if (Boolean.TRUE.equals(opening.isAllDay())) {
       builder =
         builder.opening(
           ExceptionHour
@@ -284,7 +287,7 @@ public class PeriodUtils {
    * Get a list of {@link org.folio.calendar.domain.dto.OpeningDayRelative}s from {@link org.folio.calendar.domain.entity.NormalOpening}s, for conversion to a legacy Period.
    * There MUST be at least one exception in the set.
    *
-   * @param exceptions the list of exceptions to convert (should only be one)
+   * @param exceptions the list of exceptions to convert (must only be one)
    * @return the equivalent {@code OpeningDayRelative}
    */
   public static OpeningDayRelative getOpeningDayRelativeFromExceptionRanges(
@@ -292,13 +295,13 @@ public class PeriodUtils {
   ) {
     // Set has no native get
     ExceptionRange exception = new ArrayList<ExceptionRange>(exceptions).get(0);
-    ExceptionHour opening = new ArrayList<ExceptionHour>(exception.getOpenings()).get(0);
 
     OpeningDayInfo.OpeningDayInfoBuilder openingDayInfoBuilder = OpeningDayInfo
       .builder()
       .exceptional(true);
 
-    if (opening.getStartTime() == null) {
+    // no openings => closure
+    if (exception.getOpenings().isEmpty()) {
       openingDayInfoBuilder =
         openingDayInfoBuilder
           .allDay(true)
@@ -312,26 +315,30 @@ public class PeriodUtils {
                 .build()
             )
           );
-    } else {
-      openingDayInfoBuilder =
-        openingDayInfoBuilder
-          .allDay(false)
-          .open(true)
-          .openingHour(
-            Arrays.asList(
-              OpeningHourRange
-                .builder()
-                .startTime(DateUtils.toTimeString(opening.getStartTime()))
-                .endTime(DateUtils.toTimeString(opening.getEndTime()))
-                .build()
-            )
-          );
-      if (
-        TimeConstants.TIME_MIN.equals(opening.getStartTime()) &&
-        TimeConstants.TIME_MAX.equals(opening.getEndTime())
-      ) {
-        openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
-      }
+      return OpeningDayRelative.builder().openingDay(openingDayInfoBuilder.build()).build();
+    }
+
+    ExceptionHour opening = new ArrayList<ExceptionHour>(exception.getOpenings()).get(0);
+
+    openingDayInfoBuilder =
+      openingDayInfoBuilder
+        .allDay(false)
+        .open(true)
+        .openingHour(
+          Arrays.asList(
+            OpeningHourRange
+              .builder()
+              .startTime(DateUtils.toTimeString(opening.getStartTime()))
+              .endTime(DateUtils.toTimeString(opening.getEndTime()))
+              .build()
+          )
+        );
+
+    if (
+      TimeConstants.TIME_MIN.equals(opening.getStartTime()) &&
+      TimeConstants.TIME_MAX.equals(opening.getEndTime())
+    ) {
+      openingDayInfoBuilder = openingDayInfoBuilder.allDay(true);
     }
 
     return OpeningDayRelative.builder().openingDay(openingDayInfoBuilder.build()).build();

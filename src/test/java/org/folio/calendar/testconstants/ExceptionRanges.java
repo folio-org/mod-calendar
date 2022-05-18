@@ -15,7 +15,7 @@ public class ExceptionRanges {
     .builder()
     .startDate(Dates.DATE_2021_01_01)
     .endDate(Dates.DATE_2021_12_31)
-    .openings(Arrays.asList(ExceptionHours.CLOSED_ALL_YEAR))
+    .openings(Arrays.asList())
     .build();
 
   public static final ExceptionRange OPEN_ALL_DAY_JAN_1_THRU_JAN_4 = ExceptionRange
