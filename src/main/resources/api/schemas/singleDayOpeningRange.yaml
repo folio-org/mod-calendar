@@ -1,0 +1,18 @@
+description: A time for a single opening range on a given day
+type: object
+properties:
+  startTime:
+    description: The start time of this opening
+    type: string
+    format: time
+  endTime:
+    description: The end time of this opening
+    type: string
+    format: time
+required:
+  - startTime
+  - endTime
+additionalProperties: false
+example:
+  startTime: "13:30:00"
+  endTime: "17:00:00"

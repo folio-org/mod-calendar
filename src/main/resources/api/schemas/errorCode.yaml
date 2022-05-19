@@ -5,6 +5,7 @@ enum: # from en.json in ui-calendar translations
   - invalidRequest
   - invalidParameter
   - calendarDateOverlap
+  - calendarNotFound
   - noName # LEGACY
   - settings.error.invalidDateRange # LEGACY
   - duplication # LEGACY
@@ -14,6 +15,7 @@ x-enum-varnames:
   - INVALID_REQUEST
   - INVALID_PARAMETER
   - CALENDAR_DATE_OVERLAP
+  - CALENDAR_NOT_FOUND
   - NO_NAME # LEGACY
   - INVALID_DATE_RANGE # LEGACY
   - OVERLAPPING_CALENDAR # LEGACY
@@ -23,6 +25,7 @@ x-enum-descriptions:
   - Catch-all for unparsable requests (bad JSON, etc)
   - Catch-all for missing or wrongly-typed parameters
   - The provided dates overlap other dates for the same assignment
+  - The calender with the provided UUID was not found
   - The request did not include a name (or used an empty name) for the object # LEGACY
   - The start date was after the end date # LEGACY
   - The new calendar would overlap with another calendar for this service point!  Please change the

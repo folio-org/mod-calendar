@@ -1,0 +1,42 @@
+description: Opening information for a single day
+type: object
+properties:
+  date:
+    description: The date that this object is describing openings for
+    type: string
+    format: date
+  allDay:
+    description: If the service point is open or closed for the entire day
+    type: boolean
+  open:
+    description: If the service point is open on this day
+    type: boolean
+  exceptional:
+    description: If this opening (or closure) was the result of an exception
+    type: boolean
+  exceptionName:
+    description: The name of an exception, if this day was affected by one
+    type: string
+  openings:
+    description: A list of all the opening ranges of the service point on this day
+    type: array
+    items:
+      $ref: singleDayOpeningRange.yaml
+required:
+  - date
+  - allDay
+  - open
+  - exceptional
+  - openings
+additionalProperties: false
+example:
+  date: "2022-05-01"
+  allDay: false
+  open: true
+  exceptional: true
+  exceptionName: "Holiday (reduced hours with lunch break)"
+  openings:
+    - startTime: "10:00:00"
+      endTime: "12:00:00"
+    - startTime: "13:30:00"
+      endTime: "17:00:00"

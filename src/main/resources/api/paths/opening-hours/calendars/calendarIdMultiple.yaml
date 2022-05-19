@@ -1,0 +1,38 @@
+get:
+  summary: Get calendar(s)
+  description:
+    Get one or more calendar's information by their ID.  All calendars must exist for a successful
+    response, otherwise a 404 will be returned.
+  operationId: getCalendars
+  parameters:
+    - $ref: ../../../parameters/calendarList.yaml
+  responses:
+    "200":
+      description: The query results
+      content:
+        application/json:
+          schema:
+            $ref: ../../../schemas/calendarCollection.yaml
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../../errors/calendarNotFound.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml
+delete:
+  summary: Delete calendar(s)
+  description:
+    Delete one or more calendar's information by their ID.  All calendars must exist for a
+    successful response, otherwise a 404 will be returned and no action performed.
+  operationId: deleteCalendars
+  parameters:
+    - $ref: ../../../parameters/calendarList.yaml
+  responses:
+    "204":
+      description: The requested calendars were deleted
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../../errors/calendarNotFound.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml

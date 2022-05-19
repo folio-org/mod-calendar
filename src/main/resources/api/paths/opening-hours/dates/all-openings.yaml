@@ -1,0 +1,62 @@
+get:
+  operationId: getAllOpenings
+  summary: Daily opening information
+  description: Calculate the opening information for each date within a range
+  parameters:
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The service point to calculate openings on
+    - in: query
+      name: startDate
+      required: true
+      schema:
+        type: string
+        format: date
+      description: The first date to include, inclusive
+    - in: query
+      name: endDate
+      required: true
+      schema:
+        type: string
+        format: date
+      description: The last date to include, inclusive
+    - in: query
+      name: includeClosed
+      required: true
+      schema:
+        type: boolean
+      description: Whether or not the results should include days where the service point is closed
+    - in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+      description: Skip a certain number of the first values; used for pagination
+    - in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        default: 10
+        minimum: 0
+      description:
+        The maximum number of elements returned in the response, used for pagination.  A limit of
+        zero will not include any results (however, totalRecords will still be included) -- to
+        include all results, use a large number such as 2147483647.
+  responses:
+    "200":
+      description: The query results
+      content:
+        application/json:
+          schema:
+            $ref: ../../../schemas/singleDayOpeningCollection.yaml
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml

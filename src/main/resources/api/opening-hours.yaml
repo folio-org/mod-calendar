@@ -7,7 +7,11 @@ servers:
 paths:
   /opening-hours/calendars:
     $ref: paths/opening-hours/calendars.yaml
-  # /opening-hours/calendars/{calendarId*}:
-  #   $ref: paths/opening-hours/calendars/calendarId.yaml
-  # /opening-hours/adjacent-openings:
-  #   $ref: paths/opening-hours/adjacent-openings.yaml
+  /opening-hours/calendars/{calendarId}:
+    $ref: paths/opening-hours/calendars/calendarIdSingle.yaml
+  /opening-hours/calendars/{calendarId*}:
+    $ref: paths/opening-hours/calendars/calendarIdMultiple.yaml
+  /opening-hours/dates/{servicePointId}/adjacent-openings/{date}:
+    $ref: paths/opening-hours/dates/adjacent-openings.yaml
+  /opening-hours/dates/{servicePointId}/all-openings:
+    $ref: paths/opening-hours/dates/all-openings.yaml

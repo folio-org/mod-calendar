@@ -1,0 +1,7 @@
+description: A calendar with the given UUID could not be found.
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      $ref: ../examples/calendarNotFound.yaml
