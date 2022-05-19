@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "calendar",
-      "version": "4.1",
+      "version": "5.0",
       "handlers": [
         {
           "methods": ["GET"],
@@ -40,6 +40,42 @@
           "methods": ["GET"],
           "pathPattern": "/calendar/periods/{servicePointId}/calculateopening",
           "permissionsRequired": ["calendar.opening-hours.collection.get"]
+        },
+
+        {
+          "methods": ["GET"],
+          "pathPattern": "/opening-hours/calendars",
+          "permissionsRequired": ["opening-hours.calendars.get"]
+        },
+        {
+          "methods": ["POST"],
+          "pathPattern": "/opening-hours/calendars",
+          "permissionsRequired": ["opening-hours.calendars.post"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/opening-hours/calendars/{calendarIds}",
+          "permissionsRequired": ["opening-hours.calendars.calendarIds.get"]
+        },
+        {
+          "methods": ["DELETE"],
+          "pathPattern": "/opening-hours/calendars/{calendarIds}",
+          "permissionsRequired": ["opening-hours.calendars.calendarIds.delete"]
+        },
+        {
+          "methods": ["PUT"],
+          "pathPattern": "/opening-hours/calendars/{calendarId}",
+          "permissionsRequired": ["opening-hours.calendars.calendarId.put"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/opening-hours/dates/{servicePointId}/adjacent-openings/{date}",
+          "permissionsRequired": ["opening-hours.dates.get"]
+        },
+        {
+          "methods": ["GET"],
+          "pathPattern": "/opening-hours/dates/{servicePointId}/all-openings",
+          "permissionsRequired": ["opening-hours.dates.get"]
         }
       ]
     },
@@ -67,7 +103,11 @@
       "subPermissions": [
         "calendar.opening-hours.collection.get",
         "calendar.periods.collection.get",
-        "calendar.periods.item.get"
+        "calendar.periods.item.get",
+
+        "opening-hours.calendars.get",
+        "opening-hours.calendars.calendarIds.get",
+        "opening-hours.dates.get"
       ],
       "visible": false
     },
@@ -75,21 +115,76 @@
       "permissionName": "calendar.create",
       "displayName": "Create new calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.post"],
+      "subPermissions": [
+        "calendar.view",
+
+        "calendar.periods.item.post",
+
+        "opening-hours.calendars.post"
+      ],
       "visible": false
     },
     {
       "permissionName": "calendar.update",
       "displayName": "Edit existing calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.put"],
+      "subPermissions": [
+        "calendar.view",
+
+        "calendar.periods.item.put",
+
+        "opening-hours.calendars.calendarId.put"
+      ],
       "visible": false
     },
     {
       "permissionName": "calendar.delete",
       "displayName": "Delete calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.periods.item.delete"],
+      "subPermissions": [
+        "calendar.view",
+
+        "calendar.periods.item.delete",
+
+        "opening-hours.calendars.calendarIds.delete"
+      ],
+      "visible": false
+    },
+
+    {
+      "permissionName": "opening-hours.calendars.get",
+      "displayName": "AAAAAA",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "opening-hours.calendars.post",
+      "displayName": "AAAAAA",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "opening-hours.calendars.calendarIds.get",
+      "displayName": "AAAAAA",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "opening-hours.calendars.calendarIds.delete",
+      "displayName": "AAAAAA",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "opening-hours.calendars.calendarId.put",
+      "displayName": "AAAAAA",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "opening-hours.dates.get",
+      "displayName": "AAAAAA",
+      "description": "",
       "visible": false
     },
 
