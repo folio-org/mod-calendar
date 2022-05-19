@@ -1,6 +1,7 @@
 get:
-  operationId: getAllCalendars
+  summary: Get all calendars
   description: Get all calendars that match the given query
+  operationId: getAllCalendars
   parameters:
     - in: query
       name: servicePointId
@@ -59,5 +60,28 @@ get:
             $ref: ../../schemas/calendarCollection.yaml
     "400":
       $ref: ../../errors/invalidRequest.yaml
+    "500":
+      $ref: ../../errors/internalServerError.yaml
+post:
+  summary: Create a new calendar
+  description: Create a new calendar from a provided body
+  operationId: createCalendar
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/calendar.yaml
+  responses:
+    "201":
+      description: The created calendar
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/calendar.yaml
+    "400":
+      $ref: ../../errors/invalidRequest.yaml
+    "409":
+      $ref: ../../errors/calendarDateOverlap.yaml
     "500":
       $ref: ../../errors/internalServerError.yaml
