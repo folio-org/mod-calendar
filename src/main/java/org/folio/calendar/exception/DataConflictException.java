@@ -20,7 +20,7 @@ public class DataConflictException extends AbstractCalendarException {
     ExceptionParameters parameters,
     String message
   ) {
-    super(null, parameters, HttpStatus.CONFLICT, errorCode, message);
+    super(null, parameters, HttpStatus.CONFLICT, errorCode, message, null);
   }
 
   /**

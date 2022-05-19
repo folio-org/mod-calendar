@@ -1,1 +1,33 @@
-../legacy/schemas/errorCode.yaml
+description: A code describing the error.
+type: string
+enum: # from en.json in ui-calendar translations
+  - internalServerError
+  - invalidRequest
+  - invalidParameter
+  - calendarDateOverlap
+  - noName # LEGACY
+  - settings.error.invalidDateRange # LEGACY
+  - duplication # LEGACY
+  - notFound # LEGACY
+x-enum-varnames:
+  - INTERNAL_SERVER_ERROR
+  - INVALID_REQUEST
+  - INVALID_PARAMETER
+  - CALENDAR_DATE_OVERLAP
+  - NO_NAME # LEGACY
+  - INVALID_DATE_RANGE # LEGACY
+  - OVERLAPPING_CALENDAR # LEGACY
+  - NOT_FOUND # LEGACY
+x-enum-descriptions:
+  - Catch-all for any other unhandled exceptions
+  - Catch-all for unparsable requests (bad JSON, etc)
+  - Catch-all for missing or wrongly-typed parameters
+  - The provided dates overlap other dates for the same assignment
+  - The request did not include a name (or used an empty name) for the object # LEGACY
+  - The start date was after the end date # LEGACY
+  - The new calendar would overlap with another calendar for this service point!  Please change the
+    dates or add an exception. # LEGACY
+  - No calendar/period was found with this ID # LEGACY
+example:
+  code: internalServerError
+  message: Internal Server Error

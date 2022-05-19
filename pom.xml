@@ -381,9 +381,6 @@
                 <interfaceOnly>true</interfaceOnly>
               </configOptions>
               <typeMappings>
-                <typeMapping>
-                  legacy-period-date=org.folio.calendar.domain.types.LegacyPeriodDate
-                </typeMapping>
                 <typeMapping>DateTime=Instant</typeMapping>
                 <typeMapping>date=LocalDate</typeMapping>
                 <typeMapping>time=LocalTime</typeMapping>

@@ -16,7 +16,7 @@ public class DataNotFoundException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public DataNotFoundException(Throwable cause, ExceptionParameters parameters, String message) {
-    super(cause, parameters, HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, message);
+    super(cause, parameters, HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, message, null);
   }
 
   /**

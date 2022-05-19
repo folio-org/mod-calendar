@@ -39,6 +39,6 @@ public class NonspecificCalendarException extends AbstractCalendarException {
     ErrorCode errorCode,
     String message
   ) {
-    super(cause, null, statusCode, errorCode, message);
+    super(cause, null, statusCode, errorCode, message, null);
   }
 }

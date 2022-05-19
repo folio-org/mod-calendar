@@ -16,7 +16,7 @@ public class InvalidDataException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public InvalidDataException(ErrorCode errorCode, ExceptionParameters parameters, String message) {
-    super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message);
+    super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message, null);
   }
 
   /**
@@ -37,6 +37,6 @@ public class InvalidDataException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public InvalidDataException(Throwable cause, ExceptionParameters parameters, String message) {
-    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST, message);
+    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST, message, null);
   }
 }

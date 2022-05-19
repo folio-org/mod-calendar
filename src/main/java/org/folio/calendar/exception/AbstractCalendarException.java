@@ -10,6 +10,7 @@ import lombok.ToString;
 import org.folio.calendar.domain.dto.Error;
 import org.folio.calendar.domain.dto.ErrorCode;
 import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.error.ErrorData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 @ToString(callSuper = true)
 public abstract class AbstractCalendarException extends RuntimeException {
 
-  /** Constant <code>DEFAULT_STATUS_CODE</code> */
+  /** By default, send a 400 */
   public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
   @Getter
@@ -33,6 +34,9 @@ public abstract class AbstractCalendarException extends RuntimeException {
   @NonNull
   protected final ExceptionParameters parameters;
 
+  @Getter
+  protected final ErrorData data;
+
   /**
    * Create an AbstractCalendarException with the given HTTP status code, error
    * code, message, and format.
@@ -42,13 +46,15 @@ public abstract class AbstractCalendarException extends RuntimeException {
    * @param statusCode The Spring HTTP status code ({@link org.springframework.http.HttpStatus HttpStatus})
    * @param errorCode  An error code as described in the ErrorResponse API type
    * @param message    A string for the error message
+   * @param data       Nullable additional data to include in the response for richer errors
    */
   protected AbstractCalendarException(
     Throwable cause,
     ExceptionParameters parameters,
     HttpStatus statusCode,
     ErrorCode errorCode,
-    String message
+    String message,
+    ErrorData data
   ) {
     super(message, cause);
     if (parameters == null) {
@@ -57,6 +63,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
     this.parameters = parameters;
     this.errorCode = errorCode;
     this.statusCode = statusCode;
+    this.data = data;
   }
 
   /**
@@ -73,6 +80,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
     Error.ErrorBuilder errorBuilder = Error.builder();
     errorBuilder = errorBuilder.code(this.getErrorCode());
     errorBuilder = errorBuilder.message(this.getMessage());
+    errorBuilder = errorBuilder.data(this.getData());
     for (StackTraceElement frame : this.getStackTrace()) {
       errorBuilder = errorBuilder.traceItem(frame.toString());
     }
