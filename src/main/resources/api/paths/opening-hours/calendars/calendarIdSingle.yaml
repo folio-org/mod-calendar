@@ -8,7 +8,7 @@ put:
   operationId: updateCalendar
   parameters:
     - in: path
-      name: calendar
+      name: calendarId
       required: true
       schema:
         type: string

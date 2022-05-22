@@ -1,6 +1,6 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -20,7 +20,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
    * @param errorCode An error code as described in the ErrorResponse API type
    * @param message   A string for the error message
    */
-  public NonspecificCalendarException(Throwable cause, ErrorCode errorCode, String message) {
+  public NonspecificCalendarException(Throwable cause, ErrorCodeDTO errorCode, String message) {
     this(cause, AbstractCalendarException.DEFAULT_STATUS_CODE, errorCode, message);
   }
 
@@ -36,7 +36,7 @@ public class NonspecificCalendarException extends AbstractCalendarException {
   public NonspecificCalendarException(
     Throwable cause,
     HttpStatus statusCode,
-    ErrorCode errorCode,
+    ErrorCodeDTO errorCode,
     String message
   ) {
     super(cause, null, statusCode, errorCode, message, null);

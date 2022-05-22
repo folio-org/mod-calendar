@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Error;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Tag;
@@ -29,7 +29,7 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
 
     response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -39,9 +39,13 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
-    assertThat("Error reports that no name was provided", error.getCode(), is(ErrorCode.NO_NAME));
+    assertThat(
+      "Error reports that no name was provided",
+      error.getCode(),
+      is(ErrorCodeDTO.NO_NAME)
+    );
     assertThat(
       "Error message specified missing name error",
       error.getMessage(),

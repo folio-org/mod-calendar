@@ -376,6 +376,7 @@
               <generateModelTests>true</generateModelTests>
               <generateSupportingFiles>true</generateSupportingFiles>
               <generateModelDocumentation>true</generateModelDocumentation>
+              <modelNameSuffix>DTO</modelNameSuffix>
               <configOptions>
                 <dateLibrary>custom</dateLibrary>
                 <interfaceOnly>true</interfaceOnly>

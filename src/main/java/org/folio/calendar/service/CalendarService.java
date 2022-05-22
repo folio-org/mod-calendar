@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.controller.CalendarController;
-import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.dto.PeriodCollection;
@@ -200,11 +200,12 @@ public class CalendarService {
    */
   public Calendar getCalendarById(UUID id) {
     return this.calendarRepository.findById(id)
-      .orElseThrow(() ->
-        new DataNotFoundException(
-          new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
-          translationService.format("error.calendarNotFound", "requestedId", id)
-        )
+      .orElseThrow(
+        () ->
+          new DataNotFoundException(
+            new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
+            translationService.format("error.calendarNotFound", "requestedId", id)
+          )
       );
   }
 
@@ -263,7 +264,7 @@ public class CalendarService {
   public void checkPeriod(Period period, UUID servicePointId, Calendar ignore) {
     if (period.getName().isBlank()) {
       throw new InvalidDataException(
-        ErrorCode.NO_NAME,
+        ErrorCodeDTO.NO_NAME,
         new ExceptionParameters(
           CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
           servicePointId,
@@ -275,7 +276,7 @@ public class CalendarService {
     }
     if (period.getStartDate().getValue().isAfter(period.getEndDate().getValue())) {
       throw new InvalidDataException(
-        ErrorCode.INVALID_DATE_RANGE,
+        ErrorCodeDTO.INVALID_DATE_RANGE,
         new ExceptionParameters(
           CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
           servicePointId,
@@ -332,7 +333,7 @@ public class CalendarService {
 
     if (overlapped != null) {
       throw new DataConflictException(
-        ErrorCode.OVERLAPPING_CALENDAR,
+        ErrorCodeDTO.OVERLAPPING_CALENDAR,
         new ExceptionParameters(
           CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
           servicePointId,

@@ -6,8 +6,8 @@ import static org.apache.logging.log4j.Level.INFO;
 import java.util.Arrays;
 import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
 import org.folio.calendar.i18n.TranslationService;
@@ -37,29 +37,29 @@ public class ApiExceptionHandler {
    *
    * @param exception an {@link org.folio.calendar.exception.AbstractCalendarException AbstractCalendarException}
    * @see AbstractCalendarException
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponseDTO ErrorResponseDTO} body.
    */
   @ExceptionHandler(AbstractCalendarException.class)
-  public ResponseEntity<ErrorResponse> handleCalendarException(
+  public ResponseEntity<ErrorResponseDTO> handleCalendarException(
     AbstractCalendarException exception
   ) {
     log.log(INFO, exception);
-    return exception.getErrorResponseEntity();
+    return exception.getErrorResponseDTOEntity();
   }
 
   /**
    * Handles requests to endpoints that do not exist
    *
    * @param exception exception indicating that no handler exists for an endpoint
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponseDTO ErrorResponseDTO} body.
    */
   @ExceptionHandler(NoHandlerFoundException.class)
-  public ResponseEntity<ErrorResponse> handleNotFound(NoHandlerFoundException exception) {
+  public ResponseEntity<ErrorResponseDTO> handleNotFound(NoHandlerFoundException exception) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
       HttpStatus.NOT_FOUND,
-      ErrorCode.INVALID_REQUEST,
+      ErrorCodeDTO.INVALID_REQUEST,
       translationService.format(
         "error.endpointNotFound",
         "method",
@@ -68,24 +68,24 @@ public class ApiExceptionHandler {
         exception.getRequestURL()
       )
     )
-      .getErrorResponseEntity();
+      .getErrorResponseDTOEntity();
   }
 
   /**
    * Handles requests to endpoints with unknown methods
    *
    * @param exception exception indicating that no handler exists for an endpoint with this method
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponseDTO ErrorResponseDTO} body.
    */
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-  public ResponseEntity<ErrorResponse> handleBadMethod(
+  public ResponseEntity<ErrorResponseDTO> handleBadMethod(
     HttpRequestMethodNotSupportedException exception
   ) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
       HttpStatus.METHOD_NOT_ALLOWED,
-      ErrorCode.INVALID_REQUEST,
+      ErrorCodeDTO.INVALID_REQUEST,
       translationService.format(
         "error.endpointMethodInvalid",
         "method",
@@ -94,14 +94,14 @@ public class ApiExceptionHandler {
         Arrays.toString(exception.getSupportedMethods())
       )
     )
-      .getErrorResponseEntity();
+      .getErrorResponseDTOEntity();
   }
 
   /**
    * Handles improperly typed parameters/requests
    *
    * @param exception exception indicating that the request could not be parsed
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponseDTO ErrorResponseDTO} body.
    */
   @ExceptionHandler(
     {
@@ -111,28 +111,28 @@ public class ApiExceptionHandler {
       HttpMessageNotReadableException.class,
     }
   )
-  public ResponseEntity<ErrorResponse> handleBadRequest(Exception exception) {
+  public ResponseEntity<ErrorResponseDTO> handleBadRequest(Exception exception) {
     log.log(INFO, exception);
     return new NonspecificCalendarException(
       exception,
-      ErrorCode.INVALID_PARAMETER,
+      ErrorCodeDTO.INVALID_PARAMETER,
       translationService.format(
         "error.unparsableData",
         "unLocalizedErrorMessage",
         exception.getMessage()
       )
     )
-      .getErrorResponseEntity();
+      .getErrorResponseDTOEntity();
   }
 
   /**
    * Handles all uncaught exceptions.
    *
    * @param exception exceptions not otherwise caught
-   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse ErrorResponse} body.
+   * @return {@link org.springframework.http.ResponseEntity ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponseDTO ErrorResponseDTO} body.
    */
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> handleAllOtherExceptions(Exception exception) {
+  public ResponseEntity<ErrorResponseDTO> handleAllOtherExceptions(Exception exception) {
     log.log(ERROR, exception);
 
     // As a note, NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
@@ -140,7 +140,7 @@ public class ApiExceptionHandler {
     return new NonspecificCalendarException(
       exception,
       HttpStatus.INTERNAL_SERVER_ERROR,
-      ErrorCode.INTERNAL_SERVER_ERROR,
+      ErrorCodeDTO.INTERNAL_SERVER_ERROR,
       translationService.format(
         "error.internalServerError",
         "className",
@@ -149,6 +149,6 @@ public class ApiExceptionHandler {
         exception.getMessage()
       )
     )
-      .getErrorResponseEntity();
+      .getErrorResponseDTOEntity();
   }
 }

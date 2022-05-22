@@ -9,7 +9,7 @@ paths:
     $ref: paths/opening-hours/calendars.yaml
   /opening-hours/calendars/{calendarId}:
     $ref: paths/opening-hours/calendars/calendarIdSingle.yaml
-  /opening-hours/calendars/{calendarId*}:
+  /opening-hours/calendars/{calendarIds}:
     $ref: paths/opening-hours/calendars/calendarIdMultiple.yaml
   /opening-hours/dates/{servicePointId}/adjacent-openings/{date}:
     $ref: paths/opening-hours/dates/adjacent-openings.yaml

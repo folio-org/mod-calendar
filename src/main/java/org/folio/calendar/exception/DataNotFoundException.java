@@ -1,6 +1,6 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -16,7 +16,7 @@ public class DataNotFoundException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public DataNotFoundException(Throwable cause, ExceptionParameters parameters, String message) {
-    super(cause, parameters, HttpStatus.NOT_FOUND, ErrorCode.NOT_FOUND, message, null);
+    super(cause, parameters, HttpStatus.NOT_FOUND, ErrorCodeDTO.NOT_FOUND, message, null);
   }
 
   /**

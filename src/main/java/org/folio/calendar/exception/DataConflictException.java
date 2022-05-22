@@ -1,6 +1,6 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -16,7 +16,7 @@ public class DataConflictException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public DataConflictException(
-    ErrorCode errorCode,
+    ErrorCodeDTO errorCode,
     ExceptionParameters parameters,
     String message
   ) {
@@ -30,6 +30,6 @@ public class DataConflictException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public DataConflictException(ExceptionParameters parameters, String message) {
-    this(ErrorCode.INVALID_REQUEST, parameters, message);
+    this(ErrorCodeDTO.INVALID_REQUEST, parameters, message);
   }
 }

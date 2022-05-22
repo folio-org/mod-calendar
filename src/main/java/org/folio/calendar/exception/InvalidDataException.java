@@ -1,6 +1,6 @@
 package org.folio.calendar.exception;
 
-import org.folio.calendar.domain.dto.ErrorCode;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -15,7 +15,11 @@ public class InvalidDataException extends AbstractCalendarException {
    * @param parameters Parameters which caused this issue
    * @param message    A string for the error message
    */
-  public InvalidDataException(ErrorCode errorCode, ExceptionParameters parameters, String message) {
+  public InvalidDataException(
+    ErrorCodeDTO errorCode,
+    ExceptionParameters parameters,
+    String message
+  ) {
     super(null, parameters, HttpStatus.BAD_REQUEST, errorCode, message, null);
   }
 
@@ -26,7 +30,7 @@ public class InvalidDataException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public InvalidDataException(ExceptionParameters parameters, String message) {
-    this(ErrorCode.INVALID_REQUEST, parameters, message);
+    this(ErrorCodeDTO.INVALID_REQUEST, parameters, message);
   }
 
   /**
@@ -37,6 +41,6 @@ public class InvalidDataException extends AbstractCalendarException {
    * @param message    A string for the error message
    */
   public InvalidDataException(Throwable cause, ExceptionParameters parameters, String message) {
-    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCode.INVALID_REQUEST, message, null);
+    super(cause, parameters, HttpStatus.BAD_REQUEST, ErrorCodeDTO.INVALID_REQUEST, message, null);
   }
 }

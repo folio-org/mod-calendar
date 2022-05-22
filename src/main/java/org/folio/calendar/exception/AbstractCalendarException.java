@@ -7,9 +7,9 @@ import java.util.Map.Entry;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
-import org.folio.calendar.domain.dto.Error;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.domain.error.ErrorData;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
   public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
   @Getter
-  protected final ErrorCode errorCode;
+  protected final ErrorCodeDTO errorCode;
 
   @Getter
   protected final HttpStatus statusCode;
@@ -52,7 +52,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
     Throwable cause,
     ExceptionParameters parameters,
     HttpStatus statusCode,
-    ErrorCode errorCode,
+    ErrorCodeDTO errorCode,
     String message,
     ErrorData data
   ) {
@@ -71,13 +71,13 @@ public abstract class AbstractCalendarException extends RuntimeException {
    *
    * @return An ErrorResponse for API return
    */
-  protected ErrorResponse getErrorResponse() {
-    ErrorResponse.ErrorResponseBuilder responseBuilder = ErrorResponse.builder();
+  protected ErrorResponseDTO getErrorResponseDTO() {
+    ErrorResponseDTO.ErrorResponseDTOBuilder responseBuilder = ErrorResponseDTO.builder();
     responseBuilder = responseBuilder.timestamp(Instant.now());
     responseBuilder = responseBuilder.status(this.getStatusCode().value());
 
     // Can only have one exception at a time
-    Error.ErrorBuilder errorBuilder = Error.builder();
+    ErrorDTO.ErrorDTOBuilder errorBuilder = ErrorDTO.builder();
     errorBuilder = errorBuilder.code(this.getErrorCode());
     errorBuilder = errorBuilder.message(this.getMessage());
     errorBuilder = errorBuilder.data(this.getData());
@@ -107,7 +107,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    *
    * @return {@link org.springframework.http.ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse} body.
    */
-  public ResponseEntity<ErrorResponse> getErrorResponseEntity() {
-    return new ResponseEntity<>(this.getErrorResponse(), this.getStatusCode());
+  public ResponseEntity<ErrorResponseDTO> getErrorResponseDTOEntity() {
+    return new ResponseEntity<>(this.getErrorResponseDTO(), this.getStatusCode());
   }
 }

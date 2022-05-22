@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Error;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.integration.BaseApiTest;
 import org.folio.calendar.integration.ValidationSchema;
 import org.folio.calendar.integration.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
@@ -30,7 +30,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -40,12 +40,12 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports the endpoint is not found (an invalid request)",
       error.getCode(),
-      is(ErrorCode.INVALID_REQUEST)
+      is(ErrorCodeDTO.INVALID_REQUEST)
     );
     assertThat(
       "Error message specified that the endpoint is unknown",
@@ -60,7 +60,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -70,12 +70,12 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports the endpoint is not found (an invalid request)",
       error.getCode(),
-      is(ErrorCode.INVALID_REQUEST)
+      is(ErrorCodeDTO.INVALID_REQUEST)
     );
     assertThat(
       "Error message specified that the endpoint is unknown",
@@ -91,7 +91,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
     response.then().statusCode(is(HttpStatus.METHOD_NOT_ALLOWED.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -101,12 +101,12 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports this method is an invalid request",
       error.getCode(),
-      is(ErrorCode.INVALID_REQUEST)
+      is(ErrorCodeDTO.INVALID_REQUEST)
     );
     assertThat(
       "Error message specified that the endpoint can not accept these requests",
@@ -122,7 +122,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
     response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -132,12 +132,12 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that there was an invalid parameter",
       error.getCode(),
-      is(ErrorCode.INVALID_PARAMETER)
+      is(ErrorCodeDTO.INVALID_PARAMETER)
     );
     assertThat(
       "Error message specified that a parameter was not understood",
@@ -156,7 +156,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     // for some reason, a NullPointerException occurs in the JSON parser; nothing we can control
     response.then().statusCode(is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -166,12 +166,12 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that there was an internal server error",
       error.getCode(),
-      is(ErrorCode.INTERNAL_SERVER_ERROR)
+      is(ErrorCodeDTO.INTERNAL_SERVER_ERROR)
     );
     assertThat(
       "Error reports proper",

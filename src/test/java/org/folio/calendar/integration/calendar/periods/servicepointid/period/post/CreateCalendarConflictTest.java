@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Error;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.testconstants.Periods;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -32,7 +32,7 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
 
     response.then().statusCode(is(HttpStatus.CONFLICT.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -42,12 +42,12 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that the date range was invalid",
       error.getCode(),
-      is(ErrorCode.OVERLAPPING_CALENDAR)
+      is(ErrorCodeDTO.OVERLAPPING_CALENDAR)
     );
     assertThat(
       "Error message specified overlap information",
@@ -77,7 +77,7 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
 
     response.then().statusCode(is(HttpStatus.CONFLICT.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -87,12 +87,12 @@ class CreateCalendarConflictTest extends CreateCalendarAbstractTest {
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that the period with this ID already exists",
       error.getCode(),
-      is(ErrorCode.INVALID_REQUEST)
+      is(ErrorCodeDTO.INVALID_REQUEST)
     );
     assertThat(
       "Error message specifies collision",

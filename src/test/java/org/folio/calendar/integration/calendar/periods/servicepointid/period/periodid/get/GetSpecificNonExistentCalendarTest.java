@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Error;
-import org.folio.calendar.domain.dto.ErrorCode;
-import org.folio.calendar.domain.dto.ErrorResponse;
+import org.folio.calendar.domain.dto.ErrorCodeDTO;
+import org.folio.calendar.domain.dto.ErrorDTO;
+import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -21,7 +21,7 @@ class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest
     Response response = sendGetRequest(UUIDs.UUID_0, UUIDs.UUID_2);
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -31,12 +31,12 @@ class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that no calendar was found",
       error.getCode(),
-      is(ErrorCode.NOT_FOUND)
+      is(ErrorCodeDTO.NOT_FOUND)
     );
     assertThat(
       "Error message specified calendar not found error",
@@ -50,7 +50,7 @@ class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest
     Response response = sendGetRequest(UUIDs.UUID_0, UUIDs.UUID_D);
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
-    ErrorResponse errorResponse = response.getBody().as(ErrorResponse.class);
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
     assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
     assertThat(
@@ -60,12 +60,12 @@ class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
-    Error error = errorResponse.getErrors().get(0);
+    ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
       "Error reports that no calendar was found",
       error.getCode(),
-      is(ErrorCode.NOT_FOUND)
+      is(ErrorCodeDTO.NOT_FOUND)
     );
     assertThat(
       "Error message specified that the calendar does not correlate",
