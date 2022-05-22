@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.utils.DateUtils;
 
 @UtilityClass

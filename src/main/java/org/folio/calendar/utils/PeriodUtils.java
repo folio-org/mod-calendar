@@ -17,7 +17,6 @@ import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.domain.dto.Weekday;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
@@ -26,6 +25,7 @@ import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.NormalOpening.NormalOpeningBuilder;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.types.LegacyPeriodDate;
+import org.folio.calendar.domain.types.Weekday;
 
 /**
  * Utilities for acting on {@link org.folio.calendar.domain.dto.Period} objects

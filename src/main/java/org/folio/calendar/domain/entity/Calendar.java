@@ -26,10 +26,9 @@ import lombok.With;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.domain.dto.OpeningDayRelative;
 import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
-import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.PeriodUtils;
-import org.folio.calendar.utils.WeekdayUtils;
 
 /**
  * Calendar entity
@@ -149,7 +148,7 @@ public class Calendar {
     );
 
     for (LocalDate date : dates) {
-      OpeningDayInfo opening = openingsByWeekday.get(WeekdayUtils.toWeekday(date));
+      OpeningDayInfo opening = openingsByWeekday.get(Weekday.from(date));
       if (opening != null) {
         dateMap.put(date, opening);
       }

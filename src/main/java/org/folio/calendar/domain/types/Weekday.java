@@ -1,16 +1,58 @@
-package org.folio.calendar.utils;
+package org.folio.calendar.domain.types;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.Weekday;
+import lombok.AllArgsConstructor;
+import lombok.ToString;
 
 /**
- * Utilities for weekdays
+ * Days of the week enumeration
  */
-@UtilityClass
-public class WeekdayUtils {
+@ToString
+@AllArgsConstructor
+public enum Weekday {
+  /**
+   * Sunday
+   */
+  SUNDAY("SUNDAY"),
+
+  /**
+   * Monday
+   */
+  MONDAY("MONDAY"),
+
+  /**
+   * Tuesday
+   */
+  TUESDAY("TUESDAY"),
+
+  /**
+   * Wednesday
+   */
+  WEDNESDAY("WEDNESDAY"),
+
+  /**
+   * Thursday
+   */
+  THURSDAY("THURSDAY"),
+
+  /**
+   * Friday
+   */
+  FRIDAY("FRIDAY"),
+
+  /**
+   * Saturday
+   */
+  SATURDAY("SATURDAY"),
+
+  /**
+   * This should never be used.  It is only for unit testing coverage of invalid values.
+   */
+  INVALID("INVALID");
 
   /**
    * All seven weekdays.  This is intentionally not public as no code should rely on a specific start/end of the week
@@ -25,14 +67,15 @@ public class WeekdayUtils {
     Weekday.SATURDAY,
   };
 
+  private String value;
+
   /**
-   * Get the weekday before the provided one
+   * Get the weekday before the current one
    *
-   * @param w a weekday
    * @return the day of the week before w
    */
-  public static Weekday previous(Weekday w) {
-    switch (w) {
+  public Weekday previous() {
+    switch (this) {
       case SUNDAY:
         return Weekday.SATURDAY;
       case MONDAY:
@@ -48,20 +91,17 @@ public class WeekdayUtils {
       case SATURDAY:
         return Weekday.FRIDAY;
       default:
-        throw new IllegalArgumentException(
-          "Weekday passed to WeekdayUtils::previous somehow is not in the enum"
-        );
+        throw new IllegalArgumentException("Cannot get previous weekday of an invalid value");
     }
   }
 
   /**
-   * Get the weekday after the provided one
+   * Get the weekday after this one
    *
-   * @param w a weekday
    * @return the day of the week after w
    */
-  public static Weekday next(Weekday w) {
-    switch (w) {
+  public Weekday next() {
+    switch (this) {
       case SUNDAY:
         return Weekday.MONDAY;
       case MONDAY:
@@ -77,9 +117,7 @@ public class WeekdayUtils {
       case SATURDAY:
         return Weekday.SUNDAY;
       default:
-        throw new IllegalArgumentException(
-          "Weekday passed to WeekdayUtils::next somehow is not in the enum"
-        );
+        throw new IllegalArgumentException("Cannot get next weekday of an invalid value");
     }
   }
 
@@ -111,7 +149,13 @@ public class WeekdayUtils {
     return list;
   }
 
-  public static Weekday toWeekday(LocalDate date) {
+  /**
+   * Convert a {@link java.time.LocalDate LocalDate} to a {@code Weekday}
+   *
+   * @param date the date to get the {@code Weekday} of
+   * @return the corresponding {@code Weekday}
+   */
+  public static Weekday from(LocalDate date) {
     switch (date.getDayOfWeek()) {
       case SUNDAY:
         return Weekday.SUNDAY;
@@ -129,5 +173,20 @@ public class WeekdayUtils {
       default:
         return Weekday.SATURDAY;
     }
+  }
+
+  @JsonValue
+  public String getValue() {
+    return this.value;
+  }
+
+  @JsonCreator
+  public static Weekday fromValue(String value) {
+    for (Weekday b : Weekday.values()) {
+      if (b.value.equals(value)) {
+        return b;
+      }
+    }
+    throw new IllegalArgumentException("Unexpected value '" + value + "'");
   }
 }

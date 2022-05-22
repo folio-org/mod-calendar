@@ -24,10 +24,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
-import org.folio.calendar.domain.dto.Weekday;
+import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
-import org.folio.calendar.utils.WeekdayUtils;
 
 /**
  * A normal opening for a service point
@@ -142,7 +141,7 @@ public class NormalOpening {
     if (
       former.getEndTime().equals(TimeConstants.TIME_MAX) &&
       latter.getStartTime().equals(TimeConstants.TIME_MIN) &&
-      WeekdayUtils.next(former.getEndDay()).equals(latter.getStartDay())
+      former.getEndDay().next().equals(latter.getStartDay())
     ) {
       return true;
     }
@@ -177,7 +176,7 @@ public class NormalOpening {
    * @return a Map of {@link org.folio.calendar.domain.dto.Weekday}s to {@link org.folio.calendar.domain.dto.OpeningHourRange}
    */
   public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
-    List<Weekday> weekdays = WeekdayUtils.getRange(this.getStartDay(), this.getEndDay());
+    List<Weekday> weekdays = Weekday.getRange(this.getStartDay(), this.getEndDay());
 
     Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
 

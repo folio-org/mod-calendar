@@ -1,5 +1,6 @@
 description: Days of the week enumeration
 type: string
+format: weekday
 enum:
   - SUNDAY
   - MONDAY
@@ -8,7 +9,6 @@ enum:
   - THURSDAY
   - FRIDAY
   - SATURDAY
-  - INVALID
 x-enum-descriptions:
   - Sunday
   - Monday
@@ -17,4 +17,3 @@ x-enum-descriptions:
   - Thursday
   - Friday
   - Saturday
-  - This should never be used.  It is only for unit testing coverage of invalid values.
