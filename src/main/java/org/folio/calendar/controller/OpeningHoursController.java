@@ -1,6 +1,5 @@
 package org.folio.calendar.controller;
 
-import io.swagger.annotations.ApiParam;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -14,7 +13,6 @@ import org.folio.calendar.service.CalendarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,16 +35,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Void> deleteCalendars(List<UUID> calendars) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public ResponseEntity<AdjacentOpeningsDTO> getAdjacentOpenings(
-    UUID servicePointId,
-    LocalDate date
-  ) {
+  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendars) {
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 
@@ -64,28 +53,35 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<SingleDayOpeningCollectionDTO> getAllOpenings(
-    @ApiParam(value = "The service point to calculate openings on", required = true) @PathVariable(
-      "servicePointId"
-    ) UUID servicePointId,
-    LocalDate startDate,
-    LocalDate endDate,
-    Boolean includeClosed,
-    Integer offset,
-    Integer limit
+  public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendar) {
+    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Void> deleteCalendars(List<UUID> calendars) {
+    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<AdjacentOpeningsDTO> getAdjacentOpenings(
+    UUID servicePointId,
+    LocalDate date
   ) {
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendars) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendar) {
+  public ResponseEntity<SingleDayOpeningCollectionDTO> getAllOpenings(
+    UUID servicePointId,
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosed,
+    Integer offset,
+    Integer limit
+  ) {
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }
 }
