@@ -37,9 +37,9 @@ import org.folio.calendar.utils.PeriodUtils;
 @With
 @Table(name = "calendars")
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Calendar {
 
   /**
@@ -107,9 +107,9 @@ public class Calendar {
   )
   private Set<ExceptionRange> exceptions;
 
-  @PrePersist
   @PreUpdate
-  private void prePersist() {
+  @PrePersist
+  public void propagate() {
     if (this.getServicePoints() != null) {
       this.getServicePoints().forEach(assignment -> assignment.setCalendar(this));
     }

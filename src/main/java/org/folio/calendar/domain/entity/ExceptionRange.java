@@ -80,9 +80,9 @@ public class ExceptionRange {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "exception")
   private Set<ExceptionHour> openings;
 
-  @PrePersist
   @PreUpdate
-  private void prePersist() {
+  @PrePersist
+  public void propagate() {
     if (this.getOpenings() != null) {
       this.getOpenings().forEach(assignment -> assignment.setException(this));
     }
