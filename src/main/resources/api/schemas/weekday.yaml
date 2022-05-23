@@ -1,20 +1,4 @@
-description: Days of the week enumeration
+description:
+  A day of the week.  Either SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, or SATURDAY
 type: string
-enum:
-  - SUNDAY
-  - MONDAY
-  - TUESDAY
-  - WEDNESDAY
-  - THURSDAY
-  - FRIDAY
-  - SATURDAY
-  - INVALID
-x-enum-descriptions:
-  - Sunday
-  - Monday
-  - Tuesday
-  - Wednesday
-  - Thursday
-  - Friday
-  - Saturday
-  - This should never be used.  It is only for unit testing coverage of invalid values.
+format: Weekday

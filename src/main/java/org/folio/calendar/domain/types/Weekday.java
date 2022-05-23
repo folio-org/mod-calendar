@@ -175,18 +175,18 @@ public enum Weekday {
     }
   }
 
-  @JsonValue
-  public String getValue() {
-    return this.value;
-  }
-
   @JsonCreator
-  public static Weekday fromValue(String value) {
+  public static Weekday from(String value) {
     for (Weekday b : Weekday.values()) {
       if (b.value.equals(value)) {
         return b;
       }
     }
     throw new IllegalArgumentException("Unexpected value '" + value + "'");
+  }
+
+  @JsonValue
+  public String getValue() {
+    return this.value;
   }
 }

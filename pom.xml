@@ -79,6 +79,7 @@
     <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
     <jackson-datatype-jsr310.version>2.13.2</jackson-datatype-jsr310.version>
+    <mapstruct.version>1.4.2.Final</mapstruct.version>
   </properties>
 
   <dependencies>
@@ -162,6 +163,12 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
       <version>${jackson-datatype-jsr310.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
     </dependency>
   </dependencies>
   <repositories>
@@ -291,6 +298,21 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
+
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
       </plugin>
 
       <plugin>
@@ -388,11 +410,13 @@
                 <typeMapping>DateTime=Instant</typeMapping>
                 <typeMapping>date=LocalDate</typeMapping>
                 <typeMapping>time=LocalTime</typeMapping>
+                <typeMapping>Weekday=Weekday</typeMapping>
               </typeMappings>
               <importMappings>
                 <importMapping>Instant=java.time.Instant</importMapping>
                 <importMapping>LocalDate=java.time.LocalDate</importMapping>
                 <importMapping>LocalTime=java.time.LocalTime</importMapping>
+                <importMapping>Weekday=org.folio.calendar.domain.types.Weekday</importMapping>
               </importMappings>
             </configuration>
           </execution>
