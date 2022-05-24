@@ -51,6 +51,25 @@ public class DateUtils {
   }
 
   /**
+   * Check that two inclusive local time pairs overlap (within the same day)
+   *
+   * @param start1 Start of time range 1
+   * @param end1 End of time range 1
+   * @param start2 Start of time range 2
+   * @param end2 End of time range 2
+   * @return if they overlap
+   */
+  public static boolean overlaps(
+    LocalTime start1,
+    LocalTime end1,
+    LocalTime start2,
+    LocalTime end2
+  ) {
+    // False if: 2 starts after 1 OR 2 ends before 1 starts
+    return !(start2.isAfter(end1) || end2.isBefore(start1));
+  }
+
+  /**
    * Check that two inclusive local date pairs overlap
    *
    * @param start1 Start of date range 1
