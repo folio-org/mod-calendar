@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.NormalOpening;
 
@@ -66,32 +64,6 @@ public class TimeUtils {
    */
   public static LocalTime fromTimeString(String time) {
     return LocalTime.parse(time, TimeConstants.TIME_FORMATTER);
-  }
-
-  /**
-   * Helper class used to facilitate set overlap search algorithm
-   */
-  @Data
-  @AllArgsConstructor
-  private class LocalTimeFromRange implements Comparable<LocalTimeFromRange> {
-
-    private LocalTime time;
-    private TimeRange rangeSource;
-
-    private boolean isStart;
-
-    public int compareTo(LocalTimeFromRange other) {
-      if (this.getTime().compareTo(other.getTime()) != 0) {
-        return this.getTime().compareTo(other.getTime());
-      }
-
-      // prioritize starting over ending ranges
-      if (this.isStart()) {
-        return -1;
-      } else {
-        return 1;
-      }
-    }
   }
 
   /**
