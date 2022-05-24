@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 
@@ -173,6 +174,13 @@ public enum Weekday {
       default:
         return Weekday.SATURDAY;
     }
+  }
+
+  /**
+   * Get a set of all weekdays.  The order of these elements is not guaranteed
+   */
+  public static Set<Weekday> getAll() {
+    return Set.of(WEEKDAYS);
   }
 
   @JsonCreator
