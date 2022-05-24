@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.types.Weekday;
@@ -14,21 +15,39 @@ import org.folio.calendar.domain.types.Weekday;
 @UtilityClass
 public class NormalOpeningUtils {
 
-  public static boolean overlaps(NormalOpening a, NormalOpening b) {
+  /**
+   * Find overlaps between two normal openings, if any exist
+   * @param ranges a set of ranges to evaluate
+   * @return an optional list of openings that overlap (empty/no value if there were no overlaps).
+   * Not all overlaps may be returned, however, if there are overlap(s), then this function will
+   * return at least two overlapping openings.
+   */
+  public static List<List<NormalOpening>> getOverlaps(Iterable<NormalOpening> openings) {
+    // initialize weekday map
     EnumMap<Weekday, List<TimeRange>> weekdays = new EnumMap<>(Weekday.class);
+    Weekday.getAll().forEach(weekday -> weekdays.put(weekday, new ArrayList<>()));
 
-    for (Weekday weekday : Weekday.getAll()) {
-      weekdays.put(weekday, new ArrayList<>());
+    // split openings into weekdays
+    openings.forEach(opening -> fillWeekdayMapWithTimeTuples(weekdays, opening));
+
+    List<List<NormalOpening>> conflicts = new ArrayList<>();
+
+    for (Entry<Weekday, List<TimeRange>> entry : weekdays.entrySet()) {
+      Optional<List<NormalOpening>> weekdayConflicts = TimeUtils.getOverlaps(entry.getValue());
+      if (weekdayConflicts.isPresent()) {
+        conflicts.add(weekdayConflicts.get());
+      }
     }
 
-    fillWeekdayMapWithTimeTuples(weekdays, a);
-    fillWeekdayMapWithTimeTuples(weekdays, b);
-
-    for (Entry<Weekday, List<TimeRange>> entry : weekdays.entrySet()) {}
-
-    return false;
+    return conflicts;
   }
 
+  /**
+   * Split a {@link NormalOpening NormalOpening} up into separate {@link TimeRange TimeRanges}
+   * for each weekday, inserting these range(s) into an {@link EnumMap EnumMap}
+   * @param weekdays the map to insert ranges into
+   * @param opening the opening to split into weekdays
+   */
   protected static void fillWeekdayMapWithTimeTuples(
     EnumMap<Weekday, List<TimeRange>> weekdays,
     NormalOpening opening

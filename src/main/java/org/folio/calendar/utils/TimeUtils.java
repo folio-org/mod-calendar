@@ -97,7 +97,9 @@ public class TimeUtils {
   /**
    * Find overlaps within a set of time ranges, if any exist
    * @param ranges a set of ranges to evaluate
-   * @return
+   * @return an optional list of openings that overlap (empty/no value if there were no overlaps).
+   * Not all overlaps may be returned, however, if there are overlap(s), then this function will
+   * return at least two overlapping openings.
    */
   public static Optional<List<NormalOpening>> getOverlaps(Iterable<TimeRange> ranges) {
     PriorityQueue<LocalTimeFromRange> queue = new PriorityQueue<>();
