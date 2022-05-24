@@ -118,9 +118,9 @@ public class PeriodUtils {
             ExceptionHour
               .builder()
               .startDate(date)
-              .startTime(DateUtils.fromTimeString(openingHours.getStartTime()))
+              .startTime(TimeUtils.fromTimeString(openingHours.getStartTime()))
               .endDate(date)
-              .endTime(DateUtils.fromTimeString(openingHours.getEndTime()))
+              .endTime(TimeUtils.fromTimeString(openingHours.getEndTime()))
               .build()
           );
       }
@@ -178,8 +178,8 @@ public class PeriodUtils {
 
         normalizedOpenings.add(
           builder
-            .startTime(DateUtils.fromTimeString(hourRange.getStartTime()))
-            .endTime(DateUtils.fromTimeString(hourRange.getEndTime()))
+            .startTime(TimeUtils.fromTimeString(hourRange.getStartTime()))
+            .endTime(TimeUtils.fromTimeString(hourRange.getEndTime()))
             .build()
         );
       }
@@ -328,8 +328,8 @@ public class PeriodUtils {
           Arrays.asList(
             OpeningHourRange
               .builder()
-              .startTime(DateUtils.toTimeString(opening.getStartTime()))
-              .endTime(DateUtils.toTimeString(opening.getEndTime()))
+              .startTime(TimeUtils.toTimeString(opening.getStartTime()))
+              .endTime(TimeUtils.toTimeString(opening.getEndTime()))
               .build()
           )
         );

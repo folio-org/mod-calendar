@@ -25,8 +25,8 @@ import lombok.ToString;
 import lombok.With;
 import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.types.Weekday;
-import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.TimeConstants;
+import org.folio.calendar.utils.TimeUtils;
 
 /**
  * A normal opening for a service point
@@ -186,10 +186,10 @@ public class NormalOpening {
         .startTime(TimeConstants.TIME_MIN_STRING)
         .endTime(TimeConstants.TIME_MAX_STRING);
       if (day == this.getStartDay()) {
-        builder = builder.startTime(DateUtils.toTimeString(this.getStartTime()));
+        builder = builder.startTime(TimeUtils.toTimeString(this.getStartTime()));
       }
       if (day == this.getEndDay()) {
-        builder = builder.endTime(DateUtils.toTimeString(this.getEndTime()));
+        builder = builder.endTime(TimeUtils.toTimeString(this.getEndTime()));
       }
       map.put(day, builder.build());
     }
