@@ -41,7 +41,7 @@ class GetSpecificNonExistentCalendarTest extends GetSpecificCalendarAbstractTest
     assertThat(
       "Error message specified calendar not found error",
       error.getMessage(),
-      containsString(String.format("No calendar exists with ID"))
+      containsString(String.format("No calendar was found with the specified query"))
     );
   }
 

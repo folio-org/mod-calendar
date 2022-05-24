@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
+import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
 import org.folio.calendar.i18n.TranslationService;
@@ -61,10 +62,10 @@ public class ApiExceptionHandler {
       HttpStatus.NOT_FOUND,
       ErrorCodeDTO.INVALID_REQUEST,
       translationService.format(
-        "error.endpointNotFound",
-        "method",
+        TranslationKey.ERROR_ENDPOINT_NOT_FOUND,
+        TranslationKey.ERROR_ENDPOINT_NOT_FOUND_P.METHOD,
         exception.getHttpMethod(),
-        "url",
+        TranslationKey.ERROR_ENDPOINT_NOT_FOUND_P.URL,
         exception.getRequestURL()
       )
     )
@@ -87,10 +88,10 @@ public class ApiExceptionHandler {
       HttpStatus.METHOD_NOT_ALLOWED,
       ErrorCodeDTO.INVALID_REQUEST,
       translationService.format(
-        "error.endpointMethodInvalid",
-        "method",
+        TranslationKey.ERROR_ENDPOINT_METHOD_INVALID,
+        TranslationKey.ERROR_ENDPOINT_METHOD_INVALID_P.METHOD,
         exception.getMethod(),
-        "urlList",
+        TranslationKey.ERROR_ENDPOINT_METHOD_INVALID_P.METHOD_LIST,
         Arrays.toString(exception.getSupportedMethods())
       )
     )
@@ -117,8 +118,8 @@ public class ApiExceptionHandler {
       exception,
       ErrorCodeDTO.INVALID_PARAMETER,
       translationService.format(
-        "error.unparsableData",
-        "unLocalizedErrorMessage",
+        TranslationKey.ERROR_UNPARSABLE_DATA,
+        TranslationKey.ERROR_UNPARSABLE_DATA_P.UNLOCALIZED_ERROR_MESSAGE,
         exception.getMessage()
       )
     )
@@ -142,10 +143,10 @@ public class ApiExceptionHandler {
       HttpStatus.INTERNAL_SERVER_ERROR,
       ErrorCodeDTO.INTERNAL_SERVER_ERROR,
       translationService.format(
-        "error.internalServerError",
-        "className",
+        TranslationKey.ERROR_INTERNAL_SERVER_ERROR,
+        TranslationKey.ERROR_INTERNAL_SERVER_ERROR_P.CLASS_NAME,
         exception.getClass().getSimpleName(),
-        "errorMessage",
+        TranslationKey.ERROR_INTERNAL_SERVER_ERROR_P.ERROR_MESSAGE,
         exception.getMessage()
       )
     )

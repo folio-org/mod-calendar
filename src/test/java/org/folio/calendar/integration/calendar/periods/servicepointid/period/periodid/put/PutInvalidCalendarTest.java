@@ -44,12 +44,12 @@ class PutInvalidCalendarTest extends PutCalendarAbstractTest {
     assertThat(
       "Error reports that no name was provided",
       error.getCode(),
-      is(ErrorCodeDTO.NO_NAME)
+      is(ErrorCodeDTO.CALENDAR_NO_NAME)
     );
     assertThat(
       "Error message specified missing name error",
       error.getMessage(),
-      containsString("Name cannot be empty or only whitespace")
+      containsString("Please provide a non-empty calendar name")
     );
   }
 }

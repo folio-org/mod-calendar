@@ -26,7 +26,7 @@ public class MapUtils {
     }
 
     for (int i = 0; i < args.length; i += NUM_IN_A_PAIR) {
-      map.put((String) args[i], args[i + 1]);
+      map.put(args[i].toString(), args[i + 1]);
     }
 
     return map;

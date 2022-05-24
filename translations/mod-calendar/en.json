@@ -1,14 +1,15 @@
 {
   "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
-  "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {urlList})",
-  "error.unparsableData": "One of the parameters was the incorrect type: {unLocalizedErrorMessage}",
+  "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
+  "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",
   "error.internalServerError": "An internal server error occurred ({className}): {errorMessage}",
+  "error.calendarNotFound": "No calendar was found with the specified query",
+  "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})",
+  "error.calendarNameEmpty": "Please provide a non-empty calendar name",
+  "error.dateRangeInvalid": "Start date {startDate, date, medium} cannot be after end date {endDate, date, medium}",
+
   "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
   "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",
-  "error.calendarNotFound": "No calendar exists with ID {requestedId}",
   "error.servicePointExistingMismatch": "The period requested does exist, however, is not assigned to service point {requestedId}",
-  "error.servicePointUrlMismatch": "Service point ID in the URL ({uuid1}) does not match the payload ({uuid2})",
-  "error.nameEmpty": "Name cannot be empty or only whitespace",
-  "error.dateRangeInvalid": "Start date {startDate, date, medium} cannot be after end date {endDate, date, medium}",
-  "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})"
+  "error.servicePointUrlMismatch": "Service point ID in the URL ({uuid1}) does not match the payload ({uuid2})"
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDate;
 import lombok.Data;
+import org.folio.calendar.domain.request.LegacyTranslationKey;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.i18n.TranslationService;
@@ -42,7 +43,11 @@ public class LegacyPeriodDate {
       throw new InvalidDataException(
         e,
         new ExceptionParameters("date", input),
-        translationService.format("error.dateInvalid", "userInputtedDateString", input)
+        translationService.format(
+          LegacyTranslationKey.ERROR_DATE_INVALID,
+          LegacyTranslationKey.ERROR_DATE_INVALID_P.USER_INPUTTED_DATE_STRING,
+          input
+        )
       );
     }
   }

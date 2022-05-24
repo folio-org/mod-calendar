@@ -44,7 +44,7 @@ class DeleteNonExistentCalendarTest extends DeleteCalendarAbstractTest {
     assertThat(
       "Error message specified calendar not found error",
       error.getMessage(),
-      allOf(containsString("No calendar exists with ID " + UUIDs.UUID_2))
+      allOf(containsString("No calendar was found with the specified query"))
     );
   }
 

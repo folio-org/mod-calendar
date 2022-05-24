@@ -14,6 +14,8 @@ import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.Calendar.CalendarBuilder;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.domain.request.LegacyTranslationKey;
+import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
@@ -153,7 +155,11 @@ public class CalendarService {
     if (this.calendarRepository.existsById(period.getId())) {
       throw new DataConflictException(
         new ExceptionParameters("period", period),
-        translationService.format("error.periodIdConflict", "conflictingUuid", period.getId())
+        translationService.format(
+          LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT,
+          LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT_P.CONFLICTING_UUID,
+          period.getId()
+        )
       );
     }
 
@@ -200,12 +206,11 @@ public class CalendarService {
    */
   public Calendar getCalendarById(UUID id) {
     return this.calendarRepository.findById(id)
-      .orElseThrow(
-        () ->
-          new DataNotFoundException(
-            new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
-            translationService.format("error.calendarNotFound", "requestedId", id)
-          )
+      .orElseThrow(() ->
+        new DataNotFoundException(
+          new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
+          translationService.format(TranslationKey.ERROR_CALENDAR_NOT_FOUND)
+        )
       );
   }
 
@@ -234,8 +239,8 @@ public class CalendarService {
           periodId
         ),
         translationService.format(
-          "error.servicePointExistingMismatch",
-          "requestedId",
+          LegacyTranslationKey.ERROR_SERVICE_POINT_EXISTING_MISMATCH,
+          LegacyTranslationKey.ERROR_SERVICE_POINT_EXISTING_MISMATCH_P.REQUESTED_ID,
           servicePointId
         )
       );
@@ -264,14 +269,14 @@ public class CalendarService {
   public void checkPeriod(Period period, UUID servicePointId, Calendar ignore) {
     if (period.getName().isBlank()) {
       throw new InvalidDataException(
-        ErrorCodeDTO.NO_NAME,
+        ErrorCodeDTO.CALENDAR_NO_NAME,
         new ExceptionParameters(
           CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
           servicePointId,
           CalendarController.PARAMETER_NAME_PERIOD,
           period
         ),
-        translationService.format("error.nameEmpty")
+        translationService.format(TranslationKey.ERROR_CALENDAR_NAME_EMPTY)
       );
     }
     if (period.getStartDate().getValue().isAfter(period.getEndDate().getValue())) {
@@ -284,10 +289,10 @@ public class CalendarService {
           period
         ),
         translationService.format(
-          "error.dateRangeInvalid",
-          "startDate",
+          TranslationKey.ERROR_DATE_RANGE_INVALID,
+          TranslationKey.ERROR_DATE_RANGE_INVALID_P.START_DATE,
           period.getStartDate(),
-          "endDate",
+          TranslationKey.ERROR_DATE_RANGE_INVALID_P.END_DATE,
           period.getEndDate()
         )
       );
@@ -301,10 +306,10 @@ public class CalendarService {
           period
         ),
         translationService.format(
-          "error.servicePointUrlMismatch",
-          "uuid1",
+          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH,
+          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH_P.UUID_1,
           servicePointId,
-          "uuid2",
+          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH_P.UUID_2,
           period.getServicePointId()
         )
       );
@@ -341,12 +346,12 @@ public class CalendarService {
           period
         ),
         translationService.format(
-          "error.calendarOverlap",
-          "name",
+          TranslationKey.ERROR_CALENDAR_OVERLAP,
+          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_NAME,
           overlapped.getName(),
-          "startDate",
+          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_START_DATE,
           overlapped.getStartDate(),
-          "endDate",
+          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_END_DATE,
           overlapped.getEndDate()
         )
       );
