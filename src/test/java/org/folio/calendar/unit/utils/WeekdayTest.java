@@ -94,7 +94,7 @@ class WeekdayTest {
   }
 
   @Test
-  void testWeekdayConversion() {
+  void testWeekdayDateConversion() {
     assertThat("Jan 1 2021 => Fri", Weekday.from(Dates.DATE_2021_01_01), is(Weekday.FRIDAY));
     assertThat("Jan 2 2021 => Sat", Weekday.from(Dates.DATE_2021_01_02), is(Weekday.SATURDAY));
     assertThat("Jan 3 2021 => Sun", Weekday.from(Dates.DATE_2021_01_03), is(Weekday.SUNDAY));
@@ -102,5 +102,36 @@ class WeekdayTest {
     assertThat("Mar 16 2021 => Tue", Weekday.from(Dates.DATE_2021_03_16), is(Weekday.TUESDAY));
     assertThat("Sep 22 2021 => Wed", Weekday.from(Dates.DATE_2021_09_22), is(Weekday.WEDNESDAY));
     assertThat("Dec 30 2021 => Thu", Weekday.from(Dates.DATE_2021_12_30), is(Weekday.THURSDAY));
+  }
+
+  @Test
+  void testWeekdayStringConversion() {
+    assertThat("\"SUNDAY\" => SUNDAY", Weekday.from("SUNDAY"), is(Weekday.SUNDAY));
+    assertThat("\"Sunday\" => SUNDAY", Weekday.from("Sunday"), is(Weekday.SUNDAY));
+    assertThat("\"sunday\" => SUNDAY", Weekday.from("sunday"), is(Weekday.SUNDAY));
+    assertThat("\"MONDAY\" => MONDAY", Weekday.from("MONDAY"), is(Weekday.MONDAY));
+    assertThat("\"Monday\" => MONDAY", Weekday.from("Monday"), is(Weekday.MONDAY));
+    assertThat("\"monday\" => MONDAY", Weekday.from("monday"), is(Weekday.MONDAY));
+    assertThat("\"TUESDAY\" => TUESDAY", Weekday.from("TUESDAY"), is(Weekday.TUESDAY));
+    assertThat("\"Tuesday\" => TUESDAY", Weekday.from("Tuesday"), is(Weekday.TUESDAY));
+    assertThat("\"tuesday\" => TUESDAY", Weekday.from("tuesday"), is(Weekday.TUESDAY));
+    assertThat("\"WEDNESDAY\" => WEDNESDAY", Weekday.from("WEDNESDAY"), is(Weekday.WEDNESDAY));
+    assertThat("\"Wednesday\" => WEDNESDAY", Weekday.from("Wednesday"), is(Weekday.WEDNESDAY));
+    assertThat("\"wednesday\" => WEDNESDAY", Weekday.from("wednesday"), is(Weekday.WEDNESDAY));
+    assertThat("\"THURSDAY\" => THURSDAY", Weekday.from("THURSDAY"), is(Weekday.THURSDAY));
+    assertThat("\"Thursday\" => THURSDAY", Weekday.from("Thursday"), is(Weekday.THURSDAY));
+    assertThat("\"thursday\" => THURSDAY", Weekday.from("thursday"), is(Weekday.THURSDAY));
+    assertThat("\"FRIDAY\" => FRIDAY", Weekday.from("FRIDAY"), is(Weekday.FRIDAY));
+    assertThat("\"Friday\" => FRIDAY", Weekday.from("Friday"), is(Weekday.FRIDAY));
+    assertThat("\"friday\" => FRIDAY", Weekday.from("friday"), is(Weekday.FRIDAY));
+    assertThat("\"SATURDAY\" => SATURDAY", Weekday.from("SATURDAY"), is(Weekday.SATURDAY));
+    assertThat("\"Saturday\" => SATURDAY", Weekday.from("Saturday"), is(Weekday.SATURDAY));
+    assertThat("\"saturday\" => SATURDAY", Weekday.from("saturday"), is(Weekday.SATURDAY));
+
+    assertThrows(
+      "Invalid strings cannot be converted",
+      IllegalArgumentException.class,
+      () -> Weekday.from("foo")
+    );
   }
 }

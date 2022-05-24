@@ -178,7 +178,7 @@ public enum Weekday {
   @JsonCreator
   public static Weekday from(String value) {
     for (Weekday b : Weekday.values()) {
-      if (b.value.equals(value)) {
+      if (b.value.equals(value.toUpperCase())) {
         return b;
       }
     }
