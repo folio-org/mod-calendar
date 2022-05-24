@@ -8,8 +8,11 @@ import org.folio.calendar.domain.dto.AdjacentOpeningsDTO;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
+import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.mapper.CalendarMapper;
+import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.rest.resource.OpeningHoursApi;
-import org.folio.calendar.service.CalendarService;
+import org.folio.calendar.service.OpeningHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +28,23 @@ import org.springframework.web.bind.annotation.RestController;
 public final class OpeningHoursController implements OpeningHoursApi {
 
   @Autowired
-  public CalendarService calendarService;
+  private OpeningHoursService openingHoursService;
+
+  @Autowired
+  private CalendarMapper calendarMapper;
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendar) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
+    log.warn(Parameters.CALENDAR.toString());
+    Calendar calendar = calendarMapper.fromDto(calendarDto);
+    openingHoursService.validate(calendar);
+
+    log.info("createCalendar: Calendar passed validation, saving...");
+
+    openingHoursService.saveCalendar(calendar);
+
+    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.CREATED);
   }
 
   /** {@inheritDoc} */
