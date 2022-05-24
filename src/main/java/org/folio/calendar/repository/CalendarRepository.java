@@ -47,7 +47,7 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   );
 
   /**
-   * Find calendars for a service point ID and in the given date range
+   * Find calendars for a service point ID and in the given (optional ends) date range
    *
    * @param servicePointId the UUID of the service point
    * @param startDate the date which returned results will end before
@@ -63,6 +63,27 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   )
   List<Calendar> findWithServicePointAndDateRange(
     @Param("servicePointId") UUID servicePointId,
+    @Param("startDate") @CheckForNull LocalDate startDate,
+    @Param("endDate") @CheckForNull LocalDate endDate
+  );
+
+  /**
+   * Find calendars for a service point(s) and in the given (optional ends) date range
+   *
+   * @param servicePointIds a list of service point UUIDs to search
+   * @param startDate the date which returned results will end before
+   * @param endDate the date which returned results will not start after
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
+   */
+  @Query(
+    "SELECT c FROM Calendar c INNER JOIN ServicePointCalendarAssignment r ON c.id = r.calendar.id " +
+    "WHERE (r.servicePointId IN :servicePointIds) AND " +
+    "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
+    "(cast(:endDate as date) is null OR c.startDate <= :endDate) " +
+    "ORDER BY c.startDate"
+  )
+  List<Calendar> findWithServicePointsAndDateRange(
+    @Param("servicePointIds") List<UUID> servicePointId,
     @Param("startDate") @CheckForNull LocalDate startDate,
     @Param("endDate") @CheckForNull LocalDate endDate
   );
