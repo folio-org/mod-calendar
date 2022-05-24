@@ -6,6 +6,9 @@ properties:
   message:
     type: string
     description: A description of the error, properly localized.
+  data:
+    type: object
+    description: Additional data that may be used for rich error display in the UI
   _parameters:
     description: Parameters which may give insight into what caused the error
   _trace:

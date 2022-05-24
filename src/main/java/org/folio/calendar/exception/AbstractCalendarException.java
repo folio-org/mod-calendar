@@ -18,23 +18,20 @@ import org.springframework.http.ResponseEntity;
  * Abstract calendar exception, to be implemented by more concrete exceptions thrown from our application.
  * {@link org.folio.calendar.exception.NonspecificCalendarException NonspecificCalendarException} should be used for otherwise unknown errors (e.g. generic Exception or Spring-related exceptions).
  */
+@Getter
 @ToString(callSuper = true)
 public abstract class AbstractCalendarException extends RuntimeException {
 
   /** By default, send a 400 */
   public static final HttpStatus DEFAULT_STATUS_CODE = HttpStatus.BAD_REQUEST;
 
-  @Getter
   protected final ErrorCodeDTO errorCode;
 
-  @Getter
   protected final HttpStatus statusCode;
 
-  @Getter
   @NonNull
   protected final ExceptionParameters parameters;
 
-  @Getter
   protected final ErrorData data;
 
   /**
@@ -67,15 +64,9 @@ public abstract class AbstractCalendarException extends RuntimeException {
   }
 
   /**
-   * Create a standardized error response for the rest API
-   *
-   * @return An ErrorResponse for API return
+   * Get the standardized error response for this exception
    */
-  protected ErrorResponseDTO getErrorResponseDTO() {
-    ErrorResponseDTO.ErrorResponseDTOBuilder responseBuilder = ErrorResponseDTO.builder();
-    responseBuilder = responseBuilder.timestamp(Instant.now());
-    responseBuilder = responseBuilder.status(this.getStatusCode().value());
-
+  protected ErrorDTO getErrorDto() {
     // Can only have one exception at a time
     ErrorDTO.ErrorDTOBuilder errorBuilder = ErrorDTO.builder();
     errorBuilder = errorBuilder.code(this.getErrorCode());
@@ -96,8 +87,20 @@ public abstract class AbstractCalendarException extends RuntimeException {
       errorParameters.put(parameter.getKey(), parameter.getValue());
     }
     errorBuilder = errorBuilder.parameters(errorParameters);
+    return errorBuilder.build();
+  }
 
-    responseBuilder.error(errorBuilder.build());
+  /**
+   * Create a standardized error response for the rest API
+   *
+   * @return An ErrorResponse for API return
+   */
+  protected ErrorResponseDTO getErrorResponseDto() {
+    ErrorResponseDTO.ErrorResponseDTOBuilder responseBuilder = ErrorResponseDTO.builder();
+    responseBuilder = responseBuilder.timestamp(Instant.now());
+    responseBuilder = responseBuilder.status(this.getStatusCode().value());
+
+    responseBuilder.error(getErrorDto());
 
     return responseBuilder.build();
   }
@@ -107,7 +110,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
    *
    * @return {@link org.springframework.http.ResponseEntity} with {@link org.folio.calendar.domain.dto.ErrorResponse} body.
    */
-  public ResponseEntity<ErrorResponseDTO> getErrorResponseDTOEntity() {
-    return new ResponseEntity<>(this.getErrorResponseDTO(), this.getStatusCode());
+  public ResponseEntity<ErrorResponseDTO> getErrorResponseDtoEntity() {
+    return new ResponseEntity<>(this.getErrorResponseDto(), this.getStatusCode());
   }
 }

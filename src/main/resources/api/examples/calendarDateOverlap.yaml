@@ -7,10 +7,6 @@ value:
         This calendar cannot be created due to an overlap with "Other calendar" (which is from Jan
         3, 2022 to Mar 30, 2022)
       data:
-        conflicts:
-          - name: Other calendar
-            startDate: "2022-01-03"
-            endDate: "2022-03-30"
-            servicePointIds:
-              - dddddddd-dddd-dddd-dddd-dddddddddddd
+        conflictingServicePointIds:
+          - dddddddd-dddd-dddd-dddd-dddddddddddd
 summary: A calendar being created overlaps with an existing one

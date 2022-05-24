@@ -45,7 +45,7 @@ public class ApiExceptionHandler {
     AbstractCalendarException exception
   ) {
     log.log(INFO, exception);
-    return exception.getErrorResponseDTOEntity();
+    return exception.getErrorResponseDtoEntity();
   }
 
   /**
@@ -69,7 +69,7 @@ public class ApiExceptionHandler {
         exception.getRequestURL()
       )
     )
-      .getErrorResponseDTOEntity();
+      .getErrorResponseDtoEntity();
   }
 
   /**
@@ -95,7 +95,7 @@ public class ApiExceptionHandler {
         Arrays.toString(exception.getSupportedMethods())
       )
     )
-      .getErrorResponseDTOEntity();
+      .getErrorResponseDtoEntity();
   }
 
   /**
@@ -123,7 +123,7 @@ public class ApiExceptionHandler {
         exception.getMessage()
       )
     )
-      .getErrorResponseDTOEntity();
+      .getErrorResponseDtoEntity();
   }
 
   /**
@@ -150,6 +150,6 @@ public class ApiExceptionHandler {
         exception.getMessage()
       )
     )
-      .getErrorResponseDTOEntity();
+      .getErrorResponseDtoEntity();
   }
 }

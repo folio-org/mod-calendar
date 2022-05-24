@@ -1,6 +1,7 @@
 package org.folio.calendar.service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import org.folio.calendar.domain.dto.PeriodCollection;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.Calendar.CalendarBuilder;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.domain.error.CalendarOverlapErrorData;
 import org.folio.calendar.domain.request.LegacyTranslationKey;
 import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.DataConflictException;
@@ -353,7 +355,8 @@ public class CalendarService {
           overlapped.getStartDate(),
           TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_END_DATE,
           overlapped.getEndDate()
-        )
+        ),
+        new CalendarOverlapErrorData(Arrays.asList(servicePointId))
       );
     }
   }
