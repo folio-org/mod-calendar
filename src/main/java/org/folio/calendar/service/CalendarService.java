@@ -156,12 +156,14 @@ public class CalendarService {
   public Calendar createCalendarFromPeriod(Period period, UUID servicePointId) {
     if (this.calendarRepository.existsById(period.getId())) {
       throw new DataConflictException(
+        ErrorCodeDTO.INVALID_REQUEST,
         new ExceptionParameters("period", period),
         translationService.format(
           LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT,
           LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT_P.CONFLICTING_UUID,
           period.getId()
-        )
+        ),
+        null
       );
     }
 

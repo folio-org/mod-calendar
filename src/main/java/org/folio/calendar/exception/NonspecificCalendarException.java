@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 /**
  * An exception to be used whenever nothing more specific has been written. This
- * will primarily be used by {@link org.folio.calendar.controller.ApiExceptionHandler ApiExceptionHandler} for Spring exceptions
+ * will primarily be used by {@link org.folio.calendar.controller.APIExceptionHandler ApiExceptionHandler} for Spring exceptions
  * ({@link org.springframework.web.method.annotation.MethodArgumentTypeMismatchException MethodArgumentTypeMismatchException},
  * {@link org.springframework.web.bind.MissingRequestValueException MissingRequestValueException}) and any otherwise unhandled {@link
  * Exception}

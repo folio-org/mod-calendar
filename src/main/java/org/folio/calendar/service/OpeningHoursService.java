@@ -11,7 +11,6 @@ import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.error.CalendarOverlapErrorData;
 import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.domain.request.TranslationKey;
-import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;

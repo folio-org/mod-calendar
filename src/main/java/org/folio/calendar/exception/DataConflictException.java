@@ -27,14 +27,4 @@ public class DataConflictException extends AbstractCalendarException {
   ) {
     super(null, parameters, DEFAULT_STATUS_CODE, errorCode, message, data);
   }
-
-  /**
-   * Create an exception for data conflict with a message and parameters.
-   *
-   * @param parameters Parameters which caused this issue
-   * @param message    A string for the error message
-   */
-  public DataConflictException(ExceptionParameters parameters, String message) {
-    this(ErrorCodeDTO.INVALID_REQUEST, parameters, message);
-  }
 }
