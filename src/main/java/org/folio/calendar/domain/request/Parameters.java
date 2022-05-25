@@ -10,7 +10,8 @@ public enum Parameters {
   NAME("name"),
   START_DATE("startDate"),
   END_DATE("endDate"),
-  ASSIGNMENTS("assignments");
+  ASSIGNMENTS("assignments"),
+  NORMAL_HOURS("normalHours");
 
   private String value;
 

@@ -63,6 +63,33 @@ public class TranslationKey {
   );
 
   /**
+   * A string representation of a normal opening, such as "Mon 7:00 AM - Fri 11:00 PM"
+   *
+   * Parameters {@link NORMAL_OPENING_P}: {@code START_WEEKDAY_SHORT},
+   * {@code START_TIME}, {@code END_WEEKDAY_SHORT}, and {@code END_TIME}.
+   * It is recommended to use short weekday formatting (as given in {@code WEEKDAY_SHORT})
+   * for the weekdays.
+   */
+  public static final String NORMAL_OPENING = "normalOpening";
+
+  @UtilityClass
+  public class NORMAL_OPENING_P {
+
+    /**
+     * The use of short weekdays, as given in {@code WEEKDAY_SHORT}, such as
+     * Mon, Tue, etc., is recommended for this parameter.
+     */
+    public static final String START_WEEKDAY_SHORT = "startWeekdayShort";
+    public static final String START_TIME = "startTime";
+    /**
+     * The use of short weekdays, as given in {@code WEEKDAY_SHORT}, such as
+     * Mon, Tue, etc., is recommended for this parameter.
+     */
+    public static final String END_WEEKDAY_SHORT = "endWeekdayShort";
+    public static final String END_TIME = "endTime";
+  }
+
+  /**
    * Delimiters for list items
    */
   @UtilityClass
@@ -106,7 +133,7 @@ public class TranslationKey {
   /**
    * An error message for when an endpoint is not found.
    *
-   * Parameters {@link ERROR_ENDPOINT_NOT_FOUND_P} {@code METHOD} and {@code URL}
+   * Parameters {@link ERROR_ENDPOINT_NOT_FOUND_P}: {@code METHOD} and {@code URL}
    */
   public static final String ERROR_ENDPOINT_NOT_FOUND = "error.endpointNotFound";
 
@@ -120,7 +147,7 @@ public class TranslationKey {
   /**
    * An error message for when an endpoint exists, however, does not support the provided method.
    *
-   * Parameters {@link ERROR_ENDPOINT_METHOD_INVALID_P} {@code METHOD} and {@code METHOD_LIST}
+   * Parameters {@link ERROR_ENDPOINT_METHOD_INVALID_P}: {@code METHOD} and {@code METHOD_LIST}
    */
   public static final String ERROR_ENDPOINT_METHOD_INVALID = "error.endpointMethodInvalid";
 
@@ -140,7 +167,7 @@ public class TranslationKey {
   /**
    * An error message for when a request could not be parsed at all.
    *
-   * Parameters {@link ERROR_UNPARSABLE_DATA_P} {@code UNLOCALIZED_ERROR_MESSAGE}
+   * Parameters {@link ERROR_UNPARSABLE_DATA_P}: {@code UNLOCALIZED_ERROR_MESSAGE}
    */
   public static final String ERROR_UNPARSABLE_DATA = "error.unparsableData";
 
@@ -156,7 +183,7 @@ public class TranslationKey {
   /**
    * Catch all internal server error.
    *
-   * Parameters {@link ERROR_INTERNAL_SERVER_ERROR_P} {@code CLASS_NAME} and {@code ERROR_MESSAGE}
+   * Parameters {@link ERROR_INTERNAL_SERVER_ERROR_P}: {@code CLASS_NAME} and {@code ERROR_MESSAGE}
    */
   public static final String ERROR_INTERNAL_SERVER_ERROR = "error.internalServerError";
 
@@ -181,7 +208,7 @@ public class TranslationKey {
   /**
    * An error message for when a calendar overlaps with an existing one
    *
-   * Parameters {@link ERROR_CALENDAR_OVERLAP_P} {@code OVERLAP_NAME}, {@code OVERLAP_START_DATE}, and {@code OVERLAP_END_DATE}
+   * Parameters {@link ERROR_CALENDAR_OVERLAP_P}: {@code OVERLAP_NAME}, {@code OVERLAP_START_DATE}, and {@code OVERLAP_END_DATE}
    */
   public static final String ERROR_CALENDAR_OVERLAP = "error.calendarOverlap";
 
@@ -201,7 +228,7 @@ public class TranslationKey {
   /**
    * The calendar's start date is after the end date.
    *
-   * Parameters {@link ERROR_DATE_RANGE_INVALID_P} {@code START_DATE} and {@code END_DATE}
+   * Parameters {@link ERROR_DATE_RANGE_INVALID_P}: {@code START_DATE} and {@code END_DATE}
    */
   public static final String ERROR_DATE_RANGE_INVALID = "error.dateRangeInvalid";
 
@@ -210,5 +237,24 @@ public class TranslationKey {
 
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
+  }
+
+  /**
+   * The calendar's normal openings conflict.  The list will always contain at
+   * least two openings (otherwise there would be no conflict).
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P}: {@code OPENING_LIST}
+   */
+  public static final String ERROR_CALENDAR_INVALID_NORMAL_OPENINGS =
+    "error.calendarInvalidNormalOpenings";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P {
+
+    /**
+     * This should be a list as formatted by
+     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     */
+    public static final String OPENING_LIST = "openingList";
   }
 }

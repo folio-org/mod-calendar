@@ -3,13 +3,17 @@ package org.folio.calendar.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.error.CalendarOverlapErrorData;
+import org.folio.calendar.domain.error.NormalOpeningOverlapErrorData;
 import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.AbstractCalendarException;
@@ -19,6 +23,7 @@ import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.exception.NestedCalendarException;
 import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.repository.CalendarRepository;
+import org.folio.calendar.utils.NormalOpeningUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -98,12 +103,52 @@ public class OpeningHoursService {
       validationErrors.addAll(conflicts);
       errorStatusCode = DataConflictException.DEFAULT_STATUS_CODE;
     }
-    // validateNormalOpeningIntegrity(calendar.getNormalHours());
-    // validationErrors.addAll(validate(calendar.getNormalHours()));
+    Optional<InvalidDataException> normalOpeningException = validate(calendar.getNormalHours());
+    if (normalOpeningException.isPresent()) {
+      validationErrors.add(normalOpeningException.get());
+    }
 
     if (!validationErrors.isEmpty()) {
       throw new NestedCalendarException(errorStatusCode, validationErrors);
     }
+  }
+
+  protected Optional<InvalidDataException> validate(Set<NormalOpening> normalHours) {
+    Set<NormalOpening> overlapping = NormalOpeningUtils.getOverlaps(normalHours);
+
+    if (overlapping.isEmpty()) {
+      return Optional.empty();
+    }
+
+    List<String> openingStrings = overlapping
+      .stream()
+      .map(opening ->
+        translationService.format(
+          TranslationKey.NORMAL_OPENING,
+          TranslationKey.NORMAL_OPENING_P.START_WEEKDAY_SHORT,
+          opening.getStartDay().getShortLocalizedString().apply(translationService),
+          TranslationKey.NORMAL_OPENING_P.START_TIME,
+          opening.getStartTime(),
+          TranslationKey.NORMAL_OPENING_P.END_WEEKDAY_SHORT,
+          opening.getEndDay().getShortLocalizedString().apply(translationService),
+          TranslationKey.NORMAL_OPENING_P.END_TIME,
+          opening.getEndTime()
+        )
+      )
+      .collect(Collectors.toList());
+
+    return Optional.of(
+      new InvalidDataException(
+        ErrorCodeDTO.CALENDAR_INVALID_NORMAL_OPENINGS,
+        new ExceptionParameters(Parameters.NORMAL_HOURS, normalHours),
+        translationService.format(
+          TranslationKey.ERROR_CALENDAR_INVALID_NORMAL_OPENINGS,
+          TranslationKey.ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P.OPENING_LIST,
+          translationService.formatList(openingStrings)
+        ),
+        new NormalOpeningOverlapErrorData(overlapping)
+      )
+    );
   }
 
   /**

@@ -19,6 +19,8 @@
   "list.threeOrMoreSeparator": ", ",
   "list.threeOrMoreLastSeparator": ", and ",
 
+  "normalOpening": "{startWeekdayShort} {startTime, time, short} - {endWeekdayShort} {endTime, time, short}",
+
   "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
   "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
   "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",
@@ -27,6 +29,7 @@
   "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})",
   "error.calendarNameEmpty": "Please provide a non-empty calendar name",
   "error.dateRangeInvalid": "Start date {startDate, date, medium} cannot be after end date {endDate, date, medium}",
+  "error.calendarInvalidNormalOpenings": "The following openings conflict with each other: {openingList}",
 
   "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
   "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",
