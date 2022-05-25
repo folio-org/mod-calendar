@@ -28,7 +28,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
  */
 @Log4j2
 @RestControllerAdvice
-public class APIExceptionHandler {
+public class ApiExceptionHandler {
 
   @Autowired
   private TranslationService translationService;
