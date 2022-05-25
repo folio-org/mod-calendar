@@ -2,10 +2,11 @@ package org.folio.calendar.utils;
 
 import java.time.LocalTime;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.NormalOpening;
@@ -73,7 +74,7 @@ public class TimeUtils {
    * Not all overlaps may be returned, however, if there are overlap(s), then this function will
    * return at least two overlapping openings.
    */
-  public static Optional<List<NormalOpening>> getOverlaps(Iterable<TimeRange> ranges) {
+  public static Optional<Set<NormalOpening>> getOverlaps(Iterable<TimeRange> ranges) {
     PriorityQueue<LocalTimeFromRange> queue = new PriorityQueue<>();
 
     // create a sorted queue of each time, with the first times at the beginning
@@ -85,6 +86,8 @@ public class TimeUtils {
     // track the ranges we are currently inside of
     Deque<TimeRange> stack = new LinkedList<>();
 
+    Set<NormalOpening> conflicts = new HashSet<>();
+
     for (LocalTimeFromRange time : queue) {
       if (time.isStart()) {
         // for new ranges, we just add them to the stack
@@ -92,12 +95,16 @@ public class TimeUtils {
       } else {
         // a range ended, but we hit an overlap
         if (stack.size() > 1) {
-          return Optional.of(stack.stream().map(TimeRange::getSource).collect(Collectors.toList()));
+          conflicts.addAll(stack.stream().map(TimeRange::getSource).collect(Collectors.toList()));
         }
         stack.pop();
       }
     }
 
-    return Optional.empty();
+    if (conflicts.isEmpty()) {
+      return Optional.empty();
+    } else {
+      return Optional.of(conflicts);
+    }
   }
 }

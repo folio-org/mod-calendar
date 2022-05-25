@@ -1,16 +1,18 @@
 package org.folio.calendar.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.aspectj.weaver.bcel.ExceptionRange;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.error.CalendarOverlapErrorData;
 import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.domain.request.TranslationKey;
+import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
@@ -18,6 +20,7 @@ import org.folio.calendar.exception.NestedCalendarException;
 import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.repository.CalendarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -57,47 +60,66 @@ public class OpeningHoursService {
    * @throws DataConflictException
    */
   public void validate(Calendar calendar) {
+    List<AbstractCalendarException> validationErrors = new ArrayList<>();
+    HttpStatus errorStatusCode = AbstractCalendarException.DEFAULT_STATUS_CODE;
+
     if (calendar.getName().isBlank()) {
-      throw new InvalidDataException(
-        ErrorCodeDTO.CALENDAR_NO_NAME,
-        new ExceptionParameters(Parameters.NAME, calendar.getName()),
-        translationService.format(TranslationKey.ERROR_CALENDAR_NAME_EMPTY)
+      validationErrors.add(
+        new InvalidDataException(
+          ErrorCodeDTO.CALENDAR_NO_NAME,
+          new ExceptionParameters(Parameters.NAME, calendar.getName()),
+          translationService.format(TranslationKey.ERROR_CALENDAR_NAME_EMPTY)
+        )
       );
     }
     if (calendar.getStartDate().isAfter(calendar.getEndDate())) {
-      throw new InvalidDataException(
-        ErrorCodeDTO.INVALID_DATE_RANGE,
-        new ExceptionParameters(
-          Parameters.START_DATE,
-          calendar.getStartDate(),
-          Parameters.END_DATE,
-          calendar.getEndDate()
-        ),
-        translationService.format(
-          TranslationKey.ERROR_DATE_RANGE_INVALID,
-          TranslationKey.ERROR_DATE_RANGE_INVALID_P.START_DATE,
-          calendar.getStartDate(),
-          TranslationKey.ERROR_DATE_RANGE_INVALID_P.END_DATE,
-          calendar.getEndDate()
+      validationErrors.add(
+        new InvalidDataException(
+          ErrorCodeDTO.INVALID_DATE_RANGE,
+          new ExceptionParameters(
+            Parameters.START_DATE,
+            calendar.getStartDate(),
+            Parameters.END_DATE,
+            calendar.getEndDate()
+          ),
+          translationService.format(
+            TranslationKey.ERROR_DATE_RANGE_INVALID,
+            TranslationKey.ERROR_DATE_RANGE_INVALID_P.START_DATE,
+            calendar.getStartDate(),
+            TranslationKey.ERROR_DATE_RANGE_INVALID_P.END_DATE,
+            calendar.getEndDate()
+          )
         )
       );
     }
 
-    validateServicePointOverlaps(calendar);
+    List<DataConflictException> conflicts = validate(calendar.getServicePoints(), calendar);
+    if (!conflicts.isEmpty()) {
+      validationErrors.addAll(conflicts);
+      errorStatusCode = DataConflictException.DEFAULT_STATUS_CODE;
+    }
     // validateNormalOpeningIntegrity(calendar.getNormalHours());
+    // validationErrors.addAll(validate(calendar.getNormalHours()));
+
+    if (!validationErrors.isEmpty()) {
+      throw new NestedCalendarException(errorStatusCode, validationErrors);
+    }
   }
 
   /**
    * Check if any assigned service points already have calendars within the new calendar's date
-   * range
+   * range, returning a list of found conflicts.  If none are found, an empty list is returned
    * @param calendar
+   * @return any conflicts, represented as exceptions
    */
-  protected void validateServicePointOverlaps(Calendar calendar) {
-    if (calendar.getServicePoints().isEmpty()) {
-      return;
+  protected List<DataConflictException> validate(
+    Collection<ServicePointCalendarAssignment> assignments,
+    Calendar calendar
+  ) {
+    if (assignments.isEmpty()) {
+      return new ArrayList<>();
     }
-    List<UUID> servicePointAssignmentList = calendar
-      .getServicePoints()
+    List<UUID> servicePointAssignmentList = assignments
       .stream()
       .map(ServicePointCalendarAssignment::getServicePointId)
       .collect(Collectors.toList());
@@ -107,7 +129,7 @@ public class OpeningHoursService {
       calendar.getEndDate()
     );
     if (!overlaps.isEmpty()) {
-      List<DataConflictException> exceptions = overlaps
+      return overlaps
         .stream()
         .map(overlap ->
           new DataConflictException(
@@ -140,10 +162,7 @@ public class OpeningHoursService {
           )
         )
         .collect(Collectors.toList());
-
-      throw new NestedCalendarException(DataConflictException.DEFAULT_STATUS_CODE, exceptions);
     }
+    return new ArrayList<>();
   }
-
-  protected void validate(ExceptionRange range) {}
 }

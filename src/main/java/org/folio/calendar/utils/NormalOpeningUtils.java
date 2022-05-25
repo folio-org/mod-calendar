@@ -2,9 +2,11 @@ package org.folio.calendar.utils;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.types.Weekday;
@@ -22,7 +24,7 @@ public class NormalOpeningUtils {
    * Not all overlaps may be returned, however, if there are overlap(s), then this function will
    * return at least two overlapping openings.
    */
-  public static List<List<NormalOpening>> getOverlaps(Iterable<NormalOpening> openings) {
+  public static Set<NormalOpening> getOverlaps(Iterable<NormalOpening> openings) {
     // initialize weekday map
     EnumMap<Weekday, List<TimeRange>> weekdays = new EnumMap<>(Weekday.class);
     Weekday.getAll().forEach(weekday -> weekdays.put(weekday, new ArrayList<>()));
@@ -30,12 +32,12 @@ public class NormalOpeningUtils {
     // split openings into weekdays
     openings.forEach(opening -> fillWeekdayMapWithTimeTuples(weekdays, opening));
 
-    List<List<NormalOpening>> conflicts = new ArrayList<>();
+    Set<NormalOpening> conflicts = new HashSet<>();
 
     for (Entry<Weekday, List<TimeRange>> entry : weekdays.entrySet()) {
-      Optional<List<NormalOpening>> weekdayConflicts = TimeUtils.getOverlaps(entry.getValue());
+      Optional<Set<NormalOpening>> weekdayConflicts = TimeUtils.getOverlaps(entry.getValue());
       if (weekdayConflicts.isPresent()) {
-        conflicts.add(weekdayConflicts.get());
+        conflicts.addAll(weekdayConflicts.get());
       }
     }
 
