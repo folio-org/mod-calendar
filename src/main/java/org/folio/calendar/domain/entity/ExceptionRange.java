@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
@@ -34,7 +35,7 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExceptionRange {
+public class ExceptionRange implements Serializable {
 
   /**
    * The exception's internal ID

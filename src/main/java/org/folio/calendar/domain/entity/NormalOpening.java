@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.EnumMap;
@@ -37,7 +38,7 @@ import org.folio.calendar.utils.TimeUtils;
 @Entity
 @Builder
 @NoArgsConstructor
-public class NormalOpening {
+public class NormalOpening implements Serializable {
 
   /**
    * The opening's internal ID

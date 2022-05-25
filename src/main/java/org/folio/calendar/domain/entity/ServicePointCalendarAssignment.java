@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import java.io.Serializable;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ import lombok.With;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ServicePointCalendarAssignment {
+public class ServicePointCalendarAssignment implements Serializable {
 
   /**
    * The UUID for this row

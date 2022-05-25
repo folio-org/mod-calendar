@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ import org.folio.calendar.utils.PeriodUtils;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Calendar {
+public class Calendar implements Serializable {
 
   /**
    * The UUID of the calendar
