@@ -235,11 +235,17 @@ public class TranslationService {
           list.get(0) + this.format(TranslationKey.LIST_SEPARATORS.LIST_TWO_SEPARATOR) + list.get(1)
         );
       default:
-        return formatThreeOrMoreList(list);
+        return formatListOfThreeOrMore(list);
     }
   }
 
-  protected String formatThreeOrMoreList(List<String> list) {
+  /**
+   * Format a list of three or more items.  This is a helper function for
+   * {@link #formatList formatList}; use that instead of this method directly.
+   * @param list the list to format
+   * @return a list concatenated per the description in formatList
+   */
+  protected String formatListOfThreeOrMore(List<String> list) {
     String threeOrMoreSeparator =
       this.format(TranslationKey.LIST_SEPARATORS.LIST_THREE_OR_MORE_SEPARATOR);
     String threeOrMoreLastSeparator =
