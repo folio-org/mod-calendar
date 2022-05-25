@@ -439,7 +439,8 @@
         <version>${jacoco-maven-plugin.version}</version>
         <configuration>
           <excludes>
-            <exclude>**/dto/*</exclude>
+            <exclude>**/domain/mapper/*Impl.class</exclude>
+            <exclude>**/domain/dto/*</exclude>
             <exclude>**/rest/resource/*</exclude>
           </excludes>
         </configuration>
