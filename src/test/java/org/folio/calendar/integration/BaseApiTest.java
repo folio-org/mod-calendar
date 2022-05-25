@@ -15,6 +15,7 @@ import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
+import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
@@ -110,6 +111,8 @@ public abstract class BaseApiTest {
 
   @BeforeAll
   static void initialize() {
+    Locale.setDefault(Locale.US);
+
     log.info("Configuring JSON to parse decimals as doubles, not floats");
     // allow comparison with doubles, not floats
     JsonConfig jsonConfig = JsonConfig
