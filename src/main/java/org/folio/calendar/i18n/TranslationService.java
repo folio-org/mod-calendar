@@ -251,16 +251,15 @@ public class TranslationService {
     String threeOrMoreLastSeparator =
       this.format(TranslationKey.LIST_SEPARATORS.LIST_THREE_OR_MORE_LAST_SEPARATOR);
 
-    StringBuilder sb = new StringBuilder("");
-    for (int i = 0; i < list.size(); i++) {
-      sb.append(list.get(i));
+    StringBuilder sb = new StringBuilder(list.get(0));
+    for (int i = 1; i < list.size(); i++) {
       if (i == list.size() - 1) {
         sb.append(threeOrMoreLastSeparator);
       } else {
         sb.append(threeOrMoreSeparator);
       }
+      sb.append(list.get(i));
     }
-    sb.append(list.get(list.size() - 1));
     return sb.toString();
   }
 
