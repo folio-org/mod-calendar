@@ -63,6 +63,47 @@ public class TranslationKey {
   );
 
   /**
+   * Delimiters for list items
+   */
+  @UtilityClass
+  public class LIST_SEPARATORS {
+
+    /**
+     * The number of elements in the list to indicate that
+     * {@code LIST_TWO_SEPARATOR} should be used.
+     */
+    public static final int LIST_TWO_COUNT = 2;
+
+    /**
+     * A separator for two items only.  For example, with {@code [A, B]} and
+     * {@code list.twoSeparator: " and "}, the result will be {@code "A and B"}
+     */
+    public static final String LIST_TWO_SEPARATOR = "list.twoSeparator";
+    /**
+     * A separator, with {@link LIST_THREE_OR_MORE_LAST_SEPARATOR}, for lists
+     * of three or more items.  This separator is placed between every pair of
+     * items except for the last pair.
+     *
+     * If {@code list.threeOrMoreSeparator: ", "} and
+     * {@code list.threeOrMoreLastSeparator: ", and "} then a list of
+     * {@code [A B C]} will result in {@code "A, B, and C"}.  {@code [A B C D]}
+     * will yield {@code "A, B, C, and D"}
+     */
+    public static final String LIST_THREE_OR_MORE_SEPARATOR = "list.threeOrMoreSeparator";
+    /**
+     * A separator, with {@link LIST_THREE_OR_MORE_SEPARATOR}, for lists
+     * of three or more items.  This separator is placed between the last pair
+     * of items in the list.  In English, {@code ", and "} would be used.
+     *
+     * If {@code list.threeOrMoreSeparator: ", "} and
+     * {@code list.threeOrMoreLastSeparator: ", and "} then a list of
+     * {@code [A B C]} will result in {@code "A, B, and C"}.  {@code [A B C D]}
+     * will yield {@code "A, B, C, and D"}
+     */
+    public static final String LIST_THREE_OR_MORE_LAST_SEPARATOR = "list.threeOrMoreLastSeparator";
+  }
+
+  /**
    * An error message for when an endpoint is not found.
    *
    * Parameters {@link ERROR_ENDPOINT_NOT_FOUND_P} {@code METHOD} and {@code URL}

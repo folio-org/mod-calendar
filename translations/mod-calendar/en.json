@@ -15,6 +15,10 @@
   "weekday.long.friday": "Friday",
   "weekday.long.saturday": "Saturday",
 
+  "list.twoSeparator": " and ",
+  "list.threeOrMoreSeparator": ", ",
+  "list.threeOrMoreLastSeparator": ", and ",
+
   "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
   "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
   "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",

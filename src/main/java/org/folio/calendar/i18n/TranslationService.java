@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.request.TranslationKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
@@ -206,12 +207,55 @@ public class TranslationService {
    *
    * Format an ICU format string (found by its key), supplying a series of named arguments as key
    * value pairs.  For example: {@code format("Hello {name}", "name", parameterValue)}
-   * @param key the key of the format string
+   * @param key the key of the format string.  You likely want to use a constant from
+   * {@link TranslationKey TranslationKey} rather than hard-coding a string.
    * @param args pairs of keys and values to interpolate
    * @return the formatted string
    */
   public String format(String key, Object... args) {
     return this.getCurrentTranslation().format(key, args);
+  }
+
+  /**
+   * Format a list of strings into one cohesive string.  For example, in English, {@code [A B C D]}
+   * would become {@code "A, B, C, and D"}.  The tokens between each pair is determined by the
+   * values referenced by {@link TranslationKey.LIST_SEPARATORS TranslationKey.LIST_SEPARATORS}.
+   *
+   * @param list a list of strings to join
+   * @return the joined string
+   */
+  public String formatList(List<String> list) {
+    switch (list.size()) {
+      case 0:
+        return "";
+      case 1:
+        return list.get(0);
+      case TranslationKey.LIST_SEPARATORS.LIST_TWO_COUNT:
+        return (
+          list.get(0) + this.format(TranslationKey.LIST_SEPARATORS.LIST_TWO_SEPARATOR) + list.get(1)
+        );
+      default:
+        return formatThreeOrMoreList(list);
+    }
+  }
+
+  protected String formatThreeOrMoreList(List<String> list) {
+    String threeOrMoreSeparator =
+      this.format(TranslationKey.LIST_SEPARATORS.LIST_THREE_OR_MORE_SEPARATOR);
+    String threeOrMoreLastSeparator =
+      this.format(TranslationKey.LIST_SEPARATORS.LIST_THREE_OR_MORE_LAST_SEPARATOR);
+
+    StringBuilder sb = new StringBuilder("");
+    for (int i = 0; i < list.size(); i++) {
+      sb.append(list.get(i));
+      if (i == list.size() - 1) {
+        sb.append(threeOrMoreLastSeparator);
+      } else {
+        sb.append(threeOrMoreSeparator);
+      }
+    }
+    sb.append(list.get(list.size() - 1));
+    return sb.toString();
   }
 
   /**
