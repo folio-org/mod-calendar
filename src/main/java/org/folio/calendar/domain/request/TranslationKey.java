@@ -1,6 +1,8 @@
 package org.folio.calendar.domain.request;
 
+import java.util.Map;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.types.Weekday;
 
 /**
  * A class with constants for each translation key.
@@ -19,6 +21,46 @@ import lombok.experimental.UtilityClass;
 // allow different naming convention for parameter keys
 @SuppressWarnings("java:S101")
 public class TranslationKey {
+
+  /**
+   * Weekdays in their long representation, such as Monday, etc
+   */
+  public static final Map<Weekday, String> WEEKDAY_LONG = Map.of(
+    Weekday.SUNDAY,
+    "weekday.long.sunday",
+    Weekday.MONDAY,
+    "weekday.long.monday",
+    Weekday.TUESDAY,
+    "weekday.long.tuesday",
+    Weekday.WEDNESDAY,
+    "weekday.long.wednesday",
+    Weekday.THURSDAY,
+    "weekday.long.thursday",
+    Weekday.FRIDAY,
+    "weekday.long.friday",
+    Weekday.SATURDAY,
+    "weekday.long.saturday"
+  );
+
+  /**
+   * Weekdays in their short representation, such as Mon, Tue, etc
+   */
+  public static final Map<Weekday, String> WEEKDAY_SHORT = Map.of(
+    Weekday.SUNDAY,
+    "weekday.short.sunday",
+    Weekday.MONDAY,
+    "weekday.short.monday",
+    Weekday.TUESDAY,
+    "weekday.short.tuesday",
+    Weekday.WEDNESDAY,
+    "weekday.short.wednesday",
+    Weekday.THURSDAY,
+    "weekday.short.thursday",
+    Weekday.FRIDAY,
+    "weekday.short.friday",
+    Weekday.SATURDAY,
+    "weekday.short.saturday"
+  );
 
   /**
    * An error message for when an endpoint is not found.

@@ -6,8 +6,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
+import org.folio.calendar.domain.request.TranslationKey;
+import org.folio.calendar.i18n.TranslationService;
 
 /**
  * Days of the week enumeration
@@ -181,6 +184,14 @@ public enum Weekday {
    */
   public static Set<Weekday> getAll() {
     return Set.of(WEEKDAYS);
+  }
+
+  public Function<TranslationService, String> getLongLocalizedString() {
+    return service -> service.format(TranslationKey.WEEKDAY_LONG.get(this));
+  }
+
+  public Function<TranslationService, String> getShortLocalizedString() {
+    return service -> service.format(TranslationKey.WEEKDAY_SHORT.get(this));
   }
 
   @JsonCreator

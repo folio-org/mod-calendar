@@ -1,4 +1,20 @@
 {
+  "weekday.short.sunday": "Sun",
+  "weekday.short.monday": "Mon",
+  "weekday.short.tuesday": "Tue",
+  "weekday.short.wednesday": "Wed",
+  "weekday.short.thursday": "Thu",
+  "weekday.short.friday": "Fri",
+  "weekday.short.saturday": "Sat",
+
+  "weekday.long.sunday": "Sunday",
+  "weekday.long.monday": "Monday",
+  "weekday.long.tuesday": "Tuesday",
+  "weekday.long.wednesday": "Wednesday",
+  "weekday.long.thursday": "Thursday",
+  "weekday.long.friday": "Friday",
+  "weekday.long.saturday": "Saturday",
+
   "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
   "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
   "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",
