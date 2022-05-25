@@ -1,6 +1,8 @@
-package org.folio.calendar.unit.utils;
+package org.folio.calendar.unit.domain.types;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 
@@ -132,6 +134,23 @@ class WeekdayTest {
       "Invalid strings cannot be converted",
       IllegalArgumentException.class,
       () -> Weekday.from("foo")
+    );
+  }
+
+  @Test
+  void testGetAll() {
+    assertThat(Weekday.getAll(), hasSize(7));
+    assertThat(
+      Weekday.getAll(),
+      containsInAnyOrder(
+        Weekday.SUNDAY,
+        Weekday.MONDAY,
+        Weekday.TUESDAY,
+        Weekday.WEDNESDAY,
+        Weekday.THURSDAY,
+        Weekday.FRIDAY,
+        Weekday.SATURDAY
+      )
     );
   }
 }
