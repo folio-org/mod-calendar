@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -50,8 +51,8 @@ public class NormalOpeningUtils {
    * @param weekdays the map to insert ranges into
    * @param opening the opening to split into weekdays
    */
-  protected static void fillWeekdayMapWithTimeTuples(
-    EnumMap<Weekday, List<TimeRange>> weekdays,
+  public static void fillWeekdayMapWithTimeTuples(
+    Map<Weekday, List<TimeRange>> weekdays,
     NormalOpening opening
   ) {
     for (Weekday weekday : Weekday.getRange(opening.getStartDay(), opening.getEndDay())) {
