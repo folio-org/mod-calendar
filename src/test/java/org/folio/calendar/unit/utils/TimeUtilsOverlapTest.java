@@ -27,8 +27,6 @@ class TimeUtilsOverlapTest {
   static final Map<Weekday, List<TimeRange>> MONDAY_04_00_TO_14_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
   static final Map<Weekday, List<TimeRange>> MONDAY_04_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
   static final Map<Weekday, List<TimeRange>> MONDAY_23_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> MONDAY_04_00_TO_TUESDAY_12_30 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> TUESDAY_ALL_DAY = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
 
   static {
     NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
@@ -50,14 +48,6 @@ class TimeUtilsOverlapTest {
     NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
       MONDAY_23_00_TO_23_59,
       NormalOpenings.MONDAY_23_00_TO_23_59
-    );
-    NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
-      MONDAY_04_00_TO_TUESDAY_12_30,
-      NormalOpenings.MONDAY_04_00_TO_TUESDAY_12_30
-    );
-    NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
-      TUESDAY_ALL_DAY,
-      NormalOpenings.TUESDAY_ALL_DAY
     );
   }
 
