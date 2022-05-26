@@ -27,8 +27,7 @@ public class NormalOpeningUtils {
    */
   public static Set<NormalOpening> getOverlaps(Iterable<NormalOpening> openings) {
     // initialize weekday map
-    EnumMap<Weekday, List<TimeRange>> weekdays = new EnumMap<>(Weekday.class);
-    Weekday.getAll().forEach(weekday -> weekdays.put(weekday, new ArrayList<>()));
+    Map<Weekday, List<TimeRange>> weekdays = initializeWeekdayMapOfTimeRanges();
 
     // split openings into weekdays
     openings.forEach(opening -> fillWeekdayMapWithTimeTuples(weekdays, opening));
@@ -43,6 +42,16 @@ public class NormalOpeningUtils {
     }
 
     return conflicts;
+  }
+
+  /**
+   * Create a weekday map with empty lists for each weekday
+   * @return a map with each weekday mapped to an empty list
+   */
+  public static Map<Weekday, List<TimeRange>> initializeWeekdayMapOfTimeRanges() {
+    EnumMap<Weekday, List<TimeRange>> map = new EnumMap<>(Weekday.class);
+    Weekday.getAll().forEach(weekday -> map.put(weekday, new ArrayList<>()));
+    return map;
   }
 
   /**
@@ -61,7 +70,7 @@ public class NormalOpeningUtils {
         tuple.setStart(opening.getStartTime());
       }
       if (weekday == opening.getEndDay()) {
-        tuple.setStart(opening.getEndTime());
+        tuple.setEnd(opening.getEndTime());
       }
       weekdays.get(weekday).add(tuple);
     }

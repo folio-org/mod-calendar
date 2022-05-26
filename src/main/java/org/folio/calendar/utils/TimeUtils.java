@@ -88,7 +88,8 @@ public class TimeUtils {
 
     Set<NormalOpening> conflicts = new HashSet<>();
 
-    for (LocalTimeFromRange time : queue) {
+    while (!queue.isEmpty()) {
+      LocalTimeFromRange time = queue.poll();
       if (time.isStart()) {
         // for new ranges, we just add them to the stack
         stack.push(time.getRangeSource());
