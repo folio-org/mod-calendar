@@ -9,14 +9,14 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class LocalTimeFromRange implements Comparable<LocalTimeFromRange> {
+public class LocalTimeFromRange<T> implements Comparable<LocalTimeFromRange<?>> {
 
   private LocalTime time;
-  private TimeRange rangeSource;
+  private TimeRange<T> rangeSource;
 
   private boolean isStart;
 
-  public int compareTo(LocalTimeFromRange other) {
+  public int compareTo(LocalTimeFromRange<?> other) {
     if (time.compareTo(other.time) != 0) {
       return time.compareTo(other.time);
     }

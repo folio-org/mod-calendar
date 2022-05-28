@@ -9,7 +9,6 @@ import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.entity.NormalOpening;
 
 /**
  * Utilities for times
@@ -43,7 +42,7 @@ public class TimeUtils {
    * @param b time range 2
    * @return if they overlap
    */
-  public static boolean overlaps(TimeRange a, TimeRange b) {
+  public static boolean overlaps(TimeRange<?> a, TimeRange<?> b) {
     return overlaps(a.getStart(), a.getEnd(), b.getStart(), b.getEnd());
   }
 
@@ -74,29 +73,31 @@ public class TimeUtils {
    * Not all overlaps may be returned, however, if there are overlap(s), then this function will
    * return at least two overlapping openings.
    */
-  public static Optional<Set<NormalOpening>> getOverlaps(Iterable<TimeRange> ranges) {
-    PriorityQueue<LocalTimeFromRange> queue = new PriorityQueue<>();
+  public static <T> Optional<Set<T>> getOverlaps(Iterable<TimeRange<T>> ranges) {
+    PriorityQueue<LocalTimeFromRange<T>> queue = new PriorityQueue<>();
 
     // create a sorted queue of each time, with the first times at the beginning
-    for (TimeRange range : ranges) {
-      queue.add(new LocalTimeFromRange(range.getStart(), range, true));
-      queue.add(new LocalTimeFromRange(range.getEnd(), range, false));
+    for (TimeRange<T> range : ranges) {
+      queue.add(new LocalTimeFromRange<>(range.getStart(), range, true));
+      queue.add(new LocalTimeFromRange<>(range.getEnd(), range, false));
     }
 
     // track the ranges we are currently inside of
-    Deque<TimeRange> stack = new LinkedList<>();
+    Deque<TimeRange<T>> stack = new LinkedList<>();
 
-    Set<NormalOpening> conflicts = new HashSet<>();
+    Set<T> conflicts = new HashSet<>();
 
     while (!queue.isEmpty()) {
-      LocalTimeFromRange time = queue.poll();
+      LocalTimeFromRange<T> time = queue.poll();
       if (time.isStart()) {
         // for new ranges, we just add them to the stack
         stack.push(time.getRangeSource());
       } else {
         // a range ended, but we hit an overlap
         if (stack.size() > 1) {
-          conflicts.addAll(stack.stream().map(TimeRange::getSource).collect(Collectors.toList()));
+          conflicts.addAll(
+            stack.stream().map(TimeRange<T>::getSource).collect(Collectors.toList())
+          );
         }
         stack.pop();
       }

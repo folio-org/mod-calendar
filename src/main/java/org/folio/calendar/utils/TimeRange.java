@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.folio.calendar.domain.entity.NormalOpening;
 
 /**
  * A simple class that holds a start and end time, used to simplify algorithms
@@ -13,12 +12,12 @@ import org.folio.calendar.domain.entity.NormalOpening;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class TimeRange {
+public class TimeRange<T> {
 
   /**
-   * Used to retain a link to the original open, for reporting conflicts
+   * Used to retain a link to the original object, for reporting conflicts or similar
    */
-  protected NormalOpening source;
+  protected T source;
 
   @NonNull
   protected LocalTime start;

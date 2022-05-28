@@ -11,18 +11,26 @@ import org.junit.jupiter.api.Test;
 
 class LocalTimeFromRangeTest {
 
-  static final LocalTimeFromRange START_04_00 = new LocalTimeFromRange(
+  static final LocalTimeFromRange<Object> START_04_00 = new LocalTimeFromRange<>(
     Times.TIME_04_00,
     null,
     true
   );
-  static final LocalTimeFromRange START_15_00 = new LocalTimeFromRange(
+  static final LocalTimeFromRange<Object> START_15_00 = new LocalTimeFromRange<>(
     Times.TIME_15_00,
     null,
     true
   );
-  static final LocalTimeFromRange END_04_00 = new LocalTimeFromRange(Times.TIME_04_00, null, false);
-  static final LocalTimeFromRange END_15_00 = new LocalTimeFromRange(Times.TIME_15_00, null, false);
+  static final LocalTimeFromRange<Object> END_04_00 = new LocalTimeFromRange<>(
+    Times.TIME_04_00,
+    null,
+    false
+  );
+  static final LocalTimeFromRange<Object> END_15_00 = new LocalTimeFromRange<>(
+    Times.TIME_15_00,
+    null,
+    false
+  );
 
   @Test
   void testCompare() {

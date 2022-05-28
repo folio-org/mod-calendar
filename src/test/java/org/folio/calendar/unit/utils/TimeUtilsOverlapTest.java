@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.utils.NormalOpeningUtils;
@@ -22,11 +23,11 @@ import org.junit.jupiter.api.Test;
 
 class TimeUtilsOverlapTest {
 
-  static final Map<Weekday, List<TimeRange>> SUNDAY_MONDAY_ALL_DAY = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> MONDAY_00_00_TO_12_30 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> MONDAY_04_00_TO_14_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> MONDAY_04_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange>> MONDAY_23_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TimeRange<NormalOpening>>> SUNDAY_MONDAY_ALL_DAY = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_00_00_TO_12_30 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_04_00_TO_14_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_04_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_23_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
 
   static {
     NormalOpeningUtils.fillWeekdayMapWithTimeTuples(

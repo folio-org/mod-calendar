@@ -52,16 +52,16 @@ class TimeUtilsOverlapTimeRangesTest {
     assertThat(
       "Distinct time ranges (1 then 2) do not overlap",
       TimeUtils.overlaps(
-        new TimeRange(Times.TIME_00_00, Times.TIME_04_00),
-        new TimeRange(Times.TIME_12_30, Times.TIME_14_00)
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_04_00),
+        new TimeRange<Object>(Times.TIME_12_30, Times.TIME_14_00)
       ),
       is(false)
     );
     assertThat(
       "Distinct time ranges (2 then 1) do not overlap",
       TimeUtils.overlaps(
-        new TimeRange(Times.TIME_12_30, Times.TIME_14_00),
-        new TimeRange(Times.TIME_00_00, Times.TIME_04_00)
+        new TimeRange<Object>(Times.TIME_12_30, Times.TIME_14_00),
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_04_00)
       ),
       is(false)
     );
@@ -72,8 +72,8 @@ class TimeUtilsOverlapTimeRangesTest {
     assertThat(
       "The same time on all range edges (1-1 and 1-1) does overlap",
       TimeUtils.overlaps(
-        new TimeRange(Times.TIME_00_00, Times.TIME_00_00),
-        new TimeRange(Times.TIME_00_00, Times.TIME_00_00)
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_00_00),
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_00_00)
       ),
       is(true)
     );
@@ -84,16 +84,16 @@ class TimeUtilsOverlapTimeRangesTest {
     assertThat(
       "Overlapping time ranges (1 then 2) do overlap",
       TimeUtils.overlaps(
-        new TimeRange(Times.TIME_00_00, Times.TIME_12_30),
-        new TimeRange(Times.TIME_04_00, Times.TIME_14_00)
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_12_30),
+        new TimeRange<Object>(Times.TIME_04_00, Times.TIME_14_00)
       ),
       is(true)
     );
     assertThat(
       "Overlapping time ranges (2 then 1) do overlap",
       TimeUtils.overlaps(
-        new TimeRange(Times.TIME_04_00, Times.TIME_14_00),
-        new TimeRange(Times.TIME_00_00, Times.TIME_12_30)
+        new TimeRange<Object>(Times.TIME_04_00, Times.TIME_14_00),
+        new TimeRange<Object>(Times.TIME_00_00, Times.TIME_12_30)
       ),
       is(true)
     );

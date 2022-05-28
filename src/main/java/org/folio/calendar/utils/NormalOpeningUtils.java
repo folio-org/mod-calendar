@@ -27,14 +27,14 @@ public class NormalOpeningUtils {
    */
   public static Set<NormalOpening> getOverlaps(Iterable<NormalOpening> openings) {
     // initialize weekday map
-    Map<Weekday, List<TimeRange>> weekdays = initializeWeekdayMapOfTimeRanges();
+    Map<Weekday, List<TimeRange<NormalOpening>>> weekdays = initializeWeekdayMapOfTimeRanges();
 
     // split openings into weekdays
     openings.forEach(opening -> fillWeekdayMapWithTimeTuples(weekdays, opening));
 
     Set<NormalOpening> conflicts = new HashSet<>();
 
-    for (Entry<Weekday, List<TimeRange>> entry : weekdays.entrySet()) {
+    for (Entry<Weekday, List<TimeRange<NormalOpening>>> entry : weekdays.entrySet()) {
       Optional<Set<NormalOpening>> weekdayConflicts = TimeUtils.getOverlaps(entry.getValue());
       if (weekdayConflicts.isPresent()) {
         conflicts.addAll(weekdayConflicts.get());
@@ -46,10 +46,11 @@ public class NormalOpeningUtils {
 
   /**
    * Create a weekday map with empty lists for each weekday
+   * @param <T> the type sourcing each {@code TimeRange}
    * @return a map with each weekday mapped to an empty list
    */
-  public static Map<Weekday, List<TimeRange>> initializeWeekdayMapOfTimeRanges() {
-    EnumMap<Weekday, List<TimeRange>> map = new EnumMap<>(Weekday.class);
+  public static <T> Map<Weekday, List<TimeRange<T>>> initializeWeekdayMapOfTimeRanges() {
+    EnumMap<Weekday, List<TimeRange<T>>> map = new EnumMap<>(Weekday.class);
     Weekday.getAll().forEach(weekday -> map.put(weekday, new ArrayList<>()));
     return map;
   }
@@ -61,11 +62,15 @@ public class NormalOpeningUtils {
    * @param opening the opening to split into weekdays
    */
   public static void fillWeekdayMapWithTimeTuples(
-    Map<Weekday, List<TimeRange>> weekdays,
+    Map<Weekday, List<TimeRange<NormalOpening>>> weekdays,
     NormalOpening opening
   ) {
     for (Weekday weekday : Weekday.getRange(opening.getStartDay(), opening.getEndDay())) {
-      TimeRange tuple = new TimeRange(opening, TimeConstants.TIME_MIN, TimeConstants.TIME_MAX);
+      TimeRange<NormalOpening> tuple = new TimeRange<>(
+        opening,
+        TimeConstants.TIME_MIN,
+        TimeConstants.TIME_MAX
+      );
       if (weekday == opening.getStartDay()) {
         tuple.setStart(opening.getStartTime());
       }
