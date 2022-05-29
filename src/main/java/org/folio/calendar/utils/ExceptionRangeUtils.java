@@ -1,7 +1,14 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.i18n.TranslationService;
@@ -13,14 +20,48 @@ import org.folio.calendar.i18n.TranslationService;
 public class ExceptionRangeUtils {
 
   /**
+   * Find overlaps within an exception ranges, if any exist
+   * @param range a range to evaluate, containing openings
+   * @return an optional list of openings that overlap (empty/no value if there were no overlaps).
+   * Not all overlaps may be returned, however, if there are overlap(s), then this function will
+   * return at least two overlapping openings.
+   */
+  public static Optional<Set<ExceptionHour>> getHourOverlaps(ExceptionRange range) {
+    return TemporalUtils.getOverlaps(
+      range
+        .getOpenings()
+        .stream()
+        .map(hour ->
+          new TemporalRange<LocalDateTime, ExceptionHour>(
+            hour,
+            LocalDateTime.of(hour.getStartDate(), hour.getStartTime()),
+            LocalDateTime.of(hour.getEndDate(), hour.getEndTime())
+          )
+        )
+        .collect(Collectors.toList())
+    );
+  }
+
+  /**
    * Find overlaps between a set of exception ranges, if any exist
    * @param ranges a set of ranges to evaluate
    * @return an optional list of ranges that overlap (empty/no value if there were no overlaps).
    * Not all overlaps may be returned, however, if there are overlap(s), then this function will
    * return at least two overlapping openings.
    */
-  public static Set<ExceptionRange> getOverlaps(Iterable<ExceptionRange> ranges) {
-    return new HashSet<>();
+  public static Optional<Set<ExceptionRange>> getOverlaps(Collection<ExceptionRange> ranges) {
+    return TemporalUtils.getOverlaps(
+      ranges
+        .stream()
+        .map(range ->
+          new TemporalRange<LocalDate, ExceptionRange>(
+            range,
+            range.getStartDate(),
+            range.getEndDate()
+          )
+        )
+        .collect(Collectors.toList())
+    );
   }
 
   /**

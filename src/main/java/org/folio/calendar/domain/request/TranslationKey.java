@@ -348,14 +348,14 @@ public class TranslationKey {
   /**
    * The calendar has an exception with a start date after its end date.
    *
-   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_DATES_P}:
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P}:
    * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
    */
-  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATES =
-    "error.calendarInvalidExceptionRangeDates";
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER =
+    "error.calendarInvalidExceptionRangeDateOrder";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATES_P {
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P {
 
     /**
      * This expects a {@code LocalDate}
@@ -366,6 +366,38 @@ public class TranslationKey {
      */
     public static final String END_DATE = "endDate";
     public static final String NAME = "name";
+  }
+
+  /**
+   * The calendar has an exception whose dates are not fully enclosed by the
+   * parent calendar.
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P}:
+   * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS =
+    "error.calendarInvalidExceptionRangeDateOrder";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P {
+
+    public static final String NAME = "name";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String EXCEPTION_START_DATE = "startDateException";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String EXCEPTION_END_DATE = "endDateException";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String CALENDAR_START_DATE = "startDateCalendar";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String CALENDAR_END_DATE = "endDateCalendar";
   }
 
   /**

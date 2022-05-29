@@ -11,7 +11,8 @@ enum: # from en.json in ui-calendar translations
   - calendarInvalidNormalOpenings
   - calendarInvalidExceptions
   - calendarInvalidExceptionName
-  - calendarInvalidExceptionDates
+  - calendarInvalidExceptionDateOrder
+  - calendarInvalidExceptionDateBoundary
   - calendarInvalidExceptionOpenings
   - settings.error.invalidDateRange # LEGACY
   - duplication # LEGACY
@@ -27,7 +28,8 @@ x-enum-varnames:
   - CALENDAR_INVALID_NORMAL_OPENINGS
   - CALENDAR_INVALID_EXCEPTIONS
   - CALENDAR_INVALID_EXCEPTION_NAME
-  - CALENDAR_INVALID_EXCEPTION_DATES
+  - CALENDAR_INVALID_EXCEPTION_DATE_ORDER
+  - CALENDAR_INVALID_EXCEPTION_DATE_BOUNDARY
   - CALENDAR_INVALID_EXCEPTION_OPENINGS
   - INVALID_DATE_RANGE # LEGACY
   - OVERLAPPING_CALENDAR # LEGACY
@@ -44,6 +46,7 @@ x-enum-descriptions:
   - The calendar has overlapping exceptions
   - An exception has an empty or whitespace-only name
   - An exception has a start date after its end date
+  - An exception is outside of the boundary of the enclosing calendar
   - The calendar has overlapping openings within an exception
   - The start date was after the end date # LEGACY
   - The new calendar would overlap with another calendar for this service point!  Please change the
