@@ -50,6 +50,23 @@ public class DateUtils {
   }
 
   /**
+   * Check if a date range is contained within another (inclusive) range
+   * @param testStart the first date of the range to test, inclusive
+   * @param testEnd the last date of the range to test, inclusive
+   * @param start the first date of the range, inclusive
+   * @param end the last date of the range, inclusive
+   * @return if the test range is contained within the other range
+   */
+  public static boolean containsRange(
+    ChronoLocalDate testStart,
+    ChronoLocalDate testEnd,
+    ChronoLocalDate start,
+    ChronoLocalDate end
+  ) {
+    return contains(testStart, start, end) && contains(testEnd, start, end);
+  }
+
+  /**
    * Check that two inclusive local date pairs overlap
    *
    * @param start1 Start of date range 1

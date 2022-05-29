@@ -58,4 +58,110 @@ class DateUtilsContainsTest {
       is(false)
     );
   }
+
+  @Test
+  void testRangeCorrect() {
+    assertThat(
+      "A date range that is a subset of another is contained",
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04
+      ),
+      is(true)
+    );
+    assertThat(
+      "A date range that is a subset of another is contained",
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_03,
+        Dates.DATE_2021_01_04,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04
+      ),
+      is(true)
+    );
+    assertThat(
+      "A date range that is a subset of another is contained",
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_03,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04
+      ),
+      is(true)
+    );
+    assertThat(
+      "A date range that is a subset of another is contained",
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04
+      ),
+      is(true)
+    );
+  }
+
+  @Test
+  void testRangeSingle() {
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_01
+      ),
+      is(true)
+    );
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_02
+      ),
+      is(false)
+    );
+  }
+
+  @Test
+  void testRangeIncorrect() {
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_01
+      ),
+      is(false)
+    );
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_03_16,
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04
+      ),
+      is(false)
+    );
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_01_04,
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_04
+      ),
+      is(false)
+    );
+    assertThat(
+      DateUtils.containsRange(
+        Dates.DATE_2021_01_01,
+        Dates.DATE_2021_03_16,
+        Dates.DATE_2021_01_02,
+        Dates.DATE_2021_01_04
+      ),
+      is(false)
+    );
+  }
 }
