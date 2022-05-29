@@ -1,5 +1,6 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -27,15 +28,15 @@ public class NormalOpeningUtils {
    */
   public static Set<NormalOpening> getOverlaps(Iterable<NormalOpening> openings) {
     // initialize weekday map
-    Map<Weekday, List<TimeRange<NormalOpening>>> weekdays = initializeWeekdayMapOfTimeRanges();
+    Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> weekdays = initializeWeekdayMapOfRanges();
 
     // split openings into weekdays
     openings.forEach(opening -> fillWeekdayMapWithTimeTuples(weekdays, opening));
 
     Set<NormalOpening> conflicts = new HashSet<>();
 
-    for (Entry<Weekday, List<TimeRange<NormalOpening>>> entry : weekdays.entrySet()) {
-      Optional<Set<NormalOpening>> weekdayConflicts = TimeUtils.getOverlaps(entry.getValue());
+    for (Entry<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> entry : weekdays.entrySet()) {
+      Optional<Set<NormalOpening>> weekdayConflicts = TemporalUtils.getOverlaps(entry.getValue());
       if (weekdayConflicts.isPresent()) {
         conflicts.addAll(weekdayConflicts.get());
       }
@@ -46,27 +47,28 @@ public class NormalOpeningUtils {
 
   /**
    * Create a weekday map with empty lists for each weekday
-   * @param <T> the type sourcing each {@code TimeRange}
+   * @param <T> the type sourcing each {@code TemporalRange}
    * @return a map with each weekday mapped to an empty list
    */
-  public static <T> Map<Weekday, List<TimeRange<T>>> initializeWeekdayMapOfTimeRanges() {
-    EnumMap<Weekday, List<TimeRange<T>>> map = new EnumMap<>(Weekday.class);
+  public static <T> Map<Weekday, List<TemporalRange<LocalTime, T>>> initializeWeekdayMapOfRanges() {
+    EnumMap<Weekday, List<TemporalRange<LocalTime, T>>> map = new EnumMap<>(Weekday.class);
     Weekday.getAll().forEach(weekday -> map.put(weekday, new ArrayList<>()));
     return map;
   }
 
   /**
-   * Split a {@link NormalOpening NormalOpening} up into separate {@link TimeRange TimeRanges}
-   * for each weekday, inserting these range(s) into an {@link EnumMap EnumMap}
+   * Split a {@link NormalOpening NormalOpening} up into separate time-based
+   * {@link TemporalRange TemporalRanges} for each weekday, inserting these
+   * range(s) into an {@link EnumMap EnumMap}
    * @param weekdays the map to insert ranges into
    * @param opening the opening to split into weekdays
    */
   public static void fillWeekdayMapWithTimeTuples(
-    Map<Weekday, List<TimeRange<NormalOpening>>> weekdays,
+    Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> weekdays,
     NormalOpening opening
   ) {
     for (Weekday weekday : Weekday.getRange(opening.getStartDay(), opening.getEndDay())) {
-      TimeRange<NormalOpening> tuple = new TimeRange<>(
+      TemporalRange<LocalTime, NormalOpening> tuple = new TemporalRange<>(
         opening,
         TimeConstants.TIME_MIN,
         TimeConstants.TIME_MAX

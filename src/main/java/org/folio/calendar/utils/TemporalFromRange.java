@@ -1,6 +1,6 @@
 package org.folio.calendar.utils;
 
-import java.time.LocalTime;
+import java.time.temporal.Temporal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -9,14 +9,15 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class LocalTimeFromRange<T> implements Comparable<LocalTimeFromRange<?>> {
+public class TemporalFromRange<D extends Temporal & Comparable<? super D>, T>
+  implements Comparable<TemporalFromRange<D, ?>> {
 
-  private LocalTime time;
-  private TimeRange<T> rangeSource;
+  private D time;
+  private TemporalRange<D, T> rangeSource;
 
   private boolean isStart;
 
-  public int compareTo(LocalTimeFromRange<?> other) {
+  public int compareTo(TemporalFromRange<D, ?> other) {
     if (time.compareTo(other.time) != 0) {
       return time.compareTo(other.time);
     }

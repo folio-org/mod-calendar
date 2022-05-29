@@ -5,28 +5,29 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThan;
 
+import java.time.LocalTime;
 import org.folio.calendar.testconstants.Times;
-import org.folio.calendar.utils.LocalTimeFromRange;
+import org.folio.calendar.utils.TemporalFromRange;
 import org.junit.jupiter.api.Test;
 
-class LocalTimeFromRangeTest {
+class TemporalFromRangeTest {
 
-  static final LocalTimeFromRange<Object> START_04_00 = new LocalTimeFromRange<>(
+  static final TemporalFromRange<LocalTime, Object> START_04_00 = new TemporalFromRange<>(
     Times.TIME_04_00,
     null,
     true
   );
-  static final LocalTimeFromRange<Object> START_15_00 = new LocalTimeFromRange<>(
+  static final TemporalFromRange<LocalTime, Object> START_15_00 = new TemporalFromRange<>(
     Times.TIME_15_00,
     null,
     true
   );
-  static final LocalTimeFromRange<Object> END_04_00 = new LocalTimeFromRange<>(
+  static final TemporalFromRange<LocalTime, Object> END_04_00 = new TemporalFromRange<>(
     Times.TIME_04_00,
     null,
     false
   );
-  static final LocalTimeFromRange<Object> END_15_00 = new LocalTimeFromRange<>(
+  static final TemporalFromRange<LocalTime, Object> END_15_00 = new TemporalFromRange<>(
     Times.TIME_15_00,
     null,
     false

@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.not;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,17 +18,17 @@ import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.utils.NormalOpeningUtils;
-import org.folio.calendar.utils.TimeRange;
-import org.folio.calendar.utils.TimeUtils;
+import org.folio.calendar.utils.TemporalRange;
+import org.folio.calendar.utils.TemporalUtils;
 import org.junit.jupiter.api.Test;
 
-class TimeUtilsOverlapTest {
+class TemporalUtilsTimeOverlapTest {
 
-  static final Map<Weekday, List<TimeRange<NormalOpening>>> SUNDAY_MONDAY_ALL_DAY = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_00_00_TO_12_30 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_04_00_TO_14_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_04_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
-  static final Map<Weekday, List<TimeRange<NormalOpening>>> MONDAY_23_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfTimeRanges();
+  static final Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> SUNDAY_MONDAY_ALL_DAY = NormalOpeningUtils.initializeWeekdayMapOfRanges();
+  static final Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> MONDAY_00_00_TO_12_30 = NormalOpeningUtils.initializeWeekdayMapOfRanges();
+  static final Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> MONDAY_04_00_TO_14_59 = NormalOpeningUtils.initializeWeekdayMapOfRanges();
+  static final Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> MONDAY_04_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfRanges();
+  static final Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> MONDAY_23_00_TO_23_59 = NormalOpeningUtils.initializeWeekdayMapOfRanges();
 
   static {
     NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
@@ -54,13 +55,13 @@ class TimeUtilsOverlapTest {
 
   @Test
   void testNoOverlaps() {
-    assertThat(TimeUtils.getOverlaps(new ArrayList<>()), isEmpty());
+    assertThat(TemporalUtils.getOverlaps(new ArrayList<>()), isEmpty());
     assertThat(
-      TimeUtils.getOverlaps(new ArrayList<>(SUNDAY_MONDAY_ALL_DAY.get(Weekday.SUNDAY))),
+      TemporalUtils.getOverlaps(new ArrayList<>(SUNDAY_MONDAY_ALL_DAY.get(Weekday.SUNDAY))),
       isEmpty()
     );
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           MONDAY_00_00_TO_12_30.get(Weekday.MONDAY).get(0),
           MONDAY_23_00_TO_23_59.get(Weekday.MONDAY).get(0)
@@ -73,7 +74,7 @@ class TimeUtilsOverlapTest {
   @Test
   void testSingleOverlaps() {
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           SUNDAY_MONDAY_ALL_DAY.get(Weekday.MONDAY).get(0),
           MONDAY_23_00_TO_23_59.get(Weekday.MONDAY).get(0)
@@ -87,7 +88,7 @@ class TimeUtilsOverlapTest {
       )
     );
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           SUNDAY_MONDAY_ALL_DAY.get(Weekday.MONDAY).get(0),
           SUNDAY_MONDAY_ALL_DAY.get(Weekday.MONDAY).get(0)
@@ -96,7 +97,7 @@ class TimeUtilsOverlapTest {
       isPresentAnd(hasItem(NormalOpenings.SUNDAY_MONDAY_ALL_DAY))
     );
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           MONDAY_00_00_TO_12_30.get(Weekday.MONDAY).get(0),
           MONDAY_04_00_TO_14_59.get(Weekday.MONDAY).get(0),
@@ -115,7 +116,7 @@ class TimeUtilsOverlapTest {
   @Test
   void testMultipleOverlaps() {
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           MONDAY_00_00_TO_12_30.get(Weekday.MONDAY).get(0),
           MONDAY_04_00_TO_14_59.get(Weekday.MONDAY).get(0),
@@ -134,7 +135,7 @@ class TimeUtilsOverlapTest {
     );
     // 23:00-23:59 self-conflicts
     assertThat(
-      TimeUtils.getOverlaps(
+      TemporalUtils.getOverlaps(
         Arrays.asList(
           MONDAY_00_00_TO_12_30.get(Weekday.MONDAY).get(0),
           MONDAY_04_00_TO_14_59.get(Weekday.MONDAY).get(0),
