@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
@@ -49,10 +50,11 @@ public class ExceptionRange implements Serializable {
    * The calendar that this is exceptional to
    */
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "calendar_id")
+  @JsonIgnore
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @JoinColumn(name = "calendar_id")
+  @ManyToOne(fetch = FetchType.LAZY)
   private Calendar calendar;
 
   @NotNull

@@ -1,5 +1,6 @@
 package org.folio.calendar.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -53,10 +54,11 @@ public class NormalOpening implements Serializable {
    * The calendar that this opening is a part of
    */
   @NotNull
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "calendar_id")
+  @JsonIgnore
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @JoinColumn(name = "calendar_id")
+  @ManyToOne(fetch = FetchType.LAZY)
   private Calendar calendar;
 
   /**
