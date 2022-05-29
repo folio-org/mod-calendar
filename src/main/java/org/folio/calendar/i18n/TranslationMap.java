@@ -2,6 +2,7 @@ package org.folio.calendar.i18n;
 
 import com.ibm.icu.text.MessageFormat;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
@@ -137,6 +138,13 @@ public class TranslationMap {
       // Sadly, ICU formatting strings only support date formats with the old Date class :(
       if (args[i] instanceof LocalDate) {
         args[i] = Date.from(((LocalDate) args[i]).atStartOfDay(ZoneId.systemDefault()).toInstant());
+      }
+      // Same for LocalTime
+      if (args[i] instanceof LocalTime) {
+        args[i] =
+          Date.from(
+            ((LocalTime) args[i]).atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()
+          );
       }
     }
     return MessageFormat.format(this.get(key), MapUtils.buildMap(args));
