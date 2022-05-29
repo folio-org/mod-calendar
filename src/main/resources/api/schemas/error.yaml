@@ -20,7 +20,7 @@ properties:
 additionalProperties: false
 required:
   - code
-
+  - message
 example:
   code: internalServerError
   message: Internal Server Error

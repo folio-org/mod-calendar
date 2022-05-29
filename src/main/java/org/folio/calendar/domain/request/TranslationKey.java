@@ -136,6 +136,38 @@ public class TranslationKey {
   }
 
   /**
+   * A string representation of an exception's range, such as
+   * ""Foo" from Jan 12, 2022 to Jan 13, 2022"
+   *
+   * Parameters {@link EXCEPTION_RANGE_MULTIPLE_DAYS_P}: {@code NAME},
+   * {@code START_DATE}, and {@code END_DATE}.
+   *
+   * For single-day exceptions, use {@code EXCEPTION_RANGE_SINGLE_DAY}
+   */
+  public static final String EXCEPTION_OPENING = "exceptionOpening";
+
+  @UtilityClass
+  public class EXCEPTION_OPENING_P {
+
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String START_DATE = "startDate";
+    /**
+     * This expects a {@code LocalTime}
+     */
+    public static final String START_TIME = "startTime";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String END_DATE = "endDate";
+    /**
+     * This expects a {@code LocalTime}
+     */
+    public static final String END_TIME = "endTime";
+  }
+
+  /**
    * Delimiters for list items
    */
   @UtilityClass
@@ -305,6 +337,38 @@ public class TranslationKey {
   }
 
   /**
+   * The calendar has an exception with no name (or one of only whitespace)
+   *
+   * No parameters are available (since it is difficult to refer to a specific
+   * exception when it has no name)
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_NAME =
+    "error.calendarInvalidExceptionRangeName";
+
+  /**
+   * The calendar has an exception with a start date after its end date.
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_DATES_P}:
+   * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATES =
+    "error.calendarInvalidExceptionRangeDates";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATES_P {
+
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String START_DATE = "startDate";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String END_DATE = "endDate";
+    public static final String NAME = "name";
+  }
+
+  /**
    * The calendar's exception ranges conflict.  The list will always contain at
    * least two items (otherwise there would be no conflict).
    *
@@ -321,5 +385,24 @@ public class TranslationKey {
      * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String EXCEPTION_LIST = "exceptionList";
+  }
+
+  /**
+   * The calendar's exception hours/openings conflict.  The list will always
+   * contain at least two items (otherwise there would be no conflict).
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P}: {@code OPENING_LIST}
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS =
+    "error.calendarInvalidExceptionOpenings";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P {
+
+    /**
+     * This should be a list as formatted by
+     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     */
+    public static final String OPENING_LIST = "openingList";
   }
 }

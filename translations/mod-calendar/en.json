@@ -22,6 +22,7 @@
   "normalOpening": "{startWeekdayShort} {startTime, time, short} - {endWeekdayShort} {endTime, time, short}",
   "exceptionRangeMultipleDays": "“{name}” from {startDate, date, medium} to {endDate, date, medium}",
   "exceptionRangeSingleDay": "“{name}” on {date, date, medium}",
+  "exceptionOpening": "{startDate, date, medium} {startTime, time, short} to {endDate, date, medium} {endTime, time, short}",
 
   "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
   "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
@@ -30,9 +31,12 @@
   "error.calendarNotFound": "No calendar was found with the specified query",
   "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})",
   "error.calendarNameEmpty": "Please provide a non-empty calendar name",
-  "error.dateRangeInvalid": "Start date {startDate, date, medium} cannot be after end date {endDate, date, medium}",
+  "error.dateRangeInvalid": "Start date ({startDate, date, medium}) cannot be after end date ({endDate, date, medium})",
   "error.calendarInvalidNormalOpenings": "The following openings conflict with each other: {openingList}",
+  "error.calendarInvalidExceptionRangeName": "At least one exception is missing a name",
+  "error.calendarInvalidExceptionRangeDates": "The start date ({startDate, date, medium}) is after the end date ({endDate, date, medium}) of exception “{name}”",
   "error.calendarInvalidExceptionRanges": "The following exceptions conflict with each other: {exceptionList}",
+  "error.calendarInvalidExceptionOpenings": "The following openings within {name} conflict with each other: {openingList}",
 
   "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
   "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",
