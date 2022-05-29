@@ -16,5 +16,5 @@ public class NormalOpeningOverlapErrorData implements ErrorData {
   /**
    * A list of normal openings with conflicts
    */
-  private Set<NormalOpening> conflictingServicePointIds;
+  private Set<NormalOpening> conflicts;
 }
