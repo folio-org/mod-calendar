@@ -376,7 +376,7 @@ public class TranslationKey {
    * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS =
-    "error.calendarInvalidExceptionRangeDateOrder";
+    "error.calendarInvalidExceptionRangeDateOutOfBounds";
 
   @UtilityClass
   public class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P {
