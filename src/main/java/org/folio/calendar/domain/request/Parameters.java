@@ -11,7 +11,8 @@ public enum Parameters {
   START_DATE("startDate"),
   END_DATE("endDate"),
   ASSIGNMENTS("assignments"),
-  NORMAL_HOURS("normalHours");
+  NORMAL_HOURS("normalHours"),
+  EXCEPTIONS("exceptions");
 
   private String value;
 

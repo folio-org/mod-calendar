@@ -90,6 +90,52 @@ public class TranslationKey {
   }
 
   /**
+   * A string representation of an exception's range, such as
+   * ""Foo" on Jan 12, 2022"
+   *
+   * Parameters {@link EXCEPTION_RANGE_SINGLE_DAY_P}: {@code NAME} and
+   * {@code DATE}.
+   *
+   * For multiple-day exceptions, use {@code EXCEPTION_RANGE_MULTIPLE_DAYS}
+   */
+  public static final String EXCEPTION_RANGE_SINGLE_DAY = "exceptionRangeSingleDay";
+
+  @UtilityClass
+  public class EXCEPTION_RANGE_SINGLE_DAY_P {
+
+    public static final String NAME = "name";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String DATE = "date";
+  }
+
+  /**
+   * A string representation of an exception's range, such as
+   * ""Foo" from Jan 12, 2022 to Jan 13, 2022"
+   *
+   * Parameters {@link EXCEPTION_RANGE_MULTIPLE_DAYS_P}: {@code NAME},
+   * {@code START_DATE}, and {@code END_DATE}.
+   *
+   * For single-day exceptions, use {@code EXCEPTION_RANGE_SINGLE_DAY}
+   */
+  public static final String EXCEPTION_RANGE_MULTIPLE_DAYS = "exceptionRangeMultipleDays";
+
+  @UtilityClass
+  public class EXCEPTION_RANGE_MULTIPLE_DAYS_P {
+
+    public static final String NAME = "name";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String START_DATE = "startDate";
+    /**
+     * This expects a {@code LocalDate}
+     */
+    public static final String END_DATE = "endDate";
+  }
+
+  /**
    * Delimiters for list items
    */
   @UtilityClass
@@ -256,5 +302,24 @@ public class TranslationKey {
      * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String OPENING_LIST = "openingList";
+  }
+
+  /**
+   * The calendar's exception ranges conflict.  The list will always contain at
+   * least two items (otherwise there would be no conflict).
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P}: {@code EXCEPTION_LIST}
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_RANGES =
+    "error.calendarInvalidExceptionRanges";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P {
+
+    /**
+     * This should be a list as formatted by
+     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     */
+    public static final String EXCEPTION_LIST = "exceptionList";
   }
 }

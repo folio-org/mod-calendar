@@ -9,6 +9,7 @@ enum: # from en.json in ui-calendar translations
   - calendarNoName
   - calendarInvalidDateRange
   - calendarInvalidNormalOpenings
+  - calendarInvalidExceptions
   - settings.error.invalidDateRange # LEGACY
   - duplication # LEGACY
   - notFound # LEGACY
@@ -21,6 +22,7 @@ x-enum-varnames:
   - CALENDAR_NO_NAME
   - CALENDAR_INVALID_DATE_RANGE
   - CALENDAR_INVALID_NORMAL_OPENINGS
+  - CALENDAR_INVALID_EXCEPTIONS
   - INVALID_DATE_RANGE # LEGACY
   - OVERLAPPING_CALENDAR # LEGACY
   - NOT_FOUND # LEGACY
@@ -33,10 +35,8 @@ x-enum-descriptions:
   - The calendar's name was empty or whitespace
   - The calendar's start date was after the end date
   - The calendar has overlapping normal openings
+  - The calendar has overlapping exceptions
   - The start date was after the end date # LEGACY
   - The new calendar would overlap with another calendar for this service point!  Please change the
     dates or add an exception. # LEGACY
   - No calendar/period was found with this ID # LEGACY
-example:
-  code: internalServerError
-  message: Internal Server Error
