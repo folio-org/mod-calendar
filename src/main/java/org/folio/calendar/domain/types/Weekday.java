@@ -186,10 +186,18 @@ public enum Weekday {
     return Set.of(WEEKDAYS);
   }
 
+  /**
+   * Get a function that will generate the long-form translation, such as Monday
+   * @return a function that a {@link TranslationService} must be applied to
+   */
   public Function<TranslationService, String> getLongLocalizedString() {
     return service -> service.format(TranslationKey.WEEKDAY_LONG.get(this));
   }
 
+  /**
+   * Get a function that will generate the short-form translation, such as Mon
+   * @return a function that a {@link TranslationService} must be applied to
+   */
   public Function<TranslationService, String> getShortLocalizedString() {
     return service -> service.format(TranslationKey.WEEKDAY_SHORT.get(this));
   }
