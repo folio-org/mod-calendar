@@ -17,6 +17,8 @@ import org.folio.calendar.domain.error.CalendarOverlapErrorData;
 import org.folio.calendar.domain.error.ExceptionRangeOverlapErrorData;
 import org.folio.calendar.domain.error.ExceptionRangeSingleErrorData;
 import org.folio.calendar.domain.error.NormalOpeningOverlapErrorData;
+import org.folio.calendar.domain.mapper.ExceptionRangeMapper;
+import org.folio.calendar.domain.mapper.NormalOpeningMapper;
 import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.AbstractCalendarException;
@@ -44,6 +46,10 @@ public class OpeningHoursService {
 
   private final CalendarRepository calendarRepository;
 
+  private final NormalOpeningMapper normalOpeningMapper;
+
+  private final ExceptionRangeMapper exceptionRangeMapper;
+
   /**
    * Get all the calendars for a certain service point
    *
@@ -66,8 +72,7 @@ public class OpeningHoursService {
   /**
    * Validate the integrity and sanity of a calendar
    * @param calendar
-   * @throws InvalidDataException
-   * @throws DataConflictException
+   * @throws NestedCalendarException
    */
   public void validate(Calendar calendar) {
     List<AbstractCalendarException> validationErrors = new ArrayList<>();
@@ -190,7 +195,7 @@ public class OpeningHoursService {
     if (calendar.getStartDate().isAfter(calendar.getEndDate())) {
       return Optional.of(
         new InvalidDataException(
-          ErrorCodeDTO.INVALID_DATE_RANGE,
+          ErrorCodeDTO.CALENDAR_INVALID_DATE_RANGE,
           new ExceptionParameters(
             Parameters.START_DATE,
             calendar.getStartDate(),
@@ -243,7 +248,10 @@ public class OpeningHoursService {
     return Optional.of(
       new InvalidDataException(
         ErrorCodeDTO.CALENDAR_INVALID_NORMAL_OPENINGS,
-        new ExceptionParameters(Parameters.NORMAL_HOURS, normalHours),
+        new ExceptionParameters(
+          Parameters.NORMAL_HOURS,
+          normalHours.stream().map(normalOpeningMapper::toDto).collect(Collectors.toList())
+        ),
         translationService.format(
           TranslationKey.ERROR_CALENDAR_INVALID_NORMAL_OPENINGS,
           TranslationKey.ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P.OPENING_LIST,
@@ -266,7 +274,10 @@ public class OpeningHoursService {
       return Optional.of(
         new InvalidDataException(
           ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_NAME,
-          new ExceptionParameters(Parameters.EXCEPTIONS, ranges),
+          new ExceptionParameters(
+            Parameters.EXCEPTIONS,
+            ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+          ),
           translationService.format(TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_RANGES)
         )
       );
@@ -297,7 +308,10 @@ public class OpeningHoursService {
           .map(range ->
             new InvalidDataException(
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_DATE_ORDER,
-              new ExceptionParameters(Parameters.EXCEPTIONS, ranges),
+              new ExceptionParameters(
+                Parameters.EXCEPTIONS,
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+              ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER,
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P.NAME,
@@ -331,7 +345,7 @@ public class OpeningHoursService {
     List<ExceptionRange> failed = ranges
       .stream()
       .filter(range ->
-        DateUtils.containsRange(
+        !DateUtils.containsRange(
           range.getStartDate(),
           range.getEndDate(),
           calendar.getStartDate(),
@@ -346,7 +360,10 @@ public class OpeningHoursService {
           .map(range ->
             new InvalidDataException(
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_DATE_BOUNDARY,
-              new ExceptionParameters(Parameters.EXCEPTIONS, ranges),
+              new ExceptionParameters(
+                Parameters.EXCEPTIONS,
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+              ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS,
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P.NAME,
@@ -394,7 +411,10 @@ public class OpeningHoursService {
     return Optional.of(
       new InvalidDataException(
         ErrorCodeDTO.CALENDAR_INVALID_EXCEPTIONS,
-        new ExceptionParameters(Parameters.EXCEPTIONS, exceptionRanges),
+        new ExceptionParameters(
+          Parameters.EXCEPTIONS,
+          exceptionRanges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+        ),
         translationService.format(
           TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_RANGES,
           TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P.EXCEPTION_LIST,
