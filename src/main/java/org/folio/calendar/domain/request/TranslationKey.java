@@ -447,7 +447,7 @@ public class TranslationKey {
    * The exception's openings are outside of its own range.
    *
    * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P}:
-   * {@code NAME} and {@code NUM_ERRORS}
+   * {@code NAME}, {@code NUM_ERRORS}, and {@code LIST}.
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS =
     "error.calendarInvalidExceptionHourOutOfBounds";
@@ -464,5 +464,6 @@ public class TranslationKey {
      * Integer or similar is expected.
      */
     public static final String NUM_ERRORS = "n";
+    public static final String LIST = "list";
   }
 }

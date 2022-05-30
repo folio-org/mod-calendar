@@ -36,9 +36,9 @@
   "error.calendarInvalidExceptionRangeName": "At least one exception is missing a name",
   "error.calendarInvalidExceptionRangeDateOrder": "The start date ({startDate, date, medium}) is after the end date ({endDate, date, medium}) for exception “{name}”",
   "error.calendarInvalidExceptionRangeDateOutOfBounds": "The exception “{name}” ({startDateException, date, medium} to {endDateException, date, medium}) is not fully enclosed by the calendar's start and end dates ({startDateCalendar, date, medium} to {endDateCalendar, date, medium})",
-  "error.calendarInvalidExceptionHourOutOfBounds": "The exception “{name}” has {n, plural, one {an opening}, other {openings}} outside of the exception's bounds:",
+  "error.calendarInvalidExceptionHourOutOfBounds": "The exception “{name}” has {n, plural, one {an opening} other {openings}} outside of the exception's bounds: {list}",
   "error.calendarInvalidExceptionRanges": "The following exceptions conflict with each other: {exceptionList}",
-  "error.calendarInvalidExceptionOpenings": "The following openings within {name} conflict with each other: {openingList}",
+  "error.calendarInvalidExceptionOpenings": "The following openings within “{name}” conflict with each other: {openingList}",
 
   "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
   "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",

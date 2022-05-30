@@ -267,7 +267,7 @@ public class CalendarValidationService {
             Parameters.EXCEPTIONS,
             ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
           ),
-          translationService.format(TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_RANGES)
+          translationService.format(TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_NAME)
         )
       );
     }
@@ -427,7 +427,7 @@ public class CalendarValidationService {
     Stream<Optional<InvalidDataException>> stream = ranges
       .stream()
       .map((ExceptionRange range) -> {
-        long failures = range
+        List<ExceptionHour> failures = range
           .getOpenings()
           .stream()
           .filter(opening ->
@@ -438,8 +438,8 @@ public class CalendarValidationService {
               range.getEndDate()
             )
           )
-          .count();
-        if (failures != 0) {
+          .collect(Collectors.toList());
+        if (!failures.isEmpty()) {
           return Optional.of(
             new InvalidDataException(
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_OPENING_BOUNDARY,
@@ -452,7 +452,26 @@ public class CalendarValidationService {
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P.NAME,
                 range.getName(),
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P.NUM_ERRORS,
-                (int) failures
+                failures.size(),
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P.LIST,
+                translationService.formatList(
+                  failures
+                    .stream()
+                    .map(hour ->
+                      translationService.format(
+                        TranslationKey.EXCEPTION_OPENING,
+                        TranslationKey.EXCEPTION_OPENING_P.START_DATE,
+                        hour.getStartDate(),
+                        TranslationKey.EXCEPTION_OPENING_P.START_TIME,
+                        hour.getStartTime(),
+                        TranslationKey.EXCEPTION_OPENING_P.END_DATE,
+                        hour.getEndDate(),
+                        TranslationKey.EXCEPTION_OPENING_P.END_TIME,
+                        hour.getEndTime()
+                      )
+                    )
+                    .collect(Collectors.toList())
+                )
               )
             )
           );
