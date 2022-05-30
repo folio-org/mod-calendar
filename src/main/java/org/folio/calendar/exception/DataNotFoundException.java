@@ -43,6 +43,6 @@ public class DataNotFoundException extends AbstractCalendarException {
     String message,
     CalendarNotFoundErrorData data
   ) {
-    super(null, parameters, HttpStatus.NOT_FOUND, ErrorCodeDTO.NOT_FOUND, message, data);
+    super(null, parameters, HttpStatus.NOT_FOUND, ErrorCodeDTO.CALENDAR_NOT_FOUND, message, data);
   }
 }
