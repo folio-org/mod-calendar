@@ -256,7 +256,9 @@ public class CalendarValidationService {
    * @param ranges the set of ranges to validate
    * @return optionally, an {@code InvalidDataException} if validation failed.
    */
-  public Optional<InvalidDataException> validateExceptionRangeNames(Set<ExceptionRange> ranges) {
+  public Optional<InvalidDataException> validateExceptionRangeNames(
+    Collection<ExceptionRange> ranges
+  ) {
     if (ranges.stream().anyMatch(range -> range.getName().isBlank())) {
       return Optional.of(
         new InvalidDataException(
@@ -282,7 +284,7 @@ public class CalendarValidationService {
    * failed.
    */
   public Optional<List<InvalidDataException>> validateExceptionRangeDateOrder(
-    Set<ExceptionRange> ranges
+    Collection<ExceptionRange> ranges
   ) {
     List<ExceptionRange> failed = ranges
       .stream()
@@ -327,7 +329,7 @@ public class CalendarValidationService {
    */
   public Optional<List<InvalidDataException>> validateExceptionRangeDateBounds(
     Calendar calendar,
-    Set<ExceptionRange> ranges
+    Collection<ExceptionRange> ranges
   ) {
     List<ExceptionRange> failed = ranges
       .stream()
@@ -421,7 +423,7 @@ public class CalendarValidationService {
    * @return optionally, a set of {@code InvalidDataException}s if issues
    * occurred.
    */
-  public List<InvalidDataException> validateExceptionHourBounds(Set<ExceptionRange> ranges) {
+  public List<InvalidDataException> validateExceptionHourBounds(Collection<ExceptionRange> ranges) {
     Stream<Optional<InvalidDataException>> stream = ranges
       .stream()
       .map((ExceptionRange range) -> {
@@ -469,7 +471,9 @@ public class CalendarValidationService {
    * @return optionally, a set of {@code InvalidDataException}s if issues
    * occurred.
    */
-  public List<InvalidDataException> validateExceptionHourOverlaps(Set<ExceptionRange> ranges) {
+  public List<InvalidDataException> validateExceptionHourOverlaps(
+    Collection<ExceptionRange> ranges
+  ) {
     Stream<Optional<InvalidDataException>> stream = ranges
       .stream()
       .map((ExceptionRange range) -> {
