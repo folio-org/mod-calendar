@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.exception;
+package org.folio.calendar.integration.api.calendar.periods.servicepointid.period.post;
 
 import static org.folio.calendar.testutils.DateTimeHandler.isCurrentInstant;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -10,115 +10,19 @@ import io.restassured.response.Response;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
-import org.folio.calendar.integration.BaseApiTest;
-import org.folio.calendar.integration.ValidationSchema;
-import org.folio.calendar.integration.api.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
+import org.folio.calendar.testconstants.Dates;
+import org.folio.calendar.testconstants.Periods;
 import org.folio.calendar.testconstants.UUIDs;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
-class ApiExceptionHandlerTest extends BaseApiTest {
-
-  public static final String BAD_API_ROUTE = "/bad";
-
-  public static final String VALID_API_ROUTE = CreateCalendarAbstractTest.CREATE_CALENDAR_API_ROUTE;
+@Tag("idempotent")
+class CreateCalendarErrorTest extends CreateCalendarAbstractTest {
 
   @Test
-  void testInvalidGetApiRoute() {
-    Response response = ra(ValidationSchema.NONE).get(getRequestUrl(BAD_API_ROUTE));
-
-    response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
-
-    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
-
-    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
-    assertThat(
-      "Error HTTP code is correct",
-      errorResponse.getStatus(),
-      is(HttpStatus.NOT_FOUND.value())
-    );
-    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
-
-    ErrorDTO error = errorResponse.getErrors().get(0);
-
-    assertThat(
-      "Error reports the endpoint is not found (an invalid request)",
-      error.getCode(),
-      is(ErrorCodeDTO.INVALID_REQUEST)
-    );
-    assertThat(
-      "Error message specified that the endpoint is unknown",
-      error.getMessage(),
-      containsString("This application does not know how to handle a ")
-    );
-  }
-
-  @Test
-  void testInvalidPostApiRoute() {
-    Response response = ra(ValidationSchema.NONE).post(getRequestUrl(BAD_API_ROUTE));
-
-    response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
-
-    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
-
-    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
-    assertThat(
-      "Error HTTP code is correct",
-      errorResponse.getStatus(),
-      is(HttpStatus.NOT_FOUND.value())
-    );
-    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
-
-    ErrorDTO error = errorResponse.getErrors().get(0);
-
-    assertThat(
-      "Error reports the endpoint is not found (an invalid request)",
-      error.getCode(),
-      is(ErrorCodeDTO.INVALID_REQUEST)
-    );
-    assertThat(
-      "Error message specified that the endpoint is unknown",
-      error.getMessage(),
-      containsString("This application does not know how to handle a ")
-    );
-  }
-
-  @Test
-  void testInvalidMethodToValidApiRoute() {
-    Response response = ra(ValidationSchema.NONE)
-      .patch(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
-
-    response.then().statusCode(is(HttpStatus.METHOD_NOT_ALLOWED.value()));
-
-    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
-
-    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
-    assertThat(
-      "Error HTTP code is correct",
-      errorResponse.getStatus(),
-      is(HttpStatus.METHOD_NOT_ALLOWED.value())
-    );
-    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
-
-    ErrorDTO error = errorResponse.getErrors().get(0);
-
-    assertThat(
-      "Error reports this method is an invalid request",
-      error.getCode(),
-      is(ErrorCodeDTO.INVALID_REQUEST)
-    );
-    assertThat(
-      "Error message specified that the endpoint can not accept these requests",
-      error.getMessage(),
-      containsString("This endpoint does not accept PATCH requests")
-    );
-  }
-
-  @Test
-  void testInvalidParametersToValidApiRoute() {
-    Response response = ra(ValidationSchema.NONE)
-      .post(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_INVALID)));
+  void testInvalidServicePointId() {
+    Response response = sendCalendarCreationRequest(Periods.PERIOD_FULL_EXAMPLE_A, UUIDs.UUID_F);
 
     response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
 
@@ -135,26 +39,31 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
-      "Error reports that there was an invalid parameter",
+      "Error reports an invalid request was made",
       error.getCode(),
-      is(ErrorCodeDTO.INVALID_PARAMETER)
+      is(ErrorCodeDTO.INVALID_REQUEST)
     );
     assertThat(
-      "Error message specified that a parameter was not understood",
+      "Error message specified service point mismatch",
       error.getMessage(),
-      containsString("One of the parameters was the incorrect type")
+      containsString(
+        String.format(
+          "Service point ID in the URL (%s) does not match the payload (%s)",
+          UUIDs.UUID_F,
+          Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+        )
+      )
     );
   }
 
   @Test
-  void testInvalidRequestBody() {
-    Response response = ra(ValidationSchema.NONE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .body("{}")
-      .post(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
+  void testEmptyCalendarName() {
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_A.withName(""),
+      Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+    );
 
-    // for some reason, a NullPointerException occurs in the JSON parser; nothing we can control
-    response.then().statusCode(is(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
 
     ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
 
@@ -162,21 +71,134 @@ class ApiExceptionHandlerTest extends BaseApiTest {
     assertThat(
       "Error HTTP code is correct",
       errorResponse.getStatus(),
-      is(HttpStatus.INTERNAL_SERVER_ERROR.value())
+      is(HttpStatus.BAD_REQUEST.value())
     );
     assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
 
     ErrorDTO error = errorResponse.getErrors().get(0);
 
     assertThat(
-      "Error reports that there was an internal server error",
+      "Error reports that no name was provided",
       error.getCode(),
-      is(ErrorCodeDTO.INTERNAL_SERVER_ERROR)
+      is(ErrorCodeDTO.CALENDAR_NO_NAME)
     );
     assertThat(
-      "Error reports proper",
+      "Error message specified missing name error",
       error.getMessage(),
-      containsString("An internal server error occurred")
+      containsString("Please provide a non-empty calendar name")
+    );
+  }
+
+  @Test
+  void testWhitespaceCalendarName() {
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_A.withName(" \t "), // space tab space
+      Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+    );
+
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
+
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
+
+    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
+    assertThat(
+      "Error HTTP code is correct",
+      errorResponse.getStatus(),
+      is(HttpStatus.BAD_REQUEST.value())
+    );
+    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
+
+    ErrorDTO error = errorResponse.getErrors().get(0);
+
+    assertThat(
+      "Error reports that no name was provided",
+      error.getCode(),
+      is(ErrorCodeDTO.CALENDAR_NO_NAME)
+    );
+    assertThat(
+      "Error message specified missing name error",
+      error.getMessage(),
+      containsString("Please provide a non-empty calendar name")
+    );
+  }
+
+  @Test
+  void testInvalidCalendarDates() {
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_A
+        .withStartDate(Dates.LDATE_2021_12_31)
+        .withEndDate(Dates.LDATE_2021_01_01),
+      Periods.PERIOD_FULL_EXAMPLE_A.getServicePointId()
+    );
+
+    response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
+
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
+
+    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
+    assertThat(
+      "Error HTTP code is correct",
+      errorResponse.getStatus(),
+      is(HttpStatus.BAD_REQUEST.value())
+    );
+    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
+
+    ErrorDTO error = errorResponse.getErrors().get(0);
+
+    assertThat(
+      "Error reports that the date range was invalid",
+      error.getCode(),
+      is(ErrorCodeDTO.INVALID_DATE_RANGE)
+    );
+    assertThat(
+      "Error message specified invalid date range",
+      error.getMessage(),
+      containsString("cannot be after end date")
+    );
+  }
+
+  @Test
+  void testOverlappingCalendars() {
+    sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_C,
+      Periods.PERIOD_FULL_EXAMPLE_C.getServicePointId()
+    )
+      .then()
+      .statusCode(is(HttpStatus.CREATED.value()));
+
+    Response response = sendCalendarCreationRequest(
+      Periods.PERIOD_FULL_EXAMPLE_D,
+      Periods.PERIOD_FULL_EXAMPLE_D.getServicePointId()
+    );
+
+    response.then().statusCode(is(HttpStatus.CONFLICT.value()));
+
+    ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
+
+    assertThat("Error timestamp is current", errorResponse.getTimestamp(), isCurrentInstant());
+    assertThat(
+      "Error HTTP code is correct",
+      errorResponse.getStatus(),
+      is(HttpStatus.CONFLICT.value())
+    );
+    assertThat("One error was returned", errorResponse.getErrors(), hasSize(1));
+
+    ErrorDTO error = errorResponse.getErrors().get(0);
+
+    assertThat(
+      "Error reports that the date range was invalid",
+      error.getCode(),
+      is(ErrorCodeDTO.OVERLAPPING_CALENDAR)
+    );
+    assertThat(
+      "Error message specified overlap information",
+      error.getMessage(),
+      containsString(
+        String.format(
+          "This calendar overlaps with another calendar (“%s”",
+          Periods.PERIOD_FULL_EXAMPLE_C.getName()
+        )
+      )
     );
   }
 }

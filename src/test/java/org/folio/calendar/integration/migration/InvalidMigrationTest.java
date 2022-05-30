@@ -1,6 +1,6 @@
 package org.folio.calendar.integration.migration;
 
-import static org.folio.calendar.integration.calendar.periods.servicepointid.period.periodid.get.GetSpecificCalendarAbstractTest.GET_CALENDAR_API_ROUTE;
+import static org.folio.calendar.integration.api.calendar.periods.servicepointid.period.periodid.get.GetSpecificCalendarAbstractTest.GET_CALENDAR_API_ROUTE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
