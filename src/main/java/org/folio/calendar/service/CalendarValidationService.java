@@ -167,9 +167,10 @@ public class CalendarValidationService {
     if (!overlaps.isEmpty()) {
       return overlaps
         .stream()
+        .distinct()
         .map(overlap ->
           new DataConflictException(
-            ErrorCodeDTO.OVERLAPPING_CALENDAR,
+            ErrorCodeDTO.CALENDAR_DATE_OVERLAP,
             new ExceptionParameters(
               Parameters.ASSIGNMENTS,
               servicePointAssignmentList,
@@ -191,8 +192,14 @@ public class CalendarValidationService {
               calendar
                 .getServicePoints()
                 .stream()
-                .filter(overlap.getServicePoints()::contains)
                 .map(ServicePointCalendarAssignment::getServicePointId)
+                .filter(
+                  overlap
+                    .getServicePoints()
+                    .stream()
+                    .map(ServicePointCalendarAssignment::getServicePointId)
+                    .collect(Collectors.toList())::contains
+                )
                 .collect(Collectors.toList())
             )
           )

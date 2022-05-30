@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.api.calendar.health;
+package org.folio.calendar.integration.api.health;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

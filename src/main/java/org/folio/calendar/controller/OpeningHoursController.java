@@ -10,7 +10,6 @@ import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
-import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.rest.resource.OpeningHoursApi;
 import org.folio.calendar.service.CalendarValidationService;
 import org.folio.calendar.service.OpeningHoursService;
@@ -40,7 +39,6 @@ public final class OpeningHoursController implements OpeningHoursApi {
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
-    log.warn(Parameters.CALENDAR.toString());
     Calendar calendar = calendarMapper.fromDto(calendarDto);
     calendarValidationService.validate(calendar);
 

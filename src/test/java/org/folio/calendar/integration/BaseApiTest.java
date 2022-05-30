@@ -200,7 +200,7 @@ public abstract class BaseApiTest {
    *         RestAssured library methods
    */
   public RequestSpecification ra() {
-    return ra(ValidationSchema.NONE);
+    return ra(ValidationSchema.LEGACY);
   }
 
   /**

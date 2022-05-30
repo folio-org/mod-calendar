@@ -215,4 +215,21 @@ public class Calendars {
       )
     )
     .withExceptions(Set.of(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4));
+
+  public static final Calendar CALENDAR_COMBINED_EXAMPLE_B = CALENDAR_2021_03_16_TO_2021_05_01
+    .withServicePoints(
+      Set.of(
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_2,
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_3
+      )
+    )
+    .withName(Names.NAME_4)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    )
+    .withExceptions(Set.of());
 }
