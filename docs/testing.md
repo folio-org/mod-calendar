@@ -16,9 +16,9 @@ Integration tests require a local Docker instance to run (a Postgres instance is
 
 All integration tests should go within the `test/.../integration/` folder and extend `BaseApiTest`.
 For optimization, if a test is designed to not use the database or be idempotent, give it a `@Tag`
-with the proper `DatabaseUsage` value; this prevents the database from being re-initialized (slow!)
-every time a test completes. Failed tests will still cause a rebuild (as they may not have removed
-all traces of themselves).
+of `"idempotent"` (or, when possible, use `BaseApiTest` instead of `BaseApiAutoDatabaseTest`
+directly); this prevents the database from being re-initialized (slow!) every time a test completes.
+Failed tests will still cause a rebuild (as they may not have removed all traces of themselves).
 
 ## Surefire Reports
 
