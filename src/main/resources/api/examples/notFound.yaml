@@ -3,5 +3,5 @@ value:
   status: 404
   errors:
     - code: notFound
-      message: The request could not be parsed
+      message: The request could not be found with the given parameters
 summary: Nothing could be found with the given parameters

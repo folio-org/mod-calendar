@@ -9,4 +9,5 @@ schema:
     type: string
     format: uuid
   minItems: 1
-description: A list of calendar IDs to operate on, separated by commas
+description:
+  A list of calendar IDs to operate on, separated by commas.  Duplicate IDs will be ignored.

@@ -12,7 +12,8 @@ public enum Parameters {
   END_DATE("endDate"),
   ASSIGNMENTS("assignments"),
   NORMAL_HOURS("normalHours"),
-  EXCEPTIONS("exceptions");
+  EXCEPTIONS("exceptions"),
+  QUERY("query");
 
   private String value;
 

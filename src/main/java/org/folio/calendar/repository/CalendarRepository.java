@@ -2,6 +2,7 @@ package org.folio.calendar.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.CheckForNull;
 import org.folio.calendar.domain.entity.Calendar;
@@ -17,6 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
+  /**
+   * Find calendars based on a given set of IDs
+   *
+   * @param ids a {@link java.util.List List} of calendars to search for
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
+   */
+  @Query("SELECT c FROM Calendar c " + "WHERE c.id IN :calendarIds")
+  List<Calendar> findByIds(@Param("calendarIds") Set<UUID> calendarIds);
+
   /**
    * Find calendars for a service point ID
    *

@@ -1,6 +1,7 @@
 package org.folio.calendar.controller;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
@@ -51,8 +52,11 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendars) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendarIds) {
+    return new ResponseEntity<>(
+      openingHoursService.getCalendarsForIdList(new HashSet<>(calendarIds)),
+      HttpStatus.OK
+    );
   }
 
   /** {@inheritDoc} */
