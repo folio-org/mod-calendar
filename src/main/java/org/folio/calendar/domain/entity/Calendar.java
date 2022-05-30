@@ -108,6 +108,14 @@ public class Calendar implements Serializable {
   )
   private Set<ExceptionRange> exceptions;
 
+  // provide default random ID when another is not specified
+  // SonarLint does not like that this is unused; lombok provides the builder implementation
+  @SuppressWarnings("java:S1068")
+  public static class CalendarBuilder {
+
+    private UUID id = UUID.randomUUID();
+  }
+
   @PreUpdate
   @PrePersist
   public void propagate() {
