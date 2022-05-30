@@ -67,6 +67,30 @@ public class NormalOpeningUtils {
     Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> weekdays,
     NormalOpening opening
   ) {
+    // if the opening wraps around into the same weekday, split it into two
+    // portions to enclose it within a single day
+    if (
+      opening.getStartDay() == opening.getEndDay() &&
+      opening.getStartTime().isAfter(opening.getEndTime())
+    ) {
+      Weekday
+        .getAll()
+        .forEach((Weekday weekday) -> {
+          if (weekday == opening.getStartDay()) {
+            weekdays
+              .get(weekday)
+              .add(new TemporalRange<>(opening, TimeConstants.TIME_MIN, opening.getEndTime()));
+            weekdays
+              .get(weekday)
+              .add(new TemporalRange<>(opening, opening.getStartTime(), TimeConstants.TIME_MAX));
+          } else {
+            weekdays
+              .get(weekday)
+              .add(new TemporalRange<>(opening, TimeConstants.TIME_MIN, TimeConstants.TIME_MAX));
+          }
+        });
+      return;
+    }
     for (Weekday weekday : Weekday.getRange(opening.getStartDay(), opening.getEndDay())) {
       TemporalRange<LocalTime, NormalOpening> tuple = new TemporalRange<>(
         opening,
@@ -79,6 +103,7 @@ public class NormalOpeningUtils {
       if (weekday == opening.getEndDay()) {
         tuple.setEnd(opening.getEndTime());
       }
+
       weekdays.get(weekday).add(tuple);
     }
   }

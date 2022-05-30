@@ -55,6 +55,14 @@ public class NormalOpenings {
     .endTime(Times.TIME_23_59)
     .build();
 
+  public static final NormalOpening MONDAY_23_00_TO_04_00_WRAPAROUND = NormalOpening
+    .builder()
+    .startDay(Weekday.MONDAY)
+    .startTime(Times.TIME_23_00)
+    .endDay(Weekday.MONDAY)
+    .endTime(Times.TIME_04_00)
+    .build();
+
   public static final NormalOpening MONDAY_04_00_TO_TUESDAY_12_30 = NormalOpening
     .builder()
     .startDay(Weekday.MONDAY)

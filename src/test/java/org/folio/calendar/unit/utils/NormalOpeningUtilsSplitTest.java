@@ -100,4 +100,88 @@ class NormalOpeningUtilsSplitTest {
     );
     assertThat(map.get(Weekday.SATURDAY), is(empty()));
   }
+
+  @Test
+  void testWraparoundSplitting() {
+    Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> map = NormalOpeningUtils.initializeWeekdayMapOfRanges();
+    NormalOpeningUtils.fillWeekdayMapWithTimeTuples(
+      map,
+      NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND
+    );
+    assertThat(
+      map.get(Weekday.SUNDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.MONDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_04_00
+        ),
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_23_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.TUESDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.WEDNESDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.THURSDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.FRIDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+    assertThat(
+      map.get(Weekday.SATURDAY),
+      containsInAnyOrder(
+        new TemporalRange<>(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          Times.TIME_00_00,
+          Times.TIME_23_59
+        )
+      )
+    );
+  }
 }

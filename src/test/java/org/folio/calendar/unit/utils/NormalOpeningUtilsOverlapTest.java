@@ -26,6 +26,12 @@ class NormalOpeningUtilsOverlapTest {
     );
     assertThat(
       NormalOpeningUtils.getOverlaps(
+        Arrays.asList(NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND)
+      ),
+      is(empty())
+    );
+    assertThat(
+      NormalOpeningUtils.getOverlaps(
         Arrays.asList(
           NormalOpenings.MONDAY_00_00_TO_12_30,
           NormalOpenings.MONDAY_23_00_TO_23_59,
@@ -50,6 +56,18 @@ class NormalOpeningUtilsOverlapTest {
         Arrays.asList(NormalOpenings.SUNDAY_MONDAY_ALL_DAY, NormalOpenings.SUNDAY_MONDAY_ALL_DAY)
       ),
       hasItem(NormalOpenings.SUNDAY_MONDAY_ALL_DAY)
+    );
+    assertThat(
+      NormalOpeningUtils.getOverlaps(
+        Arrays.asList(
+          NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+          NormalOpenings.WEDNESDAY_23_00_TO_FRIDAY_23_59
+        )
+      ),
+      containsInAnyOrder(
+        NormalOpenings.MONDAY_23_00_TO_04_00_WRAPAROUND,
+        NormalOpenings.WEDNESDAY_23_00_TO_FRIDAY_23_59
+      )
     );
     assertThat(
       NormalOpeningUtils.getOverlaps(
