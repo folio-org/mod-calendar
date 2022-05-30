@@ -12,6 +12,7 @@ import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.rest.resource.OpeningHoursApi;
+import org.folio.calendar.service.CalendarValidationService;
 import org.folio.calendar.service.OpeningHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 public final class OpeningHoursController implements OpeningHoursApi {
 
   @Autowired
+  private CalendarValidationService calendarValidationService;
+
+  @Autowired
   private OpeningHoursService openingHoursService;
 
   @Autowired
@@ -38,7 +42,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
   public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
     log.warn(Parameters.CALENDAR.toString());
     Calendar calendar = calendarMapper.fromDto(calendarDto);
-    openingHoursService.validate(calendar);
+    calendarValidationService.validate(calendar);
 
     log.info("createCalendar: Calendar passed validation, saving...");
 
