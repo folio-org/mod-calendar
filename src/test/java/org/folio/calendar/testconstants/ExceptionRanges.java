@@ -13,8 +13,41 @@ public class ExceptionRanges {
 
   public static final ExceptionRange CLOSED_ALL_YEAR = ExceptionRange
     .builder()
+    .name(Names.NAME_1)
     .startDate(Dates.DATE_2021_01_01)
     .endDate(Dates.DATE_2021_12_31)
+    .openings(Arrays.asList())
+    .build();
+
+  public static final ExceptionRange CLOSED_JAN_1 = ExceptionRange
+    .builder()
+    .name(Names.NAME_2)
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_01_01)
+    .openings(Arrays.asList())
+    .build();
+
+  public static final ExceptionRange CLOSED_JAN_1_TO_JAN_2 = ExceptionRange
+    .builder()
+    .name(Names.NAME_3)
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_01_02)
+    .openings(Arrays.asList())
+    .build();
+
+  public static final ExceptionRange CLOSED_JAN_1_THRU_JAN_4 = ExceptionRange
+    .builder()
+    .name(Names.NAME_4)
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_01_04)
+    .openings(Arrays.asList())
+    .build();
+
+  public static final ExceptionRange CLOSED_JAN_3_TO_JAN_4 = ExceptionRange
+    .builder()
+    .name(Names.NAME_5)
+    .startDate(Dates.DATE_2021_01_03)
+    .endDate(Dates.DATE_2021_01_04)
     .openings(Arrays.asList())
     .build();
 

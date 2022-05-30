@@ -20,16 +20,15 @@ import org.folio.calendar.i18n.TranslationService;
 public class ExceptionRangeUtils {
 
   /**
-   * Find overlaps within an exception ranges, if any exist
-   * @param range a range to evaluate, containing openings
+   * Find overlaps within a set of exceptional opening hours, if any exist
+   * @param openings a set of openings to consider
    * @return an optional list of openings that overlap (empty/no value if there were no overlaps).
    * Not all overlaps may be returned, however, if there are overlap(s), then this function will
    * return at least two overlapping openings.
    */
-  public static Optional<Set<ExceptionHour>> getHourOverlaps(ExceptionRange range) {
+  public static Optional<Set<ExceptionHour>> getHourOverlaps(Collection<ExceptionHour> openings) {
     return TemporalUtils.getOverlaps(
-      range
-        .getOpenings()
+      openings
         .stream()
         .map(hour ->
           new TemporalRange<LocalDateTime, ExceptionHour>(

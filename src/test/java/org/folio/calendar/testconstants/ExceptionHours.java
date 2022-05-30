@@ -9,15 +9,43 @@ public class ExceptionHours {
   public static final ExceptionHour OPEN_ALL_DAY_JAN_1_THRU_JAN_4 = ExceptionHour
     .builder()
     .startDate(Dates.DATE_2021_01_01)
-    .endDate(Dates.DATE_2021_01_04)
     .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_04)
+    .endTime(Times.TIME_23_59)
+    .build();
+  public static final ExceptionHour OPEN_ALL_DAY_JAN_1 = ExceptionHour
+    .builder()
+    .startDate(Dates.DATE_2021_01_01)
+    .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_01)
     .endTime(Times.TIME_23_59)
     .build();
   public static final ExceptionHour OPEN_00_00_TO_14_59_JAN_1 = ExceptionHour
     .builder()
     .startDate(Dates.DATE_2021_01_01)
-    .endDate(Dates.DATE_2021_01_01)
     .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_01)
+    .endTime(Times.TIME_14_59)
+    .build();
+  public static final ExceptionHour OPEN_00_00_TO_14_59_JAN_1_THRU_JAN_2 = ExceptionHour
+    .builder()
+    .startDate(Dates.DATE_2021_01_01)
+    .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_02)
+    .endTime(Times.TIME_14_59)
+    .build();
+  public static final ExceptionHour OPEN_00_00_TO_14_59_JAN_2_THRU_JAN_3 = ExceptionHour
+    .builder()
+    .startDate(Dates.DATE_2021_01_02)
+    .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_03)
+    .endTime(Times.TIME_14_59)
+    .build();
+  public static final ExceptionHour OPEN_00_00_TO_14_59_JAN_3_THRU_JAN_4 = ExceptionHour
+    .builder()
+    .startDate(Dates.DATE_2021_01_03)
+    .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_01_04)
     .endTime(Times.TIME_14_59)
     .build();
   public static final ExceptionHour OPEN_04_00_TO_14_59_JAN_1 = OPEN_00_00_TO_14_59_JAN_1.withStartTime(
@@ -32,4 +60,7 @@ public class ExceptionHours {
   public static final ExceptionHour OPEN_04_00_TO_14_59_JAN_4 = OPEN_04_00_TO_14_59_JAN_1
     .withStartDate(Dates.DATE_2021_01_04)
     .withEndDate(Dates.DATE_2021_01_04);
+  public static final ExceptionHour OPEN_15_00_TO_23_00_JAN_4 = OPEN_04_00_TO_14_59_JAN_4
+    .withStartTime(Times.TIME_15_00)
+    .withEndTime(Times.TIME_23_00);
 }

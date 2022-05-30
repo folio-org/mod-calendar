@@ -492,7 +492,9 @@ public class OpeningHoursService {
     Stream<Optional<InvalidDataException>> stream = ranges
       .stream()
       .map((ExceptionRange range) -> {
-        Optional<Set<ExceptionHour>> overlaps = ExceptionRangeUtils.getHourOverlaps(range);
+        Optional<Set<ExceptionHour>> overlaps = ExceptionRangeUtils.getHourOverlaps(
+          range.getOpenings()
+        );
         if (overlaps.isPresent()) {
           return Optional.of(
             new InvalidDataException(

@@ -136,7 +136,9 @@ class PeriodUtilsExceptionalTest {
       "An exceptional closure can be equivalently represented as an ExceptionRange",
       result,
       hasItem(
-        ExceptionRanges.withExceptionId(ExceptionRanges.CLOSED_ALL_YEAR, result.get(0).getId())
+        ExceptionRanges
+          .withExceptionId(ExceptionRanges.CLOSED_ALL_YEAR, result.get(0).getId())
+          .withName("Untitled exception")
       )
     );
   }
