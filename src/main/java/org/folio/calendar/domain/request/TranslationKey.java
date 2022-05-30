@@ -423,7 +423,8 @@ public class TranslationKey {
    * The calendar's exception hours/openings conflict.  The list will always
    * contain at least two items (otherwise there would be no conflict).
    *
-   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P}: {@code OPENING_LIST}
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P}:
+   * {@code NAME} and {@code OPENING_LIST}
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS =
     "error.calendarInvalidExceptionOpenings";
@@ -432,9 +433,36 @@ public class TranslationKey {
   public class ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P {
 
     /**
+     * The exception's name
+     */
+    public static final String NAME = "name";
+    /**
      * This should be a list as formatted by
      * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String OPENING_LIST = "openingList";
+  }
+
+  /**
+   * The exception's openings are outside of its own range.
+   *
+   * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P}:
+   * {@code NAME} and {@code NUM_ERRORS}
+   */
+  public static final String ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS =
+    "error.calendarInvalidExceptionHourOutOfBounds";
+
+  @UtilityClass
+  public class ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P {
+
+    /**
+     * The exception's name
+     */
+    public static final String NAME = "name";
+    /**
+     * The number of openings that exceeded the bounds, used for plurality.
+     * Integer or similar is expected.
+     */
+    public static final String NUM_ERRORS = "n";
   }
 }

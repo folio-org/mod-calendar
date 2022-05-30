@@ -7,9 +7,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.entity.Calendar;
+import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
@@ -102,6 +104,10 @@ public class OpeningHoursService {
 
     // check exception ranges do not conflict
     validateExceptionRangeOverlaps(calendar.getExceptions()).ifPresent(validationErrors::add);
+
+    // check exception hours
+    validateExceptionHourBounds(calendar.getExceptions()).forEach(validationErrors::add);
+    validateExceptionHourOverlaps(calendar.getExceptions()).forEach(validationErrors::add);
 
     if (!validationErrors.isEmpty()) {
       throw new NestedCalendarException(errorStatusCode, validationErrors);
@@ -423,5 +429,108 @@ public class OpeningHoursService {
         new ExceptionRangeOverlapErrorData(overlapping.get())
       )
     );
+  }
+
+  /**
+   * Validate that a set of exceptions' opening hours are within their
+   * containing exception's bounds. For each violation, an
+   * {@link InvalidDataException InvalidDataException} will be returned for
+   * later reporting
+   * @param ranges the set of ranges to validate
+   * @return optionally, a set of {@code InvalidDataException}s if issues
+   * occurred.
+   */
+  protected List<InvalidDataException> validateExceptionHourBounds(Set<ExceptionRange> ranges) {
+    Stream<Optional<InvalidDataException>> stream = ranges
+      .stream()
+      .map((ExceptionRange range) -> {
+        long failures = range
+          .getOpenings()
+          .stream()
+          .filter(opening ->
+            !DateUtils.containsRange(
+              opening.getStartDate(),
+              opening.getEndDate(),
+              range.getStartDate(),
+              range.getEndDate()
+            )
+          )
+          .count();
+        if (failures != 0) {
+          return Optional.of(
+            new InvalidDataException(
+              ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_OPENING_BOUNDARY,
+              new ExceptionParameters(
+                Parameters.EXCEPTIONS,
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+              ),
+              translationService.format(
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS,
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P.NAME,
+                range.getName(),
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P.NUM_ERRORS,
+                (int) failures
+              )
+            )
+          );
+        }
+        return Optional.empty();
+      });
+    return stream.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+  }
+
+  /**
+   * Validate that a set of exceptions' opening hours do not overlap with their
+   * parent exception. For each violation, an
+   * {@link InvalidDataException InvalidDataException} will be returned for
+   * later reporting
+   * @param ranges the set of ranges to validate
+   * @return optionally, a set of {@code InvalidDataException}s if issues
+   * occurred.
+   */
+  protected List<InvalidDataException> validateExceptionHourOverlaps(Set<ExceptionRange> ranges) {
+    Stream<Optional<InvalidDataException>> stream = ranges
+      .stream()
+      .map((ExceptionRange range) -> {
+        Optional<Set<ExceptionHour>> overlaps = ExceptionRangeUtils.getHourOverlaps(range);
+        if (overlaps.isPresent()) {
+          return Optional.of(
+            new InvalidDataException(
+              ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_OPENINGS,
+              new ExceptionParameters(
+                Parameters.EXCEPTIONS,
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
+              ),
+              translationService.format(
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS,
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P.NAME,
+                range.getName(),
+                TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P.OPENING_LIST,
+                translationService.formatList(
+                  overlaps
+                    .get()
+                    .stream()
+                    .map(hour ->
+                      translationService.format(
+                        TranslationKey.EXCEPTION_OPENING,
+                        TranslationKey.EXCEPTION_OPENING_P.START_DATE,
+                        hour.getStartDate(),
+                        TranslationKey.EXCEPTION_OPENING_P.START_TIME,
+                        hour.getStartTime(),
+                        TranslationKey.EXCEPTION_OPENING_P.END_DATE,
+                        hour.getEndDate(),
+                        TranslationKey.EXCEPTION_OPENING_P.END_TIME,
+                        hour.getEndTime()
+                      )
+                    )
+                    .collect(Collectors.toList())
+                )
+              )
+            )
+          );
+        }
+        return Optional.empty();
+      });
+    return stream.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
   }
 }
