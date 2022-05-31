@@ -2,10 +2,6 @@ package org.folio.calendar.domain.entity;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.persistence.CascadeType;
@@ -24,12 +20,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.With;
-import org.folio.calendar.domain.dto.OpeningDayInfo;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
-import org.folio.calendar.domain.types.Weekday;
-import org.folio.calendar.utils.DateUtils;
-import org.folio.calendar.utils.PeriodUtils;
 
 /**
  * Calendar entity
@@ -146,73 +136,5 @@ public class Calendar implements Serializable {
     if (this.getExceptions() != null) {
       this.getExceptions().forEach(ExceptionRange::clearIds);
     }
-  }
-
-  /**
-   * Get all of the dates spanned by this calendar as OpeningDayInfo objects representing normal openings
-   * @param firstDate the first date to include, optional
-   * @param lastDate the last date to include, optional
-   * @return a map of date to OpeningDayInfo
-   */
-  public Map<LocalDate, OpeningDayInfo> getDailyNormalOpenings(
-    LocalDate firstDate,
-    LocalDate lastDate
-  ) {
-    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
-
-    List<OpeningDayRelative> openings = PeriodUtils.getOpeningDayRelativeFromNormalOpenings(
-      this.getNormalHours()
-    );
-    Map<Weekday, OpeningDayInfo> openingsByWeekday = new EnumMap<>(Weekday.class);
-    for (OpeningDayRelative opening : openings) {
-      OpeningDayRelativeWeekdays weekdays = opening.getWeekdays();
-      openingsByWeekday.put(weekdays.getDay(), opening.getOpeningDay());
-    }
-
-    List<LocalDate> dates = DateUtils.getDateRange(
-      DateUtils.max(this.getStartDate(), firstDate),
-      DateUtils.min(this.getEndDate(), lastDate)
-    );
-
-    for (LocalDate date : dates) {
-      OpeningDayInfo opening = openingsByWeekday.get(Weekday.from(date));
-      if (opening != null) {
-        dateMap.put(date, opening);
-      }
-    }
-
-    return dateMap;
-  }
-
-  /**
-   * Get all of the dates spanned by the exception (singular, must be legacy calendar) as OpeningDayInfo objects
-   * @param firstDate the first date to include, optional
-   * @param lastDate the last date to include, optional
-   * @return a map of date to OpeningDayInfo
-   */
-  public Map<LocalDate, OpeningDayInfo> getDailyExceptionalOpenings(
-    LocalDate firstDate,
-    LocalDate lastDate
-  ) {
-    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
-
-    if (this.getExceptions().isEmpty()) {
-      return dateMap;
-    }
-
-    OpeningDayInfo exception = PeriodUtils
-      .getOpeningDayRelativeFromExceptionRanges(this.getExceptions())
-      .getOpeningDay();
-
-    List<LocalDate> dates = DateUtils.getDateRange(
-      DateUtils.max(this.getStartDate(), firstDate),
-      DateUtils.min(this.getEndDate(), lastDate)
-    );
-
-    for (LocalDate date : dates) {
-      dateMap.put(date, exception);
-    }
-
-    return dateMap;
   }
 }

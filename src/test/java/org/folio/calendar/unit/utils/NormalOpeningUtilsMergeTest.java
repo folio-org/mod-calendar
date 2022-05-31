@@ -1,13 +1,14 @@
-package org.folio.calendar.unit.domain.entity;
+package org.folio.calendar.unit.utils;
 
 import static org.junit.Assert.assertThrows;
 
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.NormalOpenings;
+import org.folio.calendar.utils.NormalOpeningUtils;
 import org.junit.jupiter.api.Test;
 
-class NormalOpeningMergeTest {
+class NormalOpeningUtilsMergeTest {
 
   @Test
   void testInabilityToMergeDifferentCalendarOpenings() {
@@ -20,7 +21,7 @@ class NormalOpeningMergeTest {
     assertThrows(
       "Openings from different calendars should not be mergeable",
       IllegalArgumentException.class,
-      () -> NormalOpening.merge(a, b)
+      () -> NormalOpeningUtils.merge(a, b)
     );
   }
 }

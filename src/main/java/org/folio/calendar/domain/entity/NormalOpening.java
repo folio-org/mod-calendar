@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,10 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.With;
-import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.types.Weekday;
-import org.folio.calendar.utils.TimeConstants;
-import org.folio.calendar.utils.TimeUtils;
 
 /**
  * A normal opening for a service point
@@ -123,89 +117,6 @@ public class NormalOpening implements Serializable {
    */
   public void clearIds() {
     this.setId(null);
-  }
-
-  /**
-   * Determine if two NormalOpenings are adjacent to each other.  Small overlaps less than one weekday will be considered adjacent.
-   *
-   * @param opening1 The first opening to compare
-   * @param opening2 The second opening to compare
-   * @return if they are adjacent
-   */
-  public static boolean adjacent(final NormalOpening opening1, final NormalOpening opening2) {
-    if (opening1.equals(opening2)) {
-      return false;
-    }
-
-    NormalOpening former = opening1;
-    NormalOpening latter = opening2;
-
-    // account for small variations in overlap, < 1 weekday
-    if (
-      former.getEndDay() == latter.getStartDay() &&
-      !latter.getStartTime().isAfter(former.getEndTime())
-    ) {
-      latter = latter.withStartTime(former.getEndTime().plusMinutes(1));
-    }
-
-    // former ends at midnight the day before latter
-    if (
-      former.getEndTime().equals(TimeConstants.TIME_MAX) &&
-      latter.getStartTime().equals(TimeConstants.TIME_MIN) &&
-      former.getEndDay().next().equals(latter.getStartDay())
-    ) {
-      return true;
-    }
-
-    // former ends one minute before latter, on the same day
-    return (
-      former.getEndDay() == latter.getStartDay() &&
-      former.getEndTime().plusMinutes(1).equals(latter.getStartTime())
-    );
-  }
-
-  /**
-   * Merge two NormalOpenings into one range over both.  You most likely want to make sure they are {@link org.folio.calendar.domain.entity.NormalOpening#adjacent} first.
-   *
-   * @param opening1 a {@link org.folio.calendar.domain.entity.NormalOpening NormalOpening}
-   * @param opening2 a {@link org.folio.calendar.domain.entity.NormalOpening NormalOpening}
-   * @return a NormalOpening which surrounds opening1 and opening2
-   */
-  public static NormalOpening merge(final NormalOpening opening1, final NormalOpening opening2) {
-    if (opening1.getCalendar() != opening2.getCalendar()) {
-      throw new IllegalArgumentException(
-        "Cannot merge two NormalOpenings from different calendars!"
-      );
-    }
-
-    return opening1.withEndDay(opening2.getEndDay()).withEndTime(opening2.getEndTime());
-  }
-
-  /**
-   * Split this NormalOpening into weekdays (as a series of {@link org.folio.calendar.domain.dto.OpeningHourRange}s)
-   *
-   * @return a Map of {@link org.folio.calendar.domain.dto.Weekday}s to {@link org.folio.calendar.domain.dto.OpeningHourRange}
-   */
-  public Map<Weekday, OpeningHourRange> splitIntoWeekdays() {
-    List<Weekday> weekdays = Weekday.getRange(this.getStartDay(), this.getEndDay());
-
-    Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
-
-    for (Weekday day : weekdays) {
-      OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
-        .builder()
-        .startTime(TimeConstants.TIME_MIN_STRING)
-        .endTime(TimeConstants.TIME_MAX_STRING);
-      if (day == this.getStartDay()) {
-        builder = builder.startTime(TimeUtils.toTimeString(this.getStartTime()));
-      }
-      if (day == this.getEndDay()) {
-        builder = builder.endTime(TimeUtils.toTimeString(this.getEndTime()));
-      }
-      map.put(day, builder.build());
-    }
-
-    return map;
   }
 
   /**

@@ -1,4 +1,4 @@
-package org.folio.calendar.unit.domain.entity;
+package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -10,13 +10,15 @@ import java.util.Map;
 import org.folio.calendar.domain.dto.OpeningDayInfo;
 import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.OpeningDayInfoRelativeConstants;
+import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
-class CalendarNormalDailyConversionTest {
+class PeriodUtilsDailyNormalOpeningsTest {
 
   @Test
   void testGetAllDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       null,
       null
     );
@@ -55,7 +57,8 @@ class CalendarNormalDailyConversionTest {
 
   @Test
   void testGetSubsetOfDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       LocalDate.of(2021, 4, 5),
       LocalDate.of(2021, 4, 12)
     );
@@ -79,7 +82,8 @@ class CalendarNormalDailyConversionTest {
 
   @Test
   void testGetOpenStartSubsetOfDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       null,
       LocalDate.of(2021, 4, 12)
     );
@@ -113,7 +117,8 @@ class CalendarNormalDailyConversionTest {
 
   @Test
   void testGetOpenEndSubsetOfDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       LocalDate.of(2021, 4, 9),
       null
     );
@@ -145,7 +150,8 @@ class CalendarNormalDailyConversionTest {
 
   @Test
   void testGetEmptySubsetOfDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       LocalDate.of(2021, 4, 9),
       LocalDate.of(2021, 4, 11)
     );

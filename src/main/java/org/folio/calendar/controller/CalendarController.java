@@ -145,8 +145,14 @@ public final class CalendarController implements CalendarApi {
         lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
       }
 
-      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings(startDate, endDate));
-      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(startDate, endDate));
+      PeriodUtils.mergeInto(
+        normalOpenings,
+        PeriodUtils.getDailyNormalOpenings(calendar, startDate, endDate)
+      );
+      PeriodUtils.mergeInto(
+        exceptions,
+        PeriodUtils.getDailyExceptionalOpenings(calendar, startDate, endDate)
+      );
     }
 
     List<OpeningDayConcrete> collection = PeriodUtils.buildOpeningDayConcreteCollection(
@@ -187,8 +193,14 @@ public final class CalendarController implements CalendarApi {
       firstDate = DateUtils.min(calendar.getStartDate(), firstDate);
       lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
 
-      PeriodUtils.mergeInto(normalOpenings, calendar.getDailyNormalOpenings(null, null));
-      PeriodUtils.mergeInto(exceptions, calendar.getDailyExceptionalOpenings(null, null));
+      PeriodUtils.mergeInto(
+        normalOpenings,
+        PeriodUtils.getDailyNormalOpenings(calendar, null, null)
+      );
+      PeriodUtils.mergeInto(
+        exceptions,
+        PeriodUtils.getDailyExceptionalOpenings(calendar, null, null)
+      );
     }
 
     List<OpeningDayConcrete> allOpenings = PeriodUtils.buildOpeningDayConcreteCollection(

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -214,12 +215,12 @@ public class PeriodUtils {
       }
 
       // merge if touching each other, including across days
-      if (NormalOpening.adjacent(former, latter)) {
+      if (NormalOpeningUtils.adjacent(former, latter)) {
         if (i == 0) {
-          normalOpenings.set(normalOpenings.size() - 1, NormalOpening.merge(former, latter));
+          normalOpenings.set(normalOpenings.size() - 1, NormalOpeningUtils.merge(former, latter));
           normalOpenings.remove(0);
         } else {
-          normalOpenings.set(i - 1, NormalOpening.merge(former, latter));
+          normalOpenings.set(i - 1, NormalOpeningUtils.merge(former, latter));
           normalOpenings.remove(i);
         }
       }
@@ -242,7 +243,7 @@ public class PeriodUtils {
     Map<Weekday, List<OpeningHourRange>> openings = new EnumMap<>(Weekday.class);
 
     for (NormalOpening opening : normalHours) {
-      Map<Weekday, OpeningHourRange> openingRanges = opening.splitIntoWeekdays();
+      Map<Weekday, OpeningHourRange> openingRanges = NormalOpeningUtils.splitIntoWeekdays(opening);
 
       for (Map.Entry<Weekday, OpeningHourRange> range : openingRanges.entrySet()) {
         if (!openings.containsKey(range.getKey())) {
@@ -509,5 +510,78 @@ public class PeriodUtils {
     }
 
     return result;
+  }
+
+  /**
+   * Get all of the dates spanned by a calendar as OpeningDayInfo objects representing normal openings
+   * @param calendar the calendar to query
+   * @param firstDate the first date to include, optional
+   * @param lastDate the last date to include, optional
+   * @return a map of date to OpeningDayInfo
+   */
+  public static Map<LocalDate, OpeningDayInfo> getDailyNormalOpenings(
+    Calendar calendar,
+    LocalDate firstDate,
+    LocalDate lastDate
+  ) {
+    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
+
+    List<OpeningDayRelative> openings = PeriodUtils.getOpeningDayRelativeFromNormalOpenings(
+      calendar.getNormalHours()
+    );
+    Map<Weekday, OpeningDayInfo> openingsByWeekday = new EnumMap<>(Weekday.class);
+    for (OpeningDayRelative opening : openings) {
+      OpeningDayRelativeWeekdays weekdays = opening.getWeekdays();
+      openingsByWeekday.put(weekdays.getDay(), opening.getOpeningDay());
+    }
+
+    List<LocalDate> dates = DateUtils.getDateRange(
+      DateUtils.max(calendar.getStartDate(), firstDate),
+      DateUtils.min(calendar.getEndDate(), lastDate)
+    );
+
+    for (LocalDate date : dates) {
+      OpeningDayInfo opening = openingsByWeekday.get(Weekday.from(date));
+      if (opening != null) {
+        dateMap.put(date, opening);
+      }
+    }
+
+    return dateMap;
+  }
+
+  /**
+   * Get all of the dates spanned by the exceptional calendar (singular, must
+   * be a legacy calendar) as OpeningDayInfo objects
+   * @param calendar the calendar to query
+   * @param firstDate the first date to include, optional
+   * @param lastDate the last date to include, optional
+   * @return a map of date to OpeningDayInfo
+   */
+  public Map<LocalDate, OpeningDayInfo> getDailyExceptionalOpenings(
+    Calendar calendar,
+    LocalDate firstDate,
+    LocalDate lastDate
+  ) {
+    Map<LocalDate, OpeningDayInfo> dateMap = new HashMap<>();
+
+    if (calendar.getExceptions().isEmpty()) {
+      return dateMap;
+    }
+
+    OpeningDayInfo exception = PeriodUtils
+      .getOpeningDayRelativeFromExceptionRanges(calendar.getExceptions())
+      .getOpeningDay();
+
+    List<LocalDate> dates = DateUtils.getDateRange(
+      DateUtils.max(calendar.getStartDate(), firstDate),
+      DateUtils.min(calendar.getEndDate(), lastDate)
+    );
+
+    for (LocalDate date : dates) {
+      dateMap.put(date, exception);
+    }
+
+    return dateMap;
   }
 }

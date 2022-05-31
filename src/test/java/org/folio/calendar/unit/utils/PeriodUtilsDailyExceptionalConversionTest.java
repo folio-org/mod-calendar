@@ -1,4 +1,4 @@
-package org.folio.calendar.unit.domain.entity;
+package org.folio.calendar.unit.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -12,13 +12,15 @@ import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.OpeningDayInfoRelativeConstants;
 import org.folio.calendar.utils.DateUtils;
+import org.folio.calendar.utils.PeriodUtils;
 import org.junit.jupiter.api.Test;
 
-class CalendarExceptionalDailyConversionTest {
+class PeriodUtilsDailyExceptionalConversionTest {
 
   @Test
   void testGetNoDailyExceptions() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyExceptionalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyExceptionalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       null,
       null
     );
@@ -30,7 +32,8 @@ class CalendarExceptionalDailyConversionTest {
 
   @Test
   void testGetSubsetExceptionalClosures() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXCEPTIONAL_A.getDailyExceptionalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyExceptionalOpenings(
+      Calendars.CALENDAR_FULL_EXCEPTIONAL_A,
       Dates.DATE_2021_12_30,
       null
     );
@@ -49,7 +52,8 @@ class CalendarExceptionalDailyConversionTest {
 
   @Test
   void testGetExceptionalClosures() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXCEPTIONAL_A.getDailyExceptionalOpenings(
+    Map<LocalDate, OpeningDayInfo> result = PeriodUtils.getDailyExceptionalOpenings(
+      Calendars.CALENDAR_FULL_EXCEPTIONAL_A,
       null,
       null
     );
@@ -61,22 +65,6 @@ class CalendarExceptionalDailyConversionTest {
     }
     assertThat(
       "Exceptional calendar A produces the expected map of closures",
-      result,
-      is(equalTo(expected))
-    );
-  }
-
-  @Test
-  void testGetEmptySubsetOfDailyNormalOpenings() {
-    Map<LocalDate, OpeningDayInfo> result = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
-      LocalDate.of(2021, 4, 9),
-      LocalDate.of(2021, 4, 11)
-    );
-
-    Map<LocalDate, OpeningDayInfo> expected = new HashMap<>();
-
-    assertThat(
-      "Calendar E produces the expected map of empty normal openings when the date range excludes all",
       result,
       is(equalTo(expected))
     );

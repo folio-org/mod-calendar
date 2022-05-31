@@ -35,7 +35,8 @@ class PeriodUtilsMergeTest {
 
   @Test
   void testMergeEmptyIntoSingle() {
-    Map<LocalDate, OpeningDayInfo> full = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> full = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       null,
       null
     );
@@ -50,7 +51,8 @@ class PeriodUtilsMergeTest {
 
   @Test
   void testMergeSingleIntoEmpty() {
-    Map<LocalDate, OpeningDayInfo> full = Calendars.CALENDAR_FULL_EXAMPLE_E.getDailyNormalOpenings(
+    Map<LocalDate, OpeningDayInfo> full = PeriodUtils.getDailyNormalOpenings(
+      Calendars.CALENDAR_FULL_EXAMPLE_E,
       null,
       null
     );
