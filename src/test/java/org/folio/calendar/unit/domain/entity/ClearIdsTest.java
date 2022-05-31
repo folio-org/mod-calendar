@@ -18,14 +18,23 @@ class ClearIdsTest {
 
   @Test
   void testClearIdsNull() {
-    Calendar cal = Calendar.builder().build();
+    Calendar cal = Calendar
+      .builder()
+      .id(null)
+      .build()
+      .withServicePoints(null)
+      .withNormalHours(null)
+      .withExceptions(null);
     cal.clearIds();
     assertThat(cal.getId(), is(nullValue()));
   }
 
   @Test
   void testClearIdsNullRange() {
-    Calendar cal = Calendar.builder().exception(ExceptionRange.builder().build()).build();
+    Calendar cal = Calendar
+      .builder()
+      .exception(ExceptionRange.builder().build().withOpenings(null))
+      .build();
     cal.clearIds();
     assertThat(cal.getId(), is(nullValue()));
   }
