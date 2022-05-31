@@ -232,4 +232,21 @@ public class Calendars {
       )
     )
     .withExceptions(Set.of());
+
+  public static final Calendar CALENDAR_COMBINED_EXAMPLE_C = CALENDAR_2021_07_04_TO_2021_09_22
+    .withServicePoints(
+      Set.of(
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_2,
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_3
+      )
+    )
+    .withName(Names.NAME_3)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    )
+    .withExceptions(Set.of());
 }

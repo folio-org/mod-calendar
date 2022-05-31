@@ -54,8 +54,8 @@ class CreateCalendarTest extends BaseApiAutoDatabaseTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result.withId(calendarWithNoAssignments.getId()),
-      is(equalTo(calendarWithNoAssignments))
+      result,
+      is(equalTo(calendarWithNoAssignments.withId(result.getId())))
     );
   }
 
@@ -66,8 +66,29 @@ class CreateCalendarTest extends BaseApiAutoDatabaseTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result.withId(Calendars.CALENDAR_COMBINED_EXAMPLE_A.getId()),
-      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A))
+      result,
+      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
+    );
+  }
+
+  @Test
+  void testMultipleCalendarCreation() {
+    Response response = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
+    assertThat(
+      "The newly created calendar is the same as the one provided",
+      result,
+      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
+    );
+
+    response = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_C);
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
+    assertThat(
+      "The newly created calendar is the same as the one provided",
+      result,
+      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_C.withId(result.getId())))
     );
   }
 
@@ -79,8 +100,8 @@ class CreateCalendarTest extends BaseApiAutoDatabaseTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result.withId(Calendars.CALENDAR_COMBINED_EXAMPLE_A.getId()),
-      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A))
+      result,
+      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
     );
 
     response = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_B);
