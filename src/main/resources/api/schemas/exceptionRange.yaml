@@ -1,10 +1,6 @@
 description: An exception to a calendar, consisting of a set of openings (or none if a closure)
 type: object
 properties:
-  id:
-    description: A unique UUID identifying this exception range
-    type: string
-    format: uuid
   calendarId:
     description: The UUID of the calendar which this exception is for
     type: string

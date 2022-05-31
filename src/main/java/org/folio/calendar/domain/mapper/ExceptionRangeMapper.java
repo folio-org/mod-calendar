@@ -26,7 +26,6 @@ public interface ExceptionRangeMapper {
 
     ExceptionRangeBuilder exceptionRange = ExceptionRange.builder();
 
-    exceptionRange.id(source.getId());
     exceptionRange.name(source.getName());
     exceptionRange.startDate(source.getStartDate());
     exceptionRange.endDate(source.getEndDate());

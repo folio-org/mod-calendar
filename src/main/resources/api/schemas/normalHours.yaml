@@ -1,10 +1,6 @@
 description: A range of hours when a calendar is open
 type: object
 properties:
-  id:
-    description: A unique UUID identifying this set of hours
-    type: string
-    format: uuid
   calendarId:
     description: The UUID of the calendar which these hours are for
     type: string

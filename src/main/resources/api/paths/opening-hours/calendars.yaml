@@ -64,7 +64,9 @@ get:
       $ref: ../../errors/internalServerError.yaml
 post:
   summary: Create a new calendar
-  description: Create a new calendar from a provided body
+  description:
+    Create a new calendar from a provided body.  If an ID is provided for the calendar, it will be
+    ignored (and a new one generated).
   operationId: createCalendar
   requestBody:
     required: true

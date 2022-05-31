@@ -1,10 +1,6 @@
 description: An opening as part of an exception
 type: object
 properties:
-  id:
-    description: A unique UUID identifying this exceptional opening
-    type: string
-    format: uuid
   exceptionId:
     description: The UUID of the exception which this opening is for
     type: string
