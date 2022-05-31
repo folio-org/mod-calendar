@@ -86,4 +86,12 @@ public class ExceptionHour implements Serializable {
   @Column(name = "open_end_time")
   @CheckForNull
   private LocalTime endTime;
+
+  /**
+   * Clears all IDs from this object, to prepare it for insertion (as new IDs
+   * will then be generated).
+   */
+  public void clearIds() {
+    this.setId(null);
+  }
 }

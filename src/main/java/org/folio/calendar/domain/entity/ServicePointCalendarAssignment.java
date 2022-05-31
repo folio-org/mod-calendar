@@ -58,4 +58,12 @@ public class ServicePointCalendarAssignment implements Serializable {
   @JoinColumn(name = "calendar_id")
   @ManyToOne(fetch = FetchType.LAZY)
   private Calendar calendar;
+
+  /**
+   * Clears all IDs from this object, to prepare it for insertion (as new IDs
+   * will then be generated).
+   */
+  public void clearIds() {
+    this.setId(null);
+  }
 }

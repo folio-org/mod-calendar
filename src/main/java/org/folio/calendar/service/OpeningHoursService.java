@@ -78,9 +78,6 @@ public class OpeningHoursService {
    * @param calendar the calendar to insert/update/save
    */
   public void saveCalendar(Calendar calendar) {
-    if (calendar.getId() == null) {
-      calendar.setId(UUID.randomUUID());
-    }
     this.calendarRepository.save(calendar);
   }
 }

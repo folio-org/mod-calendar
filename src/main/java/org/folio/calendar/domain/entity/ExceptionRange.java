@@ -89,7 +89,18 @@ public class ExceptionRange implements Serializable {
   @PrePersist
   public void propagate() {
     if (this.getOpenings() != null) {
-      this.getOpenings().forEach(assignment -> assignment.setException(this));
+      this.getOpenings().forEach(opening -> opening.setException(this));
+    }
+  }
+
+  /**
+   * Clears all IDs from this object, to prepare it for insertion (as new IDs
+   * will then be generated).
+   */
+  public void clearIds() {
+    this.setId(null);
+    if (this.getOpenings() != null) {
+      this.getOpenings().forEach(ExceptionHour::clearIds);
     }
   }
 }

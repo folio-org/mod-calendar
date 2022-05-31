@@ -131,6 +131,24 @@ public class Calendar implements Serializable {
   }
 
   /**
+   * Clears all IDs from this object, to prepare it for insertion (as new IDs
+   * will then be generated).
+   */
+  public void clearIds() {
+    this.setId(null);
+
+    if (this.getServicePoints() != null) {
+      this.getServicePoints().forEach(ServicePointCalendarAssignment::clearIds);
+    }
+    if (this.getNormalHours() != null) {
+      this.getNormalHours().forEach(NormalOpening::clearIds);
+    }
+    if (this.getExceptions() != null) {
+      this.getExceptions().forEach(ExceptionRange::clearIds);
+    }
+  }
+
+  /**
    * Get all of the dates spanned by this calendar as OpeningDayInfo objects representing normal openings
    * @param firstDate the first date to include, optional
    * @param lastDate the last date to include, optional

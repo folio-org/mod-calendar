@@ -118,6 +118,14 @@ public class NormalOpening implements Serializable {
   }
 
   /**
+   * Clears all IDs from this object, to prepare it for insertion (as new IDs
+   * will then be generated).
+   */
+  public void clearIds() {
+    this.setId(null);
+  }
+
+  /**
    * Determine if two NormalOpenings are adjacent to each other.  Small overlaps less than one weekday will be considered adjacent.
    *
    * @param opening1 The first opening to compare
