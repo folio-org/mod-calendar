@@ -56,7 +56,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
   @Override
   public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendarIds) {
     return new ResponseEntity<>(
-      openingHoursService.getCalendarsForIdList(new HashSet<>(calendarIds)),
+      openingHoursService.getCalendarCollectionForIdList(new HashSet<>(calendarIds)),
       HttpStatus.OK
     );
   }
@@ -81,8 +81,12 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Void> deleteCalendars(List<UUID> calendars) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public ResponseEntity<Void> deleteCalendars(List<UUID> calendarIds) {
+    openingHoursService
+      .getCalendarsForIdList(new HashSet<>(calendarIds))
+      .forEach(openingHoursService::deleteCalendar);
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   /** {@inheritDoc} */

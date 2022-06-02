@@ -49,12 +49,13 @@ public class OpeningHoursService {
   }
 
   /**
-   * Get all the calendars based on a list of ids
+   * Get all the calendars based on a list of ids.  If not all calendars are
+   * found, a {@link DataNotFoundException DataNotFoundException} is thrown
    *
    * @param calendarIds a {@link java.util.List List} of calendars to search for
    * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s
    */
-  public CalendarCollectionDTO getCalendarsForIdList(Set<UUID> calendarIds) {
+  public List<Calendar> getCalendarsForIdList(Set<UUID> calendarIds) {
     List<Calendar> calendars = this.calendarRepository.findByIds(calendarIds);
     List<UUID> foundIds = calendars.stream().map(Calendar::getId).collect(Collectors.toList());
     if (calendars.size() != calendarIds.size()) {
@@ -69,7 +70,18 @@ public class OpeningHoursService {
         )
       );
     }
-    return calendarsToCalendarCollection(calendars);
+    return calendars;
+  }
+
+  /**
+   * Get all the calendars based on a list of ids.  If not all calendars are
+   * found, a {@link DataNotFoundException DataNotFoundException} is thrown
+   *
+   * @param calendarIds a {@link java.util.List List} of calendars to search for
+   * @return a {@link CalendarCollectionDTO CalendarCollectionDTO} with found calendars
+   */
+  public CalendarCollectionDTO getCalendarCollectionForIdList(Set<UUID> calendarIds) {
+    return calendarsToCalendarCollection(getCalendarsForIdList(calendarIds));
   }
 
   /**
@@ -79,5 +91,14 @@ public class OpeningHoursService {
    */
   public void saveCalendar(Calendar calendar) {
     this.calendarRepository.save(calendar);
+  }
+
+  /**
+   * Delete a calendar by its ID
+   *
+   * @param calendar the calendar to delete
+   */
+  public void deleteCalendar(Calendar calendar) {
+    this.calendarRepository.deleteCascadingById(calendar.getId());
   }
 }
