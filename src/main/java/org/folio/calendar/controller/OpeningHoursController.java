@@ -1,6 +1,8 @@
 package org.folio.calendar.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +44,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
   @Override
   public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
     Calendar calendar = calendarMapper.fromDto(calendarDto);
-    calendarValidationService.validate(calendar);
+    calendarValidationService.validate(calendar, new ArrayList<>());
 
     log.info("createCalendar: Calendar passed validation, saving...");
 
@@ -81,7 +83,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
     openingHoursService.getCalendarCollectionForIdList(Set.of(calendarId));
 
     Calendar calendar = calendarMapper.fromDto(calendarDto);
-    calendarValidationService.validate(calendar);
+    calendarValidationService.validate(calendar, Arrays.asList(calendarId));
 
     log.info("updateCalendar: Calendar passed validation, saving...");
 
@@ -89,7 +91,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
     calendar.setId(calendarId);
     openingHoursService.saveCalendar(calendar);
 
-    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.CREATED);
+    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.OK);
   }
 
   /** {@inheritDoc} */

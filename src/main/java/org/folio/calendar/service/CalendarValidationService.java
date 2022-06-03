@@ -54,10 +54,11 @@ public class CalendarValidationService {
 
   /**
    * Validate the integrity and sanity of a calendar
-   * @param calendar
+   * @param calendar the calendar to validate
+   * @param ignore   a list of calendar IDs to ignore for overlaps
    * @throws NestedCalendarException
    */
-  public void validate(Calendar calendar) {
+  public void validate(Calendar calendar, Collection<UUID> ignore) {
     List<AbstractCalendarException> validationErrors = new ArrayList<>();
     HttpStatus errorStatusCode = AbstractCalendarException.DEFAULT_STATUS_CODE;
 
@@ -65,10 +66,7 @@ public class CalendarValidationService {
     validateCalendarDates(calendar).ifPresent(validationErrors::add);
 
     // check other SPs for conflict
-    List<DataConflictException> conflicts = validateServicePointConflicts(
-      calendar.getServicePoints(),
-      calendar
-    );
+    List<DataConflictException> conflicts = validateServicePointConflicts(calendar, ignore);
     if (!conflicts.isEmpty()) {
       validationErrors.addAll(conflicts);
       errorStatusCode = DataConflictException.DEFAULT_STATUS_CODE;
@@ -145,25 +143,31 @@ public class CalendarValidationService {
   /**
    * Check if any assigned service points already have calendars within the new calendar's date
    * range, returning a list of found conflicts.  If none are found, an empty list is returned
-   * @param calendar
+   * @param calendar the calendar to check for conflicts against
+   * @param ignore   a list of conflicts to ignore
    * @return any conflicts, represented as exceptions
    */
   public List<DataConflictException> validateServicePointConflicts(
-    Collection<ServicePointCalendarAssignment> assignments,
-    Calendar calendar
+    Calendar calendar,
+    Collection<UUID> ignore
   ) {
-    if (assignments.isEmpty()) {
+    if (calendar.getServicePoints().isEmpty()) {
       return new ArrayList<>();
     }
-    List<UUID> servicePointAssignmentList = assignments
+    List<UUID> servicePointAssignmentList = calendar
+      .getServicePoints()
       .stream()
       .map(ServicePointCalendarAssignment::getServicePointId)
       .collect(Collectors.toList());
-    List<Calendar> overlaps = calendarRepository.findWithServicePointsAndDateRange(
-      servicePointAssignmentList,
-      calendar.getStartDate(),
-      calendar.getEndDate()
-    );
+    List<Calendar> overlaps = calendarRepository
+      .findWithServicePointsAndDateRange(
+        servicePointAssignmentList,
+        calendar.getStartDate(),
+        calendar.getEndDate()
+      )
+      .stream()
+      .filter(c -> !ignore.contains(c.getId()))
+      .collect(Collectors.toList());
     if (!overlaps.isEmpty()) {
       return overlaps
         .stream()
