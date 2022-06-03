@@ -20,6 +20,7 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
 
   public static final String CREATE_CALENDAR_API_ROUTE = "/opening-hours/calendars";
   public static final String GET_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
+  public static final String PUT_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
   public static final String DELETE_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
 
   @Autowired
@@ -73,5 +74,18 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
           )
         )
       );
+  }
+
+  /**
+   * PUT /opening-hours/calendars/{id} - Send a Calendar update request
+   * @param id the ID of the calendar to overwrite
+   * @param calendar the calendar to save
+   * @return the Response
+   */
+  public Response sendCalendarUpdateRequest(UUID id, Calendar calendar) {
+    return ra(ValidationSchema.OPENING_HOURS)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .body(calendarMapper.toDto(calendar))
+      .put(getRequestUrl(String.format(PUT_CALENDAR_API_ROUTE, id)));
   }
 }
