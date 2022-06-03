@@ -3,6 +3,7 @@ package org.folio.calendar.controller;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.AdjacentOpeningsDTO;
@@ -75,8 +76,20 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendar) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendarDto) {
+    // ensure the ID currently exists
+    openingHoursService.getCalendarCollectionForIdList(Set.of(calendarId));
+
+    Calendar calendar = calendarMapper.fromDto(calendarDto);
+    calendarValidationService.validate(calendar);
+
+    log.info("createCalendar: Calendar passed validation, saving...");
+
+    calendar.clearIds();
+    calendar.setId(calendarId);
+    openingHoursService.saveCalendar(calendar);
+
+    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.CREATED);
   }
 
   /** {@inheritDoc} */

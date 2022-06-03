@@ -3,8 +3,7 @@ put:
   description:
     Overwrite an existing calendar with the provided payload.  The provided calendar must already
     exist (attempting to overwrite a calendar that does not yet exist will result in a 404).  If the
-    payload includes an ID, it must be the same ID as the original calendar, otherwise the payload
-    will be rejected as a 400 Invalid Request.
+    payload includes any IDs, they will be ignored, and the existing calendar ID reused.
   operationId: updateCalendar
   parameters:
     - in: path
