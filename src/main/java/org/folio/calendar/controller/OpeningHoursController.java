@@ -83,7 +83,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
     Calendar calendar = calendarMapper.fromDto(calendarDto);
     calendarValidationService.validate(calendar);
 
-    log.info("createCalendar: Calendar passed validation, saving...");
+    log.info("updateCalendar: Calendar passed validation, saving...");
 
     calendar.clearIds();
     calendar.setId(calendarId);
