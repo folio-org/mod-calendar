@@ -43,7 +43,7 @@ public class CustomOffsetPageRequest implements Pageable {
 
   @Override
   public Pageable previousOrFirst() {
-    return this.withOffset(Math.max(this.getOffset() + this.getLimit(), 0));
+    return this.withOffset(Math.max(this.getOffset() - this.getLimit(), 0));
   }
 
   @Override
@@ -58,6 +58,6 @@ public class CustomOffsetPageRequest implements Pageable {
 
   @Override
   public boolean hasPrevious() {
-    return this.offset == 0;
+    return this.offset != 0L;
   }
 }
