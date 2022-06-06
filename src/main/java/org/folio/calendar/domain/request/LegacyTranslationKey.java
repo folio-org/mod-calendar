@@ -23,7 +23,7 @@ public class LegacyTranslationKey {
   public static final String ERROR_DATE_INVALID = "error.dateInvalid";
 
   @UtilityClass
-  public class ERROR_DATE_INVALID_P {
+  public static class ERROR_DATE_INVALID_P {
 
     public static final String USER_INPUTTED_DATE_STRING = "userInputtedDateString";
   }
@@ -31,7 +31,7 @@ public class LegacyTranslationKey {
   public static final String ERROR_PERIOD_ID_CONFLICT = "error.periodIdConflict";
 
   @UtilityClass
-  public class ERROR_PERIOD_ID_CONFLICT_P {
+  public static class ERROR_PERIOD_ID_CONFLICT_P {
 
     public static final String CONFLICTING_UUID = "conflictingUuid";
   }
@@ -40,7 +40,7 @@ public class LegacyTranslationKey {
     "error.servicePointExistingMismatch";
 
   @UtilityClass
-  public class ERROR_SERVICE_POINT_EXISTING_MISMATCH_P {
+  public static class ERROR_SERVICE_POINT_EXISTING_MISMATCH_P {
 
     public static final String REQUESTED_ID = "requestedId";
   }
@@ -48,7 +48,7 @@ public class LegacyTranslationKey {
   public static final String ERROR_SERVICE_POINT_URL_MISMATCH = "error.servicePointUrlMismatch";
 
   @UtilityClass
-  public class ERROR_SERVICE_POINT_URL_MISMATCH_P {
+  public static class ERROR_SERVICE_POINT_URL_MISMATCH_P {
 
     public static final String UUID_1 = "uuid1";
     public static final String UUID_2 = "uuid2";

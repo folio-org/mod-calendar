@@ -73,7 +73,7 @@ public class TranslationKey {
   public static final String NORMAL_OPENING = "normalOpening";
 
   @UtilityClass
-  public class NORMAL_OPENING_P {
+  public static class NORMAL_OPENING_P {
 
     /**
      * The use of short weekdays, as given in {@code WEEKDAY_SHORT}, such as
@@ -101,7 +101,7 @@ public class TranslationKey {
   public static final String EXCEPTION_RANGE_SINGLE_DAY = "exceptionRangeSingleDay";
 
   @UtilityClass
-  public class EXCEPTION_RANGE_SINGLE_DAY_P {
+  public static class EXCEPTION_RANGE_SINGLE_DAY_P {
 
     public static final String NAME = "name";
     /**
@@ -122,7 +122,7 @@ public class TranslationKey {
   public static final String EXCEPTION_RANGE_MULTIPLE_DAYS = "exceptionRangeMultipleDays";
 
   @UtilityClass
-  public class EXCEPTION_RANGE_MULTIPLE_DAYS_P {
+  public static class EXCEPTION_RANGE_MULTIPLE_DAYS_P {
 
     public static final String NAME = "name";
     /**
@@ -147,7 +147,7 @@ public class TranslationKey {
   public static final String EXCEPTION_OPENING = "exceptionOpening";
 
   @UtilityClass
-  public class EXCEPTION_OPENING_P {
+  public static class EXCEPTION_OPENING_P {
 
     /**
      * This expects a {@code LocalDate}
@@ -171,7 +171,7 @@ public class TranslationKey {
    * Delimiters for list items
    */
   @UtilityClass
-  public class LIST_SEPARATORS {
+  public static class LIST_SEPARATORS {
 
     /**
      * The number of elements in the list to indicate that
@@ -216,7 +216,7 @@ public class TranslationKey {
   public static final String ERROR_ENDPOINT_NOT_FOUND = "error.endpointNotFound";
 
   @UtilityClass
-  public class ERROR_ENDPOINT_NOT_FOUND_P {
+  public static class ERROR_ENDPOINT_NOT_FOUND_P {
 
     public static final String METHOD = "method";
     public static final String URL = "url";
@@ -230,7 +230,7 @@ public class TranslationKey {
   public static final String ERROR_ENDPOINT_METHOD_INVALID = "error.endpointMethodInvalid";
 
   @UtilityClass
-  public class ERROR_ENDPOINT_METHOD_INVALID_P {
+  public static class ERROR_ENDPOINT_METHOD_INVALID_P {
 
     /**
      * The attempted, invalid method
@@ -250,7 +250,7 @@ public class TranslationKey {
   public static final String ERROR_UNPARSABLE_DATA = "error.unparsableData";
 
   @UtilityClass
-  public class ERROR_UNPARSABLE_DATA_P {
+  public static class ERROR_UNPARSABLE_DATA_P {
 
     /**
      * An error message from the parser, likely not localized
@@ -266,7 +266,7 @@ public class TranslationKey {
   public static final String ERROR_INTERNAL_SERVER_ERROR = "error.internalServerError";
 
   @UtilityClass
-  public class ERROR_INTERNAL_SERVER_ERROR_P {
+  public static class ERROR_INTERNAL_SERVER_ERROR_P {
 
     /**
      * The thrown exception class's name
@@ -291,7 +291,7 @@ public class TranslationKey {
   public static final String ERROR_CALENDAR_OVERLAP = "error.calendarOverlap";
 
   @UtilityClass
-  public class ERROR_CALENDAR_OVERLAP_P {
+  public static class ERROR_CALENDAR_OVERLAP_P {
 
     public static final String OVERLAP_NAME = "name";
     public static final String OVERLAP_START_DATE = "startDate";
@@ -311,7 +311,7 @@ public class TranslationKey {
   public static final String ERROR_DATE_RANGE_INVALID = "error.dateRangeInvalid";
 
   @UtilityClass
-  public class ERROR_DATE_RANGE_INVALID_P {
+  public static class ERROR_DATE_RANGE_INVALID_P {
 
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
@@ -327,7 +327,7 @@ public class TranslationKey {
     "error.calendarInvalidNormalOpenings";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P {
+  public static class ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P {
 
     /**
      * This should be a list as formatted by
@@ -355,7 +355,7 @@ public class TranslationKey {
     "error.calendarInvalidExceptionRangeDateOrder";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P {
+  public static class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P {
 
     /**
      * This expects a {@code LocalDate}
@@ -379,7 +379,7 @@ public class TranslationKey {
     "error.calendarInvalidExceptionRangeDateOutOfBounds";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P {
+  public static class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P {
 
     public static final String NAME = "name";
     /**
@@ -410,7 +410,7 @@ public class TranslationKey {
     "error.calendarInvalidExceptionRanges";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P {
+  public static class ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P {
 
     /**
      * This should be a list as formatted by
@@ -430,7 +430,7 @@ public class TranslationKey {
     "error.calendarInvalidExceptionOpenings";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P {
+  public static class ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P {
 
     /**
      * The exception's name
@@ -453,7 +453,7 @@ public class TranslationKey {
     "error.calendarInvalidExceptionHourOutOfBounds";
 
   @UtilityClass
-  public class ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P {
+  public static class ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P {
 
     /**
      * The exception's name
