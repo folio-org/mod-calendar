@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.api.openinghours.calendars.delete;
+package org.folio.calendar.integration.api.openinghours.calendars.ids.delete;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
