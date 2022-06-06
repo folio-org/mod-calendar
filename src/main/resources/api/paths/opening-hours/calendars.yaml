@@ -1,7 +1,7 @@
 get:
-  summary: Get all calendars
+  summary: Search all calendars
   description: Get all calendars that match the given query
-  operationId: getAllCalendars
+  operationId: searchCalendars
   parameters:
     - in: query
       name: servicePointId

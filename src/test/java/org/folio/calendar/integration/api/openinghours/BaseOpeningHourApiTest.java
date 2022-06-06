@@ -1,9 +1,14 @@
 package org.folio.calendar.integration.api.openinghours;
 
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Singular;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
@@ -18,6 +23,7 @@ import org.springframework.http.MediaType;
  */
 public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
 
+  public static final String GET_SEARCH_CALENDAR_API_ROUTE = "/opening-hours/calendars";
   public static final String CREATE_CALENDAR_API_ROUTE = "/opening-hours/calendars";
   public static final String GET_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
   public static final String PUT_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
@@ -46,7 +52,7 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
   public Response sendCalendarGetRequest(List<UUID> ids) {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
-    return ra(ValidationSchema.NONE)
+    return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.OPENING_HOURS)
       .get(
         getRequestUrl(
           String.format(
@@ -65,7 +71,7 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
   public Response sendCalendarDeleteRequest(List<UUID> ids) {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
-    return ra(ValidationSchema.NONE)
+    return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.OPENING_HOURS)
       .delete(
         getRequestUrl(
           String.format(
@@ -87,5 +93,72 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(calendarMapper.toDto(calendar))
       .put(getRequestUrl(String.format(PUT_CALENDAR_API_ROUTE, id)));
+  }
+
+  /**
+   * Parameters for {@link #sendCalendarSearchRequest sendCalendarSearchRequest}.
+   * Builder usage is recommended to make parameters more descriptive
+   */
+  @Data
+  @Builder
+  public static class SearchRequestParameters {
+
+    @Singular
+    List<UUID> servicePointIds;
+
+    LocalDate startDate;
+    LocalDate endDate;
+    Boolean includeClosedDays;
+    Boolean actualOpening;
+    Integer offset;
+    Integer limit;
+  }
+
+  /**
+   * GET /opening-hours/calendars : Get all calendars
+   * Get all calendars that match the given query
+   *
+   * @param parameters The parameters, built into a {@link SearchRequestParameters SearchRequestParameters}
+   * @return The query results (status code 200)
+   *         or Invalid request or parameters (status code 400)
+   *         or Internal server error (status code 500)
+   */
+  public Response sendCalendarSearchRequest(SearchRequestParameters parameters) {
+    RequestSpecification request = ra(ValidationSchema.OPENING_HOURS);
+    if (parameters.getServicePointIds() != null && !parameters.getServicePointIds().isEmpty()) {
+      // disable validation for when there are multiple service points
+      // as the validator does not support multiple UUIDs as an array
+      if (parameters.getServicePointIds().size() > 1) {
+        request = ra(ValidationSchema.NONE);
+      }
+      request =
+        request.queryParam(
+          "servicePointId",
+          parameters
+            .getServicePointIds()
+            .stream()
+            .map(UUID::toString)
+            .collect(Collectors.joining(","))
+        );
+    }
+    if (parameters.getStartDate() != null) {
+      request = request.queryParam("startDate", parameters.getStartDate().toString());
+    }
+    if (parameters.getEndDate() != null) {
+      request = request.queryParam("endDate", parameters.getEndDate().toString());
+    }
+    if (parameters.getIncludeClosedDays() != null) {
+      request = request.queryParam("includeClosedDays", parameters.getIncludeClosedDays());
+    }
+    if (parameters.getActualOpening() != null) {
+      request = request.queryParam("actualOpening", parameters.getActualOpening());
+    }
+    if (parameters.getOffset() != null) {
+      request = request.queryParam("offset", parameters.getOffset());
+    }
+    if (parameters.getLimit() != null) {
+      request = request.queryParam("limit", parameters.getLimit());
+    }
+    return request.get(getRequestUrl(GET_SEARCH_CALENDAR_API_ROUTE));
   }
 }

@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.annotation.CheckForNull;
 import org.folio.calendar.domain.entity.Calendar;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -93,7 +94,59 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
     "ORDER BY c.startDate"
   )
   List<Calendar> findWithServicePointsAndDateRange(
-    @Param("servicePointIds") List<UUID> servicePointId,
+    @Param("servicePointIds") List<UUID> servicePointIds,
+    @Param("startDate") @CheckForNull LocalDate startDate,
+    @Param("endDate") @CheckForNull LocalDate endDate
+  );
+
+  /**
+   * Find calendars for (optional) service point(s) and in the given (optional ends) date range
+   *
+   * @param checkServicePoints if service points should be checked
+   * @param servicePointIds a list of service point UUIDs to search, no effect if {@code checkServicePoints} is false
+   * @param startDate the date which returned results will end before
+   * @param endDate the date which returned results will not start after
+   * @param page current page, for pagination
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
+   */
+  @Query(
+    "SELECT c FROM Calendar c " +
+    "WHERE (:checkServicePoints = FALSE OR " +
+    "EXISTS (SELECT 1 FROM ServicePointCalendarAssignment r WHERE r.calendar.id = c.id AND r.servicePointId IN :servicePointIds)" +
+    ") AND " +
+    "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
+    "(cast(:endDate as date) is null OR c.startDate <= :endDate) " +
+    "ORDER BY c.startDate"
+  )
+  List<Calendar> findWithServicePointsDateRangeAndPagination(
+    @Param("checkServicePoints") Boolean checkServicePoints,
+    @Param("servicePointIds") List<UUID> servicePointIds,
+    @Param("startDate") @CheckForNull LocalDate startDate,
+    @Param("endDate") @CheckForNull LocalDate endDate,
+    Pageable page
+  );
+
+  /**
+   * Count calendars for a service point(s) and in the given (optional ends) date range
+   *
+   * @param checkServicePoints if service points should be checked
+   * @param servicePointIds a list of service point UUIDs to search, no effect if {@code checkServicePoints} is false
+   * @param startDate the date which returned results will end before
+   * @param endDate the date which returned results will not start after
+   * @param page current page, for pagination
+   * @return a {@link java.util.List List} of {@link org.folio.calendar.domain.entity.Calendar}s
+   */
+  @Query(
+    "SELECT COUNT(*) FROM Calendar c " +
+    "WHERE (:checkServicePoints = FALSE OR " +
+    "EXISTS (SELECT 1 FROM ServicePointCalendarAssignment r WHERE r.calendar.id = c.id AND r.servicePointId IN :servicePointIds)" +
+    ") AND " +
+    "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
+    "(cast(:endDate as date) is null OR c.startDate <= :endDate)"
+  )
+  Integer countWithServicePointsDateRangeAndPagination(
+    @Param("checkServicePoints") Boolean checkServicePoints,
+    @Param("servicePointIds") List<UUID> servicePointIds,
     @Param("startDate") @CheckForNull LocalDate startDate,
     @Param("endDate") @CheckForNull LocalDate endDate
   );

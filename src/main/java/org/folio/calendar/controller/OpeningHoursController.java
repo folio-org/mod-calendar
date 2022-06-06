@@ -66,14 +66,23 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarCollectionDTO> getAllCalendars(
-    List<UUID> servicePointId,
+  public ResponseEntity<CalendarCollectionDTO> searchCalendars(
+    List<UUID> servicePointIds,
     LocalDate startDate,
     LocalDate endDate,
     Integer offset,
     Integer limit
   ) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    return new ResponseEntity<>(
+      openingHoursService.getCalendarCollectionForServicePointsOrDateRange(
+        servicePointIds,
+        startDate,
+        endDate,
+        offset,
+        limit
+      ),
+      HttpStatus.OK
+    );
   }
 
   /** {@inheritDoc} */
