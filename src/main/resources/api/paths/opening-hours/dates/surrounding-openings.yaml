@@ -1,6 +1,6 @@
 get:
-  operationId: getAdjacentOpenings
-  summary: Adjacent openings dates
+  operationId: getSurroundingOpenings
+  summary: Surrounding openings
   description: Calculate openings nearest to a given date for a specified service point
   parameters:
     - in: path
@@ -16,14 +16,14 @@ get:
       schema:
         type: string
         format: date
-      description: The date to calculate openings adjacent to
+      description: The date to calculate openings around
   responses:
     "200":
       description: The query results
       content:
         application/json:
           schema:
-            $ref: ../../../schemas/adjacentOpenings.yaml
+            $ref: ../../../schemas/surroundingOpenings.yaml
     "400":
       $ref: ../../../errors/invalidRequest.yaml
     "500":

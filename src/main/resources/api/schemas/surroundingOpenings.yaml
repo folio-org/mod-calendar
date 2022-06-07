@@ -1,5 +1,8 @@
 description:
-  "Information for three dates: one before, one equal to, and one after the provided date"
+  "Information for three dates: one before when the SP is open, one representing an opening or
+  closure for the current date, and one after the provided date where the SP is open.  If there are
+  no openings before or after a given date, then an opening object will be returned with the date
+  immediately following, denoting a closure."
 type: object
 properties:
   openings:

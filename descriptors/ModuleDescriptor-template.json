@@ -69,7 +69,7 @@
         },
         {
           "methods": ["GET"],
-          "pathPattern": "/opening-hours/dates/{servicePointId}/adjacent-openings/{date}",
+          "pathPattern": "/opening-hours/dates/{servicePointId}/surrounding-openings/{date}",
           "permissionsRequired": ["opening-hours.dates.get"]
         },
         {

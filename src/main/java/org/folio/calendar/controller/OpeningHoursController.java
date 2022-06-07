@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.AdjacentOpeningsDTO;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
+import org.folio.calendar.domain.dto.SurroundingOpeningsDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.rest.resource.OpeningHoursApi;
@@ -138,7 +138,7 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<AdjacentOpeningsDTO> getAdjacentOpenings(
+  public ResponseEntity<SurroundingOpeningsDTO> getSurroundingOpenings(
     UUID servicePointId,
     LocalDate date
   ) {

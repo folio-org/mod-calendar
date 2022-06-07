@@ -11,7 +11,7 @@ paths:
     $ref: paths/opening-hours/calendars/calendarIdSingle.yaml
   /opening-hours/calendars/{calendarIds}:
     $ref: paths/opening-hours/calendars/calendarIdMultiple.yaml
-  /opening-hours/dates/{servicePointId}/adjacent-openings/{date}:
-    $ref: paths/opening-hours/dates/adjacent-openings.yaml
+  /opening-hours/dates/{servicePointId}/surrounding-openings/{date}:
+    $ref: paths/opening-hours/dates/surrounding-openings.yaml
   /opening-hours/dates/{servicePointId}/all-openings:
     $ref: paths/opening-hours/dates/all-openings.yaml
