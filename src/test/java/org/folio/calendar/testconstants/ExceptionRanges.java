@@ -72,11 +72,45 @@ public class ExceptionRanges {
     )
     .build();
 
+  public static final ExceptionRange OPEN_04_00_TO_14_59_JAN_1_AND_JAN_4 = ExceptionRange
+    .builder()
+    .name(Names.NAME_1)
+    .startDate(Dates.DATE_2021_01_01)
+    .endDate(Dates.DATE_2021_01_04)
+    .openings(
+      Arrays.asList(
+        ExceptionHours.OPEN_04_00_TO_14_59_JAN_1,
+        ExceptionHours.OPEN_04_00_TO_14_59_JAN_4
+      )
+    )
+    .build();
+
   public static final ExceptionRange OPEN_00_00_TO_14_59_JAN_1 = ExceptionRange
     .builder()
     .startDate(Dates.DATE_2021_01_01)
     .endDate(Dates.DATE_2021_01_01)
     .openings(Arrays.asList(ExceptionHours.OPEN_00_00_TO_14_59_JAN_1))
+    .build();
+
+  public static final ExceptionRange OPEN_15_00_TO_23_59_JAN_4 = ExceptionRange
+    .builder()
+    .name(Names.NAME_2)
+    .startDate(Dates.DATE_2021_01_04)
+    .endDate(Dates.DATE_2021_01_04)
+    .openings(Arrays.asList(ExceptionHours.OPEN_15_00_TO_23_59_JAN_4))
+    .build();
+
+  public static final ExceptionRange OPEN_04_00_TO_14_59_AND_18_12_TO_23_00_JAN_4 = ExceptionRange
+    .builder()
+    .name(Names.NAME_3)
+    .startDate(Dates.DATE_2021_01_04)
+    .endDate(Dates.DATE_2021_01_04)
+    .openings(
+      Arrays.asList(
+        ExceptionHours.OPEN_04_00_TO_14_59_JAN_4,
+        ExceptionHours.OPEN_18_12_TO_23_00_JAN_4
+      )
+    )
     .build();
 
   /**

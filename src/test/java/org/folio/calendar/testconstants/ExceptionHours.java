@@ -63,4 +63,10 @@ public class ExceptionHours {
   public static final ExceptionHour OPEN_15_00_TO_23_00_JAN_4 = OPEN_04_00_TO_14_59_JAN_4
     .withStartTime(Times.TIME_15_00)
     .withEndTime(Times.TIME_23_00);
+  public static final ExceptionHour OPEN_18_12_TO_23_00_JAN_4 = OPEN_04_00_TO_14_59_JAN_4
+    .withStartTime(Times.TIME_18_12)
+    .withEndTime(Times.TIME_23_00);
+  public static final ExceptionHour OPEN_15_00_TO_23_59_JAN_4 = OPEN_04_00_TO_14_59_JAN_4
+    .withStartTime(Times.TIME_15_00)
+    .withEndTime(Times.TIME_23_59);
 }
