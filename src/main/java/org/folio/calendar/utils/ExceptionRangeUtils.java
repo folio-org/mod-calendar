@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
@@ -27,18 +28,26 @@ public class ExceptionRangeUtils {
    * return at least two overlapping openings.
    */
   public static Optional<Set<ExceptionHour>> getHourOverlaps(Collection<ExceptionHour> openings) {
-    return TemporalUtils.getOverlaps(
-      openings
-        .stream()
-        .map(hour ->
-          new TemporalRange<LocalDateTime, ExceptionHour>(
-            hour,
-            LocalDateTime.of(hour.getStartDate(), hour.getStartTime()),
-            LocalDateTime.of(hour.getEndDate(), hour.getEndTime())
-          )
+    return TemporalUtils.getOverlaps(toTemporalRanges(openings).collect(Collectors.toList()));
+  }
+
+  /**
+   * Split a set of exception hours into temporal ranges
+   * @param openings the openings to split up
+   * @return a stream of temporal ranges for each opening
+   */
+  public static Stream<TemporalRange<LocalDateTime, ExceptionHour>> toTemporalRanges(
+    Collection<ExceptionHour> openings
+  ) {
+    return openings
+      .stream()
+      .map(hour ->
+        new TemporalRange<LocalDateTime, ExceptionHour>(
+          hour,
+          LocalDateTime.of(hour.getStartDate(), hour.getStartTime()),
+          LocalDateTime.of(hour.getEndDate(), hour.getEndTime())
         )
-        .collect(Collectors.toList())
-    );
+      );
   }
 
   /**
