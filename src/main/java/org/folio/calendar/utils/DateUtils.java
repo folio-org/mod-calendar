@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,7 +36,27 @@ public class DateUtils {
    */
   public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
     // the end date for datesUtil is exclusive; adding one makes it inclusive
-    return startDate.datesUntil(endDate.plusDays(1)).collect(Collectors.toList());
+    return getDateRangeStream(startDate, endDate).collect(Collectors.toList());
+  }
+
+  /**
+   * Get all LocalDates between two dates (inclusive)
+   *
+   * @param startDate the first date in the range
+   * @param endDate the last date in the range
+   * @return a stream providing all dates between the start and end dates
+   * @see <a href="https://stackoverflow.com/questions/40671689/how-to-build-a-list-of-localdate-from-a-given-range">
+   * Stack Overflow post regarding LocalDate/Stream solutions</a>
+   */
+  public static Stream<LocalDate> getDateRangeStream(LocalDate startDate, LocalDate endDate) {
+    // the end date for datesUtil is exclusive; adding one makes it inclusive
+    if (endDate.isBefore(startDate)) {
+      throw new IllegalArgumentException(
+        "Cannot get a date range where the start date is after the end date"
+      );
+    }
+
+    return startDate.datesUntil(endDate.plusDays(1));
   }
 
   /**
