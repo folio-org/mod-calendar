@@ -29,7 +29,9 @@ get:
       required: true
       schema:
         type: boolean
-      description: Whether or not the results should include days where the service point is closed
+      description:
+        Whether or not the results should include days where the service point is
+        closed.  Exceptional closures will always be returned
     - in: query
       name: offset
       required: false
