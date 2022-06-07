@@ -18,7 +18,9 @@ class ExceptionRangeUtilsTranslationTest extends BaseApiTest {
   @Test
   void testSingleDayRangeTranslations() {
     assertThat(
-      ExceptionRangeUtils.getTranslation(ExceptionRanges.CLOSED_JAN_1).apply(translationService),
+      ExceptionRangeUtils
+        .getTranslation(ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01)
+        .apply(translationService),
       is("“comic sublime upscale utilize” on Jan 1, 2021")
     );
     assertThat(
@@ -32,12 +34,14 @@ class ExceptionRangeUtilsTranslationTest extends BaseApiTest {
   @Test
   void testMultiDayRangeTranslations() {
     assertThat(
-      ExceptionRangeUtils.getTranslation(ExceptionRanges.CLOSED_ALL_YEAR).apply(translationService),
+      ExceptionRangeUtils
+        .getTranslation(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31)
+        .apply(translationService),
       is("“sectional proving blanching deputy” from Jan 1, 2021 to Dec 31, 2021")
     );
     assertThat(
       ExceptionRangeUtils
-        .getTranslation(ExceptionRanges.CLOSED_JAN_1_THRU_JAN_4)
+        .getTranslation(ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_04)
         .apply(translationService),
       is("“supplier grouped bride lazily” from Jan 1, 2021 to Jan 4, 2021")
     );

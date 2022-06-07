@@ -176,7 +176,7 @@ public class Calendars {
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
     .withName(Names.NAME_1)
     .withNormalHours(Set.of())
-    .withExceptions(Set.of(ExceptionRanges.CLOSED_ALL_YEAR));
+    .withExceptions(Set.of(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31));
 
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_B = CALENDAR_2021_01_01_TO_2021_01_04
     .withId(UUIDs.UUID_B)
@@ -249,4 +249,25 @@ public class Calendars {
       )
     )
     .withExceptions(Set.of());
+
+  public static final Calendar CALENDAR_COMBINED_EXAMPLE_D = CALENDAR_2021_01_01_TO_2021_12_31
+    .withServicePoints(
+      Set.of(
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_2,
+        ServicePointCalendarAssignments.ASSIGNMENT_SP_3
+      )
+    )
+    .withName(Names.NAME_4)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.MONDAY_00_00_TO_12_30,
+        NormalOpenings.MONDAY_23_00_TO_23_59,
+        NormalOpenings.THURSDAY_ALL_DAY
+      )
+    )
+    .withExceptions(Set.of(ExceptionRanges.CLOSED_2021_07_04_TO_2021_08_16));
+
+  public static final Calendar CALENDAR_COMBINED_EXAMPLE_E = CALENDAR_COMBINED_EXAMPLE_D.withStartDate(
+    Dates.DATE_2021_07_04
+  );
 }

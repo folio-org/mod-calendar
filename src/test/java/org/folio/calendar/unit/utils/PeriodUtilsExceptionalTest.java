@@ -137,7 +137,7 @@ class PeriodUtilsExceptionalTest {
       result,
       hasItem(
         ExceptionRanges
-          .withExceptionId(ExceptionRanges.CLOSED_ALL_YEAR, result.get(0).getId())
+          .withExceptionId(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31, result.get(0).getId())
           .withName("Untitled exception")
       )
     );

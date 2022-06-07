@@ -29,12 +29,17 @@ class CalendarValidationServiceExceptionOverlapTest extends BaseApiTest {
   void testRangeNoOverlaps() {
     assertThat(validationService.validateExceptionRangeOverlaps(Set.of()), isEmpty());
     assertThat(
-      validationService.validateExceptionRangeOverlaps(Set.of(ExceptionRanges.CLOSED_ALL_YEAR)),
+      validationService.validateExceptionRangeOverlaps(
+        Set.of(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31)
+      ),
       isEmpty()
     );
     assertThat(
       validationService.validateExceptionRangeOverlaps(
-        Set.of(ExceptionRanges.CLOSED_JAN_1, ExceptionRanges.CLOSED_JAN_3_TO_JAN_4)
+        Set.of(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
+        )
       ),
       isEmpty()
     );
@@ -44,22 +49,28 @@ class CalendarValidationServiceExceptionOverlapTest extends BaseApiTest {
   void testRangeSingleOverlaps() {
     assertThat(
       validationService.validateExceptionRangeOverlaps(
-        Set.of(ExceptionRanges.CLOSED_ALL_YEAR, ExceptionRanges.CLOSED_JAN_1)
-      ),
-      isPresent()
-    );
-    assertThat(
-      validationService.validateExceptionRangeOverlaps(
-        Set.of(ExceptionRanges.CLOSED_ALL_YEAR, ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1)
+        Set.of(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01
+        )
       ),
       isPresent()
     );
     assertThat(
       validationService.validateExceptionRangeOverlaps(
         Set.of(
-          ExceptionRanges.CLOSED_JAN_1,
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31,
+          ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1
+        )
+      ),
+      isPresent()
+    );
+    assertThat(
+      validationService.validateExceptionRangeOverlaps(
+        Set.of(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       ),
       isPresent()
@@ -71,8 +82,8 @@ class CalendarValidationServiceExceptionOverlapTest extends BaseApiTest {
     assertThat(
       validationService.validateExceptionRangeOverlaps(
         Set.of(
-          ExceptionRanges.CLOSED_ALL_YEAR,
-          ExceptionRanges.CLOSED_JAN_1,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
           ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1
         )
       ),
@@ -85,9 +96,9 @@ class CalendarValidationServiceExceptionOverlapTest extends BaseApiTest {
     InvalidDataException exception = validationService
       .validateExceptionRangeOverlaps(
         Set.of(
-          ExceptionRanges.CLOSED_JAN_1,
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       )
       .get();

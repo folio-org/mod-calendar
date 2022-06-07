@@ -21,7 +21,9 @@ class ExceptionRangeUtilsOverlapTest {
   void testNoOverlaps() {
     assertThat(ExceptionRangeUtils.getOverlaps(new ArrayList<>()), isEmpty());
     assertThat(
-      ExceptionRangeUtils.getOverlaps(Arrays.asList(ExceptionRanges.CLOSED_ALL_YEAR)),
+      ExceptionRangeUtils.getOverlaps(
+        Arrays.asList(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31)
+      ),
       isEmpty()
     );
     assertThat(
@@ -30,7 +32,10 @@ class ExceptionRangeUtilsOverlapTest {
     );
     assertThat(
       ExceptionRangeUtils.getOverlaps(
-        Arrays.asList(ExceptionRanges.CLOSED_JAN_1_TO_JAN_2, ExceptionRanges.CLOSED_JAN_3_TO_JAN_4)
+        Arrays.asList(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
+        )
       ),
       isEmpty()
     );
@@ -41,38 +46,41 @@ class ExceptionRangeUtilsOverlapTest {
     assertThat(
       ExceptionRangeUtils.getOverlaps(
         Arrays.asList(
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
           ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1
         )
       ),
       isPresentAnd(
         containsInAnyOrder(
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
           ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1
         )
       )
     );
     assertThat(
       ExceptionRangeUtils.getOverlaps(
-        Arrays.asList(ExceptionRanges.CLOSED_JAN_1_TO_JAN_2, ExceptionRanges.CLOSED_JAN_1_TO_JAN_2)
+        Arrays.asList(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02
+        )
       ),
-      isPresentAnd(hasItem(ExceptionRanges.CLOSED_JAN_1_TO_JAN_2))
+      isPresentAnd(hasItem(ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02))
     );
     assertThat(
       ExceptionRangeUtils.getOverlaps(
         Arrays.asList(
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
           ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1,
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       ),
       isPresentAnd(
         allOf(
           hasItems(
-            ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
+            ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
             ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1
           ),
-          not(hasItem(ExceptionRanges.CLOSED_JAN_3_TO_JAN_4))
+          not(hasItem(ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04))
         )
       )
     );
@@ -83,16 +91,16 @@ class ExceptionRangeUtilsOverlapTest {
     assertThat(
       ExceptionRangeUtils.getOverlaps(
         Arrays.asList(
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
-          ExceptionRanges.CLOSED_JAN_1_THRU_JAN_4,
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_04,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       ),
       isPresentAnd(
         containsInAnyOrder(
-          ExceptionRanges.CLOSED_JAN_1_TO_JAN_2,
-          ExceptionRanges.CLOSED_JAN_1_THRU_JAN_4,
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_02,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_04,
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       )
     );

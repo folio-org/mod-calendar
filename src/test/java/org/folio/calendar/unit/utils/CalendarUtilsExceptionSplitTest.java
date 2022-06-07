@@ -36,7 +36,7 @@ class CalendarUtilsExceptionSplitTest {
   void testOutOfRange() {
     Map<LocalDate, SingleDayOpeningDTO> map = new HashMap<>();
     CalendarUtils.splitCalendarIntoDates(
-      Calendar.builder().exception(ExceptionRanges.CLOSED_JAN_3_TO_JAN_4).build(),
+      Calendar.builder().exception(ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04).build(),
       map,
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_01_01
@@ -49,7 +49,7 @@ class CalendarUtilsExceptionSplitTest {
   void testClosure() {
     Map<LocalDate, SingleDayOpeningDTO> map = new HashMap<>();
     CalendarUtils.splitCalendarIntoDates(
-      Calendar.builder().exception(ExceptionRanges.CLOSED_JAN_3_TO_JAN_4).build(),
+      Calendar.builder().exception(ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04).build(),
       map,
       Dates.DATE_2021_01_04,
       Dates.DATE_2021_01_04
@@ -66,7 +66,7 @@ class CalendarUtilsExceptionSplitTest {
           .allDay(true)
           .open(false)
           .exceptional(true)
-          .exceptionName(ExceptionRanges.CLOSED_JAN_3_TO_JAN_4.getName())
+          .exceptionName(ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04.getName())
           .build()
       )
     );

@@ -40,14 +40,20 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
     assertThat(
       "A set of exceptions with only one missing a name results in an error",
       validationService.validateExceptionRangeNames(
-        Set.of(ExceptionRange.builder().name("").build(), ExceptionRanges.CLOSED_ALL_YEAR)
+        Set.of(
+          ExceptionRange.builder().name("").build(),
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31
+        )
       ),
       isPresent()
     );
     assertThat(
       "A set of exceptions with names does not result in an error",
       validationService.validateExceptionRangeNames(
-        Set.of(ExceptionRanges.CLOSED_JAN_1_THRU_JAN_4, ExceptionRanges.CLOSED_ALL_YEAR)
+        Set.of(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_04,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31
+        )
       ),
       isEmpty()
     );
@@ -91,7 +97,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .startDate(Dates.DATE_2021_01_04)
             .endDate(Dates.DATE_2021_01_01)
             .build(),
-          ExceptionRanges.CLOSED_ALL_YEAR
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31
         )
       ),
       isPresentAnd(hasSize(1))
@@ -154,7 +160,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .startDate(Dates.DATE_2021_01_01)
             .endDate(Dates.DATE_2021_01_01)
             .build(),
-          ExceptionRanges.CLOSED_ALL_YEAR
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31
         )
       ),
       isEmpty()
@@ -176,7 +182,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .startDate(Dates.DATE_2021_01_04)
             .endDate(Dates.DATE_2021_01_01)
             .build(),
-          ExceptionRanges.CLOSED_ALL_YEAR
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31
         )
       )
       .get();
@@ -217,7 +223,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .startDate(Dates.DATE_2021_01_01)
             .endDate(Dates.DATE_2021_03_16)
             .build(),
-          ExceptionRanges.CLOSED_JAN_1
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01
         )
       ),
       isPresentAnd(hasSize(1))
@@ -270,7 +276,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .startDate(Dates.DATE_2021_01_01)
             .endDate(Dates.DATE_2021_01_01)
             .build(),
-          ExceptionRanges.CLOSED_JAN_3_TO_JAN_4
+          ExceptionRanges.CLOSED_2021_01_03_TO_2021_01_04
         )
       ),
       isEmpty()
@@ -336,7 +342,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
             .endDate(Dates.DATE_2021_01_01)
             .opening(ExceptionHours.OPEN_00_00_TO_14_59_JAN_1_THRU_JAN_2)
             .build(),
-          ExceptionRanges.CLOSED_JAN_1,
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
           ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4
         )
       ),
@@ -365,7 +371,10 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
     assertThat(
       "A exception range in bounds is valid",
       validationService.validateExceptionHourBounds(
-        Set.of(ExceptionRanges.CLOSED_JAN_1, ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4)
+        Set.of(
+          ExceptionRanges.CLOSED_2021_01_01_TO_2021_01_01,
+          ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4
+        )
       ),
       is(empty())
     );

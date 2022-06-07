@@ -19,8 +19,8 @@ class ExceptionRangeMapperTest extends BaseApiTest {
   @Test
   void testMapper() {
     assertThat(
-      mapper.fromDto(mapper.toDto(ExceptionRanges.CLOSED_ALL_YEAR)),
-      is(equalTo(ExceptionRanges.CLOSED_ALL_YEAR))
+      mapper.fromDto(mapper.toDto(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31)),
+      is(equalTo(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31))
     );
     assertThat(
       mapper.fromDto(mapper.toDto(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4)),
