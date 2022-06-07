@@ -15,6 +15,9 @@ public class Dates {
   public static final LocalDate DATE_2021_01_02 = LocalDate.of(2021, Month.JANUARY, 2);
   public static final LocalDate DATE_2021_01_03 = LocalDate.of(2021, Month.JANUARY, 3);
   public static final LocalDate DATE_2021_01_04 = LocalDate.of(2021, Month.JANUARY, 4);
+  public static final LocalDate DATE_2021_01_05 = LocalDate.of(2021, Month.JANUARY, 5);
+  public static final LocalDate DATE_2021_01_06 = LocalDate.of(2021, Month.JANUARY, 6);
+  public static final LocalDate DATE_2021_01_07 = LocalDate.of(2021, Month.JANUARY, 7);
   public static final LocalDate DATE_2021_03_16 = LocalDate.of(2021, Month.MARCH, 16);
   public static final LocalDate DATE_2021_04_30 = LocalDate.of(2021, Month.APRIL, 30);
   public static final LocalDate DATE_2021_05_01 = LocalDate.of(2021, Month.MAY, 1);

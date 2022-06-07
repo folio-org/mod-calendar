@@ -154,9 +154,7 @@ public class CalendarUtils {
                   .collect(Collectors.toList())
               )
               .open(true)
-              .allDay(
-                openings.isEmpty() || (openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
-              )
+              .allDay(openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
               .build()
           );
         }
@@ -204,8 +202,8 @@ public class CalendarUtils {
    */
   public static SingleDayOpeningCollectionDTO openingMapToCollection(
     Map<LocalDate, SingleDayOpeningDTO> dates,
-    Integer offset,
-    Integer limit
+    int offset,
+    int limit
   ) {
     return SingleDayOpeningCollectionDTO
       .builder()
