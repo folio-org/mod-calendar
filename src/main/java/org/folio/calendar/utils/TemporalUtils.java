@@ -1,5 +1,8 @@
 package org.folio.calendar.utils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.Temporal;
 import java.util.Deque;
 import java.util.HashSet;
@@ -62,5 +65,37 @@ public class TemporalUtils {
     } else {
       return Optional.of(conflicts);
     }
+  }
+
+  /**
+   * Get the time range of a {@link TemporalRange TemporalRange} of
+   * {@link LocalDateTime LocalDateTime} that falls on a given {@link LocalDate LocalDate}
+   * @param <T> the type contained within the range
+   * @param range the range to query
+   * @param query the date to extract times from
+   * @return a temporal range of times, if available
+   */
+  public static <T> Optional<TemporalRange<LocalTime, T>> getLocalTimeSliceOfDateTimeRange(
+    TemporalRange<LocalDateTime, T> range,
+    LocalDate query
+  ) {
+    LocalDate startDate = range.getStart().toLocalDate();
+    LocalDate endDate = range.getEnd().toLocalDate();
+
+    if (DateUtils.contains(query, startDate, endDate)) {
+      LocalTime startTime = TimeConstants.TIME_MIN;
+      LocalTime endTime = TimeConstants.TIME_MAX;
+
+      if (startDate.equals(query)) {
+        startTime = range.getStart().toLocalTime();
+      }
+      if (endDate.equals(query)) {
+        endTime = range.getEnd().toLocalTime();
+      }
+
+      return Optional.of(new TemporalRange<>(range.getSource(), startTime, endTime));
+    }
+
+    return Optional.empty();
   }
 }
