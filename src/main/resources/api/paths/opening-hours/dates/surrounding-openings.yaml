@@ -10,7 +10,7 @@ get:
         type: string
         format: uuid
       description: The service point to calculate openings on
-    - in: path
+    - in: query
       name: date
       required: true
       schema:

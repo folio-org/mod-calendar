@@ -256,7 +256,7 @@ public class CalendarUtils {
       );
 
       // remove exceptional closures for surrounding openings
-      additionalDates.entrySet().removeIf(entry -> entry.getValue().isOpen());
+      additionalDates.entrySet().removeIf(entry -> !entry.getValue().isOpen());
       map.putAll(additionalDates);
     }
     if (map.isEmpty()) {
@@ -287,7 +287,12 @@ public class CalendarUtils {
     int dateIndex = Collections.binarySearch(
       calendars,
       Calendar.builder().startDate(date).endDate(date).build(),
-      (a, b) -> a.getStartDate().compareTo(b.getStartDate())
+      (Calendar a, Calendar b) -> {
+        if (DateUtils.overlaps(a, b)) {
+          return 0;
+        }
+        return a.getStartDate().compareTo(b.getStartDate());
+      }
     );
 
     // assume closed
@@ -317,7 +322,7 @@ public class CalendarUtils {
       }
 
       // remove exceptional closures for surrounding openings
-      dates.entrySet().removeIf(entry -> entry.getValue().isOpen());
+      dates.entrySet().removeIf(entry -> !entry.getValue().isOpen());
       // start at the calendar directly after for > date
       dateIndex++;
     } else {

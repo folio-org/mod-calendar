@@ -30,6 +30,8 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
   public static final String DELETE_CALENDAR_API_ROUTE = "/opening-hours/calendars/{calendarIds}";
   public static final String GET_ALL_DATES_API_ROUTE =
     "/opening-hours/dates/{servicePointId}/all-openings";
+  public static final String GET_SURROUNDING_DATES_API_ROUTE =
+    "/opening-hours/dates/{servicePointId}/surrounding-openings";
 
   @Autowired
   private CalendarMapper calendarMapper;
@@ -189,5 +191,22 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
     }
 
     return ra.get(getRequestUrl(GET_ALL_DATES_API_ROUTE));
+  }
+
+  /**
+   * GET /opening-hours/dates/{servicePointId}/surrounding-openings/{date} : Surrounding openings
+   * Calculate openings nearest to a given date for a specified service point
+   *
+   * @param servicePointId The service point to calculate openings on (required)
+   * @param date The date to calculate openings around (required)
+   * @return The query results (status code 200)
+   *         or Invalid request or parameters (status code 400)
+   *         or Internal server error (status code 500)
+   */
+  public Response getSurroundingOpenings(UUID servicePointId, LocalDate date) {
+    return ra(ValidationSchema.OPENING_HOURS)
+      .pathParam("servicePointId", servicePointId.toString())
+      .queryParam("date", date.toString())
+      .get(getRequestUrl(GET_SURROUNDING_DATES_API_ROUTE));
   }
 }
