@@ -1,7 +1,9 @@
 package org.folio.calendar.utils;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import lombok.experimental.UtilityClass;
+import org.folio.calendar.domain.dto.SingleDayOpeningRangeDTO;
 
 /**
  * Utilities for times
@@ -37,6 +39,40 @@ public class TimeUtils {
    */
   public static boolean overlaps(TemporalRange<LocalTime, ?> a, TemporalRange<LocalTime, ?> b) {
     return overlaps(a.getStart(), a.getEnd(), b.getStart(), b.getEnd());
+  }
+
+  /**
+   * Check that a start and end time cover an entire day
+   *
+   * @param startTime the start of the range
+   * @param endTime the end of the range
+   * @return if they cover an entire day (00:00 - 23:59), to minute accuracy
+   */
+  public static boolean isAllDay(LocalTime startTime, LocalTime endTime) {
+    return (
+      startTime.truncatedTo(ChronoUnit.MINUTES).equals(TimeConstants.TIME_MIN) &&
+      endTime.truncatedTo(ChronoUnit.MINUTES).equals(TimeConstants.TIME_MAX)
+    );
+  }
+
+  /**
+   * Check that a time range covers an entire day
+   *
+   * @param range the range to consider
+   * @return if the range covers an entire day (00:00 - 23:59), to minute accuracy
+   */
+  public static boolean isAllDay(TemporalRange<LocalTime, ?> range) {
+    return isAllDay(range.getStart(), range.getEnd());
+  }
+
+  /**
+   * Check that an opening range covers an entire day
+   *
+   * @param opening the opening to consider
+   * @return if the opening covers an entire day (00:00 - 23:59), to minute accuracy
+   */
+  public static boolean isAllDay(SingleDayOpeningRangeDTO opening) {
+    return isAllDay(opening.getStartTime(), opening.getEndTime());
   }
 
   /**

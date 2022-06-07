@@ -103,11 +103,7 @@ public class CalendarUtils {
                 .open(!openings.isEmpty())
                 .allDay(
                   openings.isEmpty() ||
-                  (
-                    openings.size() == 1 &&
-                    openings.get(0).getStartTime().equals(TimeConstants.TIME_MIN) &&
-                    openings.get(0).getEndTime().equals(TimeConstants.TIME_MAX)
-                  )
+                  (openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
                 )
                 .build()
             );
@@ -159,12 +155,7 @@ public class CalendarUtils {
               )
               .open(true)
               .allDay(
-                openings.isEmpty() ||
-                (
-                  openings.size() == 1 &&
-                  openings.get(0).getStart().equals(TimeConstants.TIME_MIN) &&
-                  openings.get(0).getEnd().equals(TimeConstants.TIME_MAX)
-                )
+                openings.isEmpty() || (openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
               )
               .build()
           );
