@@ -142,6 +142,9 @@ public final class OpeningHoursController implements OpeningHoursApi {
     UUID servicePointId,
     LocalDate date
   ) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    return new ResponseEntity<>(
+      openingHoursService.getSurroundingOpenings(servicePointId, date),
+      HttpStatus.OK
+    );
   }
 }

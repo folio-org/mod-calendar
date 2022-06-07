@@ -15,6 +15,7 @@ import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
+import org.folio.calendar.domain.dto.SurroundingOpeningsDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.error.CalendarNotFoundErrorData;
 import org.folio.calendar.domain.mapper.CalendarMapper;
@@ -192,5 +193,24 @@ public class OpeningHoursService {
     }
 
     return CalendarUtils.openingMapToCollection(dates, offset, limit);
+  }
+
+  /**
+   * Get information on openings surrounding a given date
+   *
+   * @param servicePointId the service point to examine for openings
+   * @param date the date to query
+   * @return an {@link SurroundingOpeningsDTO SurroundingOpeningsDTO} representing opening information
+   */
+  public SurroundingOpeningsDTO getSurroundingOpenings(UUID servicePointId, LocalDate date) {
+    List<Calendar> calendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+      true,
+      Arrays.asList(servicePointId),
+      null,
+      null,
+      Pageable.unpaged()
+    );
+
+    return CalendarUtils.getSurroundingOpenings(calendars, date);
   }
 }

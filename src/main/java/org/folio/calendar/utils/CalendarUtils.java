@@ -2,15 +2,22 @@ package org.folio.calendar.utils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningRangeDTO;
+import org.folio.calendar.domain.dto.SurroundingOpeningsDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
@@ -218,6 +225,131 @@ public class CalendarUtils {
           .collect(Collectors.toList())
       )
       .totalRecords(dates.size())
+      .build();
+  }
+
+  /**
+   * Extracts one calendar at a time out of the provided calendars, splitting
+   * it into dates, until at least one opening is found.  The opening will not
+   * be returned directly, but placed into the provided {@code map}.
+   *
+   * @param map the map to store opening information in
+   * @param calendarIterator an iterator of calendars to examine
+   */
+  public static SingleDayOpeningDTO getFirstOpeningFromCalendarList(
+    SortedMap<LocalDate, SingleDayOpeningDTO> map,
+    Iterator<Calendar> calendarIterator,
+    LocalDate fallbackDate,
+    Function<SortedMap<LocalDate, SingleDayOpeningDTO>, LocalDate> keyGetter
+  ) {
+    // find dates < date with openings while there are more calendars to consume
+    // and a date has not been found yet
+    while (calendarIterator.hasNext() && map.isEmpty()) {
+      Calendar currentCalendar = calendarIterator.next();
+
+      SortedMap<LocalDate, SingleDayOpeningDTO> additionalDates = new TreeMap<>();
+      splitCalendarIntoDates(
+        currentCalendar,
+        additionalDates,
+        currentCalendar.getStartDate(),
+        currentCalendar.getEndDate()
+      );
+
+      // remove exceptional closures for surrounding openings
+      additionalDates.entrySet().removeIf(entry -> entry.getValue().isOpen());
+      map.putAll(additionalDates);
+    }
+    if (map.isEmpty()) {
+      return SingleDayOpeningDTO
+        .builder()
+        .date(fallbackDate)
+        .open(false)
+        .allDay(true)
+        .exceptional(false)
+        .build();
+    } else {
+      return map.get(keyGetter.apply(map));
+    }
+  }
+
+  /**
+   * Query a list of calendars for openings surrounding a given date
+   *
+   * @param calendars the list of calendars to examine
+   * @param date the date to query
+   * @return an {@link SurroundingOpeningsDTO SurroundingOpeningsDTO}
+   *         representing the opening information
+   */
+  public static SurroundingOpeningsDTO getSurroundingOpenings(
+    List<Calendar> calendars,
+    LocalDate date
+  ) {
+    int dateIndex = Collections.binarySearch(
+      calendars,
+      Calendar.builder().startDate(date).endDate(date).build(),
+      (a, b) -> a.getStartDate().compareTo(b.getStartDate())
+    );
+
+    // assume closed
+    SingleDayOpeningDTO current = SingleDayOpeningDTO
+      .builder()
+      .date(date)
+      .open(false)
+      .allDay(true)
+      .exceptional(false)
+      .build();
+
+    SortedMap<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
+
+    // the current date does fall inside a calendar
+    if (dateIndex >= 0) {
+      Calendar currentCalendar = calendars.get(dateIndex);
+      CalendarUtils.splitCalendarIntoDates(
+        currentCalendar,
+        dates,
+        currentCalendar.getStartDate(),
+        currentCalendar.getEndDate()
+      );
+
+      // if the calendar is closed on the queried date, do not overwrite the closure above
+      if (dates.containsKey(date)) {
+        current = dates.get(date);
+      }
+
+      // remove exceptional closures for surrounding openings
+      dates.entrySet().removeIf(entry -> entry.getValue().isOpen());
+      // start at the calendar directly after for > date
+      dateIndex++;
+    } else {
+      // binary search returns next-greatest index by -(index) - 1
+      // this undoes this, yielding the first place to look for > date
+      dateIndex = -(dateIndex + 1);
+    }
+
+    SortedMap<LocalDate, SingleDayOpeningDTO> beforeDateMap = dates.headMap(date);
+    SortedMap<LocalDate, SingleDayOpeningDTO> afterDateMap = dates.tailMap(date.plusDays(1));
+
+    SingleDayOpeningDTO previous = CalendarUtils.getFirstOpeningFromCalendarList(
+      beforeDateMap,
+      // array deque needed to provide reversed sorting
+      // subList from [0, dateIndex)
+      new ArrayDeque<>(calendars.subList(0, dateIndex)).descendingIterator(),
+      date.minusDays(1),
+      SortedMap::lastKey
+    );
+    SingleDayOpeningDTO next = CalendarUtils.getFirstOpeningFromCalendarList(
+      afterDateMap,
+      // subList from [dateIndex, end)
+      calendars.listIterator(dateIndex),
+      date.plusDays(1),
+      SortedMap::firstKey
+    );
+
+    return SurroundingOpeningsDTO
+      .builder()
+      .opening(previous)
+      .opening(current)
+      .opening(next)
       .build();
   }
 }
