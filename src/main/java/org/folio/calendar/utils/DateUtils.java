@@ -26,7 +26,8 @@ public class DateUtils {
   protected static LocalDate currentDateOverride = null;
 
   /**
-   * Get all LocalDates between two dates (inclusive)
+   * Get all LocalDates between two dates (inclusive).  If the range is
+   * improper (ends before it starts), an empty list is returned.
    *
    * @param startDate the first date in the range
    * @param endDate the last date in the range
@@ -40,7 +41,8 @@ public class DateUtils {
   }
 
   /**
-   * Get all LocalDates between two dates (inclusive)
+   * Get all LocalDates between two dates (inclusive).  If the range is
+   * improper (ends before it starts), an empty stream is returned.
    *
    * @param startDate the first date in the range
    * @param endDate the last date in the range
@@ -49,13 +51,11 @@ public class DateUtils {
    * Stack Overflow post regarding LocalDate/Stream solutions</a>
    */
   public static Stream<LocalDate> getDateRangeStream(LocalDate startDate, LocalDate endDate) {
-    // the end date for datesUtil is exclusive; adding one makes it inclusive
     if (endDate.isBefore(startDate)) {
-      throw new IllegalArgumentException(
-        "Cannot get a date range where the start date is after the end date"
-      );
+      return Stream.empty();
     }
 
+    // the end date for datesUtil is exclusive; adding one makes it inclusive
     return startDate.datesUntil(endDate.plusDays(1));
   }
 
