@@ -25,9 +25,11 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
 
   public static final String GET_SEARCH_CALENDAR_API_ROUTE = "/opening-hours/calendars";
   public static final String CREATE_CALENDAR_API_ROUTE = "/opening-hours/calendars";
-  public static final String GET_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
-  public static final String PUT_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
-  public static final String DELETE_CALENDAR_API_ROUTE = "/opening-hours/calendars/%s";
+  public static final String GET_CALENDAR_API_ROUTE = "/opening-hours/calendars/{calendarIds}";
+  public static final String PUT_CALENDAR_API_ROUTE = "/opening-hours/calendars/{calendarId}";
+  public static final String DELETE_CALENDAR_API_ROUTE = "/opening-hours/calendars/{calendarIds}";
+  public static final String GET_ALL_DATES_API_ROUTE =
+    "/opening-hours/dates/{servicePointId}/all-openings";
 
   @Autowired
   private CalendarMapper calendarMapper;
@@ -53,14 +55,8 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
     return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.OPENING_HOURS)
-      .get(
-        getRequestUrl(
-          String.format(
-            GET_CALENDAR_API_ROUTE,
-            ids.stream().map(UUID::toString).collect(Collectors.joining(","))
-          )
-        )
-      );
+      .pathParam("calendarIds", ids.stream().map(UUID::toString).collect(Collectors.joining(",")))
+      .get(getRequestUrl(GET_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -72,14 +68,8 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
     return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.OPENING_HOURS)
-      .delete(
-        getRequestUrl(
-          String.format(
-            DELETE_CALENDAR_API_ROUTE,
-            ids.stream().map(UUID::toString).collect(Collectors.joining(","))
-          )
-        )
-      );
+      .pathParam("calendarIds", ids.stream().map(UUID::toString).collect(Collectors.joining(",")))
+      .delete(getRequestUrl(DELETE_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -90,9 +80,10 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
    */
   public Response sendCalendarUpdateRequest(UUID id, Calendar calendar) {
     return ra(ValidationSchema.OPENING_HOURS)
+      .pathParam("calendarId", id.toString())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(calendarMapper.toDto(calendar))
-      .put(getRequestUrl(String.format(PUT_CALENDAR_API_ROUTE, id)));
+      .put(getRequestUrl(PUT_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -160,5 +151,43 @@ public abstract class BaseOpeningHourApiTest extends BaseApiAutoDatabaseTest {
       request = request.queryParam("limit", parameters.getLimit());
     }
     return request.get(getRequestUrl(GET_SEARCH_CALENDAR_API_ROUTE));
+  }
+
+  /**
+   * GET /opening-hours/dates/{servicePointId}/all-openings : Daily opening information
+   * Calculate the opening information for each date within a range
+   *
+   * @param servicePointId The service point to calculate openings on (required)
+   * @param startDate The first date to include, inclusive (required)
+   * @param endDate The last date to include, inclusive (required)
+   * @param includeClosed Whether or not the results should include days where the service point is closed.  Exceptional closures will always be returned (required)
+   * @param offset Skip a certain number of the first values; used for pagination (optional, default to 0)
+   * @param limit The maximum number of elements returned in the response, used for pagination.  A limit of zero will not include any results (however, totalRecords will still be included) -- to include all results, use a large number such as 2147483647. (optional, default to 10)
+   * @return The query results (status code 200)
+   *         or Invalid request or parameters (status code 400)
+   *         or Internal server error (status code 500)
+   */
+  public Response getAllOpenings(
+    UUID servicePointId,
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosed,
+    Integer offset,
+    Integer limit
+  ) {
+    RequestSpecification ra = ra(ValidationSchema.OPENING_HOURS)
+      .pathParam("servicePointId", servicePointId.toString())
+      .queryParam("startDate", startDate.toString())
+      .queryParam("endDate", endDate.toString())
+      .queryParam("includeClosed", includeClosed);
+
+    if (offset != null) {
+      ra = ra.queryParam("offset", offset);
+    }
+    if (limit != null) {
+      ra = ra.queryParam("limit", limit);
+    }
+
+    return ra.get(getRequestUrl(GET_ALL_DATES_API_ROUTE));
   }
 }

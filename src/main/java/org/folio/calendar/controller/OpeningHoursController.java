@@ -115,15 +115,6 @@ public final class OpeningHoursController implements OpeningHoursApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<AdjacentOpeningsDTO> getAdjacentOpenings(
-    UUID servicePointId,
-    LocalDate date
-  ) {
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-  }
-
-  /** {@inheritDoc} */
-  @Override
   public ResponseEntity<SingleDayOpeningCollectionDTO> getAllOpenings(
     UUID servicePointId,
     LocalDate startDate,
@@ -131,6 +122,25 @@ public final class OpeningHoursController implements OpeningHoursApi {
     Boolean includeClosed,
     Integer offset,
     Integer limit
+  ) {
+    return new ResponseEntity<>(
+      openingHoursService.getDailyOpeningCollection(
+        servicePointId,
+        startDate,
+        endDate,
+        includeClosed,
+        offset,
+        limit
+      ),
+      HttpStatus.OK
+    );
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<AdjacentOpeningsDTO> getAdjacentOpenings(
+    UUID servicePointId,
+    LocalDate date
   ) {
     return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
   }

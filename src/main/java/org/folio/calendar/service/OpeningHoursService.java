@@ -1,15 +1,20 @@
 package org.folio.calendar.service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
+import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
+import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.error.CalendarNotFoundErrorData;
 import org.folio.calendar.domain.mapper.CalendarMapper;
@@ -20,7 +25,9 @@ import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.CustomOffsetPageRequest;
+import org.folio.calendar.utils.CalendarUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -81,8 +88,7 @@ public class OpeningHoursService {
   }
 
   /**
-   * Get all the calendars based on a list of ids.  If not all calendars are
-   * found, a {@link DataNotFoundException DataNotFoundException} is thrown
+   * Get all the calendars matching the given, optional, criteria.
    *
    * @param servicePointIds a list of service point UUIDs to search
    * @param startDate the date which returned results will end before
@@ -143,5 +149,48 @@ public class OpeningHoursService {
    */
   public void deleteCalendar(Calendar calendar) {
     this.calendarRepository.deleteCascadingById(calendar.getId());
+  }
+
+  /**
+   * Get objects for each date within a calendar's range representing opening
+   * or closure information
+   *
+   * @param servicePointId the service point ID to return opening information for
+   * @param startDate the first date to include
+   * @param endDate the last date to include
+   * @param includeClosed whether or not closed dates should be included
+   *        (exceptional closures are always included)
+   * @param offset pagination offset
+   * @param limit pagination limit
+   * @return a {@link SingleDayOpeningCollectionDTO SingleDayOpeningCollectionDTO}
+   * representing the dates' opening information
+   */
+  public SingleDayOpeningCollectionDTO getDailyOpeningCollection(
+    UUID servicePointId,
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosed,
+    Integer offset,
+    Integer limit
+  ) {
+    List<Calendar> relevantCalendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+      true,
+      Arrays.asList(servicePointId),
+      startDate,
+      endDate,
+      Pageable.unpaged()
+    );
+
+    // TreeMap makes sorting more efficient
+    Map<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
+    relevantCalendars.forEach(calendar ->
+      CalendarUtils.splitCalendarIntoDates(calendar, dates, startDate, endDate)
+    );
+
+    if (Boolean.TRUE.equals(includeClosed)) {
+      CalendarUtils.fillClosedDates(dates, startDate, endDate);
+    }
+
+    return CalendarUtils.openingMapToCollection(dates, offset, limit);
   }
 }
