@@ -32,10 +32,10 @@
     <ramlfiles_path>${basedir}/ramls</ramlfiles_path>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <raml-module-builder.version>33.2.4</raml-module-builder.version>
-    <vertx.version>4.2.4</vertx.version>
-    <rest-assured.version>4.3.0</rest-assured.version>
-    <aspectjrt.version>1.9.6</aspectjrt.version>
+    <raml-module-builder.version>34.1.0</raml-module-builder.version>
+    <vertx.version>4.3.1</vertx.version>
+    <rest-assured.version>5.1.1</rest-assured.version>
+    <aspectjrt.version>1.9.9.1</aspectjrt.version>
     <copy-rename-maven-plugin.version>1.0.1</copy-rename-maven-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <aspectj-maven-plugin.version>1.12.6</aspectj-maven-plugin.version>
@@ -44,6 +44,9 @@
     <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
+    <maven-model.version>3.8.6</maven-model.version>
+    <junit.version>4.13.2</junit.version>
+    <joda-time.version>2.10.14</joda-time.version>
 
   </properties>
 
@@ -66,7 +69,7 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>3.3.9</version>
+      <version>${maven-model.version}</version>
     </dependency>
 
     <dependency>
@@ -86,7 +89,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -107,7 +110,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.10.10</version>
+      <version>${joda-time.version}</version>
     </dependency>
 
   </dependencies>
