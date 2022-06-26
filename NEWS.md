@@ -1,3 +1,7 @@
+## 1.15.0 2022-06-26
+* Upgrade RMB to v34.1.0 (MODCAL-110)
+* Upgrade other Maven dependencies
+
 ## 1.14.0 2022-02-22
 * Upgrade RMB to v33.2.4 (MODCAL-102)
 * Upgrade RMB to v33.0.4 and Log4j 2.16.0 (MODCAL-99)
