@@ -255,7 +255,7 @@ public class TranslationKey {
     /**
      * An error message from the parser, likely not localized
      */
-    public static final String UNLOCALIZED_ERROR_MESSAGE = "unLocalizedErrorMessage";
+    public static final String UNLOCALIZED_ERROR_MESSAGE = "unlocalizedErrorMessage";
   }
 
   /**
