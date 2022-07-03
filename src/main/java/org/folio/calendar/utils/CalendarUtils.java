@@ -161,7 +161,7 @@ public class CalendarUtils {
                   .collect(Collectors.toList())
               )
               .open(true)
-              .allDay(openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
+              .allDay(TimeUtils.isAllDay(openings))
               .build()
           );
         }

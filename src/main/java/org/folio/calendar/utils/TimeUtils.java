@@ -2,6 +2,8 @@ package org.folio.calendar.utils;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.SingleDayOpeningRangeDTO;
 
@@ -58,11 +60,43 @@ public class TimeUtils {
   /**
    * Check that a time range covers an entire day
    *
-   * @param range the range to consider
+   * @param openings the range to consider
    * @return if the range covers an entire day (00:00 - 23:59), to minute accuracy
    */
-  public static boolean isAllDay(TemporalRange<LocalTime, ?> range) {
-    return isAllDay(range.getStart(), range.getEnd());
+  public static boolean isAllDay(List<? extends TemporalRange<LocalTime, ?>> openings) {
+    if (openings.isEmpty()) {
+      return false;
+    }
+
+    if (openings.size() == 1) {
+      return isAllDay(openings.get(0).getStart(), openings.get(0).getEnd());
+    }
+
+    List<TemporalRange<LocalTime, ?>> openingsCopy = new ArrayList<>(openings);
+    openingsCopy.sort((a, b) -> a.getStart().compareTo(b.getStart()));
+
+    // range must cover the full day
+    if (
+      !isAllDay(openingsCopy.get(0).getStart(), openingsCopy.get(openingsCopy.size() - 1).getEnd())
+    ) {
+      return false;
+    }
+
+    for (int i = 1; i < openingsCopy.size(); i++) {
+      // ensure each range butts up against the previous
+      if (
+        !openingsCopy
+          .get(i - 1)
+          .getEnd()
+          .plusMinutes(1)
+          .truncatedTo(ChronoUnit.MINUTES)
+          .equals(openingsCopy.get(i).getStart().truncatedTo(ChronoUnit.MINUTES))
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
