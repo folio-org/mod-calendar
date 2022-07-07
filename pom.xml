@@ -51,9 +51,9 @@
   </distributionManagement>
 
   <properties>
-    <java.version>11</java.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <java.version>17</java.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <folio-spring-base.version>4.0.0</folio-spring-base.version>
     <openapi-generator.version>5.3.0</openapi-generator.version>
     <json.version>20200518</json.version>
