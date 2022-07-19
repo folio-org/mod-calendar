@@ -1,8 +1,5 @@
 package org.folio.calendar.controller;
 
-import static org.apache.logging.log4j.Level.ERROR;
-import static org.apache.logging.log4j.Level.INFO;
-
 import java.util.Arrays;
 import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
@@ -44,7 +41,7 @@ public class ApiExceptionHandler {
   public ResponseEntity<ErrorResponseDTO> handleCalendarException(
     AbstractCalendarException exception
   ) {
-    log.log(INFO, exception);
+    log.info(exception);
     return exception.getErrorResponseDtoEntity();
   }
 
@@ -56,7 +53,7 @@ public class ApiExceptionHandler {
    */
   @ExceptionHandler(NoHandlerFoundException.class)
   public ResponseEntity<ErrorResponseDTO> handleNotFound(NoHandlerFoundException exception) {
-    log.log(INFO, exception);
+    log.info(exception);
     return new NonspecificCalendarException(
       exception,
       HttpStatus.NOT_FOUND,
@@ -82,7 +79,7 @@ public class ApiExceptionHandler {
   public ResponseEntity<ErrorResponseDTO> handleBadMethod(
     HttpRequestMethodNotSupportedException exception
   ) {
-    log.log(INFO, exception);
+    log.info(exception);
     return new NonspecificCalendarException(
       exception,
       HttpStatus.METHOD_NOT_ALLOWED,
@@ -113,7 +110,7 @@ public class ApiExceptionHandler {
     }
   )
   public ResponseEntity<ErrorResponseDTO> handleBadRequest(Exception exception) {
-    log.log(INFO, exception);
+    log.info(exception);
     return new NonspecificCalendarException(
       exception,
       ErrorCodeDTO.INVALID_PARAMETER,
@@ -134,7 +131,8 @@ public class ApiExceptionHandler {
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleAllOtherExceptions(Exception exception) {
-    log.log(ERROR, exception);
+    log.error(exception);
+    log.error(exception.getMessage());
 
     // As a note, NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
     // However, NPE is far too generic to catch and always attribute to bad input.

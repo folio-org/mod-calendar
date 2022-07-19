@@ -159,6 +159,18 @@ public class Calendars {
       )
     );
 
+  public static final Calendar CALENDAR_FULL_EXAMPLE_F = CALENDAR_2021_01_01_TO_2021_04_30
+    .withId(UUIDs.UUID_A)
+    .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
+    .withName(Names.NAME_1)
+    .withNormalHours(
+      Set.of(
+        NormalOpenings.WEDNESDAY_23_00_TO_SUNDAY_23_59,
+        NormalOpenings.MONDAY_04_00_TO_14_59,
+        NormalOpenings.TUESDAY_ALL_DAY
+      )
+    );
+
   public static final Calendar CALENDAR_WITH_NORMAL_HOURS_AND_EXCEPTIONS = CALENDAR_FULL_EXAMPLE_B.withExceptions(
     Set.of(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4)
   );

@@ -1,30 +1,21 @@
 package org.folio.calendar.controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.CalculatedOpenings;
-import org.folio.calendar.domain.dto.OpeningDayConcrete;
-import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
-import org.folio.calendar.domain.dto.OpeningDayInfo;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.domain.dto.PeriodCollection;
+import org.folio.calendar.domain.dto.CalendarCollectionDTO;
+import org.folio.calendar.domain.dto.CalendarDTO;
+import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
+import org.folio.calendar.domain.dto.SurroundingOpeningsDTO;
 import org.folio.calendar.domain.entity.Calendar;
-import org.folio.calendar.domain.types.LegacyPeriodDate;
-import org.folio.calendar.exception.DataNotFoundException;
-import org.folio.calendar.repository.PeriodQueryFilter;
+import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
-import org.folio.calendar.utils.DateUtils;
-import org.folio.calendar.utils.PeriodUtils;
-import org.folio.calendar.utils.TimeConstants;
+import org.folio.calendar.service.CalendarValidationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,260 +30,120 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/")
 public final class CalendarController implements CalendarApi {
 
-  public static final String PARAMETER_NAME_PERIOD = "period";
-  public static final String PARAMETER_NAME_SERVICE_POINT_ID = "servicePointId";
-  public static final String PARAMETER_NAME_PERIOD_ID = "periodId";
+  @Autowired
+  private CalendarValidationService calendarValidationService;
 
   @Autowired
-  public CalendarService calendarService;
+  private CalendarService calendarService;
+
+  @Autowired
+  private CalendarMapper calendarMapper;
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Period> addNewPeriod(UUID servicePointId, Period period) {
-    Calendar calendar = this.calendarService.createCalendarFromPeriod(period, servicePointId);
+  public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
+    Calendar calendar = calendarMapper.fromDto(calendarDto);
+    calendarValidationService.validate(calendar);
 
-    return new ResponseEntity<>(PeriodUtils.toPeriod(calendar), HttpStatus.CREATED);
+    log.info("createCalendar: Calendar passed validation, saving...");
+
+    calendar.clearIds();
+    calendar.setId(UUID.randomUUID());
+    calendarService.saveCalendar(calendar);
+
+    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.CREATED);
   }
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<PeriodCollection> getPeriodsForServicePoint(
-    UUID servicePointId,
-    Boolean withOpeningDays,
-    Boolean showPast,
-    Boolean showExceptional
-  ) {
-    PeriodQueryFilter filter;
-    if (Boolean.TRUE.equals(showExceptional)) {
-      filter = PeriodQueryFilter.EXCEPTIONS;
-    } else {
-      filter = PeriodQueryFilter.NORMAL_HOURS;
-    }
-
+  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendarIds) {
     return new ResponseEntity<>(
-      this.calendarService.getPeriods(
-          servicePointId,
-          filter,
-          Boolean.TRUE.equals(showPast),
-          Boolean.TRUE.equals(withOpeningDays)
-        ),
+      calendarService.getCalendarCollectionForIdList(new HashSet<>(calendarIds)),
       HttpStatus.OK
     );
   }
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<Period> getPeriodById(UUID servicePointId, UUID periodId) {
-    return new ResponseEntity<>(
-      PeriodUtils.toPeriod(this.calendarService.getCalendarById(servicePointId, periodId)),
-      HttpStatus.OK
-    );
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public ResponseEntity<Void> deletePeriodById(UUID servicePointId, UUID periodId) {
-    Calendar calendar = this.calendarService.getCalendarById(servicePointId, periodId);
-
-    this.calendarService.deleteCalendar(calendar);
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  @SuppressWarnings("java:S1141")
-  public ResponseEntity<Void> updatePeriodById(UUID servicePointId, UUID periodId, Period period) {
-    try {
-      Calendar originalCalendar = this.calendarService.getCalendarById(periodId);
-
-      this.calendarService.replaceCalendar(originalCalendar, period, servicePointId);
-    } catch (DataNotFoundException exception) {
-      log.info("Current calendar does not exist; not doing anything and returning 204");
-      log.info(exception);
-
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  public ResponseEntity<OpeningDayConcreteCollection> getDateOpenings(
-    UUID servicePointId,
+  public ResponseEntity<CalendarCollectionDTO> searchCalendars(
+    List<UUID> servicePointIds,
     LocalDate startDate,
     LocalDate endDate,
-    Boolean includeClosedDays,
-    Boolean actualOpening,
     Integer offset,
     Integer limit
   ) {
-    Iterable<Calendar> calendars =
-      this.calendarService.getCalendars(servicePointId, startDate, endDate);
-
-    LocalDate firstDate = startDate;
-    LocalDate lastDate = endDate;
-
-    Map<LocalDate, OpeningDayInfo> normalOpenings = new HashMap<>();
-    Map<LocalDate, OpeningDayInfo> exceptions = new HashMap<>();
-
-    for (Calendar calendar : calendars) {
-      if (startDate == null) {
-        firstDate = DateUtils.min(calendar.getStartDate(), firstDate);
-      }
-      if (endDate == null) {
-        lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
-      }
-
-      PeriodUtils.mergeInto(
-        normalOpenings,
-        PeriodUtils.getDailyNormalOpenings(calendar, startDate, endDate)
-      );
-      PeriodUtils.mergeInto(
-        exceptions,
-        PeriodUtils.getDailyExceptionalOpenings(calendar, startDate, endDate)
-      );
-    }
-
-    List<OpeningDayConcrete> collection = PeriodUtils.buildOpeningDayConcreteCollection(
-      normalOpenings,
-      exceptions,
-      firstDate,
-      lastDate,
-      includeClosedDays,
-      actualOpening
-    );
-
     return new ResponseEntity<>(
-      OpeningDayConcreteCollection
-        .builder()
-        .openingPeriods(collection.stream().skip(offset).limit(limit).collect(Collectors.toList()))
-        .totalRecords(collection.size())
-        .build(),
+      calendarService.getCalendarCollectionForServicePointsOrDateRange(
+        servicePointIds,
+        startDate,
+        endDate,
+        offset,
+        limit
+      ),
       HttpStatus.OK
     );
   }
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalculatedOpenings> getNearestOpenings(
+  public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendarDto) {
+    // ensure the ID currently exists
+    calendarService.getCalendarCollectionForIdList(Set.of(calendarId));
+
+    Calendar calendar = calendarMapper.fromDto(calendarDto);
+    calendarValidationService.validate(calendar, Arrays.asList(calendarId));
+
+    log.info("updateCalendar: Calendar passed validation, saving...");
+
+    calendar.clearIds();
+    calendar.setId(calendarId);
+    calendarService.saveCalendar(calendar);
+
+    return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.OK);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<Void> deleteCalendars(List<UUID> calendarIds) {
+    calendarService
+      .getCalendarsForIdList(new HashSet<>(calendarIds))
+      .forEach(calendarService::deleteCalendar);
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<SingleDayOpeningCollectionDTO> getAllOpenings(
     UUID servicePointId,
-    LegacyPeriodDate requestedDate
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosed,
+    Integer offset,
+    Integer limit
   ) {
-    LocalDate date = requestedDate.getValue();
-    Iterable<Calendar> calendars = this.calendarService.getCalendars(servicePointId, null, null);
-
-    Map<LocalDate, OpeningDayInfo> normalOpenings = new HashMap<>();
-    Map<LocalDate, OpeningDayInfo> exceptions = new HashMap<>();
-
-    LocalDate firstDate = date;
-    LocalDate lastDate = date;
-
-    for (Calendar calendar : calendars) {
-      firstDate = DateUtils.min(calendar.getStartDate(), firstDate);
-      lastDate = DateUtils.max(calendar.getEndDate(), lastDate);
-
-      PeriodUtils.mergeInto(
-        normalOpenings,
-        PeriodUtils.getDailyNormalOpenings(calendar, null, null)
-      );
-      PeriodUtils.mergeInto(
-        exceptions,
-        PeriodUtils.getDailyExceptionalOpenings(calendar, null, null)
-      );
-    }
-
-    List<OpeningDayConcrete> allOpenings = PeriodUtils.buildOpeningDayConcreteCollection(
-      normalOpenings,
-      exceptions,
-      firstDate,
-      lastDate,
-      false,
-      true
+    return new ResponseEntity<>(
+      calendarService.getDailyOpeningCollection(
+        servicePointId,
+        startDate,
+        endDate,
+        includeClosed,
+        offset,
+        limit
+      ),
+      HttpStatus.OK
     );
+  }
 
-    int currentIndex = Arrays.binarySearch(
-      allOpenings.stream().map(opening -> opening.getDate().getValue()).toArray(),
-      date
-    );
-
-    OpeningDayInfo previous = null;
-    OpeningDayInfo current = null;
-    OpeningDayInfo next = null;
-
-    OpeningDayInfo empty = OpeningDayInfo
-      .builder()
-      .allDay(false)
-      .open(false)
-      .exceptional(false)
-      .openingHour(new ArrayList<>())
-      .build();
-
-    int prevIndex = -1;
-    int nextIndex = -1;
-
-    if (currentIndex >= 0) {
-      current = allOpenings.get(currentIndex).getOpeningDay().withDate(requestedDate);
-      if (Boolean.FALSE.equals(current.isOpen())) {
-        current =
-          empty
-            .withAllDay(true)
-            .withDate(requestedDate)
-            .withExceptional(true)
-            .withOpeningHour(Arrays.asList(TimeConstants.ALL_DAY));
-      }
-      prevIndex = currentIndex - 1;
-      nextIndex = currentIndex + 1;
-    } else {
-      // per Arrays.binarySearch: currentIndex = (-(insertion point) - 1)
-      // The insertion point is defined as the point at which the key would be inserted into
-      // the array: the index of the first element greater than the key, or a.length if all
-      // elements in the array are less than the specified key
-      current = empty.withAllDay(true).withDate(requestedDate);
-
-      nextIndex = (currentIndex + 1) * -1;
-      prevIndex = nextIndex - 1;
-    }
-
-    // ensure that previous and next do not refer to adjacent closures
-    while (
-      prevIndex >= 0 && Boolean.TRUE.equals(!allOpenings.get(prevIndex).getOpeningDay().isOpen())
-    ) {
-      prevIndex--;
-    }
-    while (
-      nextIndex < allOpenings.size() &&
-      Boolean.TRUE.equals(!allOpenings.get(nextIndex).getOpeningDay().isOpen())
-    ) {
-      nextIndex++;
-    }
-
-    if (prevIndex >= 0) {
-      OpeningDayConcrete concrete = allOpenings.get(prevIndex);
-      previous = concrete.getOpeningDay().withDate(concrete.getDate());
-    }
-
-    if (nextIndex < allOpenings.size()) {
-      OpeningDayConcrete concrete = allOpenings.get(nextIndex);
-      next = concrete.getOpeningDay().withDate(concrete.getDate());
-    }
-
-    if (previous == null) {
-      previous = empty;
-    }
-    if (next == null) {
-      next = empty;
-    }
-
-    return ResponseEntity.ok(
-      new CalculatedOpenings(
-        Arrays.asList(
-          OpeningDayRelative.builder().openingDay(previous).build(),
-          OpeningDayRelative.builder().openingDay(current).build(),
-          OpeningDayRelative.builder().openingDay(next).build()
-        )
-      )
+  /** {@inheritDoc} */
+  @Override
+  public ResponseEntity<SurroundingOpeningsDTO> getSurroundingOpenings(
+    UUID servicePointId,
+    LocalDate date
+  ) {
+    return new ResponseEntity<>(
+      calendarService.getSurroundingOpenings(servicePointId, date),
+      HttpStatus.OK
     );
   }
 }

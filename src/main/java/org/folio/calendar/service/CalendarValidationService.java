@@ -550,4 +550,8 @@ public class CalendarValidationService {
       });
     return stream.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
   }
+
+  public void validate(Calendar calendar) {
+    validate(calendar, new ArrayList<>());
+  }
 }

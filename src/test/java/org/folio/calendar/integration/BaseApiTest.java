@@ -72,11 +72,8 @@ public abstract class BaseApiTest {
   @LocalServerPort
   protected Integer port;
 
-  protected final OpenApiValidationFilter legacyValidationFilter = new OpenApiValidationFilter(
-    "api/legacy/mod-calendar.yaml"
-  );
-  protected final OpenApiValidationFilter newValidationFilter = new OpenApiValidationFilter(
-    "api/opening-hours.yaml"
+  protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
+    "api/calendar.yaml"
   );
 
   @BeforeEach
@@ -178,11 +175,8 @@ public abstract class BaseApiTest {
   public RequestSpecification ra(ValidationSchema validation) {
     RequestSpecification ra = RestAssured.given();
     switch (validation) {
-      case LEGACY:
-        ra = ra.filter(legacyValidationFilter);
-        break;
-      case OPENING_HOURS:
-        ra = ra.filter(newValidationFilter);
+      case REGULAR:
+        ra = ra.filter(validationFilter);
         break;
       case NONE:
       default:
@@ -200,7 +194,7 @@ public abstract class BaseApiTest {
    *         RestAssured library methods
    */
   public RequestSpecification ra() {
-    return ra(ValidationSchema.LEGACY);
+    return ra(ValidationSchema.REGULAR);
   }
 
   /**

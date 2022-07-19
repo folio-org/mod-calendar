@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.dto.PeriodDTO;
 import org.folio.calendar.domain.types.LegacyPeriodDate;
 import org.folio.calendar.i18n.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ import org.springframework.jdbc.core.RowMapper;
  */
 @Data
 @Log4j2
-public class RMBOpeningMapper implements RowMapper<Period> {
+public class RMBOpeningMapper implements RowMapper<PeriodDTO> {
 
   public static final String GET_RMB_OPENING_HOURS =
     "SELECT jsonb FROM regular_hours WHERE jsonb->>'openingId' = ?";
@@ -32,7 +32,7 @@ public class RMBOpeningMapper implements RowMapper<Period> {
   @Autowired
   private TranslationService translationService;
 
-  public Period mapRow(ResultSet result, int rowNum) throws SQLException {
+  public PeriodDTO mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
       JsonNode json = mapper.readTree(result.getString("jsonb"));
       UUID openingId = UUID.fromString(json.get("id").asText());
@@ -40,7 +40,7 @@ public class RMBOpeningMapper implements RowMapper<Period> {
       log.info(String.format("Attempting to migrate period %s", openingId));
 
       log.info(String.format("Getting hours for period %s", openingId));
-      List<OpeningDayRelative> openings = jdbcTemplate.queryForObject(
+      List<OpeningDayRelativeDTO> openings = jdbcTemplate.queryForObject(
         GET_RMB_OPENING_HOURS,
         new RMBHoursMapper(mapper),
         openingId.toString()
@@ -48,7 +48,7 @@ public class RMBOpeningMapper implements RowMapper<Period> {
 
       log.info(String.format("Successfully read period %s", openingId));
 
-      return Period
+      return PeriodDTO
         .builder()
         .id(openingId)
         .servicePointId(UUID.fromString(json.get("servicePointId").asText()))

@@ -5,11 +5,9 @@ import java.time.chrono.ChronoLocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.CheckForNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.Period;
 import org.folio.calendar.domain.entity.Calendar;
 
 /**
@@ -109,49 +107,6 @@ public class DateUtils {
   /**
    * Check that two periods overlap
    *
-   * @param period1 Period 1
-   * @param period2 Period 2
-   * @return if they overlap
-   */
-  public static boolean overlaps(Period period1, Period period2) {
-    return overlaps(
-      period1.getStartDate().getValue(),
-      period1.getEndDate().getValue(),
-      period2.getStartDate().getValue(),
-      period2.getEndDate().getValue()
-    );
-  }
-
-  /**
-   * Check that a period and calendar overlap
-   *
-   * @param period Period
-   * @param calendar Calendar
-   * @return if they overlap
-   */
-  public static boolean overlaps(Period period, Calendar calendar) {
-    return overlaps(calendar, period);
-  }
-
-  /**
-   * Check that a calendar and period overlap
-   *
-   * @param calendar Calendar
-   * @param period Period
-   * @return if they overlap
-   */
-  public static boolean overlaps(Calendar calendar, Period period) {
-    return overlaps(
-      calendar.getStartDate(),
-      calendar.getEndDate(),
-      period.getStartDate().getValue(),
-      period.getEndDate().getValue()
-    );
-  }
-
-  /**
-   * Check that two periods overlap
-   *
    * @param calendar1 Calendar 1
    * @param calendar2 Calendar 2
    * @return if they overlap
@@ -163,40 +118,6 @@ public class DateUtils {
       calendar2.getStartDate(),
       calendar2.getEndDate()
     );
-  }
-
-  /**
-   * Check that the given period overlaps with a list of others.  Note that this does not check overlaps within otherPeriods.
-   *
-   * @param period Period to check
-   * @param otherPeriods List of other periods
-   * @return the overlapped period, or null if no overlap
-   */
-  @CheckForNull
-  public static Period overlapsPeriodList(Period period, Iterable<Period> otherPeriods) {
-    for (Period other : otherPeriods) {
-      if (overlaps(period, other)) {
-        return other;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Check that the given period does not overlap with a list of Calendars
-   *
-   * @param period Period to check
-   * @param calendars Calendars
-   * @return the overlapped calendar, or null if no overlap
-   */
-  @CheckForNull
-  public static Calendar overlapsCalendarList(Period period, Iterable<Calendar> calendars) {
-    for (Calendar other : calendars) {
-      if (overlaps(period, other)) {
-        return other;
-      }
-    }
-    return null;
   }
 
   /**

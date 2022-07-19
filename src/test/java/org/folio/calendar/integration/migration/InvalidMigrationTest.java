@@ -1,67 +1,51 @@
 package org.folio.calendar.integration.migration;
 
-import static org.folio.calendar.integration.api.calendar.periods.servicepointid.period.periodid.get.GetSpecificCalendarAbstractTest.GET_CALENDAR_API_ROUTE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
-import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.testconstants.Periods;
-import org.folio.calendar.testconstants.UUIDs;
-import org.junit.jupiter.api.BeforeAll;
+import lombok.extern.log4j.Log4j2;
+import org.folio.calendar.domain.dto.CalendarCollectionDTO;
+import org.folio.calendar.domain.mapper.CalendarMapper;
+import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
+@Log4j2
 class InvalidMigrationTest extends AbstractMigrationTest {
 
-  @BeforeAll
-  void migrate() {
-    loadMigrationSql("database-migrate-invalid.sql");
-    runMigration();
-  }
+  @Autowired
+  CalendarMapper calendarMapper;
 
   // tests the valid calendar in the bad data
   @Test
-  void testValidCalendar() {
-    Response response = ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_5, UUIDs.UUID_C)));
-    response.then().statusCode(is(HttpStatus.OK.value()));
+  void testCalendars() {
+    loadMigrationSql("database-migrate-invalid.sql");
+    runMigration();
 
-    Period period = response.getBody().as(Period.class);
+    CalendarCollectionDTO collection = ra()
+      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+      .getBody()
+      .as(CalendarCollectionDTO.class);
+
+    // fix comparison nuances for valid calendar
+    collection.getCalendars().forEach(c -> c.setId(null));
+    assertThat("Only 2 periods were valid enough", collection.getCalendars(), hasSize(2));
     assertThat(
-      "The returned period is the expected period",
-      period,
-      is(Periods.PERIOD_FULL_EXCEPTIONAL_C)
+      "One calendar had invalid openings stripped",
+      collection.getCalendars().stream().anyMatch(c -> c.getNormalHours().isEmpty()),
+      is(true)
     );
-  }
-
-  // tests the totally invalid calendars in the bad data
-  @Test
-  void testInvalidCalendars() {
-    ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_0, UUIDs.UUID_0)))
-      .then()
-      .statusCode(is(HttpStatus.NOT_FOUND.value()));
-
-    ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_0, UUIDs.UUID_F)))
-      .then()
-      .statusCode(is(HttpStatus.NOT_FOUND.value()));
-  }
-
-  // tests the totally improper normal hours calendar in the bad data
-  @Test
-  void testCalendarWithInvalidHours() {
-    Response response = ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_0, UUIDs.UUID_B)));
-    response.then().statusCode(is(HttpStatus.OK.value()));
-
-    Period period = response.getBody().as(Period.class);
+    log.info(collection.getCalendars());
     assertThat(
-      "The returned period is the expected period with invalid hours omitted",
-      period.getOpeningDays(),
-      hasSize(0)
+      "The one valid calendar was copied properly",
+      collection
+        .getCalendars()
+        .stream()
+        .anyMatch(c ->
+          c.getExceptions().size() == 1 && c.getExceptions().get(0).getOpenings().size() == 4
+        ),
+      is(true)
     );
   }
 }

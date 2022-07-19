@@ -1,0 +1,21 @@
+openapi: 3.0.3
+info:
+  title: Calendar Opening Hours API
+  version: v5.0
+servers:
+  - url: /
+paths:
+  /calendar/calendars:
+    $ref: paths/calendar/calendars.yaml
+  /calendar/calendars/{calendarId}:
+    $ref: paths/calendar/calendars/calendarIdSingle.yaml
+  /calendar/calendars/{calendarIds}:
+    $ref: paths/calendar/calendars/calendarIdMultiple.yaml
+  /calendar/dates/{servicePointId}/surrounding-openings:
+    $ref: paths/calendar/dates/surrounding-openings.yaml
+  /calendar/dates/{servicePointId}/all-openings:
+    $ref: paths/calendar/dates/all-openings.yaml
+components:
+  schemas:
+    period:
+      $ref: schemas/legacy/period.yaml

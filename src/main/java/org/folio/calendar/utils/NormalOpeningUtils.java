@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningHourRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.types.Weekday;
 
@@ -169,34 +168,5 @@ public class NormalOpeningUtils {
     }
 
     return opening1.withEndDay(opening2.getEndDay()).withEndTime(opening2.getEndTime());
-  }
-
-  /**
-   * Split a NormalOpening into weekdays (as a series of
-   * {@link org.folio.calendar.domain.dto.OpeningHourRange}s)
-   * @param opening the opening to split
-   * @return a Map of {@link org.folio.calendar.domain.dto.Weekday}s to
-   * {@link org.folio.calendar.domain.dto.OpeningHourRange}
-   */
-  public static Map<Weekday, OpeningHourRange> splitIntoWeekdays(NormalOpening opening) {
-    List<Weekday> weekdays = Weekday.getRange(opening.getStartDay(), opening.getEndDay());
-
-    Map<Weekday, OpeningHourRange> map = new EnumMap<>(Weekday.class);
-
-    for (Weekday day : weekdays) {
-      OpeningHourRange.OpeningHourRangeBuilder builder = OpeningHourRange
-        .builder()
-        .startTime(TimeConstants.TIME_MIN_STRING)
-        .endTime(TimeConstants.TIME_MAX_STRING);
-      if (day == opening.getStartDay()) {
-        builder = builder.startTime(TimeUtils.toTimeString(opening.getStartTime()));
-      }
-      if (day == opening.getEndDay()) {
-        builder = builder.endTime(TimeUtils.toTimeString(opening.getEndTime()));
-      }
-      map.put(day, builder.build());
-    }
-
-    return map;
   }
 }

@@ -2,12 +2,12 @@ package org.folio.calendar.testconstants;
 
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningDayInfo;
+import org.folio.calendar.domain.dto.OpeningDayInfoDTO;
 
 @UtilityClass
 public class OpeningDayInfoRelativeConstants {
 
-  public static final OpeningDayInfo CLOSED_ALL_DAY = OpeningDayInfo
+  public static final OpeningDayInfoDTO CLOSED_ALL_DAY = OpeningDayInfoDTO
     .builder()
     // for some reason, the current FE sends them like this
     .openingHour(Arrays.asList(OpeningHourRanges.ALL_DAY))
@@ -15,14 +15,14 @@ public class OpeningDayInfoRelativeConstants {
     .allDay(true)
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_ALL_DAY = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_ALL_DAY = OpeningDayInfoDTO
     .builder()
     .openingHour(Arrays.asList(OpeningHourRanges.ALL_DAY))
     .open(true)
     .allDay(true)
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
@@ -31,35 +31,35 @@ public class OpeningDayInfoRelativeConstants {
     )
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_00_00_TO_12_30 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_00_00_TO_12_30 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
     .openingHour(Arrays.asList(OpeningHourRanges.RANGE_00_00_TO_12_30))
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_00_00_TO_14_59 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_00_00_TO_14_59 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
     .openingHour(Arrays.asList(OpeningHourRanges.RANGE_00_00_TO_14_59))
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_04_00_TO_14_59 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_04_00_TO_14_59 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
     .openingHour(Arrays.asList(OpeningHourRanges.RANGE_04_00_TO_14_59))
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_15_00_TO_23_59 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_15_00_TO_23_59 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
     .openingHour(Arrays.asList(OpeningHourRanges.RANGE_15_00_TO_23_59))
     .exceptional(false)
     .build();
-  public static final OpeningDayInfo OPEN_23_00_TO_23_59 = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_23_00_TO_23_59 = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
@@ -67,7 +67,7 @@ public class OpeningDayInfoRelativeConstants {
     .exceptional(false)
     .build();
 
-  public static final OpeningDayInfo OPEN_INVALID = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPEN_INVALID = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
@@ -75,7 +75,7 @@ public class OpeningDayInfoRelativeConstants {
     .exceptional(false)
     .build();
 
-  public static final OpeningDayInfo OPENING_NULL = OpeningDayInfo
+  public static final OpeningDayInfoDTO OPENING_NULL = OpeningDayInfoDTO
     .builder()
     .open(true)
     .allDay(false)
@@ -83,17 +83,19 @@ public class OpeningDayInfoRelativeConstants {
     .build()
     .withOpeningHour(null);
 
-  public static final OpeningDayInfo EXCEPTIONAL_CLOSED_ALL_DAY = CLOSED_ALL_DAY.withExceptional(
+  public static final OpeningDayInfoDTO EXCEPTIONAL_CLOSED_ALL_DAY = CLOSED_ALL_DAY.withExceptional(
     true
   );
-  public static final OpeningDayInfo EXCEPTIONAL_OPEN_ALL_DAY = OPEN_ALL_DAY.withExceptional(true);
-  public static final OpeningDayInfo EXCEPTIONAL_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withExceptional(
+  public static final OpeningDayInfoDTO EXCEPTIONAL_OPEN_ALL_DAY = OPEN_ALL_DAY.withExceptional(
     true
   );
-  public static final OpeningDayInfo EXCEPTIONAL_OPEN_00_00_TO_14_59 = OPEN_00_00_TO_14_59.withExceptional(
+  public static final OpeningDayInfoDTO EXCEPTIONAL_OPEN_00_00_TO_12_30_AND_23_00_TO_23_59 = OPEN_00_00_TO_12_30_AND_23_00_TO_23_59.withExceptional(
     true
   );
-  public static final OpeningDayInfo EXCEPTIONAL_OPEN_04_00_TO_14_59 = OPEN_04_00_TO_14_59.withExceptional(
+  public static final OpeningDayInfoDTO EXCEPTIONAL_OPEN_00_00_TO_14_59 = OPEN_00_00_TO_14_59.withExceptional(
+    true
+  );
+  public static final OpeningDayInfoDTO EXCEPTIONAL_OPEN_04_00_TO_14_59 = OPEN_04_00_TO_14_59.withExceptional(
     true
   );
 }

@@ -1,12 +1,11 @@
 package org.folio.calendar.integration;
 
 /**
- * Enum for different types of validation schemas, either none, legacy (/calendar), or opening_hours (new)
+ * Enum for different types of validation schemas, either none or regular
  */
 public enum ValidationSchema {
   NONE("NO_VALIDATION"),
-  LEGACY("VALIDATE_LEGACY_CALENDAR"),
-  OPENING_HOURS("VALIDATE_NEW_OPENING_HOURS");
+  REGULAR("VALIDATE_API");
 
   public String value;
 

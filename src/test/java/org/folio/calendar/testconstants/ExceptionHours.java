@@ -69,4 +69,11 @@ public class ExceptionHours {
   public static final ExceptionHour OPEN_15_00_TO_23_59_JAN_4 = OPEN_04_00_TO_14_59_JAN_4
     .withStartTime(Times.TIME_15_00)
     .withEndTime(Times.TIME_23_59);
+  public static final ExceptionHour OPEN_ALL_DAY_MAR_16_TO_APR_30 = ExceptionHour
+    .builder()
+    .startDate(Dates.DATE_2021_03_16)
+    .startTime(Times.TIME_00_00)
+    .endDate(Dates.DATE_2021_04_30)
+    .endTime(Times.TIME_23_59)
+    .build();
 }

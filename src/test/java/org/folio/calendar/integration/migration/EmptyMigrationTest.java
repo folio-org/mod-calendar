@@ -1,10 +1,10 @@
 package org.folio.calendar.integration.migration;
 
-import static org.folio.calendar.integration.api.calendar.periods.get.GetPeriodAbstractTest.GET_PERIOD_API_ROUTE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 
-import org.folio.calendar.domain.dto.OpeningDayConcreteCollection;
+import org.folio.calendar.domain.dto.CalendarCollectionDTO;
+import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
 import org.junit.jupiter.api.Test;
 
 class EmptyMigrationTest extends AbstractMigrationTest {
@@ -14,14 +14,14 @@ class EmptyMigrationTest extends AbstractMigrationTest {
     loadMigrationSql();
     runMigration();
 
-    OpeningDayConcreteCollection collection = ra()
-      .get(getRequestUrl(GET_PERIOD_API_ROUTE))
+    CalendarCollectionDTO collection = ra()
+      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
       .getBody()
-      .as(OpeningDayConcreteCollection.class);
+      .as(CalendarCollectionDTO.class);
 
     assertThat(
-      "The returned collection has no opening information indicating no migrated calendars",
-      collection.getOpeningPeriods(),
+      "The returned collection has no calendars, indicating no migrated calendars",
+      collection.getCalendars(),
       hasSize(0)
     );
   }

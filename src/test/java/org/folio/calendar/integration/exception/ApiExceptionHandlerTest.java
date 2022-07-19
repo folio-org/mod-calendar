@@ -12,7 +12,7 @@ import org.folio.calendar.domain.dto.ErrorDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.integration.BaseApiTest;
 import org.folio.calendar.integration.ValidationSchema;
-import org.folio.calendar.integration.api.calendar.periods.servicepointid.period.post.CreateCalendarAbstractTest;
+import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   public static final String BAD_API_ROUTE = "/bad";
 
-  public static final String VALID_API_ROUTE = CreateCalendarAbstractTest.CREATE_CALENDAR_API_ROUTE;
+  public static final String VALID_API_ROUTE = BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE;
 
   @Test
   void testInvalidGetApiRoute() {

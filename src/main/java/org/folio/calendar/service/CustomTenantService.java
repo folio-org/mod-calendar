@@ -7,16 +7,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import javax.annotation.Priority;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.Period;
+import org.folio.calendar.domain.dto.PeriodDTO;
 import org.folio.calendar.domain.entity.Calendar;
-import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.legacymapper.RMBOpeningMapper;
 import org.folio.calendar.domain.sample.SampleCalendars;
 import org.folio.calendar.exception.AbstractCalendarException;
+import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.utils.PeriodUtils;
 import org.folio.spring.FolioExecutionContext;
 import org.folio.spring.liquibase.FolioSpringLiquibase;
@@ -37,8 +36,10 @@ public class CustomTenantService extends TenantService {
   public static final String GET_RMB_OPENINGS = "SELECT jsonb FROM openings";
 
   protected final CalendarService calendarService;
+  protected final CalendarValidationService calendarValidationService;
+  protected final TranslationService translationService;
 
-  protected List<Period> periodsToMigrate;
+  protected List<PeriodDTO> periodsToMigrate;
 
   /**
    * Constructor for a new CustomTenantService.  Directly wraps the original {@link TenantService TenantService} constructor.
@@ -52,10 +53,14 @@ public class CustomTenantService extends TenantService {
     JdbcTemplate jdbcTemplate,
     FolioExecutionContext context,
     FolioSpringLiquibase folioSpringLiquibase,
-    CalendarService calendarService
+    CalendarService calendarService,
+    CalendarValidationService calendarValidationService,
+    TranslationService translationService
   ) {
     super(jdbcTemplate, context, folioSpringLiquibase);
     this.calendarService = calendarService;
+    this.calendarValidationService = calendarValidationService;
+    this.translationService = translationService;
     this.periodsToMigrate = new ArrayList<>();
   }
 
@@ -96,11 +101,13 @@ public class CustomTenantService extends TenantService {
    */
   @Override
   protected void afterLiquibaseUpdate(TenantAttributes attributes) {
-    for (Period period : this.periodsToMigrate) {
+    for (PeriodDTO period : this.periodsToMigrate) {
       try {
         log.info(String.format("Attempting to save calendar with ID %s", period.getId()));
-        this.calendarService.createCalendarFromPeriod(period, period.getServicePointId());
-      } catch (AbstractCalendarException e) {
+        Calendar calendar = PeriodUtils.toCalendar(period);
+        this.calendarValidationService.validate(calendar);
+        this.calendarService.saveCalendar(calendar);
+      } catch (RuntimeException e) {
         log.error(String.format("Could not save calendar with ID %s", period.getId()));
         log.error(e);
       }
@@ -127,20 +134,12 @@ public class CustomTenantService extends TenantService {
     );
 
     SampleCalendars
-      .getSampleCalendars()
+      .getSampleCalendars(translationService)
       .forEach((Calendar calendar) -> {
         try {
-          this.calendarService.checkPeriod(
-              PeriodUtils.toPeriod(calendar.withExceptions(new HashSet<>())),
-              calendar
-                .getServicePoints()
-                .stream()
-                .map(ServicePointCalendarAssignment::getServicePointId)
-                .findFirst()
-                .get()
-            );
-          this.calendarService.insertCalendar(calendar);
-          log.info(String.format("Loaded calendar %s", calendar.getId()));
+          this.calendarValidationService.validate(calendar);
+          this.calendarService.saveCalendar(calendar);
+          log.info(String.format("Loaded calendar %s", calendar.getName()));
         } catch (AbstractCalendarException e) {
           log.error("Could not load sample calendar - skipping and continuing");
           log.error(e);

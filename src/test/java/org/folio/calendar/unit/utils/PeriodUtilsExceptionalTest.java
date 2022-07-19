@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThrows;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
+import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.ExceptionRanges;
@@ -63,12 +63,12 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfNoExceptionsToExceptionRanges() {
-    List<OpeningDayRelative> list = new ArrayList<>();
+    List<OpeningDayRelativeDTO> list = new ArrayList<>();
     assertThrows(
       "A list of no openings cannot be converted to exception range(s)",
       IllegalArgumentException.class,
       () ->
-        PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+        PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
           list
@@ -78,7 +78,7 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfMultipleExceptionsToExceptionRanges() {
-    List<OpeningDayRelative> list = Arrays.asList(
+    List<OpeningDayRelativeDTO> list = Arrays.asList(
       OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED,
       OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59
     );
@@ -86,7 +86,7 @@ class PeriodUtilsExceptionalTest {
       "A list of multiple openings cannot be converted to exception range(s)",
       IllegalArgumentException.class,
       () ->
-        PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+        PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
           list
@@ -96,14 +96,14 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfMultipleHourPairsToExceptionRanges() {
-    List<OpeningDayRelative> list = Arrays.asList(
+    List<OpeningDayRelativeDTO> list = Arrays.asList(
       OpeningDayRelativeConstants.EXCEPTIONAL_INVALID_MULTIPLE_OPENINGS
     );
     assertThrows(
       "An opening with multiple hour ranges cannot be converted to exception range(s)",
       IllegalArgumentException.class,
       () ->
-        PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+        PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
           Dates.DATE_2021_01_01,
           Dates.DATE_2021_12_31,
           list
@@ -113,7 +113,7 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfClosureToExceptionRanges() {
-    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_12_31,
       Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED)
@@ -145,7 +145,7 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfAllDayOpeningToExceptionRanges() {
-    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_01_04,
       Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_ALL_DAY)
@@ -178,7 +178,7 @@ class PeriodUtilsExceptionalTest {
 
   @Test
   void testConversionOfPartialDayOpeningToExceptionRanges() {
-    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
+    List<ExceptionRange> result = PeriodUtils.convertOpeningDayRelativeDTOToExceptionRanges(
       Dates.DATE_2021_01_01,
       Dates.DATE_2021_01_04,
       Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_OPEN_04_00_TO_14_59)

@@ -51,6 +51,12 @@ class TranslationServiceTest extends BaseTranslationTest {
   }
 
   @Test
+  void testCurrentLocale() {
+    Locale.setDefault(new Locale("test", ""));
+    assertThat(translationService.getCurrentLocale(), is(new Locale("test", "")));
+  }
+
+  @Test
   void testDefaultLocale() {
     translationConfiguration.setTranslationDirectory("/test-translations/test-normal/");
 

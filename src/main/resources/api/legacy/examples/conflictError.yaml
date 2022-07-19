@@ -1,7 +1,0 @@
-value:
-  timestamp: 2021-11-18T13:38.51-05:00
-  status: 409
-  errors:
-    - code: invalidRequest
-      message: This ID already exists
-summary: A conflict between new and existing data

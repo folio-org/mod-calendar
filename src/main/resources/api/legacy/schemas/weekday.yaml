@@ -1,4 +1,0 @@
-description:
-  A day of the week.  Either SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, or SATURDAY
-type: string
-format: Weekday

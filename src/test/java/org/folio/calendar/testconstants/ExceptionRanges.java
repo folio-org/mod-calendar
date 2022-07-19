@@ -121,6 +121,14 @@ public class ExceptionRanges {
     )
     .build();
 
+  public static final ExceptionRange OPEN_ALL_DAY_MAR_16_TO_APR_30 = ExceptionRange
+    .builder()
+    .name("Untitled exception")
+    .startDate(Dates.DATE_2021_03_16)
+    .endDate(Dates.DATE_2021_04_30)
+    .openings(Arrays.asList(ExceptionHours.OPEN_ALL_DAY_MAR_16_TO_APR_30))
+    .build();
+
   /**
    * Get an ExceptionRange with all IDs set to a custom one.  Useful for tests which require equality
    * @param range the range to set IDs on, preferable from this class

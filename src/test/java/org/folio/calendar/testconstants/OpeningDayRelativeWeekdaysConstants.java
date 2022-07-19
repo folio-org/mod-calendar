@@ -1,31 +1,31 @@
 package org.folio.calendar.testconstants;
 
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdays;
+import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdaysDTO;
 import org.folio.calendar.domain.types.Weekday;
 
 @UtilityClass
 public class OpeningDayRelativeWeekdaysConstants {
 
-  public static final OpeningDayRelativeWeekdays SUNDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO SUNDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.SUNDAY
   );
-  public static final OpeningDayRelativeWeekdays MONDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO MONDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.MONDAY
   );
-  public static final OpeningDayRelativeWeekdays TUESDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO TUESDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.TUESDAY
   );
-  public static final OpeningDayRelativeWeekdays WEDNESDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO WEDNESDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.WEDNESDAY
   );
-  public static final OpeningDayRelativeWeekdays THURSDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO THURSDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.THURSDAY
   );
-  public static final OpeningDayRelativeWeekdays FRIDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO FRIDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.FRIDAY
   );
-  public static final OpeningDayRelativeWeekdays SATURDAY = new OpeningDayRelativeWeekdays(
+  public static final OpeningDayRelativeWeekdaysDTO SATURDAY = new OpeningDayRelativeWeekdaysDTO(
     Weekday.SATURDAY
   );
 }

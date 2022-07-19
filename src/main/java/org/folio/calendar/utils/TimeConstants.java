@@ -2,10 +2,8 @@ package org.folio.calendar.utils;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningDayInfo;
-import org.folio.calendar.domain.dto.OpeningHourRange;
+import org.folio.calendar.domain.dto.OpeningHourRangeDTO;
 
 /**
  * Assorted time-related constants
@@ -36,18 +34,10 @@ public class TimeConstants {
   public static final String TIME_MAX_STRING = TIME_MAX.format(TIME_FORMATTER);
 
   /**
-   * An OpeningHourRange that lasts all day
+   * An OpeningHourRangeDTO that lasts all day
    */
-  public static final OpeningHourRange ALL_DAY = new OpeningHourRange(
+  public static final OpeningHourRangeDTO ALL_DAY = new OpeningHourRangeDTO(
     TIME_MIN_STRING,
     TIME_MAX_STRING
   );
-
-  public static final OpeningDayInfo ALL_DAY_CLOSURE = OpeningDayInfo
-    .builder()
-    .open(false)
-    .allDay(true)
-    .exceptional(false)
-    .openingHour(Arrays.asList(ALL_DAY))
-    .build();
 }

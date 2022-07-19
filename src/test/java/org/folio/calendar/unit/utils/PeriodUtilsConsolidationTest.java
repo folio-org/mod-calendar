@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
+import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.utils.PeriodUtils;
@@ -18,7 +18,9 @@ class PeriodUtilsConsolidationTest {
   void testNoOpeningDaysToNormalOpenings() {
     assertThat(
       "No openings should be consolidated to nothing",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(new ArrayList<OpeningDayRelative>()),
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
+        new ArrayList<OpeningDayRelativeDTO>()
+      ),
       is(empty())
     );
   }
@@ -27,7 +29,7 @@ class PeriodUtilsConsolidationTest {
   void testClosedOpeningToNormalOpenings() {
     assertThat(
       "A closed \"Opening\" (OpeningDayRelative) should be consolidated to nothing",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(OpeningDayRelativeConstants.MONDAY_CLOSED)
       ),
       is(empty())
@@ -38,7 +40,7 @@ class PeriodUtilsConsolidationTest {
   void testInvalidOpeningToNormalOpenings() {
     assertThat(
       "An invalid (end time before start time) \"Opening\" (OpeningDayRelative) should be consolidated to nothing",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(OpeningDayRelativeConstants.MONDAY_INVALID)
       ),
       is(empty())
@@ -49,7 +51,7 @@ class PeriodUtilsConsolidationTest {
   void testSingleAllDayOpeningToNormalOpenings() {
     assertThat(
       "A single all day legacy opening is equivalent to a 00:00 to 23:59 NormalOpening",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY)
       ),
       is(Arrays.asList(NormalOpenings.MONDAY_ALL_DAY))
@@ -60,7 +62,7 @@ class PeriodUtilsConsolidationTest {
   void testSinglePartialDayOpeningToNormalOpenings() {
     assertThat(
       "A single partial (04:00 to 14:59) day legacy opening is equivalent to a 04:00 to 14:59 NormalOpening",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59)
       ),
       is(Arrays.asList(NormalOpenings.MONDAY_04_00_TO_14_59))
@@ -71,7 +73,7 @@ class PeriodUtilsConsolidationTest {
   void testAdjacentOverDayBoundaryToNormalOpenings() {
     assertThat(
       "Adjacent openings across day boundaries (one ends at 23:59 and next starts at 00:00) should be consolidated",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY
@@ -85,7 +87,7 @@ class PeriodUtilsConsolidationTest {
   void testAdjacentOnSameDayToNormalOpenings() {
     assertThat(
       "Two adjacent openings on the same day should be consolidated to a single normal opening",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.MONDAY_OPEN_15_00_TO_23_59
@@ -99,7 +101,7 @@ class PeriodUtilsConsolidationTest {
   void testMultipleAdjacentToNormalOpenings() {
     assertThat(
       "Multiple, consecutively adjacent openings should be consolidated into one",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.MONDAY_OPEN_15_00_TO_23_59,
@@ -114,7 +116,7 @@ class PeriodUtilsConsolidationTest {
   void testAdjacentWraparoundToNormalOpenings() {
     assertThat(
       "Two adjacent openings that are adjacent from [size - 1] to [0] should be consolidated",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY
@@ -128,7 +130,7 @@ class PeriodUtilsConsolidationTest {
   void testMultipleNonAdjacentToNormalOpenings() {
     assertThat(
       "Multiple non-adjacent openings should not be consolidated",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.TUESDAY_OPEN_00_00_TO_12_30
@@ -142,7 +144,7 @@ class PeriodUtilsConsolidationTest {
   void testManyConsolidations() {
     assertThat(
       "Multiple adjacent and non-adjacent openings should only be consolidated when adjacent",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.MONDAY_OPEN_04_00_TO_14_59,
           OpeningDayRelativeConstants.MONDAY_OPEN_15_00_TO_23_59,
@@ -167,7 +169,7 @@ class PeriodUtilsConsolidationTest {
   void testManyConsolidationsWrapped() {
     assertThat(
       "Multiple adjacent and non-adjacent openings should only be consolidated when adjacent",
-      PeriodUtils.convertOpeningDayRelativeToNormalOpening(
+      PeriodUtils.convertOpeningDayRelativeDTOToNormalOpening(
         Arrays.asList(
           OpeningDayRelativeConstants.SATURDAY_OPEN_ALL_DAY,
           OpeningDayRelativeConstants.SUNDAY_OPEN_ALL_DAY,

@@ -2,35 +2,34 @@ package org.folio.calendar.service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.AllArgsConstructor;
-import org.folio.calendar.controller.CalendarController;
-import org.folio.calendar.domain.dto.ErrorCodeDTO;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
-import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.domain.dto.PeriodCollection;
+import org.folio.calendar.domain.dto.CalendarCollectionDTO;
+import org.folio.calendar.domain.dto.CalendarDTO;
+import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
+import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
+import org.folio.calendar.domain.dto.SurroundingOpeningsDTO;
 import org.folio.calendar.domain.entity.Calendar;
-import org.folio.calendar.domain.entity.Calendar.CalendarBuilder;
-import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
-import org.folio.calendar.domain.error.CalendarOverlapErrorData;
-import org.folio.calendar.domain.request.LegacyTranslationKey;
+import org.folio.calendar.domain.error.CalendarNotFoundErrorData;
+import org.folio.calendar.domain.mapper.CalendarMapper;
+import org.folio.calendar.domain.request.Parameters;
 import org.folio.calendar.domain.request.TranslationKey;
-import org.folio.calendar.exception.DataConflictException;
 import org.folio.calendar.exception.DataNotFoundException;
 import org.folio.calendar.exception.ExceptionParameters;
-import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.repository.CalendarRepository;
-import org.folio.calendar.repository.PeriodQueryFilter;
-import org.folio.calendar.utils.DateUtils;
-import org.folio.calendar.utils.PeriodCollectionUtils;
-import org.folio.calendar.utils.PeriodUtils;
+import org.folio.calendar.repository.CustomOffsetPageRequest;
+import org.folio.calendar.utils.CalendarUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A Service class for calendar-related API calls
@@ -39,49 +38,109 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class CalendarService {
 
+  private final CalendarRepository calendarRepository;
+  private final CalendarMapper calendarMapper;
   private final TranslationService translationService;
 
-  private final CalendarRepository calendarRepository;
-
   /**
-   * Get all the calendars for a certain service point with normal hours
-   *
-   * @param servicePointId the service point
-   * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s associated with the service point
+   * Convert a set of calendars to a {@link CalendarCollectionDTO CalendarCollectionDTO}
+   * @param calendars the calendars to convert
+   * @param count     the number of calendars available (may not be equal to size, due to pagination)
+   * @return a calendar collection object ready for an API response
    */
-  public List<Calendar> getCalendarsWithNormalHoursForServicePoint(UUID servicePointId) {
-    return this.calendarRepository.findByServicePointId(servicePointId)
+  protected CalendarCollectionDTO calendarsToCalendarCollection(
+    Collection<Calendar> calendars,
+    Integer count
+  ) {
+    List<CalendarDTO> transformedCalendars = calendars
       .stream()
-      .filter(calendar -> !calendar.getNormalHours().isEmpty())
+      .map(calendarMapper::toDto)
       .collect(Collectors.toList());
+    return CalendarCollectionDTO
+      .builder()
+      .calendars(transformedCalendars)
+      .totalRecords(count)
+      .build();
   }
 
   /**
-   * Get all the calendars for a certain service point with exceptions
+   * Get all the calendars based on a list of ids.  If not all calendars are
+   * found, a {@link DataNotFoundException DataNotFoundException} is thrown
    *
-   * @param servicePointId the service point
-   * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s associated with the service point
+   * @param calendarIds a {@link java.util.List List} of calendars to search for
+   * @return a {@link java.util.List List} of {@link java.util.Calendar Calendar}s
    */
-  public List<Calendar> getCalendarsWithExceptionsForServicePoint(UUID servicePointId) {
-    return this.calendarRepository.findByServicePointId(servicePointId)
-      .stream()
-      .filter(calendar -> !calendar.getExceptions().isEmpty())
-      .collect(Collectors.toList());
-  }
-
-  /**
-   * Replace a given calendar with a new one (transactionally)
-   * @param old the calendar to replace
-   * @param replacement the new replacement, as a {@link Period}
-   * @param servicePointId the service point for the replacement to be assigned to
-   */
-  @Transactional
-  public void replaceCalendar(Calendar old, Period replacement, UUID servicePointId) {
-    this.checkPeriod(replacement, servicePointId, old);
-    if (!old.getId().equals(replacement.getId())) {
-      this.deleteCalendar(old);
+  public List<Calendar> getCalendarsForIdList(Set<UUID> calendarIds) {
+    List<Calendar> calendars = this.calendarRepository.findByIds(calendarIds);
+    List<UUID> foundIds = calendars.stream().map(Calendar::getId).collect(Collectors.toList());
+    if (calendars.size() != calendarIds.size()) {
+      throw new DataNotFoundException(
+        new ExceptionParameters(Parameters.QUERY, calendarIds),
+        translationService.format(TranslationKey.ERROR_CALENDAR_NOT_FOUND),
+        new CalendarNotFoundErrorData(
+          calendarIds
+            .stream()
+            .filter(query -> !foundIds.contains(query))
+            .collect(Collectors.toList())
+        )
+      );
     }
-    this.createCalendarFromValidPeriod(replacement);
+    return calendars;
+  }
+
+  /**
+   * Get all the calendars matching the given, optional, criteria.
+   *
+   * @param servicePointIds a list of service point UUIDs to search
+   * @param startDate the date which returned results will end before
+   * @param endDate the date which returned results will not start after
+   * @param limit the maximum number of calendars to return
+   * @param offset the number of calendars to skip over
+   * @return a {@link CalendarCollectionDTO CalendarCollectionDTO} with found calendars
+   */
+  public CalendarCollectionDTO getCalendarCollectionForServicePointsOrDateRange(
+    @CheckForNull List<UUID> servicePointIds,
+    LocalDate startDate,
+    LocalDate endDate,
+    Integer offset,
+    Integer limit
+  ) {
+    return calendarsToCalendarCollection(
+      calendarRepository.findWithServicePointsDateRangeAndPagination(
+        servicePointIds != null,
+        servicePointIds,
+        startDate,
+        endDate,
+        new CustomOffsetPageRequest(offset, limit)
+      ),
+      calendarRepository.countWithServicePointsDateRangeAndPagination(
+        servicePointIds != null,
+        servicePointIds,
+        startDate,
+        endDate
+      )
+    );
+  }
+
+  /**
+   * Get all the calendars based on a list of ids.  If not all calendars are
+   * found, a {@link DataNotFoundException DataNotFoundException} is thrown
+   *
+   * @param calendarIds a {@link java.util.List List} of calendars to search for
+   * @return a {@link CalendarCollectionDTO CalendarCollectionDTO} with found calendars
+   */
+  public CalendarCollectionDTO getCalendarCollectionForIdList(Set<UUID> calendarIds) {
+    List<Calendar> calendars = getCalendarsForIdList(calendarIds);
+    return calendarsToCalendarCollection(calendars, calendars.size());
+  }
+
+  /**
+   * Insert (or update) a calendar to the database
+   *
+   * @param calendar the calendar to insert/update/save
+   */
+  public void saveCalendar(Calendar calendar) {
+    this.calendarRepository.save(calendar);
   }
 
   /**
@@ -94,291 +153,64 @@ public class CalendarService {
   }
 
   /**
-   * Insert (or update) a calendar to the database
+   * Get objects for each date within a calendar's range representing opening
+   * or closure information
    *
-   * @param calendar the calendar to insert/update/save
+   * @param servicePointId the service point ID to return opening information for
+   * @param startDate the first date to include
+   * @param endDate the last date to include
+   * @param includeClosed whether or not closed dates should be included
+   *        (exceptional closures are always included)
+   * @param offset pagination offset
+   * @param limit pagination limit
+   * @return a {@link SingleDayOpeningCollectionDTO SingleDayOpeningCollectionDTO}
+   * representing the dates' opening information
    */
-  public void insertCalendar(Calendar calendar) {
-    this.calendarRepository.save(calendar);
-  }
-
-  /**
-   * Create a calendar from a given period (period is assumed to be valid)
-   *
-   * @param period a {@link org.folio.calendar.domain.dto.Period Period}
-   * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
-   */
-  public Calendar createCalendarFromValidPeriod(Period period) {
-    // basic info
-    CalendarBuilder calendarBuilder = Calendar
-      .builder()
-      .id(period.getId())
-      .name(period.getName())
-      .startDate(period.getStartDate().getValue())
-      .endDate(period.getEndDate().getValue());
-
-    // assign starting service point
-    ServicePointCalendarAssignment servicePointAssignment = ServicePointCalendarAssignment
-      .builder()
-      .servicePointId(period.getServicePointId())
-      .build();
-    calendarBuilder = calendarBuilder.servicePoint(servicePointAssignment);
-
-    // create hours
-    if (PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
-      calendarBuilder.exceptions(
-        PeriodUtils.convertOpeningDayRelativeToExceptionRanges(
-          period.getStartDate().getValue(),
-          period.getEndDate().getValue(),
-          period.getOpeningDays()
-        )
-      );
-    } else {
-      calendarBuilder.normalHours(
-        PeriodUtils.convertOpeningDayRelativeToNormalOpening(period.getOpeningDays())
-      );
-    }
-
-    Calendar calendar = calendarBuilder.build();
-
-    this.insertCalendar(calendar);
-
-    return calendar;
-  }
-
-  /**
-   * Create a calendar from a given period, with verification checks
-   *
-   * @param period a {@link org.folio.calendar.domain.dto.Period Period}
-   * @param servicePointId the service point this period should be associated with
-   * @return the created {@link org.folio.calendar.domain.entity.Calendar Calendar}
-   */
-  public Calendar createCalendarFromPeriod(Period period, UUID servicePointId) {
-    if (this.calendarRepository.existsById(period.getId())) {
-      throw new DataConflictException(
-        ErrorCodeDTO.INVALID_REQUEST,
-        new ExceptionParameters("period", period),
-        translationService.format(
-          LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT,
-          LegacyTranslationKey.ERROR_PERIOD_ID_CONFLICT_P.CONFLICTING_UUID,
-          period.getId()
-        ),
-        null
-      );
-    }
-
-    this.checkPeriod(period, servicePointId);
-
-    return this.createCalendarFromValidPeriod(period);
-  }
-
-  /**
-   * Get a list of periods based on a filter (for exceptional/normal openings), optionally including past and opening day information
-   *
-   * @param servicePointId the service point which these periods apply to
-   * @param filter a {@link PeriodQueryFilter PeriodQueryFilter} denoting how to filter these results
-   * @param showPast if past periods should be included
-   * @param withOpeningDays if {@link OpeningDayRelative OpeningDayRelative} information should be included
-   * @return a {@link PeriodCollection PeriodCollection} of matching periods
-   */
-  // allow a method to be if/else'd on a boolean
-  @SuppressWarnings("java:S2301")
-  public PeriodCollection getPeriods(
+  public SingleDayOpeningCollectionDTO getDailyOpeningCollection(
     UUID servicePointId,
-    PeriodQueryFilter filter,
-    boolean showPast,
-    boolean withOpeningDays
+    LocalDate startDate,
+    LocalDate endDate,
+    Boolean includeClosed,
+    Integer offset,
+    Integer limit
   ) {
-    List<Calendar> calendars;
-    if (showPast) {
-      calendars = this.calendarRepository.findByServicePointId(servicePointId);
-    } else {
-      calendars =
-        this.calendarRepository.findByServicePointIdOnOrAfterDate(
-            servicePointId,
-            DateUtils.getCurrentDate()
-          );
+    List<Calendar> relevantCalendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+      true,
+      Arrays.asList(servicePointId),
+      startDate,
+      endDate,
+      Pageable.unpaged()
+    );
+
+    // TreeMap makes sorting more efficient
+    Map<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
+    relevantCalendars.forEach(calendar ->
+      CalendarUtils.splitCalendarIntoDates(calendar, dates, startDate, endDate)
+    );
+
+    if (Boolean.TRUE.equals(includeClosed)) {
+      CalendarUtils.fillClosedDates(dates, startDate, endDate);
     }
-    return PeriodCollectionUtils.getPeriodsFromCalendarList(calendars, filter, withOpeningDays);
+
+    return CalendarUtils.openingMapToCollection(dates, offset, limit);
   }
 
   /**
-   * Get a calendar by a given UUID
+   * Get information on openings surrounding a given date
    *
-   * @param id UUID to search for
-   * @return found {@link Calendar} object
+   * @param servicePointId the service point to examine for openings
+   * @param date the date to query
+   * @return an {@link SurroundingOpeningsDTO SurroundingOpeningsDTO} representing opening information
    */
-  public Calendar getCalendarById(UUID id) {
-    return this.calendarRepository.findById(id)
-      .orElseThrow(() ->
-        new DataNotFoundException(
-          new ExceptionParameters(CalendarController.PARAMETER_NAME_PERIOD_ID, id),
-          translationService.format(TranslationKey.ERROR_CALENDAR_NOT_FOUND)
-        )
-      );
-  }
+  public SurroundingOpeningsDTO getSurroundingOpenings(UUID servicePointId, LocalDate date) {
+    List<Calendar> calendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+      true,
+      Arrays.asList(servicePointId),
+      null,
+      null,
+      Pageable.unpaged()
+    );
 
-  /**
-   * Get a calendar by a given UUID and service point
-   *
-   * @param servicePointId service point UUID that the calendar must apply to
-   * @param periodId ID to search for
-   * @return found {@link Calendar} object
-   */
-  public Calendar getCalendarById(UUID servicePointId, UUID periodId) {
-    Calendar calendar = this.getCalendarById(periodId);
-
-    if (
-      calendar
-        .getServicePoints()
-        .stream()
-        .map(ServicePointCalendarAssignment::getServicePointId)
-        .noneMatch(id -> id.equals(servicePointId))
-    ) {
-      throw new DataNotFoundException(
-        new ExceptionParameters(
-          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-          servicePointId,
-          CalendarController.PARAMETER_NAME_PERIOD_ID,
-          periodId
-        ),
-        translationService.format(
-          LegacyTranslationKey.ERROR_SERVICE_POINT_EXISTING_MISMATCH,
-          LegacyTranslationKey.ERROR_SERVICE_POINT_EXISTING_MISMATCH_P.REQUESTED_ID,
-          servicePointId
-        )
-      );
-    }
-
-    return calendar;
-  }
-
-  /**
-   * Check that a period is valid and insertable
-   * @param period period to verify
-   * @param servicePointId service point this calendar will be initially assigned to
-   * @throws org.folio.calendar.exception.AbstractCalendarException if this period is not suitable for insertion
-   */
-  public void checkPeriod(Period period, UUID servicePointId) {
-    this.checkPeriod(period, servicePointId, null);
-  }
-
-  /**
-   * Check that a period is valid and insertable
-   * @param period period to verify
-   * @param servicePointId service point this calendar will be initially assigned to
-   * @param ignore A calendar to ignore for overlaps
-   * @throws org.folio.calendar.exception.AbstractCalendarException if this period is not suitable for insertion
-   */
-  public void checkPeriod(Period period, UUID servicePointId, Calendar ignore) {
-    if (period.getName().isBlank()) {
-      throw new InvalidDataException(
-        ErrorCodeDTO.CALENDAR_NO_NAME,
-        new ExceptionParameters(
-          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-          servicePointId,
-          CalendarController.PARAMETER_NAME_PERIOD,
-          period
-        ),
-        translationService.format(TranslationKey.ERROR_CALENDAR_NAME_EMPTY)
-      );
-    }
-    if (period.getStartDate().getValue().isAfter(period.getEndDate().getValue())) {
-      throw new InvalidDataException(
-        ErrorCodeDTO.INVALID_DATE_RANGE,
-        new ExceptionParameters(
-          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-          servicePointId,
-          CalendarController.PARAMETER_NAME_PERIOD,
-          period
-        ),
-        translationService.format(
-          TranslationKey.ERROR_DATE_RANGE_INVALID,
-          TranslationKey.ERROR_DATE_RANGE_INVALID_P.START_DATE,
-          period.getStartDate(),
-          TranslationKey.ERROR_DATE_RANGE_INVALID_P.END_DATE,
-          period.getEndDate()
-        )
-      );
-    }
-    if (!servicePointId.equals(period.getServicePointId())) {
-      throw new InvalidDataException(
-        new ExceptionParameters(
-          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-          servicePointId,
-          CalendarController.PARAMETER_NAME_PERIOD,
-          period
-        ),
-        translationService.format(
-          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH,
-          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH_P.UUID_1,
-          servicePointId,
-          LegacyTranslationKey.ERROR_SERVICE_POINT_URL_MISMATCH_P.UUID_2,
-          period.getServicePointId()
-        )
-      );
-    }
-
-    Calendar overlapped = null;
-    if (!PeriodUtils.areOpeningsExceptional(period.getOpeningDays())) {
-      overlapped =
-        DateUtils.overlapsCalendarList(
-          period,
-          getCalendarsWithNormalHoursForServicePoint(servicePointId)
-            .stream()
-            .filter(calendar -> !calendar.equals(ignore))
-            .collect(Collectors.toList())
-        );
-    } else {
-      overlapped =
-        DateUtils.overlapsCalendarList(
-          period,
-          getCalendarsWithExceptionsForServicePoint(servicePointId)
-            .stream()
-            .filter(calendar -> !calendar.equals(ignore))
-            .collect(Collectors.toList())
-        );
-    }
-
-    if (overlapped != null) {
-      throw new DataConflictException(
-        ErrorCodeDTO.OVERLAPPING_CALENDAR,
-        new ExceptionParameters(
-          CalendarController.PARAMETER_NAME_SERVICE_POINT_ID,
-          servicePointId,
-          CalendarController.PARAMETER_NAME_PERIOD,
-          period
-        ),
-        translationService.format(
-          TranslationKey.ERROR_CALENDAR_OVERLAP,
-          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_NAME,
-          overlapped.getName(),
-          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_START_DATE,
-          overlapped.getStartDate(),
-          TranslationKey.ERROR_CALENDAR_OVERLAP_P.OVERLAP_END_DATE,
-          overlapped.getEndDate()
-        ),
-        new CalendarOverlapErrorData(Arrays.asList(servicePointId))
-      );
-    }
-  }
-
-  /**
-   * Get calendars with the given parameters
-   * @param servicePointId the service point
-   * @param startDate the first date of the range to include
-   * @param endDate the last date of the range to include
-   * @return a list of matching calendars
-   */
-  public Iterable<Calendar> getCalendars(
-    UUID servicePointId,
-    @CheckForNull LocalDate startDate,
-    @CheckForNull LocalDate endDate
-  ) {
-    return this.calendarRepository.findWithServicePointAndDateRange(
-        servicePointId,
-        startDate,
-        endDate
-      );
+    return CalendarUtils.getSurroundingOpenings(calendars, date);
   }
 }

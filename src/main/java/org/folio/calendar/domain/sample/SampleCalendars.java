@@ -6,7 +6,6 @@ import java.time.format.TextStyle;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.Calendar;
@@ -15,37 +14,38 @@ import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.types.Weekday;
+import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.utils.DateUtils;
 
 @UtilityClass
 public class SampleCalendars {
 
-  public static final LocalTime TIME_00_00 = LocalTime.of(0, 0);
-  public static final LocalTime TIME_09_00 = LocalTime.of(9, 0);
-  public static final LocalTime TIME_12_30 = LocalTime.of(12, 30);
-  public static final LocalTime TIME_14_00 = LocalTime.of(14, 0);
-  public static final LocalTime TIME_14_59 = LocalTime.of(14, 59);
-  public static final LocalTime TIME_23_00 = LocalTime.of(23, 0);
-  public static final LocalTime TIME_23_59 = LocalTime.of(23, 59);
+  protected static final LocalTime TIME_00_00 = LocalTime.of(0, 0);
+  protected static final LocalTime TIME_09_00 = LocalTime.of(9, 0);
+  protected static final LocalTime TIME_12_30 = LocalTime.of(12, 30);
+  protected static final LocalTime TIME_14_00 = LocalTime.of(14, 0);
+  protected static final LocalTime TIME_14_59 = LocalTime.of(14, 59);
+  protected static final LocalTime TIME_23_00 = LocalTime.of(23, 0);
+  protected static final LocalTime TIME_23_59 = LocalTime.of(23, 59);
 
-  public static final int LONG_EXCEPTION_LENGTH = 3;
+  protected static final int LONG_EXCEPTION_LENGTH = 3;
 
-  /* Default service points:
+  /* Default service points, hardcoded in other module(s):
       "3a40852d-49fd-4df2-a1f9-6e2641a6e91f" "Circ Desk 1",
       "c4c90014-c8c9-4ade-8f24-b5e313319f4b" "Circ Desk 2",
       "7c5abc9f-f3d7-4856-b8d7-6712462ca007" "Online",
   */
-  public static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_1 = UUID.fromString(
+  protected static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_1 = UUID.fromString(
     "3a40852d-49fd-4df2-a1f9-6e2641a6e91f"
   );
-  public static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_2 = UUID.fromString(
+  protected static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_2 = UUID.fromString(
     "c4c90014-c8c9-4ade-8f24-b5e313319f4b"
   );
-  public static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_ONLINE = UUID.fromString(
+  protected static final UUID SAMPLE_SERVICE_POINT_CIRC_DESK_ONLINE = UUID.fromString(
     "7c5abc9f-f3d7-4856-b8d7-6712462ca007"
   );
 
-  public List<Calendar> getSampleCalendars() {
+  public List<Calendar> getSampleCalendars(TranslationService translationService) {
     List<Calendar> calendars = new ArrayList<>();
 
     LocalDate lastMonth = DateUtils.getCurrentDate().minusMonths(1);
@@ -59,9 +59,15 @@ public class SampleCalendars {
     LocalDate lastMonthEnd = lastMonth.with(TemporalAdjusters.lastDayOfMonth());
     LocalDate nextMonthEnd = nextMonth.with(TemporalAdjusters.lastDayOfMonth());
 
-    String lastMonthName = lastMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
-    String thisMonthName = thisMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
-    String nextMonthName = nextMonth.getMonth().getDisplayName(TextStyle.FULL, Locale.US);
+    String lastMonthName = lastMonth
+      .getMonth()
+      .getDisplayName(TextStyle.FULL, translationService.getCurrentLocale());
+    String thisMonthName = thisMonth
+      .getMonth()
+      .getDisplayName(TextStyle.FULL, translationService.getCurrentLocale());
+    String nextMonthName = nextMonth
+      .getMonth()
+      .getDisplayName(TextStyle.FULL, translationService.getCurrentLocale());
 
     calendars.add(getServicePointOneCalendarOne(lastMonthStart, lastMonthEnd, lastMonthName));
     calendars.add(
@@ -224,7 +230,7 @@ public class SampleCalendars {
     return Calendar
       .builder()
       .id(UUID.randomUUID())
-      .name("Limited Opening Period")
+      .name("Limited Opening Sample")
       .startDate(nextMonthStart)
       .endDate(nextMonthEnd)
       .servicePoint(

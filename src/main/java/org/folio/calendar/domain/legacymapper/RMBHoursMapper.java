@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.OpeningDayRelative;
+import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -17,19 +17,19 @@ import org.springframework.jdbc.core.RowMapper;
  */
 @Data
 @Log4j2
-public class RMBHoursMapper implements RowMapper<List<OpeningDayRelative>> {
+public class RMBHoursMapper implements RowMapper<List<OpeningDayRelativeDTO>> {
 
   public static final String GET_RMB_OPENING_HOURS =
     "SELECT jsonb FROM regular_hours WHERE jsonb->'openingId' = ?";
 
   protected final ObjectMapper mapper;
 
-  public List<OpeningDayRelative> mapRow(ResultSet result, int rowNum) throws SQLException {
+  public List<OpeningDayRelativeDTO> mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
       return Arrays.asList(
         mapper.treeToValue(
           mapper.readTree(result.getString("jsonb")).get("openingDays"),
-          OpeningDayRelative[].class
+          OpeningDayRelativeDTO[].class
         )
       );
     } catch (JsonProcessingException e) {

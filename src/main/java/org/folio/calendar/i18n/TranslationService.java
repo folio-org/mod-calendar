@@ -158,6 +158,7 @@ public class TranslationService {
    * with empty string/fields or, in some cases, the server's current Locale.
    * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
    */
+  @SuppressWarnings("java:S1166")
   public List<Locale> getCurrentLocales() {
     try {
       return Collections.list(
@@ -165,8 +166,23 @@ public class TranslationService {
           .getLocales()
       );
     } catch (IllegalStateException e) {
-      log.error(e);
       return new ArrayList<>();
+    }
+  }
+
+  /**
+   * Get the best single locale.  Either the first from the request or the server's default.
+   *
+   * @return a single Locale object.  Invalid and wildcard Locales sent to the server will likely
+   * return a Locale with empty string/fields or, in some cases, the server's current Locale.
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Language
+   */
+  @SuppressWarnings("java:S1166")
+  public Locale getCurrentLocale() {
+    try {
+      return getCurrentLocales().get(0);
+    } catch (RuntimeException e) {
+      return Locale.getDefault();
     }
   }
 

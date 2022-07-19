@@ -1,18 +1,25 @@
 package org.folio.calendar.integration.migration;
 
-import static org.folio.calendar.integration.api.calendar.periods.servicepointid.period.periodid.get.GetSpecificCalendarAbstractTest.GET_CALENDAR_API_ROUTE;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
-import io.restassured.response.Response;
-import org.folio.calendar.domain.dto.Period;
-import org.folio.calendar.testconstants.Periods;
+import java.util.stream.Collectors;
+import org.folio.calendar.domain.dto.CalendarCollectionDTO;
+import org.folio.calendar.domain.dto.CalendarDTO;
+import org.folio.calendar.domain.mapper.CalendarMapper;
+import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
+import org.folio.calendar.testconstants.Calendars;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class NormalMigrationTest extends AbstractMigrationTest {
+
+  @Autowired
+  CalendarMapper calendarMapper;
 
   @BeforeAll
   void migrate() {
@@ -21,30 +28,35 @@ class NormalMigrationTest extends AbstractMigrationTest {
   }
 
   @Test
-  void testGetNormalHoursCalendar() {
-    Response response = ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_0, UUIDs.UUID_A)));
-    response.then().statusCode(is(HttpStatus.OK.value()));
+  void testGetCalendars() {
+    CalendarCollectionDTO collection = ra()
+      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+      .getBody()
+      .as(CalendarCollectionDTO.class);
 
-    Period period = response.getBody().as(Period.class);
+    // fix comparison nuances for valid calendar
+    collection.getCalendars().forEach(c -> c.setId(UUIDs.UUID_A));
     assertThat(
-      "The returned period is the expected period",
-      period,
-      is(Periods.PERIOD_FULL_EXAMPLE_F)
+      "The regular period was properly converted",
+      collection
+        .getCalendars()
+        .stream()
+        .map(CalendarDTO::getNormalHours)
+        .collect(Collectors.toList()),
+      hasItem(
+        containsInAnyOrder(
+          calendarMapper.toDto(Calendars.CALENDAR_FULL_EXAMPLE_F).getNormalHours().toArray()
+        )
+      )
     );
-  }
-
-  @Test
-  void testGetExceptionalCalendar() {
-    Response response = ra()
-      .get(getRequestUrl(String.format(GET_CALENDAR_API_ROUTE, UUIDs.UUID_0, UUIDs.UUID_F)));
-    response.then().statusCode(is(HttpStatus.OK.value()));
-
-    Period period = response.getBody().as(Period.class);
     assertThat(
-      "The returned period is the expected period",
-      period,
-      is(Periods.PERIOD_FULL_EXCEPTIONAL_F)
+      "The exceptional period was properly converted",
+      collection
+        .getCalendars()
+        .stream()
+        .filter(c -> !c.getExceptions().isEmpty())
+        .anyMatch(c -> c.getExceptions().get(0).getOpenings().size() == 4),
+      is(true)
     );
   }
 }

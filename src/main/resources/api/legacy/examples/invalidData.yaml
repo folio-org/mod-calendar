@@ -1,7 +1,0 @@
-value:
-  timestamp: 2021-11-18T13:38.51-05:00
-  status: 400
-  errors:
-    - code: noName
-      message: The request included an empty name
-summary: The request was understood, however, a parameter was invalid

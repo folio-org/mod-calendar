@@ -1,7 +1,0 @@
-value:
-  timestamp: 2021-11-18T13:38.51-05:00
-  status: 500
-  errors:
-    - code: internalServerError
-      message: Internal Server Error
-summary: Any kind of internal error
