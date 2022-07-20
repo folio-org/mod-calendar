@@ -65,8 +65,6 @@
       "displayName": "Access and query calendar information",
       "description": "",
       "subPermissions": [
-        "calendar.calendar.endpoint.collection.get",
-
         "calendar.endpoint.calendars.get",
         "calendar.endpoint.calendars.calendarIds.get",
         "calendar.endpoint.dates.get"
