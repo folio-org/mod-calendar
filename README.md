@@ -5,19 +5,67 @@ Copyright (C) 2017-2022 The Open Library Foundation
 This software is distributed under the terms of the Apache License, Version 2.0. See the file
 "[LICENSE](LICENSE)" for more information.
 
-[JIRA MOD-CAL](https://issues.folio.org/projects/MODCAL)
+- [Introduction](#introduction)
+- [Compiling](#compiling)
+- [Running the module locally](#running-the-module-locally)
+- [Docker/Deploying the module](#dockerdeploying-the-module)
+  - [Module descriptor](#module-descriptor)
+  - [Tenant parameters](#tenant-parameters)
+  - [Environment variables](#environment-variables)
+    - [Integration Tests](#integration-tests)
+- [API documentation](#api-documentation)
+- [Internationalization](#internationalization)
+- [Code analysis](#code-analysis)
+- [Issue tracking](#issue-tracking)
+- [Download and configuration](#download-and-configuration)
 
 ## Introduction
 
-Module to provide calendar functionalities for FOLIO systems.
+This module provides calendar functionalities for FOLIO systems, allowing service points to maintain
+hours of operation.
 
-## Module Descriptor
+## Compiling
+
+To compile, simply run:
+
+```sh
+mvn install
+```
+
+Note: _you will need Docker installed and running, for the integration tests that Maven runs as part
+of the installation. If you wish to skip this, add `-DskipTests` to the command._
+
+## Running the module locally
+
+To run the module locally, you can create a JAR with:
+
+```sh
+mvn package
+```
+
+Once the module has been packaged into a JAR, you can run it on the command line (with the
+appropriate [environment variables](#environment-variables)):
+
+```sh
+java -jar target/mod-calendar-*.jar
+```
+
+For developers with VS Code, a [`launch.json`](.vscode/launch.json) is provided which allows the
+built-in run features to launch and debug the module within the IDE.
+
+## Docker/Deploying the module
+
+Please see the [first install](docs/first-install.md) and [test deployment](docs/test-deployment.md)
+docs for information on building a docker container with the module and registering it with and
+deploying it to Okapi.
+
+### Module descriptor
 
 See the built `target/ModuleDescriptor.json` or the template
 `descriptors/ModuleDescriptor-template.json` for the interfaces that this module requires and
 provides, the permissions, and the additional module metadata.
 
-### Tenant Parameters
+### Tenant parameters
 
 When deploying to a module through Okapi, the following parameters are available:
 
@@ -69,9 +117,19 @@ in any proxy logs, making it easy to isolate each test/action.
 
 This module's [API documentation](https://dev.folio.org/reference/api/#mod-calendar).
 
+## Internationalization
+
+This module is locale-aware, based on the `Accept-Language` header. Translations are stored in the
+[translations](translations/mod-calendar/) folder.
+
 ## Code analysis
 
 [SonarQube analysis](https://sonarcloud.io/dashboard?id=org.folio%3Amod-calendar).
+
+## Issue tracking
+
+See [MODCAL](https://issues.folio.org/projects/MODCAL) in the
+[FOLIO issue tracker](https://issues.folio.org/).
 
 ## Download and configuration
 

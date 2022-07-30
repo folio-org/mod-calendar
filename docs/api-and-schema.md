@@ -1,7 +1,7 @@
 # API and Schema Management
 
-The API routing, parameters, etc., are all managed through Swagger. This is done through the main
-`mod-calendar.yaml` in `main/resources/api` folder. This should be entirely up to the OpenAPI spec.
+The API routing, parameters, etc., are all managed through Swagger/OpenAPI. This is done through the
+main `calendar.yaml` in `main/resources/api` folder.
 
 It seems that the error
 

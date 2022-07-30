@@ -32,9 +32,8 @@ inherited based on UI-level permissions (declared in that `package.json`).
 This defines how Okapi should configure an environment in which to run the module. In our case, that
 is done through a Docker image (configuration for this not yet created).
 
-The environment variables provide credentials and database information. The needed memory is
-currently just the original value and should be re-defined based on actual needs (ref
-[MODCAL-55](https://issues.folio.org/projects/MODCAL/issues/MODCAL-55?filter=allopenissues)).
+The environment variables provide credentials and database information and are further explained in
+the main [README.md](../README.md)
 
 ## Deployment Descriptor
 
