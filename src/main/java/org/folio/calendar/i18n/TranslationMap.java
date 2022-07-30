@@ -131,15 +131,13 @@ public class TranslationMap {
     for (int i = 0; i < args.length; i++) {
       // Convert LocalDate to Date
       // Sadly, ICU formatting strings only support date formats with the old Date class :(
-      if (args[i] instanceof LocalDate) {
-        args[i] = Date.from(((LocalDate) args[i]).atStartOfDay(ZoneId.systemDefault()).toInstant());
+      if (args[i] instanceof LocalDate date) {
+        args[i] = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
       }
       // Same for LocalTime
-      if (args[i] instanceof LocalTime) {
+      if (args[i] instanceof LocalTime time) {
         args[i] =
-          Date.from(
-            ((LocalTime) args[i]).atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant()
-          );
+          Date.from(time.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
       }
     }
     return MessageFormat.format(this.get(key), MapUtils.buildMap(args));
