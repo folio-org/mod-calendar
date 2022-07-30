@@ -1,13 +1,18 @@
 ## 2.0.0 PENDING
 
 - Upgrade to Spring and OpenAPI
-- Add sample and reference data
+- Add sample data
 - Add more extensible calendar and exception storage format
 - Performance improvements
 - Add translation capabilities
 - Provide more informative API error messages
 - Rename permissions to new schema
 - Replace API routes with new schema
+
+## 1.15.0 2022-06-26
+
+- Upgrade RMB to v34.1.0 (MODCAL-110)
+- Upgrade other Maven dependencies
 
 ## 1.14.0 2022-02-22
 
