@@ -3,7 +3,6 @@ package org.folio.calendar.utils;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.Setter;

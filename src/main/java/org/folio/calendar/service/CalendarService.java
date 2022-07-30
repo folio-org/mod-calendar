@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;

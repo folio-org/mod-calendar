@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;

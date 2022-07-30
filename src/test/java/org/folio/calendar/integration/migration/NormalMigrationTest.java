@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 
-import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.mapper.CalendarMapper;

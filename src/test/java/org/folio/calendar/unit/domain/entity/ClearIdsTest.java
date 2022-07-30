@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;

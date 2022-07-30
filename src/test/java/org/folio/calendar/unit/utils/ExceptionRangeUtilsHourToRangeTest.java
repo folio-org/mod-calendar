@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.ExceptionHours;
 import org.folio.calendar.testconstants.Times;

@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
 import org.folio.calendar.domain.entity.Calendar;
