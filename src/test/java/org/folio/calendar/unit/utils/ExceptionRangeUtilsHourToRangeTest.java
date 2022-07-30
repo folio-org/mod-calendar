@@ -19,13 +19,13 @@ class ExceptionRangeUtilsHourToRangeTest {
   @Test
   void testNoOverlaps() {
     assertThat(
-      ExceptionRangeUtils.toTemporalRanges(new ArrayList<>()).collect(Collectors.toList()),
+      ExceptionRangeUtils.toTemporalRanges(new ArrayList<>()).toList(),
       containsInAnyOrder()
     );
     assertThat(
       ExceptionRangeUtils
         .toTemporalRanges(Arrays.asList(ExceptionHours.OPEN_ALL_DAY_JAN_1_THRU_JAN_4))
-        .collect(Collectors.toList()),
+        .toList(),
       containsInAnyOrder(
         new TemporalRange<>(
           ExceptionHours.OPEN_ALL_DAY_JAN_1_THRU_JAN_4,
@@ -44,7 +44,7 @@ class ExceptionRangeUtilsHourToRangeTest {
             ExceptionHours.OPEN_15_00_TO_23_00_JAN_4
           )
         )
-        .collect(Collectors.toList()),
+        .toList(),
       containsInAnyOrder(
         new TemporalRange<>(
           ExceptionHours.OPEN_00_00_TO_14_59_JAN_1,

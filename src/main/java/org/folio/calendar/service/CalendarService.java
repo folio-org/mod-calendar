@@ -52,10 +52,7 @@ public class CalendarService {
     Collection<Calendar> calendars,
     Integer count
   ) {
-    List<CalendarDTO> transformedCalendars = calendars
-      .stream()
-      .map(calendarMapper::toDto)
-      .collect(Collectors.toList());
+    List<CalendarDTO> transformedCalendars = calendars.stream().map(calendarMapper::toDto).toList();
     return CalendarCollectionDTO
       .builder()
       .calendars(transformedCalendars)
@@ -72,16 +69,13 @@ public class CalendarService {
    */
   public List<Calendar> getCalendarsForIdList(Set<UUID> calendarIds) {
     List<Calendar> calendars = this.calendarRepository.findByIds(calendarIds);
-    List<UUID> foundIds = calendars.stream().map(Calendar::getId).collect(Collectors.toList());
+    List<UUID> foundIds = calendars.stream().map(Calendar::getId).toList();
     if (calendars.size() != calendarIds.size()) {
       throw new DataNotFoundException(
         new ExceptionParameters(Parameters.QUERY, calendarIds),
         translationService.format(TranslationKey.ERROR_CALENDAR_NOT_FOUND),
         new CalendarNotFoundErrorData(
-          calendarIds
-            .stream()
-            .filter(query -> !foundIds.contains(query))
-            .collect(Collectors.toList())
+          calendarIds.stream().filter(query -> !foundIds.contains(query)).toList()
         )
       );
     }

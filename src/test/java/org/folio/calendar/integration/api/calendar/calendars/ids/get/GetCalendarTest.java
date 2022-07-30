@@ -77,7 +77,7 @@ class GetCalendarTest extends BaseCalendarApiTest {
     );
     assertThat(
       "Getting an existing calendar results in the proper calendar returned",
-      result.getCalendars().stream().map(calendarMapper::fromDto).collect(Collectors.toList()),
+      result.getCalendars().stream().map(calendarMapper::fromDto).toList(),
       contains(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(createdId1))
     );
   }
@@ -108,7 +108,7 @@ class GetCalendarTest extends BaseCalendarApiTest {
     );
     assertThat(
       "Getting an existing calendar results in the proper calendar returned",
-      result.getCalendars().stream().map(calendarMapper::fromDto).collect(Collectors.toList()),
+      result.getCalendars().stream().map(calendarMapper::fromDto).toList(),
       containsInAnyOrder(
         Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(createdId1),
         Calendars.CALENDAR_COMBINED_EXAMPLE_C.withId(createdId2)

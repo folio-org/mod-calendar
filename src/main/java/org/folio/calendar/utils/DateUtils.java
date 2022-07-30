@@ -35,7 +35,7 @@ public class DateUtils {
    */
   public static List<LocalDate> getDateRange(LocalDate startDate, LocalDate endDate) {
     // the end date for datesUtil is exclusive; adding one makes it inclusive
-    return getDateRangeStream(startDate, endDate).collect(Collectors.toList());
+    return getDateRangeStream(startDate, endDate).toList();
   }
 
   /**

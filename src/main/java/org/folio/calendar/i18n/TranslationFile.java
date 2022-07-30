@@ -96,7 +96,7 @@ public class TranslationFile {
         .stream()
         .filter(Resource::isReadable)
         .map(TranslationFile::new)
-        .collect(Collectors.toList());
+        .toList();
 
       if (files.isEmpty()) {
         throw new IOException("No translation files exist");

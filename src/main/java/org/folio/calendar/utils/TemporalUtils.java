@@ -52,9 +52,7 @@ public class TemporalUtils {
       } else {
         // a range ended, but we hit an overlap
         if (stack.size() > 1) {
-          conflicts.addAll(
-            stack.stream().map(TemporalRange<D, T>::getSource).collect(Collectors.toList())
-          );
+          conflicts.addAll(stack.stream().map(TemporalRange<D, T>::getSource).toList());
         }
         stack.pop();
       }

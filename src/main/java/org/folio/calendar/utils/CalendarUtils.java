@@ -97,7 +97,7 @@ public class CalendarUtils {
                   .endTime(timeRange.getEnd())
                   .build()
               )
-              .collect(Collectors.toList());
+              .toList();
 
             dates.put(
               date,
@@ -158,7 +158,7 @@ public class CalendarUtils {
                       .endTime(timeRange.getEnd())
                       .build()
                   )
-                  .collect(Collectors.toList())
+                  .toList()
               )
               .open(true)
               .allDay(TimeUtils.isAllDay(openings))
@@ -222,7 +222,7 @@ public class CalendarUtils {
           .map(Map.Entry::getValue)
           .skip(offset)
           .limit(limit)
-          .collect(Collectors.toList())
+          .toList()
       )
       .totalRecords(dates.size())
       .build();
