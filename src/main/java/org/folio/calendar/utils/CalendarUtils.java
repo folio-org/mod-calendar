@@ -157,6 +157,7 @@ public class CalendarUtils {
                       .endTime(timeRange.getEnd())
                       .build()
                   )
+                  .sorted((a, b) -> a.getStartTime().compareTo(b.getStartTime()))
                   .toList()
               )
               .open(true)

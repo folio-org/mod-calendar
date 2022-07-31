@@ -4,7 +4,7 @@
   "provides": [
     {
       "id": "calendar",
-      "version": "5.0",
+      "version": "4.0",
       "handlers": [
         {
           "methods": ["GET"],
@@ -33,7 +33,7 @@
         },
         {
           "methods": ["GET"],
-          "pathPattern": "/calendar/dates/{servicePointId}/surrounding-openings/{date}",
+          "pathPattern": "/calendar/dates/{servicePointId}/surrounding-openings",
           "permissionsRequired": ["calendar.endpoint.dates.get"]
         },
         {
