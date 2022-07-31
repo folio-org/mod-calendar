@@ -3,6 +3,17 @@
 This is similar to [test-deployment.md](test-deployment.md), however, this document is intended for
 the first deployment onto a server with an existing, older `mod-calendar` running.
 
+## Compile the Module
+
+First, compile the module using:
+
+```sh
+mvn install
+```
+
+Note: this will require that Docker is running to complete the integration tests. If you do not have
+Docker, or wish to skip this step, add `-DskipTests` to this command.
+
 ## Declare Module
 
 The module descriptor will convey the information about the module to Okapi, as described in
