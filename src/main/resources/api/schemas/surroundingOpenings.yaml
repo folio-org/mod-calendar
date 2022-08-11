@@ -1,0 +1,40 @@
+description:
+  "Information for three dates: one before when the SP is open, one representing an opening or
+  closure for the current date, and one after the provided date where the SP is open.  If there are
+  no openings before or after a given date, then an opening object will be returned with the date
+  immediately following, denoting a closure."
+type: object
+properties:
+  openings:
+    type: array
+    minItems: 3
+    maxItems: 3
+    items:
+      $ref: singleDayOpening.yaml
+required:
+  - openings
+additionalProperties: false
+example:
+  openings:
+    - date: "2022-05-01"
+      allDay: false
+      open: true
+      exceptional: true
+      exceptionName: "Holiday (reduced hours with lunch break)"
+      openings:
+        - startTime: "10:00:00"
+          endTime: "12:00:00"
+        - startTime: "13:30:00"
+          endTime: "17:00:00"
+    - date: "2022-05-02"
+      allDay: true
+      open: false
+      exceptional: false
+      openings: []
+    - date: "2022-05-03"
+      allDay: true
+      open: true
+      exceptional: false
+      openings:
+        - startTime: "00:00:00"
+          endTime: "23:59:00"

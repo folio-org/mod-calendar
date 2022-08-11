@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-10-create-service-point-calendars-table
+      author: university-of-alabama/ncovercash
+      comment: Create service_point_calendars table
+      changes:
+        - createTable:
+            tableName: service_point_calendars
+            remarks: Relates service points to calendars
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: service_point_calendars_assignment_row_id
+              - column:
+                  name: service_point_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: calendar_id
+                  type: UUID
+                  constraints:
+                    nullable: true

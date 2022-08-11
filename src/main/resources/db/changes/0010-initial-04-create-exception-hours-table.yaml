@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-04-create-exception-hours-table
+      author: university-of-alabama/ncovercash
+      comment: Create table exception_hours
+      changes:
+        - createTable:
+            remarks:
+              Absolute hours for each exception.  Nullity of open time controls if this designates
+              closure or opening.
+            tableName: exception_hours
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: exception_hours_id
+              - column:
+                  name: exception_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: start_date
+                  remarks: No TZ
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  remarks: No TZ
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: open_start_time
+                  remarks: No TZ
+                  type: TIME WITHOUT TIME ZONE
+              - column:
+                  name: open_end_time
+                  remarks: No TZ
+                  type: TIME WITHOUT TIME ZONE

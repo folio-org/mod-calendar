@@ -1,0 +1,13 @@
+value:
+  timestamp: 2021-11-18T13:38.51-05:00
+  status: 404
+  errors:
+    - code: calendarNotFound
+      message:
+        A calendar with UUIDs aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa and
+        dddddddd-dddd-dddd-dddd-dddddddddddd could not be found.
+      data:
+        notFound:
+          - aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa
+          - dddddddd-dddd-dddd-dddd-dddddddddddd
+summary: A calendar with the requested UUID does not exist.

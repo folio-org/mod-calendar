@@ -1,0 +1,131 @@
+get:
+  summary: Search all calendars
+  description: Get all calendars that match the given query
+  operationId: searchCalendars
+  parameters:
+    - in: query
+      name: id
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      description:
+        The list of calendar IDs to retrieve, sent as separate parameters (?id=aaaa&id=bbbb...).  If
+        this list is passed, calendars must have an ID in this list in addition to any additional
+        criteria.
+    - in: query
+      name: servicePointId
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      description:
+        Filter for calendars that are assigned to a certain service point.  If this parameter is
+        excluded, all service points will be considered/included in the response.  Multiple service
+        points may be specified with form-style query expansions; in this case, calendars that are
+        assigned to any of the provided service points will be returned.
+    - in: query
+      name: startDate
+      required: false
+      schema:
+        type: string
+        format: date
+      description: The first date (YYYY-MM-DD) to consider, inclusively
+    - in: query
+      name: endDate
+      required: false
+      schema:
+        type: string
+        format: date
+      description: The last date (YYYY-MM-DD) to consider, inclusively
+    - in: query
+      name: offset
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+      description: Skip a certain number of the first values; used for pagination
+    - in: query
+      name: limit
+      required: false
+      schema:
+        type: integer
+        default: 10
+        minimum: 0
+      description:
+        The maximum number of elements returned in the response, used for pagination.  A limit of
+        zero will not include any results (however, totalRecords will still be included) -- to
+        include all results, use a large number such as 2147483647.
+  responses:
+    "200":
+      description: The query results
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/calendarCollection.yaml
+    "400":
+      $ref: ../../errors/invalidRequest.yaml
+    "500":
+      $ref: ../../errors/internalServerError.yaml
+post:
+  summary: Create a new calendar
+  description:
+    Create a new calendar from a provided body.  If an ID is provided for the calendar, it will be
+    ignored (and a new one generated).
+  operationId: createCalendar
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../schemas/calendar.yaml
+  responses:
+    "201":
+      description: The created calendar
+      content:
+        application/json:
+          schema:
+            $ref: ../../schemas/calendar.yaml
+    "400":
+      $ref: ../../errors/invalidRequest.yaml
+    "409":
+      $ref: ../../errors/calendarDateOverlap.yaml
+    "500":
+      $ref: ../../errors/internalServerError.yaml
+delete:
+  summary: Delete multiple calendars
+  description: Delete a calendar by its ID.
+  operationId: deleteCalendars
+  parameters:
+    - in: query
+      name: id
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+        minItems: 1
+      description:
+        A list of calendars to delete, sent as separate parameters (?id=aaaa&id=bbbb...).  If any
+        calendars are missing, a 404 will be returned and nothing modified.
+  responses:
+    "204":
+      description: The requested calendars were deleted
+    "400":
+      $ref: ../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../errors/calendarNotFound.yaml
+    "500":
+      $ref: ../../errors/internalServerError.yaml

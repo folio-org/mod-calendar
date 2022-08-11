@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0030-add-exception-names
+      author: university-of-alabama/ncovercash
+      comment: Add names to exceptions
+      changes:
+        - addColumn:
+            tableName: exceptions
+            columns:
+              - column:
+                  afterColumn: calendar_id
+                  name: name
+                  type: TEXT
+                  defaultValue: Untitled exception
+                  constraints:
+                    nullable: false

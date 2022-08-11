@@ -1,0 +1,49 @@
+description: Collection of calendars
+type: object
+properties:
+  calendars:
+    type: array
+    description: Each calendar returned in the response
+    items:
+      type: object
+      $ref: "calendar.yaml"
+  totalRecords:
+    type: integer
+    minimum: 0
+    description: Number of calendars in the response
+additionalProperties: false
+required:
+  - calendars
+  - totalRecords
+example:
+  calendars:
+    - name: Sample Spring Calendar
+      startDate: "2022-01-08"
+      endDate: "2022-05-09"
+      assignments:
+        - 44444444-4444-4444-4444-444444444444
+        - bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb
+        - dddddddd-dddd-dddd-dddd-dddddddddddd
+      normalHours:
+        - startDay: MONDAY
+          startTime: "07:00:00"
+          endDay: FRIDAY
+          endTime: "22:00:00"
+        - startDay: SATURDAY
+          startTime: "07:00:00"
+          endDay: SATURDAY
+          endTime: "22:00:00"
+      exceptions:
+        - name: Spring break (closed)
+          startDate: "2022-03-01"
+          endDate: "2022-03-05"
+          openings: []
+        - name: Early closure
+          startDate: "2022-04-01"
+          endDate: "2022-04-01"
+          openings:
+            - startDate: "2022-04-01"
+              startTime: "07:00:00"
+              endDate: "2022-04-01"
+              endTime: "12:00:00"
+  totalRecords: 1

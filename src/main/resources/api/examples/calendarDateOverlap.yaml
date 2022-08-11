@@ -1,0 +1,12 @@
+value:
+  timestamp: 2021-11-18T13:38.51-05:00
+  status: 409
+  errors:
+    - code: calendarDateOverlap
+      message:
+        This calendar cannot be created due to an overlap with "Other calendar" (which is from Jan
+        3, 2022 to Mar 30, 2022)
+      data:
+        conflictingServicePointIds:
+          - dddddddd-dddd-dddd-dddd-dddddddddddd
+summary: A calendar being created overlaps with an existing one

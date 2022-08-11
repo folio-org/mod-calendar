@@ -1,0 +1,7 @@
+description: Invalid request or parameters
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      $ref: ../examples/invalidRequest.yaml

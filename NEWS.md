@@ -1,3 +1,13 @@
+## 2.0.0 PENDING
+* Upgrade to Spring and OpenAPI
+* Add sample data
+* Add more extensible calendar and exception storage format
+* Performance improvements
+* Add translation capabilities
+* Provide more informative API error messages
+* Rename permissions to new schema
+* Replace API routes with new schema
+
 ## 1.15.0 2022-06-26
 * Upgrade RMB to v34.1.0 (MODCAL-110)
 * Upgrade other Maven dependencies
@@ -8,7 +18,8 @@
 * Use new api-lint and api-doc CI facilities (FOLIO-3231)
 
 ## 1.13.0 2021-09-30
-* Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours` table (MODCAL-72)
+* Disable 600 character truncation for `actualDay` and `openingId` indexes in `actual_opening_hours`
+  table (MODCAL-72)
 
 ## 1.12.0 2021-06-11
 * Upgrade to RMB 33.0.0 and Vertx 4.1.0 (MODCAL-90)
@@ -66,10 +77,13 @@
 * Bug API GET: /periods/{servicePointId}/period related to getting more than one period (MODCAL-37)
 
 ## 1.2.0
-* Add endpoint /calendar/periods/{servicePointId}/calculateopening with GET to return open periods for given Service Point
+* Add endpoint /calendar/periods/{servicePointId}/calculateopening with GET to return open periods
+  for given Service Point
+
 ## 1.0.3
 * MODCAL-19 - Fix security vulnerability reported in jackson-databind
 * MODCAL-20 - Fix missing description fields in RAML JSON schemas
+
 ## 1.0.2
 * MODCAL-1 Added exceptional opening day management
 * MODCAL-5 Added filtering for events by date

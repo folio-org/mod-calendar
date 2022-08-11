@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0050-add-calendar-change-metadata
+      author: university-of-alabama/ncovercash
+      comment: Add metadata about calendar creation and updates
+      changes:
+        - addColumn:
+            tableName: calendars
+            columns:
+              - column:
+                  name: created_date
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_by_user_id
+                  type: uuid
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_date
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_by_user_id
+                  type: uuid
+                  constraints:
+                    nullable: true

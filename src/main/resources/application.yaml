@@ -1,0 +1,59 @@
+spring:
+  cache:
+    type: none
+  application:
+    name: mod-calendar
+  jackson:
+    default-property-inclusion: NON_NULL
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog-master.yaml
+  datasource:
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_DATABASE:okapi_modules}?stringtype=unspecified
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+  banner:
+    location: classpath:/banner.txt
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+management:
+  endpoints:
+    web:
+      base-path: /admin
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
+
+logging:
+  level:
+    org:
+      springframework:
+        cache: OFF
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+folio:
+  translationDirectory: /translations/mod-calendar/
+  tenant:
+    validation:
+      enabled: true
+  logging:
+    request:
+      enabled: true
+    feign:
+      enabled: true

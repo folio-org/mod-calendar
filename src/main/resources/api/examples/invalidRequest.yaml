@@ -1,0 +1,7 @@
+value:
+  timestamp: 2021-11-18T13:38.51-50:00
+  status: 400
+  errors:
+    - code: invalidRequest
+      message: The request could not be parsed
+summary: The request could not be parsed/understood.

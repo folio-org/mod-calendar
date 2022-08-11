@@ -1,0 +1,42 @@
+description: An exception to a calendar, consisting of a set of openings (or none if a closure)
+type: object
+properties:
+  calendarId:
+    description: The UUID of the calendar which this exception is for
+    type: string
+    format: uuid
+  name:
+    description: A user-provided label for this exception
+    type: string
+  startDate:
+    description: The first effective date (inclusive, YYYY-MM-DD) of this exception range
+    type: string
+    format: date
+  endDate:
+    description: The first effective date (inclusive, YYYY-MM-DD) of this exception range
+    type: string
+    format: date
+  openings:
+    description: The openings during this exception
+    type: array
+    items:
+      $ref: exceptionalOpening.yaml
+additionalProperties: false
+required:
+  - name
+  - startDate
+  - endDate
+  - openings
+example:
+  name: Sample exception
+  startDate: "2022-05-01"
+  endDate: "2022-05-03"
+  openings:
+    - startDate: "2022-05-01"
+      startTime: "07:00:00"
+      endDate: "2022-05-02"
+      endTime: "22:00:00"
+    - startDate: "2022-05-03"
+      startTime: "09:00:00"
+      endDate: "2022-05-03"
+      endTime: "23:00:00"

@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0005-drop-rmb-calendar
+      author: university-of-alabama/ncovercash
+      comment: "Delete all existing mod-calendar tables to make way for new schema."
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS actual_opening_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_actual_opening_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_exceptional_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_exceptions CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_openings CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS audit_regular_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS exceptional_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS exceptions CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS openings CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS regular_hours CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal_analyze CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_internal_index CASCADE;
+        - sql:
+            sql: DROP TABLE IF EXISTS rmb_job CASCADE;

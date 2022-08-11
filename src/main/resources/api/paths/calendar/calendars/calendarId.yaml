@@ -1,0 +1,82 @@
+get:
+  summary: Get a calendar
+  description: Get a calendar's information by its ID.
+  operationId: getCalendar
+  parameters:
+    - in: path
+      name: calendarId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The calendar ID to retrieve
+  responses:
+    "200":
+      description: The resulting calendar
+      content:
+        application/json:
+          schema:
+            $ref: ../../../schemas/calendar.yaml
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../../errors/calendarNotFound.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml
+put:
+  summary: Update an existing calendar
+  description:
+    Overwrite an existing calendar with the provided payload.  The provided calendar must already
+    exist (attempting to overwrite a calendar that does not yet exist will result in a 404).  If the
+    payload includes any IDs, they will be ignored, and the existing calendar ID reused.
+  operationId: updateCalendar
+  parameters:
+    - in: path
+      name: calendarId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The calendar ID to replace
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: ../../../schemas/calendar.yaml
+  responses:
+    "200":
+      description: The newly saved calendar
+      content:
+        application/json:
+          schema:
+            $ref: ../../../schemas/calendar.yaml
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../../errors/calendarNotFound.yaml
+    "409":
+      $ref: ../../../errors/calendarDateOverlap.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml
+delete:
+  summary: Delete a calendar
+  description: Delete a calendar by its ID.
+  operationId: deleteCalendar
+  parameters:
+    - in: path
+      name: calendarId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The calendar ID to operate on.
+  responses:
+    "204":
+      description: The requested calendar was deleted
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../../errors/calendarNotFound.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml

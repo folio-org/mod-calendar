@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-03-index-calendar-table
+      author: university-of-alabama/ncovercash
+      comment: Add start/end date index to calendar table
+      changes:
+        - createIndex:
+            tableName: calendars
+            indexName: calendar_start_end_date
+            columns:
+              - column:
+                  name: start_date
+              - column:
+                  name: end_date
