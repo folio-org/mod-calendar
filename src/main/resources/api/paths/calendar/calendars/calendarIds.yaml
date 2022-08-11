@@ -40,7 +40,10 @@ put:
   operationId: updateCalendar
   parameters:
     - in: path
-      name: calendarId
+      # should not be plural, but must be consistent with the overall path variable.
+      # api-lint gets mad if we declare two separate paths, /{calendarId} and /{calendarIds},
+      # so we are stuck naming this variable "calendarIds" despite it being only a single id
+      name: calendarIds
       required: true
       schema:
         type: string
