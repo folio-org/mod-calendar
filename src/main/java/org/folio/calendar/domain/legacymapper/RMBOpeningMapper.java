@@ -32,6 +32,8 @@ public class RMBOpeningMapper implements RowMapper<PeriodDTO> {
   @Autowired
   private TranslationService translationService;
 
+  // false positive marking jdbcTemplate.queryForObject as deprecated
+  @SuppressWarnings("java:S1874")
   public PeriodDTO mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
       JsonNode json = mapper.readTree(result.getString("jsonb"));
