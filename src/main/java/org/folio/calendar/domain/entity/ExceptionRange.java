@@ -37,6 +37,9 @@ import lombok.With;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// Sonar reports false positive duplication with NormalOpening
+// for similar variables `id` and `calendar`
+@SuppressWarnings("common-java:DuplicatedBlocks")
 public class ExceptionRange implements Serializable {
 
   /**
