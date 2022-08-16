@@ -68,6 +68,8 @@ public class CustomTenantService extends TenantService {
    * Parse all calendars from RMB-style database, if applicable
    */
   @Override
+  // false positive on jdbcTemplate.query
+  @SuppressWarnings("java:S2259")
   protected void beforeLiquibaseUpdate(TenantAttributes attributes) {
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
