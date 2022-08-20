@@ -1,4 +1,4 @@
-package org.folio.calendar.domain.types;
+package org.folio.calendar.domain.legacy.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

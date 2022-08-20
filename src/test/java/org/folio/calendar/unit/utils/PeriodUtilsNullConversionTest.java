@@ -4,7 +4,7 @@ import static org.junit.Assert.assertThrows;
 
 import java.util.Arrays;
 import java.util.List;
-import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.utils.PeriodUtils;

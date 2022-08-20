@@ -6,8 +6,8 @@ import static org.junit.Assert.assertThrows;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.folio.calendar.domain.types.LegacyPeriodDate;
-import org.folio.calendar.domain.types.LegacyPeriodDateConverter;
+import org.folio.calendar.domain.legacy.dto.LegacyPeriodDate;
+import org.folio.calendar.domain.legacy.dto.LegacyPeriodDateConverter;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.calendar.integration.BaseApiTest;
 import org.junit.jupiter.api.Test;

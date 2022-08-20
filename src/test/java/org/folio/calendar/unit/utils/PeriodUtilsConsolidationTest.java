@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
 import org.folio.calendar.testconstants.NormalOpenings;
 import org.folio.calendar.testconstants.OpeningDayRelativeConstants;
 import org.folio.calendar.utils.PeriodUtils;

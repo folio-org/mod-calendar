@@ -1,4 +1,4 @@
-package org.folio.calendar.domain.legacymapper;
+package org.folio.calendar.domain.legacy.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
 import org.springframework.jdbc.core.RowMapper;
 
 /**

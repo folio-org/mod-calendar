@@ -58,18 +58,4 @@ class TimeConstantsTest {
       is(equalTo(Times.TIME_23_59))
     );
   }
-
-  @Test
-  void testAllDayRange() {
-    assertThat(
-      "ALL_DAY starts at \"00:00\"",
-      TimeConstants.ALL_DAY.getStartTime(),
-      is(equalTo(Times.TIME_00_00_STRING_HH_mm))
-    );
-    assertThat(
-      "ALL_DAY ends at \"23:59\"",
-      TimeConstants.ALL_DAY.getEndTime(),
-      is(equalTo(Times.TIME_23_59_STRING_HH_mm))
-    );
-  }
 }

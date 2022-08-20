@@ -3,7 +3,7 @@ package org.folio.calendar.testconstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.PeriodDTO;
+import org.folio.calendar.domain.legacy.dto.PeriodDTO;
 
 /**
  * A series of Periods for testing

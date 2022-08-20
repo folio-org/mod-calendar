@@ -6,11 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningDayInfoDTO;
-import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
-import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdaysDTO;
-import org.folio.calendar.domain.dto.OpeningHourRangeDTO;
-import org.folio.calendar.domain.dto.PeriodDTO;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.entity.Calendar.CalendarBuilder;
 import org.folio.calendar.domain.entity.ExceptionHour;
@@ -19,9 +14,16 @@ import org.folio.calendar.domain.entity.ExceptionRange.ExceptionRangeBuilder;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.NormalOpening.NormalOpeningBuilder;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
+import org.folio.calendar.domain.legacy.dto.OpeningDayInfoDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeWeekdaysDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningHourRangeDTO;
+import org.folio.calendar.domain.legacy.dto.PeriodDTO;
 
 /**
- * Utilities for acting on {@link org.folio.calendar.domain.dto.Period} objects
+ * Utilities for acting on {@link org.folio.calendar.domain.dto.Period} objects.
+ * Primarily kept for legacy reasons to facilitate the conversion of old RMB Period
+ * objects to the new Calendar format
  */
 @UtilityClass
 public class PeriodUtils {

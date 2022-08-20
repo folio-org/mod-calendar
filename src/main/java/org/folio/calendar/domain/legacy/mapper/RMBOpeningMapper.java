@@ -1,4 +1,4 @@
-package org.folio.calendar.domain.legacymapper;
+package org.folio.calendar.domain.legacy.mapper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import org.folio.calendar.domain.dto.OpeningDayRelativeDTO;
-import org.folio.calendar.domain.dto.PeriodDTO;
-import org.folio.calendar.domain.types.LegacyPeriodDate;
+import org.folio.calendar.domain.legacy.dto.LegacyPeriodDate;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
+import org.folio.calendar.domain.legacy.dto.PeriodDTO;
 import org.folio.calendar.i18n.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- * Conversion class between openings from the legacy RMB-based schema to a {@link Period Period}
+ * Conversion class between openings from the legacy RMB-based schema to a {@link PeriodDTO Period}
  */
 @Data
 @Log4j2

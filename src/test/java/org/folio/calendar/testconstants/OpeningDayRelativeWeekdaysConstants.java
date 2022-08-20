@@ -1,7 +1,7 @@
 package org.folio.calendar.testconstants;
 
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningDayRelativeWeekdaysDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeWeekdaysDTO;
 import org.folio.calendar.domain.types.Weekday;
 
 @UtilityClass

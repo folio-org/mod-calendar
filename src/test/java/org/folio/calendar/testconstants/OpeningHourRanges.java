@@ -1,7 +1,7 @@
 package org.folio.calendar.testconstants;
 
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningHourRangeDTO;
+import org.folio.calendar.domain.legacy.dto.OpeningHourRangeDTO;
 
 @UtilityClass
 public class OpeningHourRanges {

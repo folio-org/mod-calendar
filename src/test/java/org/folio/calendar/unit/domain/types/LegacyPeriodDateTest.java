@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.folio.calendar.domain.types.LegacyPeriodDate;
+import org.folio.calendar.domain.legacy.dto.LegacyPeriodDate;
 import org.folio.calendar.testconstants.Dates;
 import org.folio.calendar.testutils.MapperUtils;
 import org.junit.jupiter.api.Test;

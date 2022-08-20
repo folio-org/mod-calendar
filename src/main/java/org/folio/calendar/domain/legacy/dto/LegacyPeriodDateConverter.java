@@ -1,4 +1,4 @@
-package org.folio.calendar.domain.types;
+package org.folio.calendar.domain.legacy.dto;
 
 import org.folio.calendar.i18n.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;

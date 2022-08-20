@@ -3,7 +3,6 @@ package org.folio.calendar.utils;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import lombok.experimental.UtilityClass;
-import org.folio.calendar.domain.dto.OpeningHourRangeDTO;
 
 /**
  * Assorted time-related constants
@@ -32,12 +31,4 @@ public class TimeConstants {
    * The last minute in the day, as a HH:mm string
    */
   public static final String TIME_MAX_STRING = TIME_MAX.format(TIME_FORMATTER);
-
-  /**
-   * An OpeningHourRangeDTO that lasts all day
-   */
-  public static final OpeningHourRangeDTO ALL_DAY = new OpeningHourRangeDTO(
-    TIME_MIN_STRING,
-    TIME_MAX_STRING
-  );
 }
