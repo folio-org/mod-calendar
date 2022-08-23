@@ -8,6 +8,7 @@ This software is distributed under the terms of the Apache License, Version 2.0.
 - [Introduction](#introduction)
 - [Compiling](#compiling)
 - [Running the module locally](#running-the-module-locally)
+- [Testing the module](#testing-the-module)
 - [Docker/Deploying the module](#dockerdeploying-the-module)
   - [Module descriptor](#module-descriptor)
   - [Tenant parameters](#tenant-parameters)
@@ -52,6 +53,16 @@ java -jar target/mod-calendar-*.jar
 
 For developers with VS Code, a [`launch.json`](.vscode/launch.json) is provided which allows the
 built-in run features to launch and debug the module within the IDE.
+
+## Testing the module
+
+To test the module locally, you can run the `test` Maven command:
+
+```sh
+mvn clean test jacoco:report
+```
+
+To do this, you must be running Docker. For more information, see the [test docs](docs/testing.md).
 
 ## Docker/Deploying the module
 
