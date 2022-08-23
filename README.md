@@ -101,7 +101,8 @@ See `.env.sample` for example values.
 #### Integration Tests
 
 Integration tests have special environment variables that control whether or not API requests are
-routed through a proxy:
+routed through a proxy. A proxy can be helpful for debugging all of the API requests associated with
+integration tests, providing a separate GUI interface that may provide more details.
 
 | Name         | Default Value | Description                                            |
 | ------------ | ------------- | ------------------------------------------------------ |
