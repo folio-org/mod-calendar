@@ -214,16 +214,7 @@ public class CalendarUtils {
   ) {
     return SingleDayOpeningCollectionDTO
       .builder()
-      .dates(
-        dates
-          .entrySet()
-          .stream()
-          .sorted(Map.Entry.<LocalDate, SingleDayOpeningDTO>comparingByKey())
-          .map(Map.Entry::getValue)
-          .skip(offset)
-          .limit(limit)
-          .toList()
-      )
+      .dates(dates.entrySet().stream().map(Map.Entry::getValue).skip(offset).limit(limit).toList())
       .totalRecords(dates.size())
       .build();
   }

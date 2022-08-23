@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 import javax.annotation.CheckForNull;
@@ -176,7 +176,7 @@ public class CalendarService {
     );
 
     // TreeMap makes sorting more efficient
-    Map<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
+    SortedMap<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
     relevantCalendars.forEach(calendar ->
       CalendarUtils.splitCalendarIntoDates(calendar, dates, startDate, endDate)
     );
