@@ -16,12 +16,10 @@ import org.springframework.http.HttpStatus;
  */
 class OkapiHealthTest extends BaseApiTest {
 
-  public static final String HEALTH_API_ROUTE = "/admin/health/";
-
   @Test
   void testOkStatusReport() {
     ra(ValidationSchema.NONE) // must not validate as /admin/health is not in our schema
-      .get(getRequestUrl(HEALTH_API_ROUTE))
+      .get(getRequestUrl("/admin/health/"))
       .then()
       .statusCode(is(HttpStatus.OK.value()));
   }
