@@ -17,19 +17,24 @@
           "permissionsRequired": ["calendar.endpoint.calendars.post"]
         },
         {
-          "methods": ["GET"],
-          "pathPattern": "/calendar/calendars/{calendarIds}",
-          "permissionsRequired": ["calendar.endpoint.calendars.calendarIds.get"]
+          "methods": ["DELETE"],
+          "pathPattern": "/calendar/calendars",
+          "permissionsRequired": ["calendar.endpoint.calendars.delete"]
         },
         {
-          "methods": ["DELETE"],
-          "pathPattern": "/calendar/calendars/{calendarIds}",
-          "permissionsRequired": ["calendar.endpoint.calendars.calendarIds.delete"]
+          "methods": ["GET"],
+          "pathPattern": "/calendar/calendars/{calendarId}",
+          "permissionsRequired": ["calendar.endpoint.calendars.calendarId.get"]
         },
         {
           "methods": ["PUT"],
           "pathPattern": "/calendar/calendars/{calendarId}",
           "permissionsRequired": ["calendar.endpoint.calendars.calendarId.put"]
+        },
+        {
+          "methods": ["DELETE"],
+          "pathPattern": "/calendar/calendars/{calendarId}",
+          "permissionsRequired": ["calendar.endpoint.calendars.calendarId.delete"]
         },
         {
           "methods": ["GET"],
@@ -66,7 +71,7 @@
       "description": "",
       "subPermissions": [
         "calendar.endpoint.calendars.get",
-        "calendar.endpoint.calendars.calendarIds.get",
+        "calendar.endpoint.calendars.calendarId.get",
         "calendar.endpoint.dates.get"
       ],
       "visible": false
@@ -89,7 +94,11 @@
       "permissionName": "calendar.delete",
       "displayName": "Delete calendars",
       "description": "",
-      "subPermissions": ["calendar.view", "calendar.endpoint.calendars.calendarIds.delete"],
+      "subPermissions": [
+        "calendar.view",
+        "calendar.endpoint.calendars.delete",
+        "calendar.endpoint.calendars.calendarId.delete"
+      ],
       "visible": false
     },
 
@@ -106,20 +115,26 @@
       "visible": false
     },
     {
-      "permissionName": "calendar.endpoint.calendars.calendarIds.get",
-      "displayName": "Make GET requests to /calendar/calendars/{id}",
+      "permissionName": "calendar.endpoint.calendars.delete",
+      "displayName": "Make DELETE requests to /calendar/calendars",
       "description": "",
       "visible": false
     },
     {
-      "permissionName": "calendar.endpoint.calendars.calendarIds.delete",
-      "displayName": "Make DELETE requests to /calendar/calendars/{id}",
+      "permissionName": "calendar.endpoint.calendars.calendarId.get",
+      "displayName": "Make GET requests to /calendar/calendars/{id}",
       "description": "",
       "visible": false
     },
     {
       "permissionName": "calendar.endpoint.calendars.calendarId.put",
       "displayName": "Make PUT requests to /calendar/calendars/{id}",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.endpoint.calendars.calendarId.delete",
+      "displayName": "Make DELETE requests to /calendar/calendars/{id}",
       "description": "",
       "visible": false
     },
