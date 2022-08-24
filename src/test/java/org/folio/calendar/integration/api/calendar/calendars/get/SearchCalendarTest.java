@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.is;
 import io.restassured.response.Response;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.entity.Calendar;
@@ -208,11 +209,13 @@ class SearchCalendarTest extends BaseCalendarApiTest {
         Calendars.CALENDAR_2021_05_01_TO_2021_09_22
       )
       .stream()
-      .map((Calendar cal) -> {
-        Response response = sendCalendarCreationRequest(cal.withName("foo"));
-        response.then().statusCode(is(HttpStatus.CREATED.value()));
-        return response.getBody().as(CalendarDTO.class);
-      })
+      .map(
+        (Calendar cal) -> {
+          Response response = sendCalendarCreationRequest(cal.withName("foo"));
+          response.then().statusCode(is(HttpStatus.CREATED.value()));
+          return response.getBody().as(CalendarDTO.class);
+        }
+      )
       .toList();
 
     Response singleKnownId = sendCalendarSearchRequest(
@@ -252,11 +255,13 @@ class SearchCalendarTest extends BaseCalendarApiTest {
         Calendars.CALENDAR_2021_05_01_TO_2021_09_22
       )
       .stream()
-      .map((Calendar cal) -> {
-        Response response = sendCalendarCreationRequest(cal.withName("foo"));
-        response.then().statusCode(is(HttpStatus.CREATED.value()));
-        return response.getBody().as(CalendarDTO.class);
-      })
+      .map(
+        (Calendar cal) -> {
+          Response response = sendCalendarCreationRequest(cal.withName("foo"));
+          response.then().statusCode(is(HttpStatus.CREATED.value()));
+          return response.getBody().as(CalendarDTO.class);
+        }
+      )
       .collect(Collectors.toList());
 
     Response searchResponseUnlimited = sendCalendarSearchRequest(
