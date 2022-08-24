@@ -44,11 +44,11 @@ class ClearIdsTest {
     cal.clearIds();
     assertThat(cal.getId(), is(nullValue()));
     assertThat(
-      cal.getNormalHours().stream().map(NormalOpening::getId).toList(),
+      cal.getNormalHours().stream().map(NormalOpening::getId).collect(Collectors.toList()),
       everyItem(is(nullValue()))
     );
     assertThat(
-      cal.getExceptions().stream().map(ExceptionRange::getId).toList(),
+      cal.getExceptions().stream().map(ExceptionRange::getId).collect(Collectors.toList()),
       everyItem(is(nullValue()))
     );
     assertThat(
@@ -58,7 +58,7 @@ class ClearIdsTest {
         .map(ExceptionRange::getOpenings)
         .flatMap(Set::stream)
         .map(ExceptionHour::getId)
-        .toList(),
+        .collect(Collectors.toList()),
       everyItem(is(nullValue()))
     );
   }

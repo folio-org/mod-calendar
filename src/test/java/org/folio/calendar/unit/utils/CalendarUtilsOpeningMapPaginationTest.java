@@ -35,7 +35,7 @@ class CalendarUtilsOpeningMapPaginationTest {
       .entrySet()
       .stream()
       .map(Map.Entry::getValue)
-      .toList();
+      .collect(Collectors.toList());
 
     SingleDayOpeningCollectionDTO collection0Limit10 = CalendarUtils.openingMapToCollection(
       map,

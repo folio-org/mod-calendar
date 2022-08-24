@@ -27,7 +27,7 @@ public class ExceptionRangeUtils {
    * return at least two overlapping openings.
    */
   public static Optional<Set<ExceptionHour>> getHourOverlaps(Collection<ExceptionHour> openings) {
-    return TemporalUtils.getOverlaps(toTemporalRanges(openings).toList());
+    return TemporalUtils.getOverlaps(toTemporalRanges(openings).collect(Collectors.toList()));
   }
 
   /**
@@ -67,7 +67,7 @@ public class ExceptionRangeUtils {
             range.getEndDate()
           )
         )
-        .toList()
+        .collect(Collectors.toList())
     );
   }
 

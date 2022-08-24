@@ -257,7 +257,7 @@ class SearchCalendarTest extends BaseCalendarApiTest {
         response.then().statusCode(is(HttpStatus.CREATED.value()));
         return response.getBody().as(CalendarDTO.class);
       })
-      .toList();
+      .collect(Collectors.toList());
 
     Response searchResponseUnlimited = sendCalendarSearchRequest(
       SearchRequestParameters.builder().limit(Integer.MAX_VALUE).build()

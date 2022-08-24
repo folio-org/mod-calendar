@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
@@ -157,7 +158,7 @@ public class CalendarValidationService {
       .getServicePoints()
       .stream()
       .map(ServicePointCalendarAssignment::getServicePointId)
-      .toList();
+      .collect(Collectors.toList());
     List<Calendar> overlaps = calendarRepository
       .findWithServicePointsAndDateRange(
         servicePointAssignmentList,
@@ -166,7 +167,7 @@ public class CalendarValidationService {
       )
       .stream()
       .filter(c -> !ignore.contains(c.getId()))
-      .toList();
+      .collect(Collectors.toList());
     if (!overlaps.isEmpty()) {
       return overlaps
         .stream()
@@ -201,13 +202,13 @@ public class CalendarValidationService {
                     .getServicePoints()
                     .stream()
                     .map(ServicePointCalendarAssignment::getServicePointId)
-                    .toList()::contains
+                    .collect(Collectors.toList())::contains
                 )
-                .toList()
+                .collect(Collectors.toList())
             )
           )
         )
-        .toList();
+        .collect(Collectors.toList());
     }
     return new ArrayList<>();
   }
@@ -240,14 +241,14 @@ public class CalendarValidationService {
           opening.getEndTime()
         )
       )
-      .toList();
+      .collect(Collectors.toList());
 
     return Optional.of(
       new InvalidDataException(
         ErrorCodeDTO.CALENDAR_INVALID_NORMAL_OPENINGS,
         new ExceptionParameters(
           Parameters.NORMAL_HOURS,
-          normalHours.stream().map(normalOpeningMapper::toDto).toList()
+          normalHours.stream().map(normalOpeningMapper::toDto).collect(Collectors.toList())
         ),
         translationService.format(
           TranslationKey.ERROR_CALENDAR_INVALID_NORMAL_OPENINGS,
@@ -275,7 +276,7 @@ public class CalendarValidationService {
           ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_NAME,
           new ExceptionParameters(
             Parameters.EXCEPTIONS,
-            ranges.stream().map(exceptionRangeMapper::toDto).toList()
+            ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
           ),
           translationService.format(TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_NAME)
         )
@@ -299,7 +300,7 @@ public class CalendarValidationService {
     List<ExceptionRange> failed = ranges
       .stream()
       .filter(range -> range.getStartDate().isAfter(range.getEndDate()))
-      .toList();
+      .collect(Collectors.toList());
     if (!failed.isEmpty()) {
       return Optional.of(
         failed
@@ -309,7 +310,7 @@ public class CalendarValidationService {
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_DATE_ORDER,
               new ExceptionParameters(
                 Parameters.EXCEPTIONS,
-                ranges.stream().map(exceptionRangeMapper::toDto).toList()
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
               ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER,
@@ -323,7 +324,7 @@ public class CalendarValidationService {
               new ExceptionRangeSingleErrorData(range)
             )
           )
-          .toList()
+          .collect(Collectors.toList())
       );
     }
     return Optional.empty();
@@ -351,7 +352,7 @@ public class CalendarValidationService {
           calendar.getEndDate()
         )
       )
-      .toList();
+      .collect(Collectors.toList());
     if (!failed.isEmpty()) {
       return Optional.of(
         failed
@@ -361,7 +362,7 @@ public class CalendarValidationService {
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_DATE_BOUNDARY,
               new ExceptionParameters(
                 Parameters.EXCEPTIONS,
-                ranges.stream().map(exceptionRangeMapper::toDto).toList()
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
               ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS,
@@ -379,7 +380,7 @@ public class CalendarValidationService {
               new ExceptionRangeSingleErrorData(range)
             )
           )
-          .toList()
+          .collect(Collectors.toList())
       );
     }
     return Optional.empty();
@@ -405,14 +406,14 @@ public class CalendarValidationService {
       .stream()
       .map(ExceptionRangeUtils::getTranslation)
       .map(f -> f.apply(translationService))
-      .toList();
+      .collect(Collectors.toList());
 
     return Optional.of(
       new InvalidDataException(
         ErrorCodeDTO.CALENDAR_INVALID_EXCEPTIONS,
         new ExceptionParameters(
           Parameters.EXCEPTIONS,
-          exceptionRanges.stream().map(exceptionRangeMapper::toDto).toList()
+          exceptionRanges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
         ),
         translationService.format(
           TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_RANGES,
@@ -448,14 +449,14 @@ public class CalendarValidationService {
               range.getEndDate()
             )
           )
-          .toList();
+          .collect(Collectors.toList());
         if (!failures.isEmpty()) {
           return Optional.of(
             new InvalidDataException(
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_OPENING_BOUNDARY,
               new ExceptionParameters(
                 Parameters.EXCEPTIONS,
-                ranges.stream().map(exceptionRangeMapper::toDto).toList()
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
               ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS,
@@ -480,7 +481,7 @@ public class CalendarValidationService {
                         hour.getEndTime()
                       )
                     )
-                    .toList()
+                    .collect(Collectors.toList())
                 )
               )
             )
@@ -488,7 +489,7 @@ public class CalendarValidationService {
         }
         return Optional.empty();
       });
-    return stream.filter(Optional::isPresent).map(Optional::get).toList();
+    return stream.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
   }
 
   /**
@@ -515,7 +516,7 @@ public class CalendarValidationService {
               ErrorCodeDTO.CALENDAR_INVALID_EXCEPTION_OPENINGS,
               new ExceptionParameters(
                 Parameters.EXCEPTIONS,
-                ranges.stream().map(exceptionRangeMapper::toDto).toList()
+                ranges.stream().map(exceptionRangeMapper::toDto).collect(Collectors.toList())
               ),
               translationService.format(
                 TranslationKey.ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS,
@@ -539,7 +540,7 @@ public class CalendarValidationService {
                         hour.getEndTime()
                       )
                     )
-                    .toList()
+                    .collect(Collectors.toList())
                 )
               )
             )
@@ -547,7 +548,7 @@ public class CalendarValidationService {
         }
         return Optional.empty();
       });
-    return stream.filter(Optional::isPresent).map(Optional::get).toList();
+    return stream.filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
   }
 
   public void validate(Calendar calendar) {

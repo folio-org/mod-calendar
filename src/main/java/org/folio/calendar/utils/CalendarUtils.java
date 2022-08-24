@@ -96,7 +96,7 @@ public class CalendarUtils {
                   .endTime(timeRange.getEnd())
                   .build()
               )
-              .toList();
+              .collect(Collectors.toList());
 
             dates.put(
               date,
@@ -157,8 +157,7 @@ public class CalendarUtils {
                       .endTime(timeRange.getEnd())
                       .build()
                   )
-                  .sorted((a, b) -> a.getStartTime().compareTo(b.getStartTime()))
-                  .toList()
+                  .collect(Collectors.toList())
               )
               .open(true)
               .allDay(TimeUtils.isAllDay(openings))
@@ -214,7 +213,16 @@ public class CalendarUtils {
   ) {
     return SingleDayOpeningCollectionDTO
       .builder()
-      .dates(dates.entrySet().stream().map(Map.Entry::getValue).skip(offset).limit(limit).toList())
+      .dates(
+        dates
+          .entrySet()
+          .stream()
+          .sorted(Map.Entry.<LocalDate, SingleDayOpeningDTO>comparingByKey())
+          .map(Map.Entry::getValue)
+          .skip(offset)
+          .limit(limit)
+          .collect(Collectors.toList())
+      )
       .totalRecords(dates.size())
       .build();
   }

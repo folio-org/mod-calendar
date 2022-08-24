@@ -37,7 +37,11 @@ class NormalMigrationTest extends AbstractMigrationTest {
     collection.getCalendars().forEach(c -> c.setId(UUIDs.UUID_A));
     assertThat(
       "The regular period was properly converted",
-      collection.getCalendars().stream().map(CalendarDTO::getNormalHours).toList(),
+      collection
+        .getCalendars()
+        .stream()
+        .map(CalendarDTO::getNormalHours)
+        .collect(Collectors.toList()),
       hasItem(
         containsInAnyOrder(
           calendarMapper.toDto(Calendars.CALENDAR_FULL_EXAMPLE_F).getNormalHours().toArray()
