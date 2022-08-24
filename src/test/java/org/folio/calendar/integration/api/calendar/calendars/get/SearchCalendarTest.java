@@ -216,7 +216,7 @@ class SearchCalendarTest extends BaseCalendarApiTest {
           return response.getBody().as(CalendarDTO.class);
         }
       )
-      .toList();
+      .collect(Collectors.toList());
 
     Response singleKnownId = sendCalendarSearchRequest(
       SearchRequestParameters.builder().calendarId(calendars.get(0).getId()).build()
