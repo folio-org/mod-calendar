@@ -102,7 +102,7 @@ post:
     "500":
       $ref: ../../errors/internalServerError.yaml
 delete:
-  summary: Delete a calendar
+  summary: Delete multiple calendars
   description: Delete a calendar by its ID.
   operationId: deleteCalendars
   parameters:
