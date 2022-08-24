@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.ExceptionHour;
@@ -40,12 +41,13 @@ public class ExceptionRangeUtils {
   ) {
     return openings
       .stream()
-      .map(hour ->
-        new TemporalRange<LocalDateTime, ExceptionHour>(
-          hour,
-          LocalDateTime.of(hour.getStartDate(), hour.getStartTime()),
-          LocalDateTime.of(hour.getEndDate(), hour.getEndTime())
-        )
+      .map(
+        hour ->
+          new TemporalRange<LocalDateTime, ExceptionHour>(
+            hour,
+            LocalDateTime.of(hour.getStartDate(), hour.getStartTime()),
+            LocalDateTime.of(hour.getEndDate(), hour.getEndTime())
+          )
       );
   }
 
@@ -60,12 +62,13 @@ public class ExceptionRangeUtils {
     return TemporalUtils.getOverlaps(
       ranges
         .stream()
-        .map(range ->
-          new TemporalRange<LocalDate, ExceptionRange>(
-            range,
-            range.getStartDate(),
-            range.getEndDate()
-          )
+        .map(
+          range ->
+            new TemporalRange<LocalDate, ExceptionRange>(
+              range,
+              range.getStartDate(),
+              range.getEndDate()
+            )
         )
         .collect(Collectors.toList())
     );

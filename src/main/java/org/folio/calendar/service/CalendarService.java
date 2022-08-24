@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.annotation.CheckForNull;
 import lombok.AllArgsConstructor;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
@@ -192,8 +193,8 @@ public class CalendarService {
 
     // TreeMap makes sorting more efficient
     SortedMap<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
-    relevantCalendars.forEach(calendar ->
-      CalendarUtils.splitCalendarIntoDates(calendar, dates, startDate, endDate)
+    relevantCalendars.forEach(
+      calendar -> CalendarUtils.splitCalendarIntoDates(calendar, dates, startDate, endDate)
     );
 
     if (Boolean.TRUE.equals(includeClosed)) {

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Value;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
@@ -60,7 +61,7 @@ public class TranslationFile {
   public Map<String, String> getMap() {
     try {
       return new ObjectMapper()
-        .readValue(resource.getInputStream(), new TypeReference<Map<String, String>>() {});
+      .readValue(resource.getInputStream(), new TypeReference<Map<String, String>>() {});
     } catch (IOException e) {
       log.error(
         String.format(
@@ -172,15 +173,17 @@ public class TranslationFile {
     Map<String, Map<String, TranslationFile>> map = new HashMap<>();
 
     getAvailableTranslationFiles(translationConfiguration, resourceResolver)
-      .forEach((TranslationFile file) -> {
-        String[] parts = file.getParts();
-        map
-          .computeIfAbsent(parts[0], key -> new HashMap<String, TranslationFile>())
-          .put(parts[1], file);
-        // fill in default, e.g. en-us.json being the only en file will set en-* = en-us
-        // if en.json exists later, it will be replaced above
-        map.get(parts[0]).putIfAbsent(UNKNOWN_PART, file);
-      });
+      .forEach(
+        (TranslationFile file) -> {
+          String[] parts = file.getParts();
+          map
+            .computeIfAbsent(parts[0], key -> new HashMap<String, TranslationFile>())
+            .put(parts[1], file);
+          // fill in default, e.g. en-us.json being the only en file will set en-* = en-us
+          // if en.json exists later, it will be replaced above
+          map.get(parts[0]).putIfAbsent(UNKNOWN_PART, file);
+        }
+      );
 
     return map;
   }

@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
@@ -50,8 +51,9 @@ public class CalendarUtils {
     Map<Weekday, List<TemporalRange<LocalTime, NormalOpening>>> normalOpenings = NormalOpeningUtils.initializeWeekdayMapOfRanges();
     calendar
       .getNormalHours()
-      .forEach(normalOpening ->
-        NormalOpeningUtils.fillWeekdayMapWithTimeTuples(normalOpenings, normalOpening)
+      .forEach(
+        normalOpening ->
+          NormalOpeningUtils.fillWeekdayMapWithTimeTuples(normalOpenings, normalOpening)
       );
 
     // iterate through all other dates, checking normal openings
@@ -75,45 +77,50 @@ public class CalendarUtils {
   ) {
     calendar
       .getExceptions()
-      .forEach((ExceptionRange exception) ->
-        DateUtils
-          .getDateRangeStream(
-            DateUtils.max(startDate, exception.getStartDate()),
-            DateUtils.min(endDate, exception.getEndDate())
-          )
-          .forEach((LocalDate date) -> {
-            List<SingleDayOpeningRangeDTO> openings = ExceptionRangeUtils
-              .toTemporalRanges(exception.getOpenings())
-              .map(dateTimeRange ->
-                TemporalUtils.getLocalTimeSliceOfDateTimeRange(dateTimeRange, date)
-              )
-              .filter(Optional::isPresent)
-              .map(Optional::get)
-              .map(timeRange ->
-                SingleDayOpeningRangeDTO
-                  .builder()
-                  .startTime(timeRange.getStart())
-                  .endTime(timeRange.getEnd())
-                  .build()
-              )
-              .collect(Collectors.toList());
+      .forEach(
+        (ExceptionRange exception) ->
+          DateUtils
+            .getDateRangeStream(
+              DateUtils.max(startDate, exception.getStartDate()),
+              DateUtils.min(endDate, exception.getEndDate())
+            )
+            .forEach(
+              (LocalDate date) -> {
+                List<SingleDayOpeningRangeDTO> openings = ExceptionRangeUtils
+                  .toTemporalRanges(exception.getOpenings())
+                  .map(
+                    dateTimeRange ->
+                      TemporalUtils.getLocalTimeSliceOfDateTimeRange(dateTimeRange, date)
+                  )
+                  .filter(Optional::isPresent)
+                  .map(Optional::get)
+                  .map(
+                    timeRange ->
+                      SingleDayOpeningRangeDTO
+                        .builder()
+                        .startTime(timeRange.getStart())
+                        .endTime(timeRange.getEnd())
+                        .build()
+                  )
+                  .collect(Collectors.toList());
 
-            dates.put(
-              date,
-              SingleDayOpeningDTO
-                .builder()
-                .date(date)
-                .exceptionName(exception.getName())
-                .exceptional(true)
-                .openings(openings)
-                .open(!openings.isEmpty())
-                .allDay(
-                  openings.isEmpty() ||
-                  (openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
-                )
-                .build()
-            );
-          })
+                dates.put(
+                  date,
+                  SingleDayOpeningDTO
+                    .builder()
+                    .date(date)
+                    .exceptionName(exception.getName())
+                    .exceptional(true)
+                    .openings(openings)
+                    .open(!openings.isEmpty())
+                    .allDay(
+                      openings.isEmpty() ||
+                      (openings.size() == 1 && TimeUtils.isAllDay(openings.get(0)))
+                    )
+                    .build()
+                );
+              }
+            )
       );
   }
 
@@ -135,36 +142,39 @@ public class CalendarUtils {
   ) {
     DateUtils
       .getDateRangeStream(startDate, endDate)
-      .forEach((LocalDate date) -> {
-        List<TemporalRange<LocalTime, NormalOpening>> openings = normalOpenings.get(
-          Weekday.from(date)
-        );
-        if (!openings.isEmpty()) {
-          // put if absent will only add this date if it was not added above (from an exception)
-          dates.putIfAbsent(
-            date,
-            SingleDayOpeningDTO
-              .builder()
-              .date(date)
-              .exceptional(false)
-              .openings(
-                openings
-                  .stream()
-                  .map(timeRange ->
-                    SingleDayOpeningRangeDTO
-                      .builder()
-                      .startTime(timeRange.getStart())
-                      .endTime(timeRange.getEnd())
-                      .build()
-                  )
-                  .collect(Collectors.toList())
-              )
-              .open(true)
-              .allDay(TimeUtils.isAllDay(openings))
-              .build()
+      .forEach(
+        (LocalDate date) -> {
+          List<TemporalRange<LocalTime, NormalOpening>> openings = normalOpenings.get(
+            Weekday.from(date)
           );
+          if (!openings.isEmpty()) {
+            // put if absent will only add this date if it was not added above (from an exception)
+            dates.putIfAbsent(
+              date,
+              SingleDayOpeningDTO
+                .builder()
+                .date(date)
+                .exceptional(false)
+                .openings(
+                  openings
+                    .stream()
+                    .map(
+                      timeRange ->
+                        SingleDayOpeningRangeDTO
+                          .builder()
+                          .startTime(timeRange.getStart())
+                          .endTime(timeRange.getEnd())
+                          .build()
+                    )
+                    .collect(Collectors.toList())
+                )
+                .open(true)
+                .allDay(TimeUtils.isAllDay(openings))
+                .build()
+            );
+          }
         }
-      });
+      );
   }
 
   /**
@@ -182,18 +192,19 @@ public class CalendarUtils {
   ) {
     DateUtils
       .getDateRangeStream(startDate, endDate)
-      .forEach((LocalDate date) ->
-        dates.putIfAbsent(
-          date,
-          SingleDayOpeningDTO
-            .builder()
-            .date(date)
-            .exceptional(false)
-            .openings(new ArrayList<>())
-            .open(false)
-            .allDay(true)
-            .build()
-        )
+      .forEach(
+        (LocalDate date) ->
+          dates.putIfAbsent(
+            date,
+            SingleDayOpeningDTO
+              .builder()
+              .date(date)
+              .exceptional(false)
+              .openings(new ArrayList<>())
+              .open(false)
+              .allDay(true)
+              .build()
+          )
       );
   }
 
