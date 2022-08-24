@@ -2,6 +2,7 @@ package org.folio.calendar.integration.api.calendar.calendars.get;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -24,6 +25,18 @@ class SearchCalendarTest extends BaseCalendarApiTest {
   @Test
   void testEmptyGet() {
     Response response = sendCalendarSearchRequest(SearchRequestParameters.builder().build());
+    response.then().statusCode(is(HttpStatus.OK.value()));
+
+    CalendarCollectionDTO collection = response.getBody().as(CalendarCollectionDTO.class);
+    assertThat(collection.getTotalRecords(), is(equalTo(0)));
+    assertThat(collection.getCalendars(), hasSize(0));
+  }
+
+  @Test
+  void testEmptyGetWithIds() {
+    Response response = sendCalendarSearchRequest(
+      SearchRequestParameters.builder().calendarId(UUIDs.UUID_0).calendarId(UUIDs.UUID_1).build()
+    );
     response.then().statusCode(is(HttpStatus.OK.value()));
 
     CalendarCollectionDTO collection = response.getBody().as(CalendarCollectionDTO.class);
@@ -182,6 +195,49 @@ class SearchCalendarTest extends BaseCalendarApiTest {
 
     assertThat(resultAfter.getTotalRecords(), is(equalTo(0)));
     assertThat(resultAfter.getCalendars(), hasSize(0));
+  }
+
+  @Test
+  void testIdSearch() {
+    List<CalendarDTO> calendars = Arrays
+      .asList(
+        Calendars.CALENDAR_2021_01_01_TO_2021_01_01,
+        Calendars.CALENDAR_2021_01_02_TO_2021_01_02,
+        Calendars.CALENDAR_2021_03_16_TO_2021_03_16,
+        Calendars.CALENDAR_2021_04_30_TO_2021_04_30,
+        Calendars.CALENDAR_2021_05_01_TO_2021_09_22
+      )
+      .stream()
+      .map((Calendar cal) -> {
+        Response response = sendCalendarCreationRequest(cal.withName("foo"));
+        response.then().statusCode(is(HttpStatus.CREATED.value()));
+        return response.getBody().as(CalendarDTO.class);
+      })
+      .toList();
+
+    Response singleKnownId = sendCalendarSearchRequest(
+      SearchRequestParameters.builder().calendarId(calendars.get(0).getId()).build()
+    );
+    singleKnownId.then().statusCode(is(HttpStatus.OK.value()));
+    CalendarCollectionDTO resultAfter = singleKnownId.getBody().as(CalendarCollectionDTO.class);
+
+    assertThat(resultAfter.getTotalRecords(), is(equalTo(1)));
+    assertThat(resultAfter.getCalendars(), contains(calendars.get(0)));
+
+    Response multipleKnownIds = sendCalendarSearchRequest(
+      SearchRequestParameters
+        .builder()
+        .calendarId(calendars.get(3).getId())
+        .calendarId(UUIDs.UUID_3)
+        .calendarId(calendars.get(1).getId())
+        .calendarId(calendars.get(1).getId())
+        .build()
+    );
+    multipleKnownIds.then().statusCode(is(HttpStatus.OK.value()));
+    resultAfter = multipleKnownIds.getBody().as(CalendarCollectionDTO.class);
+
+    assertThat(resultAfter.getTotalRecords(), is(equalTo(2)));
+    assertThat(resultAfter.getCalendars(), containsInAnyOrder(calendars.get(1), calendars.get(3)));
   }
 
   @Test

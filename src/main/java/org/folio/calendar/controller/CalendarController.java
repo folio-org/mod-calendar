@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.CalendarCollectionDTO;
@@ -56,16 +55,14 @@ public final class CalendarController implements CalendarApi {
 
   /** {@inheritDoc} */
   @Override
-  public ResponseEntity<CalendarCollectionDTO> getCalendars(List<UUID> calendarIds) {
-    return new ResponseEntity<>(
-      calendarService.getCalendarCollectionForIdList(new HashSet<>(calendarIds)),
-      HttpStatus.OK
-    );
+  public ResponseEntity<CalendarDTO> getCalendar(UUID calendarId) {
+    return new ResponseEntity<>(calendarService.getCalendarById(calendarId), HttpStatus.OK);
   }
 
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<CalendarCollectionDTO> searchCalendars(
+    List<UUID> calendarIds,
     List<UUID> servicePointIds,
     LocalDate startDate,
     LocalDate endDate,
@@ -73,7 +70,8 @@ public final class CalendarController implements CalendarApi {
     Integer limit
   ) {
     return new ResponseEntity<>(
-      calendarService.getCalendarCollectionForServicePointsOrDateRange(
+      calendarService.getCalendarCollectionForIdsServicePointsOrDateRange(
+        calendarIds,
         servicePointIds,
         startDate,
         endDate,
@@ -87,8 +85,8 @@ public final class CalendarController implements CalendarApi {
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendarDto) {
-    // ensure the ID currently exists
-    calendarService.getCalendarCollectionForIdList(Set.of(calendarId));
+    // ensure the ID currently exists, as this method throws 404 otherwise
+    calendarService.getCalendarById(calendarId);
 
     Calendar calendar = calendarMapper.fromDto(calendarDto);
     calendarValidationService.validate(calendar, Arrays.asList(calendarId));
@@ -104,10 +102,22 @@ public final class CalendarController implements CalendarApi {
 
   /** {@inheritDoc} */
   @Override
+  public ResponseEntity<Void> deleteCalendar(UUID calendarId) {
+    // getting the calendar first ensures that non-existent calendars will result in 404
+    calendarService.deleteCalendarById(calendarService.getCalendarById((calendarId)).getId());
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
+
+  /** {@inheritDoc} */
+  @Override
   public ResponseEntity<Void> deleteCalendars(List<UUID> calendarIds) {
+    // getting the calendars ensure that non-existent calendars will result in 404
     calendarService
       .getCalendarsForIdList(new HashSet<>(calendarIds))
-      .forEach(calendarService::deleteCalendar);
+      .stream()
+      .map(Calendar::getId)
+      .forEach(calendarService::deleteCalendarById);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }

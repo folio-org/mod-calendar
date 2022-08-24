@@ -1,30 +1,22 @@
 get:
-  summary: Get calendar(s)
-  description:
-    Get one or more calendar's information by their ID.  All calendars must exist for a successful
-    response, otherwise a 404 will be returned.
-  operationId: getCalendars
+  summary: Get a calendar
+  description: Get a calendar's information by its ID.
+  operationId: getCalendar
   parameters:
     - in: path
-      name: calendarIds
+      name: calendarId
       required: true
-      style: simple
-      explode: true
       schema:
-        type: array
-        items:
-          type: string
-          format: uuid
-        minItems: 1
-      description:
-        A list of calendar IDs to operate on, separated by commas.  Duplicate IDs will be ignored.
+        type: string
+        format: uuid
+      description: The calendar ID to retrieve
   responses:
     "200":
-      description: The query results
+      description: The resulting calendar
       content:
         application/json:
           schema:
-            $ref: ../../../schemas/calendarCollection.yaml
+            $ref: ../../../schemas/calendar.yaml
     "400":
       $ref: ../../../errors/invalidRequest.yaml
     "404":
@@ -40,10 +32,7 @@ put:
   operationId: updateCalendar
   parameters:
     - in: path
-      # should not be plural, but must be consistent with the overall path variable.
-      # api-lint gets mad if we declare two separate paths, /{calendarId} and /{calendarIds},
-      # so we are stuck naming this variable "calendarIds" despite it being only a single id
-      name: calendarIds
+      name: calendarId
       required: true
       schema:
         type: string
@@ -71,28 +60,20 @@ put:
     "500":
       $ref: ../../../errors/internalServerError.yaml
 delete:
-  summary: Delete calendar(s)
-  description:
-    Delete one or more calendar's information by their ID.  All calendars must exist for a
-    successful response, otherwise a 404 will be returned and no action performed.
-  operationId: deleteCalendars
+  summary: Delete a calendar
+  description: Delete a calendar by its ID.
+  operationId: deleteCalendar
   parameters:
     - in: path
-      name: calendarIds
+      name: calendarId
       required: true
-      style: simple
-      explode: true
       schema:
-        type: array
-        items:
-          type: string
-          format: uuid
-        minItems: 1
-      description:
-        A list of calendar IDs to operate on, separated by commas.  Duplicate IDs will be ignored.
+        type: string
+        format: uuid
+      description: The calendar ID to operate on.
   responses:
     "204":
-      description: The requested calendars were deleted
+      description: The requested calendar was deleted
     "400":
       $ref: ../../../errors/invalidRequest.yaml
     "404":

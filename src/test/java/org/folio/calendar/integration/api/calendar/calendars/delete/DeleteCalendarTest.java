@@ -1,7 +1,6 @@
-package org.folio.calendar.integration.api.calendar.calendars.ids.get;
+package org.folio.calendar.integration.api.calendar.calendars.delete;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -12,7 +11,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
-import org.folio.calendar.domain.dto.CalendarCollectionDTO;
 import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorDTO;
@@ -25,15 +23,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-class GetCalendarTest extends BaseCalendarApiTest {
+class DeleteCalendarTest extends BaseCalendarApiTest {
 
   @Autowired
   private CalendarMapper calendarMapper;
 
   @Test
   @SuppressWarnings("unchecked")
-  void testMissingGet() {
-    Response response = sendCalendarGetRequest(Arrays.asList(UUIDs.UUID_0, UUIDs.UUID_1));
+  void testMissingDelete() {
+    Response response = sendMultiCalendarDeleteRequest(Arrays.asList(UUIDs.UUID_0, UUIDs.UUID_1));
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
     ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);
@@ -55,34 +53,20 @@ class GetCalendarTest extends BaseCalendarApiTest {
   }
 
   @Test
-  void testSingleExistingGet() {
+  void testSingleExistingDelete() {
     Response postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
     postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
     UUID createdId1 = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
 
-    Response getResponse = sendCalendarGetRequest(Arrays.asList(createdId1));
-    getResponse.then().statusCode(is(HttpStatus.OK.value()));
-    CalendarCollectionDTO result = getResponse.getBody().as(CalendarCollectionDTO.class);
+    sendMultiCalendarDeleteRequest(Arrays.asList(createdId1))
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
 
-    assertThat(
-      "Getting a single existing calendar results in one calendar returned",
-      result.getTotalRecords(),
-      is(equalTo(1))
-    );
-    assertThat(
-      "Getting a single existing calendar results in one calendar returned",
-      result.getCalendars(),
-      hasSize(1)
-    );
-    assertThat(
-      "Getting an existing calendar results in the proper calendar returned",
-      result.getCalendars().stream().map(calendarMapper::fromDto).toList(),
-      contains(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(createdId1))
-    );
+    sendCalendarGetRequest(createdId1).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
   }
 
   @Test
-  void testMultipleGet() {
+  void testPartialDelete() {
     Response postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
     postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
     UUID createdId1 = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
@@ -91,33 +75,44 @@ class GetCalendarTest extends BaseCalendarApiTest {
     postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
     UUID createdId2 = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
 
-    Response getResponse = sendCalendarGetRequest(Arrays.asList(createdId1, createdId2));
-    getResponse.then().statusCode(is(HttpStatus.OK.value()));
-    CalendarCollectionDTO result = getResponse.getBody().as(CalendarCollectionDTO.class);
+    sendMultiCalendarDeleteRequest(Arrays.asList(createdId1))
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
 
-    assertThat(
-      "Getting two existing calendars results in two calendars returned",
-      result.getTotalRecords(),
-      is(equalTo(2))
-    );
-    assertThat(
-      "Getting two existing calendars results in two calendars returned",
-      result.getCalendars(),
-      hasSize(2)
-    );
-    assertThat(
-      "Getting an existing calendar results in the proper calendar returned",
-      result.getCalendars().stream().map(calendarMapper::fromDto).toList(),
-      containsInAnyOrder(
-        Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(createdId1),
-        Calendars.CALENDAR_COMBINED_EXAMPLE_C.withId(createdId2)
-      )
-    );
+    sendCalendarGetRequest(createdId1).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
-    getResponse = sendCalendarGetRequest(Arrays.asList(createdId1, createdId2, createdId2));
-    getResponse.then().statusCode(is(HttpStatus.OK.value()));
-    result = getResponse.getBody().as(CalendarCollectionDTO.class);
-    assertThat("Duplicate IDs are ignored appropriately", result.getTotalRecords(), is(equalTo(2)));
+    sendCalendarGetRequest(createdId2).then().statusCode(is(HttpStatus.OK.value()));
+  }
+
+  @Test
+  void testMultipleDelete() {
+    Response postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
+    postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
+    UUID createdId1 = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
+
+    postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_C);
+    postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
+    UUID createdId2 = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
+
+    sendMultiCalendarDeleteRequest(Arrays.asList(createdId1, createdId2))
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+
+    sendCalendarGetRequest(createdId1).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
+    sendCalendarGetRequest(createdId2).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
+  }
+
+  @Test
+  void testDuplicateDelete() {
+    Response postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
+    postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
+    UUID createdId = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
+
+    sendMultiCalendarDeleteRequest(Arrays.asList(createdId, createdId))
+      .then()
+      .statusCode(is(HttpStatus.NO_CONTENT.value()));
+
+    sendCalendarGetRequest(createdId).then().statusCode(is(HttpStatus.NOT_FOUND.value()));
   }
 
   @Test
@@ -127,7 +122,7 @@ class GetCalendarTest extends BaseCalendarApiTest {
     postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
     UUID createdId = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
 
-    Response response = sendCalendarGetRequest(Arrays.asList(createdId, UUIDs.UUID_0));
+    Response response = sendMultiCalendarDeleteRequest(Arrays.asList(createdId, UUIDs.UUID_0));
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
     ErrorResponseDTO errorResponse = response.getBody().as(ErrorResponseDTO.class);

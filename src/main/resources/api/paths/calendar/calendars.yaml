@@ -4,6 +4,20 @@ get:
   operationId: searchCalendars
   parameters:
     - in: query
+      name: id
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+      description:
+        The list of calendar IDs to retrieve, sent as separate parameters (?id=aaaa&id=bbbb...).  If
+        this list is passed, calendars must have an ID in this list in addition to any additional
+        criteria.
+    - in: query
       name: servicePointId
       required: false
       style: form
@@ -85,5 +99,33 @@ post:
       $ref: ../../errors/invalidRequest.yaml
     "409":
       $ref: ../../errors/calendarDateOverlap.yaml
+    "500":
+      $ref: ../../errors/internalServerError.yaml
+delete:
+  summary: Delete a calendar
+  description: Delete a calendar by its ID.
+  operationId: deleteCalendars
+  parameters:
+    - in: query
+      name: id
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+        minItems: 1
+      description:
+        A list of calendars to delete, sent as separate parameters (?id=aaaa&id=bbbb...).  If any
+        calendars are missing, a 404 will be returned and nothing modified.
+  responses:
+    "204":
+      description: The requested calendars were deleted
+    "400":
+      $ref: ../../errors/invalidRequest.yaml
+    "404":
+      $ref: ../../errors/calendarNotFound.yaml
     "500":
       $ref: ../../errors/internalServerError.yaml

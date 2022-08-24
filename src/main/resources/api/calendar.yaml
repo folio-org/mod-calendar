@@ -7,8 +7,8 @@ servers:
 paths:
   /calendar/calendars:
     $ref: paths/calendar/calendars.yaml
-  /calendar/calendars/{calendarIds}:
-    $ref: paths/calendar/calendars/calendarIds.yaml
+  /calendar/calendars/{calendarId}:
+    $ref: paths/calendar/calendars/calendarId.yaml
   /calendar/dates/{servicePointId}/surrounding-openings:
     $ref: paths/calendar/dates/surrounding-openings.yaml
   /calendar/dates/{servicePointId}/all-openings:

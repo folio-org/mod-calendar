@@ -1,4 +1,4 @@
-package org.folio.calendar.integration.api.calendar.calendars.ids.put;
+package org.folio.calendar.integration.api.calendar.calendars.id.put;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;

@@ -15,7 +15,7 @@ class SampleDataCreationTest extends AbstractSampleTest {
   @Test
   void testLoadSample() {
     CalendarCollectionDTO collection = ra()
-      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+      .get(getRequestUrl(BaseCalendarApiTest.COLLECTION_CALENDAR_API_ROUTE))
       .getBody()
       .as(CalendarCollectionDTO.class);
 
@@ -29,7 +29,7 @@ class SampleDataCreationTest extends AbstractSampleTest {
   @Test
   void testMultipleLoads() {
     int totalRecords = ra()
-      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+      .get(getRequestUrl(BaseCalendarApiTest.COLLECTION_CALENDAR_API_ROUTE))
       .getBody()
       .as(CalendarCollectionDTO.class)
       .getTotalRecords();
@@ -39,7 +39,7 @@ class SampleDataCreationTest extends AbstractSampleTest {
     assertThat(
       "No additional data was loaded when samples were loaded twice",
       ra()
-        .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+        .get(getRequestUrl(BaseCalendarApiTest.COLLECTION_CALENDAR_API_ROUTE))
         .getBody()
         .as(CalendarCollectionDTO.class)
         .getTotalRecords(),

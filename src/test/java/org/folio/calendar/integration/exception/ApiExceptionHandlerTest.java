@@ -22,7 +22,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   public static final String BAD_API_ROUTE = "/bad";
 
-  public static final String VALID_API_ROUTE = BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE;
+  public static final String VALID_API_ROUTE = BaseCalendarApiTest.COLLECTION_CALENDAR_API_ROUTE;
 
   @Test
   void testInvalidGetApiRoute() {

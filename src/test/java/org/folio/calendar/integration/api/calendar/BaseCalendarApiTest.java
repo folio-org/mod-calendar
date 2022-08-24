@@ -5,7 +5,6 @@ import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -23,11 +22,8 @@ import org.springframework.http.MediaType;
  */
 public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
 
-  public static final String GET_SEARCH_CALENDAR_API_ROUTE = "/calendar/calendars";
-  public static final String CREATE_CALENDAR_API_ROUTE = "/calendar/calendars";
-  public static final String GET_CALENDAR_API_ROUTE = "/calendar/calendars/{calendarIds}";
-  public static final String PUT_CALENDAR_API_ROUTE = "/calendar/calendars/{calendarId}";
-  public static final String DELETE_CALENDAR_API_ROUTE = "/calendar/calendars/{calendarIds}";
+  public static final String COLLECTION_CALENDAR_API_ROUTE = "/calendar/calendars";
+  public static final String SINGLE_CALENDAR_API_ROUTE = "/calendar/calendars/{calendarId}";
   public static final String GET_ALL_DATES_API_ROUTE =
     "/calendar/dates/{servicePointId}/all-openings";
   public static final String GET_SURROUNDING_DATES_API_ROUTE =
@@ -45,33 +41,42 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
     return ra(ValidationSchema.REGULAR)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(calendarMapper.toDto(calendar))
-      .post(getRequestUrl(CREATE_CALENDAR_API_ROUTE));
+      .post(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
   }
 
   /**
-   * GET /calendar/calendars/{ids*} - Send a Calendar get request
-   * @param ids the calendars to get
+   * GET /calendar/calendars/{ids} - Send a Calendar get request
+   * @param id the calendar to get
    * @return the Response
    */
-  public Response sendCalendarGetRequest(List<UUID> ids) {
-    // spec must be ignored as the validator improperly flags comma-separated UUIDs
-    // as being illegal
-    return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.REGULAR)
-      .pathParam("calendarIds", ids.stream().map(UUID::toString).collect(Collectors.joining(",")))
-      .get(getRequestUrl(GET_CALENDAR_API_ROUTE));
+  public Response sendCalendarGetRequest(UUID id) {
+    return ra(ValidationSchema.REGULAR)
+      .pathParam("calendarId", id)
+      .get(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
   }
 
   /**
-   * DELETE /calendar/calendars/{ids*} - Send a Calendar delete request
-   * @param ids the calendars to delete
+   * DELETE /calendar/calendars/{id} - Send a Calendar delete request
+   * @param id the calendar to delete
    * @return the Response
    */
-  public Response sendCalendarDeleteRequest(List<UUID> ids) {
+  public Response sendCalendarDeleteRequest(UUID id) {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
-    return ra(ids.size() > 1 ? ValidationSchema.NONE : ValidationSchema.REGULAR)
-      .pathParam("calendarIds", ids.stream().map(UUID::toString).collect(Collectors.joining(",")))
-      .delete(getRequestUrl(DELETE_CALENDAR_API_ROUTE));
+    return ra(ValidationSchema.REGULAR)
+      .pathParam("calendarId", id)
+      .delete(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
+  }
+
+  /**
+   * DELETE /calendar/calendars?id=... - Send a multi-Calendar delete request
+   * @param id the calendar to delete
+   * @return the Response
+   */
+  public Response sendMultiCalendarDeleteRequest(List<UUID> ids) {
+    return ra(ValidationSchema.REGULAR)
+      .queryParam("id", ids)
+      .delete(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -85,7 +90,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
       .pathParam("calendarId", id.toString())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(calendarMapper.toDto(calendar))
-      .put(getRequestUrl(PUT_CALENDAR_API_ROUTE));
+      .put(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -95,6 +100,9 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
   @Data
   @Builder
   public static class SearchRequestParameters {
+
+    @Singular
+    List<UUID> calendarIds;
 
     @Singular
     List<UUID> servicePointIds;
@@ -118,21 +126,11 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    */
   public Response sendCalendarSearchRequest(SearchRequestParameters parameters) {
     RequestSpecification request = ra(ValidationSchema.REGULAR);
+    if (parameters.getCalendarIds() != null && !parameters.getCalendarIds().isEmpty()) {
+      request = request.queryParam("id", parameters.getCalendarIds());
+    }
     if (parameters.getServicePointIds() != null && !parameters.getServicePointIds().isEmpty()) {
-      // disable validation for when there are multiple service points
-      // as the validator does not support multiple UUIDs as an array
-      if (parameters.getServicePointIds().size() > 1) {
-        request = ra(ValidationSchema.NONE);
-      }
-      request =
-        request.queryParam(
-          "servicePointId",
-          parameters
-            .getServicePointIds()
-            .stream()
-            .map(UUID::toString)
-            .collect(Collectors.joining(","))
-        );
+      request = request.queryParam("servicePointId", parameters.getServicePointIds());
     }
     if (parameters.getStartDate() != null) {
       request = request.queryParam("startDate", parameters.getStartDate().toString());
@@ -152,7 +150,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
     if (parameters.getLimit() != null) {
       request = request.queryParam("limit", parameters.getLimit());
     }
-    return request.get(getRequestUrl(GET_SEARCH_CALENDAR_API_ROUTE));
+    return request.get(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
   }
 
   /**

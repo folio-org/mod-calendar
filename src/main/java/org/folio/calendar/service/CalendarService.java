@@ -1,6 +1,7 @@
 package org.folio.calendar.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -84,6 +85,7 @@ public class CalendarService {
   /**
    * Get all the calendars matching the given, optional, criteria.
    *
+   * @param calendarIds a list of calendar IDs to consider
    * @param servicePointIds a list of service point UUIDs to search
    * @param startDate the date which returned results will end before
    * @param endDate the date which returned results will not start after
@@ -91,7 +93,8 @@ public class CalendarService {
    * @param offset the number of calendars to skip over
    * @return a {@link CalendarCollectionDTO CalendarCollectionDTO} with found calendars
    */
-  public CalendarCollectionDTO getCalendarCollectionForServicePointsOrDateRange(
+  public CalendarCollectionDTO getCalendarCollectionForIdsServicePointsOrDateRange(
+    @CheckForNull List<UUID> calendarIds,
     @CheckForNull List<UUID> servicePointIds,
     LocalDate startDate,
     LocalDate endDate,
@@ -99,14 +102,18 @@ public class CalendarService {
     Integer limit
   ) {
     return calendarsToCalendarCollection(
-      calendarRepository.findWithServicePointsDateRangeAndPagination(
+      calendarRepository.findWithIdsServicePointsDateRangeAndPagination(
+        calendarIds != null,
+        calendarIds,
         servicePointIds != null,
         servicePointIds,
         startDate,
         endDate,
         new CustomOffsetPageRequest(offset, limit)
       ),
-      calendarRepository.countWithServicePointsDateRangeAndPagination(
+      calendarRepository.countWithIdsServicePointsDateRangeAndPagination(
+        calendarIds != null,
+        calendarIds,
         servicePointIds != null,
         servicePointIds,
         startDate,
@@ -116,15 +123,15 @@ public class CalendarService {
   }
 
   /**
-   * Get all the calendars based on a list of ids.  If not all calendars are
+   * Get the calendar corresponding to an ID.  If not
    * found, a {@link DataNotFoundException DataNotFoundException} is thrown
    *
-   * @param calendarIds a {@link java.util.List List} of calendars to search for
-   * @return a {@link CalendarCollectionDTO CalendarCollectionDTO} with found calendars
+   * @param calendarId the calendar ID to search for
+   * @return a {@link CalendarDTO CalendarDTO} representing the found calendar
    */
-  public CalendarCollectionDTO getCalendarCollectionForIdList(Set<UUID> calendarIds) {
-    List<Calendar> calendars = getCalendarsForIdList(calendarIds);
-    return calendarsToCalendarCollection(calendars, calendars.size());
+  public CalendarDTO getCalendarById(UUID calendarId) {
+    List<Calendar> calendars = getCalendarsForIdList(Set.of(calendarId));
+    return calendarMapper.toDto(calendars.get(0));
   }
 
   /**
@@ -139,10 +146,10 @@ public class CalendarService {
   /**
    * Delete a calendar by its ID
    *
-   * @param calendar the calendar to delete
+   * @param calendarId the ID of the calendar to delete
    */
-  public void deleteCalendar(Calendar calendar) {
-    this.calendarRepository.deleteCascadingById(calendar.getId());
+  public void deleteCalendarById(UUID calendarId) {
+    this.calendarRepository.deleteCascadingById(calendarId);
   }
 
   /**
@@ -167,7 +174,9 @@ public class CalendarService {
     Integer offset,
     Integer limit
   ) {
-    List<Calendar> relevantCalendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+    List<Calendar> relevantCalendars = calendarRepository.findWithIdsServicePointsDateRangeAndPagination(
+      false,
+      new ArrayList<>(),
       true,
       Arrays.asList(servicePointId),
       startDate,
@@ -196,7 +205,9 @@ public class CalendarService {
    * @return an {@link SurroundingOpeningsDTO SurroundingOpeningsDTO} representing opening information
    */
   public SurroundingOpeningsDTO getSurroundingOpenings(UUID servicePointId, LocalDate date) {
-    List<Calendar> calendars = calendarRepository.findWithServicePointsDateRangeAndPagination(
+    List<Calendar> calendars = calendarRepository.findWithIdsServicePointsDateRangeAndPagination(
+      false,
+      new ArrayList<>(),
       true,
       Arrays.asList(servicePointId),
       null,

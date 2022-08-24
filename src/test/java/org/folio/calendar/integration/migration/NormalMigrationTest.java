@@ -29,7 +29,7 @@ class NormalMigrationTest extends AbstractMigrationTest {
   @Test
   void testGetCalendars() {
     CalendarCollectionDTO collection = ra()
-      .get(getRequestUrl(BaseCalendarApiTest.GET_SEARCH_CALENDAR_API_ROUTE))
+      .get(getRequestUrl(BaseCalendarApiTest.COLLECTION_CALENDAR_API_ROUTE))
       .getBody()
       .as(CalendarCollectionDTO.class);
 

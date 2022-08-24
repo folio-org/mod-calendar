@@ -102,6 +102,8 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   /**
    * Find calendars for (optional) service point(s) and in the given (optional ends) date range
    *
+   * @param checkCalendarIds if calendar IDs should be checked
+   * @param calendarIds a list of calendar IDs to limit the search to
    * @param checkServicePoints if service points should be checked
    * @param servicePointIds a list of service point UUIDs to search, no effect if {@code checkServicePoints} is false
    * @param startDate the date which returned results will end before
@@ -111,14 +113,17 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    */
   @Query(
     "SELECT c FROM Calendar c " +
-    "WHERE (:checkServicePoints = FALSE OR " +
+    "WHERE (:checkCalendarIds = FALSE OR c.id IN :calendarIds) AND " +
+    "(:checkServicePoints = FALSE OR " +
     "EXISTS (SELECT 1 FROM ServicePointCalendarAssignment r WHERE r.calendar.id = c.id AND r.servicePointId IN :servicePointIds)" +
     ") AND " +
     "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
     "(cast(:endDate as date) is null OR c.startDate <= :endDate) " +
     "ORDER BY c.startDate"
   )
-  List<Calendar> findWithServicePointsDateRangeAndPagination(
+  List<Calendar> findWithIdsServicePointsDateRangeAndPagination(
+    @Param("checkCalendarIds") Boolean checkCalendarIds,
+    @Param("calendarIds") List<UUID> calendarIds,
     @Param("checkServicePoints") Boolean checkServicePoints,
     @Param("servicePointIds") List<UUID> servicePointIds,
     @Param("startDate") @CheckForNull LocalDate startDate,
@@ -129,6 +134,8 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
   /**
    * Count calendars for a service point(s) and in the given (optional ends) date range
    *
+   * @param checkCalendarIds if calendar IDs should be checked
+   * @param calendarIds a list of calendar IDs to limit the search to
    * @param checkServicePoints if service points should be checked
    * @param servicePointIds a list of service point UUIDs to search, no effect if {@code checkServicePoints} is false
    * @param startDate the date which returned results will end before
@@ -138,13 +145,16 @@ public interface CalendarRepository extends JpaRepository<Calendar, UUID> {
    */
   @Query(
     "SELECT COUNT(*) FROM Calendar c " +
-    "WHERE (:checkServicePoints = FALSE OR " +
+    "WHERE (:checkCalendarIds = FALSE OR c.id IN :calendarIds) AND " +
+    "(:checkServicePoints = FALSE OR " +
     "EXISTS (SELECT 1 FROM ServicePointCalendarAssignment r WHERE r.calendar.id = c.id AND r.servicePointId IN :servicePointIds)" +
     ") AND " +
     "(cast(:startDate as date) is null OR c.endDate >= :startDate) AND " +
     "(cast(:endDate as date) is null OR c.startDate <= :endDate)"
   )
-  Integer countWithServicePointsDateRangeAndPagination(
+  Integer countWithIdsServicePointsDateRangeAndPagination(
+    @Param("checkCalendarIds") Boolean checkCalendarIds,
+    @Param("calendarIds") List<UUID> calendarIds,
     @Param("checkServicePoints") Boolean checkServicePoints,
     @Param("servicePointIds") List<UUID> servicePointIds,
     @Param("startDate") @CheckForNull LocalDate startDate,
