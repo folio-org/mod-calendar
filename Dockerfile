@@ -8,4 +8,4 @@ ARG JAR_FILE=./target/*.jar
 COPY ${JAR_FILE} ${JAVA_APP_DIR}/${APP_FILE}
 
 # Expose this port locally in the container.
-EXPOSE 8080
+EXPOSE 8081
