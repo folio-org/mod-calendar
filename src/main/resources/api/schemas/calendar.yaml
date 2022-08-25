@@ -11,11 +11,11 @@ properties:
   startDate:
     type: string
     format: date
-    description: The first effective date (inclusive) of this calendar
+    description: The first effective date (inclusive, YYYY-MM-DD) of this calendar
   endDate:
     type: string
     format: date
-    description: The first effective date (inclusive) of this calendar
+    description: The first effective date (inclusive, YYYY-MM-DD) of this calendar
   assignments:
     description: A list of all service points that this calendar is assigned to
     type: array

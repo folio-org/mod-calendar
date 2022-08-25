@@ -38,14 +38,14 @@ get:
       schema:
         type: string
         format: date
-      description: The first date to consider, inclusively
+      description: The first date (YYYY-MM-DD) to consider, inclusively
     - in: query
       name: endDate
       required: false
       schema:
         type: string
         format: date
-      description: The last date to consider, inclusively
+      description: The last date (YYYY-MM-DD) to consider, inclusively
     - in: query
       name: offset
       required: false

@@ -16,7 +16,7 @@ get:
       schema:
         type: string
         format: date
-      description: The date to calculate openings around
+      description: The date (YYYY-MM-DD) to calculate openings around
   responses:
     "200":
       description: The query results

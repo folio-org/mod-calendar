@@ -9,11 +9,11 @@ properties:
     description: A user-provided label for this exception
     type: string
   startDate:
-    description: The first effective date (inclusive) of this exception range
+    description: The first effective date (inclusive, YYYY-MM-DD) of this exception range
     type: string
     format: date
   endDate:
-    description: The first effective date (inclusive) of this exception range
+    description: The first effective date (inclusive, YYYY-MM-DD) of this exception range
     type: string
     format: date
   openings:

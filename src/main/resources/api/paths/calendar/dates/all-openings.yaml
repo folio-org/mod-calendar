@@ -16,14 +16,14 @@ get:
       schema:
         type: string
         format: date
-      description: The first date to include, inclusive
+      description: The first date (YYYY-MM-DD) to include, inclusive
     - in: query
       name: endDate
       required: true
       schema:
         type: string
         format: date
-      description: The last date to include, inclusive
+      description: The last date (YYYY-MM-DD) to include, inclusive
     - in: query
       name: includeClosed
       required: true

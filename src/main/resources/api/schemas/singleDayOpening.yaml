@@ -2,7 +2,7 @@ description: Opening information for a single day
 type: object
 properties:
   date:
-    description: The date that this object is describing openings for
+    description: The date (YYYY-MM-DD) that this object is describing openings for
     type: string
     format: date
   allDay:

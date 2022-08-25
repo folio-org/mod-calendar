@@ -17,8 +17,8 @@ properties:
     $ref: weekday.yaml
   endTime:
     description:
-      The last minute of this opening, inclusive (11:59:00 if it should be open at 11:59 and closed
-      at 12:00)
+      The last minute of this opening, inclusive (11:59 if it should be open at 11:59 and closed at
+      12:00)
     type: string
     format: time
 additionalProperties: false
