@@ -371,16 +371,12 @@
                 <interfaceOnly>true</interfaceOnly>
               </configOptions>
               <typeMappings>
-                <typeMapping>legacy-period-date=LegacyPeriodDate</typeMapping>
                 <typeMapping>DateTime=Instant</typeMapping>
                 <typeMapping>date=LocalDate</typeMapping>
                 <typeMapping>time=LocalTime</typeMapping>
                 <typeMapping>Weekday=Weekday</typeMapping>
               </typeMappings>
               <importMappings>
-                <importMapping>
-                  LegacyPeriodDate=org.folio.calendar.domain.types.LegacyPeriodDate
-                </importMapping>
                 <importMapping>Instant=java.time.Instant</importMapping>
                 <importMapping>LocalDate=java.time.LocalDate</importMapping>
                 <importMapping>LocalTime=java.time.LocalTime</importMapping>
