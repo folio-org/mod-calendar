@@ -23,6 +23,10 @@ class CalendarMapperTest extends BaseApiTest {
       mapper.fromDto(mapper.toDto(Calendars.CALENDAR_COMBINED_EXAMPLE_A)),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A))
     );
+    assertThat(
+      mapper.fromDto(mapper.toDto(Calendars.CALENDAR_COMBINED_EXAMPLE_A).withMetadata(null)),
+      is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A))
+    );
   }
 
   @Test
