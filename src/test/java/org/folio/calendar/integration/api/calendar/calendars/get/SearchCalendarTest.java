@@ -213,7 +213,7 @@ class SearchCalendarTest extends BaseCalendarApiTest {
         (Calendar cal) -> {
           Response response = sendCalendarCreationRequest(cal.withName("foo"));
           response.then().statusCode(is(HttpStatus.CREATED.value()));
-          return response.getBody().as(CalendarDTO.class);
+          return response.getBody().as(CalendarDTO.class).withMetadata(null);
         }
       )
       .collect(Collectors.toList());
@@ -225,7 +225,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
     CalendarCollectionDTO resultAfter = singleKnownId.getBody().as(CalendarCollectionDTO.class);
 
     assertThat(resultAfter.getTotalRecords(), is(equalTo(1)));
-    assertThat(resultAfter.getCalendars(), contains(calendars.get(0)));
+    assertThat(
+      resultAfter
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      contains(calendars.get(0))
+    );
 
     Response multipleKnownIds = sendCalendarSearchRequest(
       SearchRequestParameters
@@ -240,7 +247,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
     resultAfter = multipleKnownIds.getBody().as(CalendarCollectionDTO.class);
 
     assertThat(resultAfter.getTotalRecords(), is(equalTo(2)));
-    assertThat(resultAfter.getCalendars(), containsInAnyOrder(calendars.get(1), calendars.get(3)));
+    assertThat(
+      resultAfter
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      containsInAnyOrder(calendars.get(1), calendars.get(3))
+    );
   }
 
   @Test
@@ -259,7 +273,7 @@ class SearchCalendarTest extends BaseCalendarApiTest {
         (Calendar cal) -> {
           Response response = sendCalendarCreationRequest(cal.withName("foo"));
           response.then().statusCode(is(HttpStatus.CREATED.value()));
-          return response.getBody().as(CalendarDTO.class);
+          return response.getBody().as(CalendarDTO.class).withMetadata(null);
         }
       )
       .collect(Collectors.toList());
@@ -273,7 +287,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultAfter.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultAfter.getCalendars(), is(equalTo(calendars)));
+    assertThat(
+      resultAfter
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      is(equalTo(calendars))
+    );
 
     Response searchResponseZeroLimit = sendCalendarSearchRequest(
       SearchRequestParameters.builder().limit(0).build()
@@ -284,7 +305,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultZeroLimit.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultZeroLimit.getCalendars(), hasSize(0));
+    assertThat(
+      resultZeroLimit
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      hasSize(0)
+    );
 
     Response searchResponseFirstPage = sendCalendarSearchRequest(
       SearchRequestParameters.builder().offset(0).limit(2).build()
@@ -295,7 +323,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultFirstPage.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultFirstPage.getCalendars(), contains(calendars.get(0), calendars.get(1)));
+    assertThat(
+      resultFirstPage
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      contains(calendars.get(0), calendars.get(1))
+    );
 
     Response searchResponseSecondPage = sendCalendarSearchRequest(
       SearchRequestParameters.builder().offset(2).limit(2).build()
@@ -306,7 +341,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultSecondPage.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultSecondPage.getCalendars(), contains(calendars.get(2), calendars.get(3)));
+    assertThat(
+      resultSecondPage
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      contains(calendars.get(2), calendars.get(3))
+    );
 
     Response searchResponseLastPage = sendCalendarSearchRequest(
       SearchRequestParameters.builder().offset(4).limit(2).build()
@@ -317,7 +359,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultLastPage.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultLastPage.getCalendars(), contains(calendars.get(4)));
+    assertThat(
+      resultLastPage
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      contains(calendars.get(4))
+    );
 
     Response searchResponseMiddleOfPage = sendCalendarSearchRequest(
       SearchRequestParameters.builder().offset(3).limit(2).build()
@@ -328,7 +377,14 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultMiddleOfPage.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultMiddleOfPage.getCalendars(), contains(calendars.get(3), calendars.get(4)));
+    assertThat(
+      resultMiddleOfPage
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      contains(calendars.get(3), calendars.get(4))
+    );
 
     Response searchResponseOutOfBounds = sendCalendarSearchRequest(
       SearchRequestParameters.builder().offset(5).limit(2).build()
@@ -339,6 +395,13 @@ class SearchCalendarTest extends BaseCalendarApiTest {
       .as(CalendarCollectionDTO.class);
 
     assertThat(resultOutOfBounds.getTotalRecords(), is(equalTo(5)));
-    assertThat(resultOutOfBounds.getCalendars(), hasSize(0));
+    assertThat(
+      resultOutOfBounds
+        .getCalendars()
+        .stream()
+        .map(c -> c.withMetadata(null))
+        .collect(Collectors.toList()),
+      hasSize(0)
+    );
   }
 }
