@@ -1,9 +1,11 @@
 package org.folio.calendar.domain.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.CheckForNull;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -98,6 +100,34 @@ public class Calendar implements Serializable {
   )
   private Set<ExceptionRange> exceptions;
 
+  /**
+   * When the calendar was created, if available
+   */
+  @CheckForNull
+  @Column(name = "created_date")
+  private Instant createdDate;
+
+  /**
+   * Who created the calendar, if available
+   */
+  @CheckForNull
+  @Column(name = "created_by_user_id")
+  private UUID createdByUserId;
+
+  /**
+   * When the calendar was last edited, if available
+   */
+  @CheckForNull
+  @Column(name = "updated_date")
+  private Instant updatedDate;
+
+  /**
+   * Who last edited the calendar, if available
+   */
+  @CheckForNull
+  @Column(name = "updated_by_user_id")
+  private UUID updatedByUserId;
+
   // provide default random ID when another is not specified
   // SonarLint does not like that this is unused; lombok provides the builder implementation
   @SuppressWarnings("java:S1068")
@@ -136,5 +166,15 @@ public class Calendar implements Serializable {
     if (this.getExceptions() != null) {
       this.getExceptions().forEach(ExceptionRange::clearIds);
     }
+  }
+
+  /**
+   * Clears all metadata from the object, to use for comparison.
+   */
+  public Calendar withoutMetadata() {
+    return this.withCreatedDate(null)
+      .withCreatedByUserId(null)
+      .withUpdatedDate(null)
+      .withUpdatedByUserId(null);
   }
 }

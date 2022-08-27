@@ -1,0 +1,20 @@
+description:
+  Metadata associated with the calendar. This is provided by the server on a best-effort basis; no
+  fields are guaranteed to be present. Metadata is provided from Okapi; any metadata sent directly
+  from the client will be ignored.
+type: object
+properties:
+  createdDate:
+    type: string
+    format: date-time
+  createdByUserId:
+    type: string
+    format: uuid
+  updatedDate:
+    type: string
+    format: date-time
+  updatedByUserId:
+    type: string
+    format: uuid
+additionalProperties: false
+required: []

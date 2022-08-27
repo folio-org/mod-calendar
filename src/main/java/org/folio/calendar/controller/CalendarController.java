@@ -1,5 +1,6 @@
 package org.folio.calendar.controller;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.rest.resource.CalendarApi;
 import org.folio.calendar.service.CalendarService;
 import org.folio.calendar.service.CalendarValidationService;
+import org.folio.spring.FolioExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,9 @@ public final class CalendarController implements CalendarApi {
   @Autowired
   private CalendarMapper calendarMapper;
 
+  @Autowired
+  private FolioExecutionContext folioExecutionContext;
+
   /** {@inheritDoc} */
   @Override
   public ResponseEntity<CalendarDTO> createCalendar(CalendarDTO calendarDto) {
@@ -48,6 +53,12 @@ public final class CalendarController implements CalendarApi {
 
     calendar.clearIds();
     calendar.setId(UUID.randomUUID());
+
+    calendar.setCreatedDate(Instant.now());
+    calendar.setUpdatedDate(Instant.now());
+    calendar.setCreatedByUserId(folioExecutionContext.getUserId());
+    calendar.setUpdatedByUserId(folioExecutionContext.getUserId());
+
     calendarService.saveCalendar(calendar);
 
     return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.CREATED);
@@ -86,7 +97,7 @@ public final class CalendarController implements CalendarApi {
   @Override
   public ResponseEntity<CalendarDTO> updateCalendar(UUID calendarId, CalendarDTO calendarDto) {
     // ensure the ID currently exists, as this method throws 404 otherwise
-    calendarService.getCalendarById(calendarId);
+    Calendar originalCalendar = calendarMapper.fromDto(calendarService.getCalendarById(calendarId));
 
     Calendar calendar = calendarMapper.fromDto(calendarDto);
     calendarValidationService.validate(calendar, Arrays.asList(calendarId));
@@ -95,6 +106,14 @@ public final class CalendarController implements CalendarApi {
 
     calendar.clearIds();
     calendar.setId(calendarId);
+
+    // ensure new request cannot update this metadata
+    calendar.setCreatedDate(originalCalendar.getCreatedDate());
+    calendar.setCreatedByUserId(originalCalendar.getCreatedByUserId());
+
+    calendar.setUpdatedDate(Instant.now());
+    calendar.setUpdatedByUserId(folioExecutionContext.getUserId());
+
     calendarService.saveCalendar(calendar);
 
     return new ResponseEntity<>(calendarMapper.toDto(calendar), HttpStatus.OK);

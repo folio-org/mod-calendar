@@ -19,7 +19,7 @@ For the purposes of this form, "store" includes the following:
 
 ## Personal Data processed by this Module
 
-- [x] This module does not store any PD.
+- [ ] This module does not store any PD.
 - [ ] This module does not process any PD.
 - [ ] This module provides [custom fields](https://github.com/folio-org/folio-custom-fields).
 - [x] This module stores fields with free-form text (calendar and exception names)
@@ -29,7 +29,7 @@ For the purposes of this form, "store" includes the following:
   - [ ] Log level WARNING includes PD
   - [ ] Log level INFO includes PD
   - [ ] Log level DEBUG includes PD
-- [ ] This module transmits PD (including queues, additional databases, etc.)
+- [x] This module transmits PD (in API responses)
 
 ---
 
@@ -55,12 +55,12 @@ Information can be combined with others to form a person’s identity.
 - [ ] Geolocation data
 - [ ] Phone number(s)
 - [ ] Pseudonym / Alias / Nickname
-- [ ] Username / User Identifier (UUID)
+- [x] Username / User Identifier (UUID)
 - [ ] Email address
 - [ ] Financial information / Fees or Fines
 - [ ] Circulation transaction(s)
 - [ ] Web cookies
-- [ ] IP address / MAC address
+- [x] IP address / MAC address (processed, not stored)
 - [ ] Photographs of users (profile picture)
 <!--- - [ ] Other PD - Please list as needed -->
 

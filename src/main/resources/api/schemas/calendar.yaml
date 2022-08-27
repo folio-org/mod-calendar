@@ -31,6 +31,8 @@ properties:
     type: array
     items:
       $ref: exceptionRange.yaml
+  metadata:
+    $ref: metadata.yaml
 additionalProperties: false
 required:
   - name

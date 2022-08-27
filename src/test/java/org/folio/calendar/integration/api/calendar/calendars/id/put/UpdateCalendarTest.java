@@ -3,10 +3,12 @@ package org.folio.calendar.integration.api.calendar.calendars.id.put;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import io.restassured.response.Response;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -66,28 +68,58 @@ class UpdateCalendarTest extends BaseCalendarApiTest {
 
     assertThat(
       "The newly updated calendar is as expected",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_B.withId(createdId)))
     );
   }
 
   @Test
-  void testIdUpdate() {
-    Response postResponse = sendCalendarCreationRequest(Calendars.CALENDAR_COMBINED_EXAMPLE_A);
+  void testIdAndMetadataUpdate() {
+    Response postResponse = sendCalendarCreationRequest(
+      Calendars.CALENDAR_COMBINED_EXAMPLE_A,
+      UUIDs.UUID_A
+    );
     postResponse.then().statusCode(is(HttpStatus.CREATED.value()));
     UUID createdId = calendarMapper.fromDto(postResponse.getBody().as(CalendarDTO.class)).getId();
+    Instant createdTimestamp = calendarMapper
+      .fromDto(postResponse.getBody().as(CalendarDTO.class))
+      .getCreatedDate();
 
     Response putResponse = sendCalendarUpdateRequest(
       createdId,
-      Calendars.CALENDAR_COMBINED_EXAMPLE_B.withId(UUIDs.UUID_0)
+      Calendars.CALENDAR_COMBINED_EXAMPLE_B
+        .withId(UUIDs.UUID_0)
+        .withCreatedByUserId(UUIDs.UUID_B)
+        .withCreatedDate(Instant.now()),
+      UUIDs.UUID_C
     );
     putResponse.then().statusCode(is(HttpStatus.OK.value()));
     Calendar result = calendarMapper.fromDto(putResponse.getBody().as(CalendarDTO.class));
 
     assertThat(
       "The newly updated calendar is as expected with its ID ignored",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_B.withId(createdId)))
+    );
+    assertThat(
+      "The newly updated calendar had a false creation timestamp ignored",
+      result.getCreatedDate(),
+      is(createdTimestamp)
+    );
+    assertThat(
+      "The newly updated calendar had a false creation user ID ignored",
+      result.getCreatedByUserId(),
+      is(UUIDs.UUID_A)
+    );
+    assertThat(
+      "The newly updated calendar has a proper updated timestamp",
+      result.getUpdatedDate(),
+      is(greaterThan(result.getCreatedDate()))
+    );
+    assertThat(
+      "The newly updated calendar has a proper updated user ID",
+      result.getUpdatedByUserId(),
+      is(UUIDs.UUID_C)
     );
   }
 

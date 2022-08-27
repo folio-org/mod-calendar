@@ -38,8 +38,29 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendCalendarCreationRequest(Calendar calendar) {
+    return sendCalendarCreationRequest(calendar, "");
+  }
+
+  /**
+   * POST /calendar/calendars - Send a Calendar creation request
+   * @param calendar the calendar to create
+   * @param userId the user to create the calendar as
+   * @return the Response
+   */
+  public Response sendCalendarCreationRequest(Calendar calendar, UUID userId) {
+    return sendCalendarCreationRequest(calendar, userId.toString());
+  }
+
+  /**
+   * POST /calendar/calendars - Send a Calendar creation request
+   * @param calendar the calendar to create
+   * @param userId the user to create the calendar as
+   * @return the Response
+   */
+  public Response sendCalendarCreationRequest(Calendar calendar, String userId) {
     return ra(ValidationSchema.REGULAR)
       .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .header("x-okapi-user-id", userId)
       .body(calendarMapper.toDto(calendar))
       .post(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
   }
@@ -86,9 +107,32 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendCalendarUpdateRequest(UUID id, Calendar calendar) {
+    return sendCalendarUpdateRequest(id, calendar, "");
+  }
+
+  /**
+   * PUT /calendar/calendars/{id} - Send a Calendar update request
+   * @param id the ID of the calendar to overwrite
+   * @param calendar the calendar to save
+   * @param userId the user ID who is performing the request
+   * @return the Response
+   */
+  public Response sendCalendarUpdateRequest(UUID id, Calendar calendar, UUID userId) {
+    return sendCalendarUpdateRequest(id, calendar, userId.toString());
+  }
+
+  /**
+   * PUT /calendar/calendars/{id} - Send a Calendar update request
+   * @param id the ID of the calendar to overwrite
+   * @param calendar the calendar to save
+   * @param userId the user ID who is performing the request
+   * @return the Response
+   */
+  public Response sendCalendarUpdateRequest(UUID id, Calendar calendar, String userId) {
     return ra(ValidationSchema.REGULAR)
       .pathParam("calendarId", id.toString())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .header("x-okapi-user-id", userId)
       .body(calendarMapper.toDto(calendar))
       .put(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
   }

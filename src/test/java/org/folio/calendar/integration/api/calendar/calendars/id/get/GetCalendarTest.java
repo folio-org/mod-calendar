@@ -1,12 +1,15 @@
 package org.folio.calendar.integration.api.calendar.calendars.id.get;
 
+import static org.exparity.hamcrest.date.InstantMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import io.restassured.response.Response;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +17,7 @@ import org.folio.calendar.domain.dto.CalendarDTO;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
+import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
 import org.folio.calendar.testconstants.Calendars;
@@ -57,10 +61,28 @@ class GetCalendarTest extends BaseCalendarApiTest {
     getResponse.then().statusCode(is(HttpStatus.OK.value()));
     CalendarDTO result = getResponse.getBody().as(CalendarDTO.class);
 
+    Calendar resultingCalendar = calendarMapper.fromDto(result);
+
     assertThat(
       "Getting an existing calendar results in the proper calendar returned",
-      calendarMapper.fromDto(result),
+      resultingCalendar.withoutMetadata(),
       is(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(createdId1))
+    );
+
+    assertThat(
+      "Newly created calendars have valid metadata",
+      resultingCalendar.getCreatedDate(),
+      is(notNullValue())
+    );
+    assertThat(
+      "Newly created calendars have valid metadata",
+      resultingCalendar.getUpdatedDate(),
+      is(notNullValue())
+    );
+    assertThat(
+      "Newly created calendars have valid metadata",
+      resultingCalendar.getCreatedDate(),
+      is(within(1, ChronoUnit.SECONDS, resultingCalendar.getUpdatedDate()))
     );
   }
 }

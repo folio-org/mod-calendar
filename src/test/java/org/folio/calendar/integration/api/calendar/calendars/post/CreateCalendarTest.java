@@ -1,12 +1,16 @@
 package org.folio.calendar.integration.api.calendar.calendars.post;
 
+import static org.exparity.hamcrest.date.InstantMatchers.within;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import io.restassured.response.Response;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +42,7 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result,
+      result.withoutMetadata(),
       is(equalTo(calendarWithNoAssignments.withId(result.getId())))
     );
   }
@@ -50,7 +54,7 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
     );
   }
@@ -62,7 +66,7 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
     );
 
@@ -71,7 +75,7 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_C.withId(result.getId())))
     );
   }
@@ -84,7 +88,7 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
     assertThat(
       "The newly created calendar is the same as the one provided",
-      result,
+      result.withoutMetadata(),
       is(equalTo(Calendars.CALENDAR_COMBINED_EXAMPLE_A.withId(result.getId())))
     );
 
@@ -104,6 +108,61 @@ class CreateCalendarTest extends BaseCalendarApiTest {
     assertThat(
       ((LinkedHashMap<String, List<String>>) error.getData()).get("conflictingServicePointIds"),
       contains(UUIDs.UUID_2.toString())
+    );
+  }
+
+  @Test
+  void testCalendarCreationMetadataNoUser() {
+    Response response = sendCalendarCreationRequest(
+      Calendars.CALENDAR_COMBINED_EXAMPLE_A.withCreatedByUserId(UUIDs.UUID_1)
+    );
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
+
+    assertThat(
+      "No user ID is stored as none was properly supplied (embedded in payload does not count)",
+      result.getCreatedByUserId(),
+      is(nullValue())
+    );
+    assertThat(
+      "No user ID is stored as none was supplied",
+      result.getUpdatedByUserId(),
+      is(nullValue())
+    );
+  }
+
+  @Test
+  void testCalendarCreationMetadata() {
+    Response response = sendCalendarCreationRequest(
+      Calendars.CALENDAR_COMBINED_EXAMPLE_A,
+      UUIDs.UUID_2
+    );
+    response.then().statusCode(is(HttpStatus.CREATED.value()));
+    Calendar result = calendarMapper.fromDto(response.getBody().as(CalendarDTO.class));
+    assertThat(
+      "The appropriate timestamp was saved",
+      result.getCreatedDate(),
+      is(within(15, ChronoUnit.SECONDS, Instant.now()))
+    );
+    assertThat(
+      "The appropriate timestamp was saved",
+      result.getUpdatedDate(),
+      is(within(15, ChronoUnit.SECONDS, Instant.now()))
+    );
+    assertThat(
+      "The appropriate timestamp was saved",
+      result.getUpdatedDate(),
+      is(within(1, ChronoUnit.SECONDS, Instant.now()))
+    );
+    assertThat(
+      "The appropriate user ID was denoted",
+      result.getCreatedByUserId(),
+      is(UUIDs.UUID_2)
+    );
+    assertThat(
+      "The appropriate user ID was denoted",
+      result.getUpdatedByUserId(),
+      is(UUIDs.UUID_2)
     );
   }
 }
