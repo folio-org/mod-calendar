@@ -66,15 +66,15 @@ To do this, you must be running Docker. For more information, see the [test docs
 
 ## Docker/Deploying the module
 
-Please see the [first install](docs/first-install.md) and [test deployment](docs/test-deployment.md)
-docs for information on building a docker container with the module and registering it with and
-deploying it to Okapi.
+Please see the [install](docs/install.md) docs for information on building a docker container and
+registering it with/deploying it to Okapi.
 
 ### Module descriptor
 
 See the built `target/ModuleDescriptor.json` or the template
 `descriptors/ModuleDescriptor-template.json` for the interfaces that this module requires and
-provides, the permissions, and the additional module metadata.
+provides, the permissions, and the additional module metadata. An explanation of the contents of
+this file may be found in the [build process](docs/build-process.md) document.
 
 ### Tenant parameters
 

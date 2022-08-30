@@ -1,7 +1,7 @@
-# First Install
+# Install/Upgrade
 
-This is similar to [test-deployment.md](test-deployment.md), however, this document is intended for
-the first deployment onto a server with an existing, older `mod-calendar` running.
+This document contains instructions for installing (or upgrading an existing version to) the local
+version of `mod-calendar` for testing with Okapi.
 
 ## Compile the Module
 
@@ -65,12 +65,17 @@ If this fails, this means there was an issue deploying the module. You can exami
 note that only the startup of the module will be in the main Okapi logs; after this, the module logs
 are only found in its container.
 
+Please note, this uses Okapi's built in deployment feature and is not meant for production
+deployments.
+
 ## Tenant Enabling
+
+If `mod-calendar
 
 This is the step where things diverge from the base deployment instructions as, instead of just
 installing the module, we want to also disable the previous mod-calendar.
 
-This can be done using (where `2.0.0` is the new version) and `diku` is the tenant to enable the
+This can be done using (where `2.0.0` is the new version and `diku` is the tenant to enable the
 module on):
 
 ```sh
@@ -79,3 +84,15 @@ curl -w '\n' -X POST -D - \
   -d '[{"id":"mod-calendar-2.0.0-SNAPSHOT","action":"enable"}]' \
   http://localhost:9130/_/proxy/tenants/diku/install
 ```
+
+## Running Locally
+
+The module can be ran locally, to increase debugging speed and ease. It is recommended to do this
+_on top of/alongside_ an existing Okapi environment (e.g. Vagrant) where the module has been
+deployed (which will create the permissions/databases/etc. needed) with the database port exposed.
+Once the environment is ready to go (and defined in a `.env` file -- an example is provided in
+`.env.sample`), Java can execute the application normally. A sample launch configuration for VS code
+is in `.vscode/launch.json`.
+
+Running it in this manner does not allow testing any of the features of Okapi (permissions,
+deployments, tenants, etc), however, it makes testing things much quicker.
