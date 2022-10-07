@@ -23,7 +23,7 @@ curl -d '{"module_to": "mod-foo-1.0.0", "parameters":["loadSample": "true"]}'
 To load the hardcoded calendars in this directly, follow these instructions:
 
 You may manually specify an `OKAPI_HOST` and `OKAPI_TOKEN` through environment variables, if not
-testing locally (defaults to `http://localhost:8080`). For example:
+testing locally (defaults to `http://localhost:8081`). For example:
 
 ```sh
 OKAPI_HOST=https://folio-testing-okapi.dev.folio.org \

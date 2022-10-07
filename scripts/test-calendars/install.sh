@@ -3,7 +3,7 @@
 # See README.md for documentation
 
 if [ -z "$OKAPI_HOST" ]; then
-  OKAPI_HOST="http://localhost:8080"
+  OKAPI_HOST="http://localhost:8081"
 fi
 
 for file in *.json; do
