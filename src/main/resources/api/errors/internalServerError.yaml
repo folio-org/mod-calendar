@@ -1,0 +1,7 @@
+description: Internal server error
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      $ref: ../examples/internalServerError.yaml

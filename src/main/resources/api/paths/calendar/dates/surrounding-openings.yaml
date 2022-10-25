@@ -1,0 +1,30 @@
+get:
+  operationId: getSurroundingOpenings
+  summary: Surrounding openings
+  description: Calculate openings nearest to a given date for a specified service point
+  parameters:
+    - in: path
+      name: servicePointId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The service point to calculate openings on
+    - in: query
+      name: date
+      required: true
+      schema:
+        type: string
+        format: date
+      description: The date (YYYY-MM-DD) to calculate openings around
+  responses:
+    "200":
+      description: The query results
+      content:
+        application/json:
+          schema:
+            $ref: ../../../schemas/surroundingOpenings.yaml
+    "400":
+      $ref: ../../../errors/invalidRequest.yaml
+    "500":
+      $ref: ../../../errors/internalServerError.yaml

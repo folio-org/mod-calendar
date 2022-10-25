@@ -1,0 +1,9 @@
+description:
+  A calendar creation/update cannot be performed due to an existing assignment overlapping with the
+  provided date range
+content:
+  application/json:
+    schema:
+      $ref: ../schemas/errorResponse.yaml
+    example:
+      $ref: ../examples/calendarDateOverlap.yaml

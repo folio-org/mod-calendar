@@ -1,0 +1,26 @@
+description: Any kind of error coming from an endpoint
+type: object
+properties:
+  code:
+    $ref: "errorCode.yaml"
+  message:
+    type: string
+    description: A description of the error, properly localized.
+  data:
+    type: object
+    description: Additional data that may be used for rich error display in the UI
+  _parameters:
+    description: Parameters which may give insight into what caused the error
+  _trace:
+    description: A stack trace of the exception which may or may not be useful.
+    type: array
+    x-singular-name: traceItem
+    items:
+      type: string
+additionalProperties: false
+required:
+  - code
+  - message
+example:
+  code: internalServerError
+  message: Internal Server Error

@@ -1,0 +1,42 @@
+description: Collection of opening information for single days
+type: object
+properties:
+  dates:
+    type: array
+    description: Each opening or date returned in the response
+    items:
+      type: object
+      $ref: singleDayOpening.yaml
+  totalRecords:
+    type: integer
+    minimum: 0
+    description: Number of total openings or dates available
+additionalProperties: false
+required:
+  - dates
+  - totalRecords
+example:
+  dates:
+    - date: "2022-05-01"
+      allDay: false
+      open: true
+      exceptional: true
+      exceptionName: "Holiday (reduced hours with lunch break)"
+      openings:
+        - startTime: "10:00:00"
+          endTime: "12:00:00"
+        - startTime: "13:30:00"
+          endTime: "17:00:00"
+    - date: "2022-05-02"
+      allDay: true
+      open: false
+      exceptional: false
+      openings: []
+    - date: "2022-05-03"
+      allDay: true
+      open: true
+      exceptional: false
+      openings:
+        - startTime: "00:00:00"
+          endTime: "23:59:00"
+  totalRecords: 3

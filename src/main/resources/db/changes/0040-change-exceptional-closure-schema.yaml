@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0040-change-exceptional-closure-schema
+      author: university-of-alabama/ncovercash
+      comment: Create exceptions table
+      changes:
+        - setTableRemarks:
+            tableName: exception_hours
+            remarks: Absolute opening hours within an exception
+        - delete:
+            tableName: exception_hours
+            where: open_start_time IS NULL
+        - addNotNullConstraint:
+            tableName: exception_hours
+            columnName: open_start_time
+        - addNotNullConstraint:
+            tableName: exception_hours
+            columnName: open_end_time

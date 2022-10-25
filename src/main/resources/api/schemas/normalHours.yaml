@@ -1,0 +1,34 @@
+description: A range of hours when a calendar is open
+type: object
+properties:
+  calendarId:
+    description: The UUID of the calendar which these hours are for
+    type: string
+    format: uuid
+  startDay:
+    description: The first weekday (inclusive) of this range
+    $ref: weekday.yaml
+  startTime:
+    description: The time when this opening starts, inclusive
+    type: string
+    format: time
+  endDay:
+    description: The last weekday (inclusive) of this range
+    $ref: weekday.yaml
+  endTime:
+    description:
+      The last minute of this opening, inclusive (11:59 if it should be open at 11:59 and closed at
+      12:00)
+    type: string
+    format: time
+additionalProperties: false
+required:
+  - startDay
+  - startTime
+  - endDay
+  - endTime
+example:
+  startDay: MONDAY
+  startTime: "07:00:00"
+  endDay: FRIDAY
+  endTime: "22:00:00"

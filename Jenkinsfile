@@ -1,22 +1,19 @@
-
-
 buildMvn {
-  publishModDescriptor = 'yes'
-  mvnDeploy = 'yes'
-  doKubeDeploy = true
-  buildNode = 'jenkins-agent-java11'
+  publishModDescriptor = true
+  mvnDeploy = true
+  doUploadApidocs = true
+  buildNode = 'jenkins-agent-java17'
 
   doApiLint = true
   doApiDoc = true
-  apiTypes = 'RAML'
-  apiDirectories = 'ramls'
+  apiTypes = 'OAS'
+  apiDirectories = 'src/main/resources/api'
+  apiExcludes = 'paths errors'
 
   doDocker = {
-    buildJavaDocker {
+    buildDocker {
       publishMaster = 'yes'
-      healthChk = 'yes'
-      healthChkCmd = 'curl -sS --fail -o /dev/null  http://localhost:8081/apidocs/ || exit 1'
+      // health check in org.folio.calendar.integration.health.OkapiHealthTest
     }
   }
 }
-

@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0010-initial-06-create-exceptions-table
+      author: university-of-alabama/ncovercash
+      comment: Create exceptions table
+      changes:
+        - createTable:
+            tableName: exceptions
+            remarks: Metadata for each exception
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: exceptions_id
+              - column:
+                  name: calendar_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: start_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: date
+                  constraints:
+                    nullable: false
