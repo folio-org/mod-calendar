@@ -1,12 +1,5 @@
-## 2.0.0 PENDING
-* Upgrade to Spring and OpenAPI
-* Add sample data
-* Add more extensible calendar and exception storage format
-* Performance improvements
-* Add translation capabilities
-* Provide more informative API error messages
-* Rename permissions to new schema
-* Replace API routes with new schema
+## 2.0.0 2022-10-27
+* Rewrite with Spring and OpenAPI for more complex calendar/exceptions (MODCAL-107)
 
 ## 1.15.0 2022-06-26
 * Upgrade RMB to v34.1.0 (MODCAL-110)
