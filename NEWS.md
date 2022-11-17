@@ -1,3 +1,6 @@
+## 2.1.0 2022-11-17
+* Update dependencies and folio-spring-base (MODCAL-119)
+
 ## 2.0.0 2022-10-27
 * Rewrite with Spring and OpenAPI for more complex calendar/exceptions (MODCAL-107)
 
