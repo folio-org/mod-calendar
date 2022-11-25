@@ -1,3 +1,6 @@
+## 2.2.0 2022-11-24
+* Remove leftover RMB functions (MODCAL-118)
+
 ## 2.1.0 2022-11-17
 * Update dependencies and folio-spring-base (MODCAL-119)
 
