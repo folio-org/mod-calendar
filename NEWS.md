@@ -1,4 +1,4 @@
-## 2.3.0 IN PROGRESS
+## 2.3.0 2022-12-01
 * Fix module migration regression in 2.2.0 (MODCAL-120)
 
 ## 2.2.0 2022-11-24
