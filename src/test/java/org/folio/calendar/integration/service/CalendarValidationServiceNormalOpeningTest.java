@@ -118,10 +118,10 @@ class CalendarValidationServiceNormalOpeningTest extends BaseApiTest {
       anyOf(
         // order is non-deterministic
         is(
-          "The following openings conflict with each other: Mon 12:00 AM - Mon 12:30 PM and Mon 4:00 AM - Mon 2:59 PM"
+          "The following openings conflict with each other: Mon 12:00 AM - Mon 12:30 PM and Mon 4:00 AM - Mon 2:59 PM"
         ),
         is(
-          "The following openings conflict with each other: Mon 4:00 AM - Mon 2:59 PM and Mon 12:00 AM - Mon 12:30 PM"
+          "The following openings conflict with each other: Mon 4:00 AM - Mon 2:59 PM and Mon 12:00 AM - Mon 12:30 PM"
         )
       )
     );

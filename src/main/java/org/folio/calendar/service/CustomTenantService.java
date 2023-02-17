@@ -58,7 +58,6 @@ public class CustomTenantService extends TenantService {
     TranslationService translationService
   ) {
     super(jdbcTemplate, context, folioSpringLiquibase);
-    log.info(" ------- badabing badaboom CUSTOM TENANT SERVICE!!!! ----------");
     this.calendarService = calendarService;
     this.calendarValidationService = calendarValidationService;
     this.translationService = translationService;
@@ -72,7 +71,6 @@ public class CustomTenantService extends TenantService {
   // false positive on jdbcTemplate.query
   @SuppressWarnings("java:S2259")
   protected void beforeLiquibaseUpdate(TenantAttributes attributes) {
-    log.info("-------- beforeLiquibaseUpdate -----");
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
       (ResultSet resultSet) -> {

@@ -406,7 +406,7 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
     assertThat(
       exception.getMessage(),
       is(
-        "The exception “Untitled exception” has an opening outside of the exception's bounds: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
+        "The exception “Untitled exception” has an opening outside of the exception's bounds: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
       )
     );
   }
@@ -434,10 +434,10 @@ class CalendarValidationServiceExceptionMetadataTest extends BaseApiTest {
       exception.getMessage(),
       anyOf(
         is(
-          "The exception “Untitled exception” has openings outside of the exception's bounds: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM and Jan 3, 2021 12:00 AM to Jan 4, 2021 2:59 PM"
+          "The exception “Untitled exception” has openings outside of the exception's bounds: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM and Jan 3, 2021 12:00 AM to Jan 4, 2021 2:59 PM"
         ),
         is(
-          "The exception “Untitled exception” has openings outside of the exception's bounds: Jan 3, 2021 12:00 AM to Jan 4, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
+          "The exception “Untitled exception” has openings outside of the exception's bounds: Jan 3, 2021 12:00 AM to Jan 4, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
         )
       )
     );
