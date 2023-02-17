@@ -1,3 +1,7 @@
+## 2.4.0 2023-02-17
+* Add local deployment descriptor (#156)
+* Upgrade module to Spring 3.0 (MODCAL-121)
+
 ## 2.3.0 2022-12-01
 * Fix module migration regression in 2.2.0 (MODCAL-120)
 
