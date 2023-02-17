@@ -5,7 +5,6 @@ properties:
     type: array
     description: Each opening or date returned in the response
     items:
-      type: object
       $ref: singleDayOpening.yaml
   totalRecords:
     type: integer

@@ -3,12 +3,19 @@ databaseChangeLog:
       id: 0030-add-exception-names
       author: university-of-alabama/ncovercash
       comment: Add names to exceptions
+      # Previous version specified to add the name column after calendar_id
+      # however, this is not supported in postgres.  Old liquibase ignored
+      # this silently, however, newer liquibase versions fail entirely.
+      # To fix this, we removed the offending parameter below; however,
+      # existing installations will see the changeset differs, so we must add
+      # this. The typical solution of rolling forward would not work here
+      # since the changeset with offending parameter would fail outright.
+      validCheckSum: 8:4053fa2e564a4f6d4221e572371f9d19
       changes:
         - addColumn:
             tableName: exceptions
             columns:
               - column:
-                  afterColumn: calendar_id
                   name: name
                   type: TEXT
                   defaultValue: Untitled exception

@@ -5,7 +5,6 @@ properties:
     type: array
     description: Each calendar returned in the response
     items:
-      type: object
       $ref: "calendar.yaml"
   totalRecords:
     type: integer

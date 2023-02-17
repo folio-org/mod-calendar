@@ -1,7 +1,7 @@
 package org.folio.calendar.controller;
 
+import jakarta.servlet.ServletException;
 import java.util.Arrays;
-import javax.servlet.ServletException;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
