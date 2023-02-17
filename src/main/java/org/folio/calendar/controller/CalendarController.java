@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Log4j2
 @RestController
 @RequestMapping(value = "/")
-public final class CalendarController implements CalendarApi {
+public class CalendarController implements CalendarApi {
 
   @Autowired
   private CalendarValidationService calendarValidationService;

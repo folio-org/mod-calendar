@@ -193,10 +193,10 @@ class CalendarValidationServiceExceptionOverlapTest extends BaseApiTest {
       anyOf(
         // order is non-deterministic
         is(
-          "The following openings within “Untitled exception” conflict with each other: Jan 1, 2021 12:00 AM to Jan 1, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
+          "The following openings within “Untitled exception” conflict with each other: Jan 1, 2021 12:00 AM to Jan 1, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM"
         ),
         is(
-          "The following openings within “Untitled exception” conflict with each other: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 1, 2021 2:59 PM"
+          "The following openings within “Untitled exception” conflict with each other: Jan 1, 2021 12:00 AM to Jan 2, 2021 2:59 PM and Jan 1, 2021 12:00 AM to Jan 1, 2021 2:59 PM"
         )
       )
     );

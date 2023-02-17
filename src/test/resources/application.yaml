@@ -19,6 +19,10 @@ spring:
   web:
     resources:
       add-mappings: false
+  cloud:
+    openfeign:
+      okhttp:
+        enabled: true
 
 zonky:
   test:
@@ -32,12 +36,6 @@ management:
   endpoints:
     web:
       base-path: /admin
-
-feign:
-  client:
-    config:
-      default:
-        loggerLevel: full
 
 logging:
   level:
@@ -58,6 +56,4 @@ folio:
       enabled: true
   logging:
     request:
-      enabled: true
-    feign:
       enabled: true

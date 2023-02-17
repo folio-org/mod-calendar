@@ -70,8 +70,6 @@ deployments.
 
 ## Tenant Enabling
 
-If `mod-calendar
-
 This is the step where things diverge from the base deployment instructions as, instead of just
 installing the module, we want to also disable the previous mod-calendar.
 
