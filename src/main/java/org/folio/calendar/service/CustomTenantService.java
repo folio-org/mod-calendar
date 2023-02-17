@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Priority;
 import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.legacy.dto.PeriodDTO;
@@ -22,12 +21,13 @@ import org.folio.spring.liquibase.FolioSpringLiquibase;
 import org.folio.spring.service.TenantService;
 import org.folio.tenant.domain.dto.TenantAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Log4j2
+@Primary
 @Service
-@Priority(-10)
 public class CustomTenantService extends TenantService {
 
   public static final String IS_RMB_SQL =
@@ -58,6 +58,7 @@ public class CustomTenantService extends TenantService {
     TranslationService translationService
   ) {
     super(jdbcTemplate, context, folioSpringLiquibase);
+    log.info(" ------- badabing badaboom CUSTOM TENANT SERVICE!!!! ----------");
     this.calendarService = calendarService;
     this.calendarValidationService = calendarValidationService;
     this.translationService = translationService;
@@ -71,6 +72,7 @@ public class CustomTenantService extends TenantService {
   // false positive on jdbcTemplate.query
   @SuppressWarnings("java:S2259")
   protected void beforeLiquibaseUpdate(TenantAttributes attributes) {
+    log.info("-------- beforeLiquibaseUpdate -----");
     boolean shouldMigrate = jdbcTemplate.query(
       IS_RMB_SQL,
       (ResultSet resultSet) -> {
