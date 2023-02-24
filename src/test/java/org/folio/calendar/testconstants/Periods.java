@@ -210,4 +210,11 @@ public class Periods {
     .withServicePointId(UUIDs.UUID_0)
     .withName(Names.NAME_3)
     .withOpeningDays(Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_CLOSED));
+
+  public static final PeriodDTO PERIOD_EXCEPTIONAL_INVALID_NULL_OPENING = Periods.PERIOD_FULL_EXCEPTIONAL_G.withOpeningDays(
+    Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_INVALID_NULL_OPENING)
+  );
+  public static final PeriodDTO PERIOD_EXCEPTIONAL_INVALID_MULTIPLE_OPENINGS = Periods.PERIOD_FULL_EXCEPTIONAL_G.withOpeningDays(
+    Arrays.asList(OpeningDayRelativeConstants.EXCEPTIONAL_INVALID_MULTIPLE_OPENINGS)
+  );
 }

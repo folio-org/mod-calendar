@@ -8,6 +8,7 @@ import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.ExceptionRange.ExceptionRangeBuilder;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 // This class directly relates to ExceptionRange and, due to MapStruct's automatic implementation
@@ -17,6 +18,8 @@ import org.mapstruct.factory.Mappers;
 public interface ExceptionRangeMapper {
   ExceptionRangeMapper INSTANCE = Mappers.getMapper(ExceptionRangeMapper.class);
 
+  @Mapping(target = "calendarId", ignore = true)
+  @Mapping(target = "opening", ignore = true)
   ExceptionRangeDTO toDto(ExceptionRange source);
 
   default ExceptionRange fromDto(ExceptionRangeDTO source) {
