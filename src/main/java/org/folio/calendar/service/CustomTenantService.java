@@ -39,7 +39,7 @@ public class CustomTenantService extends TenantService {
   protected final CalendarValidationService calendarValidationService;
   protected final TranslationService translationService;
 
-  protected List<PeriodDTO> periodsToMigrate;
+  protected List<Calendar> calendarsToMigrate;
 
   /**
    * Constructor for a new CustomTenantService.  Directly wraps the original {@link TenantService TenantService} constructor.
@@ -61,7 +61,7 @@ public class CustomTenantService extends TenantService {
     this.calendarService = calendarService;
     this.calendarValidationService = calendarValidationService;
     this.translationService = translationService;
-    this.periodsToMigrate = new ArrayList<>();
+    this.calendarsToMigrate = new ArrayList<>();
   }
 
   /**
@@ -89,12 +89,21 @@ public class CustomTenantService extends TenantService {
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         .setSerializationInclusion(Include.NON_NULL);
 
-      this.periodsToMigrate =
-        jdbcTemplate.query(GET_RMB_OPENINGS, new RMBOpeningMapper(jdbcTemplate, mapper));
-      this.periodsToMigrate.removeAll(Collections.singletonList(null));
+      List<PeriodDTO> periodsToMigrate = jdbcTemplate.query(
+        GET_RMB_OPENINGS,
+        new RMBOpeningMapper(jdbcTemplate, mapper)
+      );
+      periodsToMigrate.removeAll(Collections.singletonList(null));
 
-      log.info(String.format("Found %d periods to migrate", this.periodsToMigrate.size()));
-      log.debug(this.periodsToMigrate);
+      log.info("Found {} periods to migrate", periodsToMigrate.size());
+      log.debug(periodsToMigrate);
+
+      this.calendarsToMigrate = PeriodUtils.toCalendars(periodsToMigrate);
+      log.info(
+        "Converted {} periods into {} calendars",
+        periodsToMigrate.size(),
+        calendarsToMigrate.size()
+      );
     }
   }
 
@@ -103,14 +112,13 @@ public class CustomTenantService extends TenantService {
    */
   @Override
   protected void afterLiquibaseUpdate(TenantAttributes attributes) {
-    for (PeriodDTO period : this.periodsToMigrate) {
+    for (Calendar calendar : calendarsToMigrate) {
       try {
-        log.info(String.format("Attempting to save calendar with ID %s", period.getId()));
-        Calendar calendar = PeriodUtils.toCalendar(period);
+        log.info("Attempting to save converted calendar {}", calendar);
         this.calendarValidationService.validate(calendar);
         this.calendarService.saveCalendar(calendar);
       } catch (RuntimeException e) {
-        log.error(String.format("Could not save calendar with ID %s", period.getId()));
+        log.error("Could not save calendar {}", calendar);
         log.error(e);
       }
     }

@@ -59,6 +59,14 @@ public class ExceptionRanges {
     .openings(Arrays.asList())
     .build();
 
+  public static final ExceptionRange CLOSED_2021_07_04_TO_2021_09_22 = ExceptionRange
+    .builder()
+    .name(Names.NAME_1)
+    .startDate(Dates.DATE_2021_07_04)
+    .endDate(Dates.DATE_2021_09_22)
+    .openings(Arrays.asList())
+    .build();
+
   public static final ExceptionRange OPEN_ALL_DAY_JAN_1_THRU_JAN_4 = ExceptionRange
     .builder()
     .startDate(Dates.DATE_2021_01_01)
