@@ -186,30 +186,32 @@ public class Calendars {
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_A = CALENDAR_2021_01_01_TO_2021_12_31
     .withId(UUIDs.UUID_A)
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
-    .withName(Names.NAME_1)
+    .withName("Orphaned exception (" + Names.NAME_1 + ")")
     .withNormalHours(Set.of())
-    .withExceptions(Set.of(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31));
+    .withExceptions(Set.of(ExceptionRanges.CLOSED_2021_01_01_TO_2021_12_31.withName(Names.NAME_1)));
 
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_B = CALENDAR_2021_01_01_TO_2021_01_04
     .withId(UUIDs.UUID_B)
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_0))
-    .withName(Names.NAME_2)
+    .withName("Orphaned exception (" + Names.NAME_2 + ")")
     .withNormalHours(Set.of())
-    .withExceptions(Set.of(ExceptionRanges.OPEN_ALL_DAY_JAN_1_THRU_JAN_4));
+    .withExceptions(Set.of(ExceptionRanges.OPEN_ALL_DAY_JAN_1_THRU_JAN_4.withName(Names.NAME_2)));
 
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_C = CALENDAR_2021_01_01_TO_2021_01_04
     .withId(UUIDs.UUID_C)
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_5))
-    .withName(Names.NAME_3)
+    .withName("Orphaned exception (" + Names.NAME_3 + ")")
     .withNormalHours(Set.of())
-    .withExceptions(Set.of(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4));
+    .withExceptions(
+      Set.of(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4.withName(Names.NAME_3))
+    );
 
   public static final Calendar CALENDAR_FULL_EXCEPTIONAL_D = CALENDAR_2021_01_01_TO_2021_01_01
     .withId(UUIDs.UUID_D)
     .withServicePoints(Set.of(ServicePointCalendarAssignments.ASSIGNMENT_SP_9))
-    .withName(Names.NAME_4)
+    .withName("Orphaned exception (" + Names.NAME_4 + ")")
     .withNormalHours(Set.of())
-    .withExceptions(Set.of(ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1));
+    .withExceptions(Set.of(ExceptionRanges.OPEN_00_00_TO_14_59_JAN_1.withName(Names.NAME_4)));
 
   public static final Calendar CALENDAR_COMBINED_EXAMPLE_A = CALENDAR_2021_01_01_TO_2021_04_30
     .withServicePoints(
