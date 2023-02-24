@@ -1,28 +1,22 @@
--- Harvested from a mod-calendar 1.12.0 using the contents of AbstractExistingCalendarTest
+-- Harvested from a mod-calendar 1.15.0
 INSERT INTO
   "test_mod_calendar"."openings" ("id", "jsonb", "creation_date", "created_by")
 VALUES
   (
     'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
-    '{"id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc", "name": "replay quake aloft routine", "endDate": "2021-01-04T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": true, "servicePointId": "55555555-5555-5555-5555-555555555555"}',
+    '{"id": "cccccccc-cccc-4ccc-8ccc-cccccccccccc", "name": "replay quake aloft routine", "endDate": "2021-01-04T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": true, "servicePointId": "55555555-5555-4555-8555-555555555555"}',
     NULL,
     NULL
   ),
   (
     'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
-    '{"id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd", "name": "supplier grouped bride lazily", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-05-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "11111111-1111-1111-1111-111111111111"}',
-    NULL,
-    NULL
-  ),
-  (
-    'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-    '{"id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", "name": "comic sublime upscale utilize", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-05-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "00000000-0000-4000-8000-000000000000"}',
+    '{"id": "dddddddd-dddd-4ddd-8ddd-dddddddddddd", "name": "supplier grouped bride lazily", "endDate": "2021-09-22T00:00:00.000+00:00", "startDate": "2021-05-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "11111111-1111-4111-8111-111111111111"}',
     NULL,
     NULL
   ),
   (
     'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-    '{"id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "name": "sectional proving blanching deputy", "endDate": "2021-04-30T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "00000000-0000-4000-8000-000000000000"}',
+    '{"id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "name": "sectional proving blanching deputy", "endDate": "2021-12-31T00:00:00.000+00:00", "startDate": "2021-01-01T00:00:00.000+00:00", "exceptional": false, "servicePointId": "00000000-0000-4000-8000-000000000000"}',
     NULL,
     NULL
   ),
