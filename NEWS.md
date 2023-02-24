@@ -1,6 +1,12 @@
+## 2.4.1 2023-02-24
+* Fix migration from v1.x.x resulting in lost calendars and exceptions (MODCAL-124)
+
 ## 2.4.0 2023-02-17
 * Add local deployment descriptor (#156)
 * Upgrade module to Spring 3.0 (MODCAL-121)
+
+## 2.3.1 2023-02-24 (Nolana bugfix)
+* Fix migration from v1.x.x resulting in lost calendars and exceptions (MODCAL-124)
 
 ## 2.3.0 2022-12-01
 * Fix module migration regression in 2.2.0 (MODCAL-120)
