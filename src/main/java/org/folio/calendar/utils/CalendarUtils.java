@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.dto.SingleDayOpeningCollectionDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
@@ -227,11 +228,12 @@ public class CalendarUtils {
    * @param map the map to store opening information in
    * @param calendarIterator an iterator of calendars to examine
    */
-  public static SingleDayOpeningDTO getFirstOpeningFromCalendarList(
+  protected static SingleDayOpeningDTO getFirstOpeningFromCalendarList(
     SortedMap<LocalDate, SingleDayOpeningDTO> map,
     Iterator<Calendar> calendarIterator,
     LocalDate fallbackDate,
-    Function<SortedMap<LocalDate, SingleDayOpeningDTO>, LocalDate> keyGetter
+    Function<SortedMap<LocalDate, SingleDayOpeningDTO>, LocalDate> keyGetter,
+    Predicate<LocalDate> inRange
   ) {
     // find dates < date with openings while there are more calendars to consume
     // and a date has not been found yet
@@ -247,7 +249,9 @@ public class CalendarUtils {
       );
 
       // remove exceptional closures for surrounding openings
-      additionalDates.entrySet().removeIf(entry -> !entry.getValue().isOpen());
+      additionalDates
+        .entrySet()
+        .removeIf(entry -> !entry.getValue().isOpen() || !inRange.test(entry.getValue().getDate()));
       map.putAll(additionalDates);
     }
     if (map.isEmpty()) {
@@ -331,14 +335,16 @@ public class CalendarUtils {
       // subList from [0, dateIndex)
       new ArrayDeque<>(calendars.subList(0, dateIndex)).descendingIterator(),
       date.minusDays(1),
-      SortedMap::lastKey
+      SortedMap::lastKey,
+      openingDate -> openingDate.isBefore(date)
     );
     SingleDayOpeningDTO next = CalendarUtils.getFirstOpeningFromCalendarList(
       afterDateMap,
       // subList from [dateIndex, end)
       calendars.listIterator(dateIndex),
       date.plusDays(1),
-      SortedMap::firstKey
+      SortedMap::firstKey,
+      openingDate -> openingDate.isAfter(date)
     );
 
     return SurroundingOpeningsDTO
