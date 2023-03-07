@@ -1,3 +1,6 @@
+## 2.3.2 2023-03-06
+* Fix failing surrounding openings calculation in beginning
+
 ## 2.3.1 2023-02-24
 * Fix migration from v1.x.x resulting in lost calendars and exceptions (MODCAL-124)
 
