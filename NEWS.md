@@ -1,9 +1,15 @@
+## 2.4.2 2023-03-06
+* Fix failing surrounding openings calculation in calendar beginnings (MODCAL-125)
+
 ## 2.4.1 2023-02-24
 * Fix migration from v1.x.x resulting in lost calendars and exceptions (MODCAL-124)
 
 ## 2.4.0 2023-02-17
 * Add local deployment descriptor (#156)
 * Upgrade module to Spring 3.0 (MODCAL-121)
+
+## 2.3.2 2023-03-06 (Nolana bugfix)
+* Fix failing surrounding openings calculation in calendar beginnings (MODCAL-125)
 
 ## 2.3.1 2023-02-24 (Nolana bugfix)
 * Fix migration from v1.x.x resulting in lost calendars and exceptions (MODCAL-124)
