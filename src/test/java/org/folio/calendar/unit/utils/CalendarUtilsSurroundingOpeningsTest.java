@@ -473,4 +473,63 @@ class CalendarUtilsSurroundingOpeningsTest {
       )
     );
   }
+
+  @Test
+  void testOnStartingEdgeBetweenAdjacentCalendars() {
+    List<SingleDayOpeningDTO> openings = CalendarUtils
+      .getSurroundingOpenings(
+        Arrays.asList(Calendars.CALENDAR_FULL_EXAMPLE_E, Calendars.CALENDAR_FULL_EXAMPLE_D),
+        Dates.DATE_2021_05_01
+      )
+      .getOpenings();
+
+    assertThat(openings, hasSize(3));
+    assertThat(
+      openings,
+      contains(
+        SingleDayOpeningDTO
+          .builder()
+          .date(Dates.DATE_2021_04_29)
+          .open(true)
+          .allDay(true)
+          .opening(
+            SingleDayOpeningRangeDTO
+              .builder()
+              .startTime(Times.TIME_00_00)
+              .endTime(Times.TIME_23_59)
+              .build()
+          )
+          .exceptional(false)
+          .build(),
+        SingleDayOpeningDTO
+          .builder()
+          .date(Dates.DATE_2021_05_01)
+          .open(false)
+          .allDay(true)
+          .exceptional(false)
+          .build(),
+        SingleDayOpeningDTO
+          .builder()
+          .date(Dates.DATE_2021_05_03)
+          .open(true)
+          .allDay(false)
+          .opening(
+            SingleDayOpeningRangeDTO
+              .builder()
+              .startTime(Times.TIME_00_00)
+              .endTime(Times.TIME_12_30)
+              .build()
+          )
+          .opening(
+            SingleDayOpeningRangeDTO
+              .builder()
+              .startTime(Times.TIME_23_00)
+              .endTime(Times.TIME_23_59)
+              .build()
+          )
+          .exceptional(false)
+          .build()
+      )
+    );
+  }
 }
