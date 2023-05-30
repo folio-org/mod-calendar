@@ -13,3 +13,4 @@ paths:
     $ref: paths/calendar/dates/surrounding-openings.yaml
   /calendar/dates/{servicePointId}/all-openings:
     $ref: paths/calendar/dates/all-openings.yaml
+

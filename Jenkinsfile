@@ -4,12 +4,6 @@ buildMvn {
   doUploadApidocs = true
   buildNode = 'jenkins-agent-java17'
 
-  doApiLint = true
-  doApiDoc = true
-  apiTypes = 'OAS'
-  apiDirectories = 'src/main/resources/api'
-  apiExcludes = 'paths errors'
-
   doDocker = {
     buildDocker {
       publishMaster = 'yes'
