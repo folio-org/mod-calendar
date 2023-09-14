@@ -147,7 +147,7 @@
   ],
   "requires": [],
   "launchDescriptor": {
-    "dockerImage": "@artifactId@",
+    "dockerImage": "@artifactId@:@version@",
     "dockerPull": false,
     "dockerArgs": {
       "HostConfig": {
