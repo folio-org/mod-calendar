@@ -1,3 +1,6 @@
+## 2.5.0 2023-10-11
+* Update docker image specifier (MODCAL-128)
+
 ## 2.4.2 2023-03-06
 * Fix failing surrounding openings calculation in calendar beginnings (MODCAL-125)
 
