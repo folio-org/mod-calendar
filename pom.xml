@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.2</version>
+    <version>3.1.4</version>
     <relativePath />
   </parent>
   <groupId>org.folio</groupId>
@@ -50,15 +50,13 @@
     <java.version>17</java.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <folio-spring-base.version>6.0.1</folio-spring-base.version>
-    <openapi-generator.version>6.3.0</openapi-generator.version>
-    <json.version>20200518</json.version>
-    <lombok.version>1.18.22</lombok.version>
+    <folio-spring-base.version>7.2.0</folio-spring-base.version>
+    <openapi-generator.version>7.0.1</openapi-generator.version>
+    <lombok.version>1.18.30</lombok.version>
     <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
-    <liquibase-maven-plugin.version>4.6.2</liquibase-maven-plugin.version>
-    <javadoc-maven-plugin.version>3.3.1</javadoc-maven-plugin.version>
-    <icu4j.version>72.1</icu4j.version>
-    <postgresql.version>42.5.0</postgresql.version>
+    <liquibase-maven-plugin.version>4.24.0</liquibase-maven-plugin.version>
+    <icu4j.version>73.2</icu4j.version>
+    <postgresql.version>42.6.0</postgresql.version>
     <snakeyaml.version>1.33</snakeyaml.version>
 
     <calendar-api-defintions-yaml-file>
@@ -66,15 +64,15 @@
     </calendar-api-defintions-yaml-file>
 
     <!-- Test Properties-->
-    <spring-boot-starter-test.version>3.0.2</spring-boot-starter-test.version>
+    <spring-boot-starter-test.version>3.1.4</spring-boot-starter-test.version>
     <wiremock.version>2.35.0</wiremock.version>
-    <embedded-database-spring-test.version>2.2.0</embedded-database-spring-test.version>
-    <swagger-request-validator.version>2.33.1</swagger-request-validator.version>
+    <embedded-database-spring-test.version>2.3.0</embedded-database-spring-test.version>
+    <swagger-request-validator.version>2.37.0</swagger-request-validator.version>
     <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <hamcrest-optional.version>2.0.0</hamcrest-optional.version>
-    <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-    <jackson-datatype-jsr310.version>2.14.2</jackson-datatype-jsr310.version>
-    <mapstruct.version>1.5.3.Final</mapstruct.version>
+    <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+    <jackson-datatype-jsr310.version>2.15.2</jackson-datatype-jsr310.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
   </properties>
 
   <dependencies>
@@ -310,8 +308,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-
         <configuration>
           <annotationProcessorPaths>
             <path>
@@ -331,7 +327,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
         <configuration>
           <useSystemClassLoader>false</useSystemClassLoader>
         </configuration>
@@ -340,7 +335,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
-        <version>3.0.0-M1</version>
         <configuration>
           <preparationGoals>clean verify</preparationGoals>
           <tagNameFormat>v@{project.version}</tagNameFormat>
@@ -466,7 +460,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>${maven-javadoc-plugin.version}</version>
         <configuration>
           <sourcepath>${project.build.directory}/generated-sources/delombok</sourcepath>
           <doclint>none</doclint>
