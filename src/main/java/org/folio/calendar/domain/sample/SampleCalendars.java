@@ -14,8 +14,8 @@ import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.entity.NormalOpening;
 import org.folio.calendar.domain.entity.ServicePointCalendarAssignment;
 import org.folio.calendar.domain.types.Weekday;
-import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.utils.DateUtils;
+import org.folio.spring.service.TranslationService;
 
 @UtilityClass
 public class SampleCalendars {

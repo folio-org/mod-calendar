@@ -7,7 +7,7 @@ import lombok.Data;
 import org.folio.calendar.domain.request.LegacyTranslationKey;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
-import org.folio.calendar.i18n.TranslationService;
+import org.folio.spring.service.TranslationService;
 
 /**
  * A JSON wrapper for LocalDates that supports serialization/deserialization as midnight GMT timestamps

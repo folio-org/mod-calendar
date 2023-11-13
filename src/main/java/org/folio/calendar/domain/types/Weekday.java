@@ -10,7 +10,7 @@ import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.folio.calendar.domain.request.TranslationKey;
-import org.folio.calendar.i18n.TranslationService;
+import org.folio.spring.service.TranslationService;
 
 /**
  * Days of the week enumeration

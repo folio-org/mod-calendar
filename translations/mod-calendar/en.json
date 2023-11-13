@@ -15,10 +15,6 @@
   "weekday.long.friday": "Friday",
   "weekday.long.saturday": "Saturday",
 
-  "list.twoSeparator": " and ",
-  "list.threeOrMoreSeparator": ", ",
-  "list.threeOrMoreLastSeparator": ", and ",
-
   "normalOpening": "{startWeekdayShort} {startTime, time, short} - {endWeekdayShort} {endTime, time, short}",
   "exceptionRangeMultipleDays": "“{name}” from {startDate, date, medium} to {endDate, date, medium}",
   "exceptionRangeSingleDay": "“{name}” on {date, date, medium}",

@@ -27,19 +27,19 @@ public class TranslationKey {
    */
   public static final Map<Weekday, String> WEEKDAY_LONG = Map.of(
     Weekday.SUNDAY,
-    "weekday.long.sunday",
+    "mod-calendar.weekday.long.sunday",
     Weekday.MONDAY,
-    "weekday.long.monday",
+    "mod-calendar.weekday.long.monday",
     Weekday.TUESDAY,
-    "weekday.long.tuesday",
+    "mod-calendar.weekday.long.tuesday",
     Weekday.WEDNESDAY,
-    "weekday.long.wednesday",
+    "mod-calendar.weekday.long.wednesday",
     Weekday.THURSDAY,
-    "weekday.long.thursday",
+    "mod-calendar.weekday.long.thursday",
     Weekday.FRIDAY,
-    "weekday.long.friday",
+    "mod-calendar.weekday.long.friday",
     Weekday.SATURDAY,
-    "weekday.long.saturday"
+    "mod-calendar.weekday.long.saturday"
   );
 
   /**
@@ -47,19 +47,19 @@ public class TranslationKey {
    */
   public static final Map<Weekday, String> WEEKDAY_SHORT = Map.of(
     Weekday.SUNDAY,
-    "weekday.short.sunday",
+    "mod-calendar.weekday.short.sunday",
     Weekday.MONDAY,
-    "weekday.short.monday",
+    "mod-calendar.weekday.short.monday",
     Weekday.TUESDAY,
-    "weekday.short.tuesday",
+    "mod-calendar.weekday.short.tuesday",
     Weekday.WEDNESDAY,
-    "weekday.short.wednesday",
+    "mod-calendar.weekday.short.wednesday",
     Weekday.THURSDAY,
-    "weekday.short.thursday",
+    "mod-calendar.weekday.short.thursday",
     Weekday.FRIDAY,
-    "weekday.short.friday",
+    "mod-calendar.weekday.short.friday",
     Weekday.SATURDAY,
-    "weekday.short.saturday"
+    "mod-calendar.weekday.short.saturday"
   );
 
   /**
@@ -70,7 +70,7 @@ public class TranslationKey {
    * It is recommended to use short weekday formatting (as given in {@code WEEKDAY_SHORT})
    * for the weekdays.
    */
-  public static final String NORMAL_OPENING = "normalOpening";
+  public static final String NORMAL_OPENING = "mod-calendar.normalOpening";
 
   @UtilityClass
   public static class NORMAL_OPENING_P {
@@ -98,7 +98,7 @@ public class TranslationKey {
    *
    * For multiple-day exceptions, use {@code EXCEPTION_RANGE_MULTIPLE_DAYS}
    */
-  public static final String EXCEPTION_RANGE_SINGLE_DAY = "exceptionRangeSingleDay";
+  public static final String EXCEPTION_RANGE_SINGLE_DAY = "mod-calendar.exceptionRangeSingleDay";
 
   @UtilityClass
   public static class EXCEPTION_RANGE_SINGLE_DAY_P {
@@ -119,7 +119,8 @@ public class TranslationKey {
    *
    * For single-day exceptions, use {@code EXCEPTION_RANGE_SINGLE_DAY}
    */
-  public static final String EXCEPTION_RANGE_MULTIPLE_DAYS = "exceptionRangeMultipleDays";
+  public static final String EXCEPTION_RANGE_MULTIPLE_DAYS =
+    "mod-calendar.exceptionRangeMultipleDays";
 
   @UtilityClass
   public static class EXCEPTION_RANGE_MULTIPLE_DAYS_P {
@@ -144,7 +145,7 @@ public class TranslationKey {
    *
    * For single-day exceptions, use {@code EXCEPTION_RANGE_SINGLE_DAY}
    */
-  public static final String EXCEPTION_OPENING = "exceptionOpening";
+  public static final String EXCEPTION_OPENING = "mod-calendar.exceptionOpening";
 
   @UtilityClass
   public static class EXCEPTION_OPENING_P {
@@ -168,52 +169,11 @@ public class TranslationKey {
   }
 
   /**
-   * Delimiters for list items
-   */
-  @UtilityClass
-  public static class LIST_SEPARATORS {
-
-    /**
-     * The number of elements in the list to indicate that
-     * {@code LIST_TWO_SEPARATOR} should be used.
-     */
-    public static final int LIST_TWO_COUNT = 2;
-
-    /**
-     * A separator for two items only.  For example, with {@code [A, B]} and
-     * {@code list.twoSeparator: " and "}, the result will be {@code "A and B"}
-     */
-    public static final String LIST_TWO_SEPARATOR = "list.twoSeparator";
-    /**
-     * A separator, with {@link LIST_THREE_OR_MORE_LAST_SEPARATOR}, for lists
-     * of three or more items.  This separator is placed between every pair of
-     * items except for the last pair.
-     *
-     * If {@code list.threeOrMoreSeparator: ", "} and
-     * {@code list.threeOrMoreLastSeparator: ", and "} then a list of
-     * {@code [A B C]} will result in {@code "A, B, and C"}.  {@code [A B C D]}
-     * will yield {@code "A, B, C, and D"}
-     */
-    public static final String LIST_THREE_OR_MORE_SEPARATOR = "list.threeOrMoreSeparator";
-    /**
-     * A separator, with {@link LIST_THREE_OR_MORE_SEPARATOR}, for lists
-     * of three or more items.  This separator is placed between the last pair
-     * of items in the list.  In English, {@code ", and "} would be used.
-     *
-     * If {@code list.threeOrMoreSeparator: ", "} and
-     * {@code list.threeOrMoreLastSeparator: ", and "} then a list of
-     * {@code [A B C]} will result in {@code "A, B, and C"}.  {@code [A B C D]}
-     * will yield {@code "A, B, C, and D"}
-     */
-    public static final String LIST_THREE_OR_MORE_LAST_SEPARATOR = "list.threeOrMoreLastSeparator";
-  }
-
-  /**
    * An error message for when an endpoint is not found.
    *
    * Parameters {@link ERROR_ENDPOINT_NOT_FOUND_P}: {@code METHOD} and {@code URL}
    */
-  public static final String ERROR_ENDPOINT_NOT_FOUND = "error.endpointNotFound";
+  public static final String ERROR_ENDPOINT_NOT_FOUND = "mod-calendar.error.endpointNotFound";
 
   @UtilityClass
   public static class ERROR_ENDPOINT_NOT_FOUND_P {
@@ -227,7 +187,8 @@ public class TranslationKey {
    *
    * Parameters {@link ERROR_ENDPOINT_METHOD_INVALID_P}: {@code METHOD} and {@code METHOD_LIST}
    */
-  public static final String ERROR_ENDPOINT_METHOD_INVALID = "error.endpointMethodInvalid";
+  public static final String ERROR_ENDPOINT_METHOD_INVALID =
+    "mod-calendar.error.endpointMethodInvalid";
 
   @UtilityClass
   public static class ERROR_ENDPOINT_METHOD_INVALID_P {
@@ -247,7 +208,7 @@ public class TranslationKey {
    *
    * Parameters {@link ERROR_UNPARSABLE_DATA_P}: {@code UNLOCALIZED_ERROR_MESSAGE}
    */
-  public static final String ERROR_UNPARSABLE_DATA = "error.unparsableData";
+  public static final String ERROR_UNPARSABLE_DATA = "mod-calendar.error.unparsableData";
 
   @UtilityClass
   public static class ERROR_UNPARSABLE_DATA_P {
@@ -263,7 +224,7 @@ public class TranslationKey {
    *
    * Parameters {@link ERROR_INTERNAL_SERVER_ERROR_P}: {@code CLASS_NAME} and {@code ERROR_MESSAGE}
    */
-  public static final String ERROR_INTERNAL_SERVER_ERROR = "error.internalServerError";
+  public static final String ERROR_INTERNAL_SERVER_ERROR = "mod-calendar.error.internalServerError";
 
   @UtilityClass
   public static class ERROR_INTERNAL_SERVER_ERROR_P {
@@ -281,14 +242,14 @@ public class TranslationKey {
   /**
    * A generic message for when a calendar is not found.  No parameters
    */
-  public static final String ERROR_CALENDAR_NOT_FOUND = "error.calendarNotFound";
+  public static final String ERROR_CALENDAR_NOT_FOUND = "mod-calendar.error.calendarNotFound";
 
   /**
    * An error message for when a calendar overlaps with an existing one
    *
    * Parameters {@link ERROR_CALENDAR_OVERLAP_P}: {@code OVERLAP_NAME}, {@code OVERLAP_START_DATE}, and {@code OVERLAP_END_DATE}
    */
-  public static final String ERROR_CALENDAR_OVERLAP = "error.calendarOverlap";
+  public static final String ERROR_CALENDAR_OVERLAP = "mod-calendar.error.calendarOverlap";
 
   @UtilityClass
   public static class ERROR_CALENDAR_OVERLAP_P {
@@ -301,14 +262,14 @@ public class TranslationKey {
   /**
    * The provided calendar is missing a name (or it is only whitespace).  No parameters
    */
-  public static final String ERROR_CALENDAR_NAME_EMPTY = "error.calendarNameEmpty";
+  public static final String ERROR_CALENDAR_NAME_EMPTY = "mod-calendar.error.calendarNameEmpty";
 
   /**
    * The calendar's start date is after the end date.
    *
    * Parameters {@link ERROR_DATE_RANGE_INVALID_P}: {@code START_DATE} and {@code END_DATE}
    */
-  public static final String ERROR_DATE_RANGE_INVALID = "error.dateRangeInvalid";
+  public static final String ERROR_DATE_RANGE_INVALID = "mod-calendar.error.dateRangeInvalid";
 
   @UtilityClass
   public static class ERROR_DATE_RANGE_INVALID_P {
@@ -324,14 +285,14 @@ public class TranslationKey {
    * Parameters {@link ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P}: {@code OPENING_LIST}
    */
   public static final String ERROR_CALENDAR_INVALID_NORMAL_OPENINGS =
-    "error.calendarInvalidNormalOpenings";
+    "mod-calendar.error.calendarInvalidNormalOpenings";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_NORMAL_OPENINGS_P {
 
     /**
      * This should be a list as formatted by
-     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     * {@link org.folio.spring.service.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String OPENING_LIST = "openingList";
   }
@@ -343,7 +304,7 @@ public class TranslationKey {
    * exception when it has no name)
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_NAME =
-    "error.calendarInvalidExceptionRangeName";
+    "mod-calendar.error.calendarInvalidExceptionRangeName";
 
   /**
    * The calendar has an exception with a start date after its end date.
@@ -352,7 +313,7 @@ public class TranslationKey {
    * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER =
-    "error.calendarInvalidExceptionRangeDateOrder";
+    "mod-calendar.error.calendarInvalidExceptionRangeDateOrder";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_ORDER_P {
@@ -376,7 +337,7 @@ public class TranslationKey {
    * {@code START_DATE}, {@code END_DATE}, and {@code NAME}.
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS =
-    "error.calendarInvalidExceptionRangeDateOutOfBounds";
+    "mod-calendar.error.calendarInvalidExceptionRangeDateOutOfBounds";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_EXCEPTION_DATE_OUT_OF_BOUNDS_P {
@@ -407,14 +368,14 @@ public class TranslationKey {
    * Parameters {@link ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P}: {@code EXCEPTION_LIST}
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_RANGES =
-    "error.calendarInvalidExceptionRanges";
+    "mod-calendar.error.calendarInvalidExceptionRanges";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_EXCEPTION_RANGES_P {
 
     /**
      * This should be a list as formatted by
-     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     * {@link org.folio.spring.service.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String EXCEPTION_LIST = "exceptionList";
   }
@@ -427,7 +388,7 @@ public class TranslationKey {
    * {@code NAME} and {@code OPENING_LIST}
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS =
-    "error.calendarInvalidExceptionOpenings";
+    "mod-calendar.error.calendarInvalidExceptionOpenings";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_EXCEPTION_OPENINGS_P {
@@ -438,7 +399,7 @@ public class TranslationKey {
     public static final String NAME = "name";
     /**
      * This should be a list as formatted by
-     * {@link org.folio.calendar.i18n.TranslationService#formatList(java.util.List) TranslationService#formatList}
+     * {@link org.folio.spring.service.TranslationService#formatList(java.util.List) TranslationService#formatList}
      */
     public static final String OPENING_LIST = "openingList";
   }
@@ -450,7 +411,7 @@ public class TranslationKey {
    * {@code NAME}, {@code NUM_ERRORS}, and {@code LIST}.
    */
   public static final String ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS =
-    "error.calendarInvalidExceptionHourOutOfBounds";
+    "mod-calendar.error.calendarInvalidExceptionHourOutOfBounds";
 
   @UtilityClass
   public static class ERROR_CALENDAR_INVALID_EXCEPTION_HOUR_OUT_OF_BOUNDS_P {
