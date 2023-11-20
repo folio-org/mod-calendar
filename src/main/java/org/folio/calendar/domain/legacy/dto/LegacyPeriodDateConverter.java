@@ -1,6 +1,6 @@
 package org.folio.calendar.domain.legacy.dto;
 
-import org.folio.spring.service.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

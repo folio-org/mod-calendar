@@ -31,7 +31,7 @@ import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.utils.DateUtils;
 import org.folio.calendar.utils.ExceptionRangeUtils;
 import org.folio.calendar.utils.NormalOpeningUtils;
-import org.folio.spring.service.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

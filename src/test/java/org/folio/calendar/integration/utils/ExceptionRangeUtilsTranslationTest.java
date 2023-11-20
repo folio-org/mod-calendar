@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.is;
 import org.folio.calendar.integration.BaseApiTest;
 import org.folio.calendar.testconstants.ExceptionRanges;
 import org.folio.calendar.utils.ExceptionRangeUtils;
-import org.folio.spring.service.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

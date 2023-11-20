@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.folio.calendar.domain.types.Weekday;
 import org.folio.calendar.integration.BaseApiTest;
-import org.folio.spring.service.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

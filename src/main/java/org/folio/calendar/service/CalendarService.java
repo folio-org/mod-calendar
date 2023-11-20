@@ -26,7 +26,7 @@ import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.repository.CalendarRepository;
 import org.folio.calendar.repository.CustomOffsetPageRequest;
 import org.folio.calendar.utils.CalendarUtils;
-import org.folio.spring.service.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
