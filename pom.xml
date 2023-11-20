@@ -205,15 +205,6 @@
         <targetPath>translations</targetPath>
       </resource>
     </resources>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-      </testResource>
-      <testResource>
-        <directory>${project.basedir}/translations</directory>
-        <targetPath>translations</targetPath>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
