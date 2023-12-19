@@ -8,7 +8,7 @@ import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.domain.request.TranslationKey;
 import org.folio.calendar.exception.AbstractCalendarException;
 import org.folio.calendar.exception.NonspecificCalendarException;
-import org.folio.calendar.i18n.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

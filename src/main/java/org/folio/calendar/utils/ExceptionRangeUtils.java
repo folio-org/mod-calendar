@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 import org.folio.calendar.domain.entity.ExceptionHour;
 import org.folio.calendar.domain.entity.ExceptionRange;
 import org.folio.calendar.domain.request.TranslationKey;
-import org.folio.calendar.i18n.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 
 /**
  * Utilities for exception ranges

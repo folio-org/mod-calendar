@@ -3,10 +3,10 @@ package org.folio.calendar.integration.utils;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import org.folio.calendar.i18n.TranslationService;
 import org.folio.calendar.integration.BaseApiTest;
 import org.folio.calendar.testconstants.ExceptionRanges;
 import org.folio.calendar.utils.ExceptionRangeUtils;
+import org.folio.spring.i18n.service.TranslationService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

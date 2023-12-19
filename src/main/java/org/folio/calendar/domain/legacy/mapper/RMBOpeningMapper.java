@@ -11,7 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.folio.calendar.domain.legacy.dto.LegacyPeriodDate;
 import org.folio.calendar.domain.legacy.dto.OpeningDayRelativeDTO;
 import org.folio.calendar.domain.legacy.dto.PeriodDTO;
-import org.folio.calendar.i18n.TranslationService;
+import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
