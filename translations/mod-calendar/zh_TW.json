@@ -24,7 +24,7 @@
     "error.calendarNotFound": "找不到指定查詢的日曆",
     "error.calendarOverlap": "此日曆與另一個日曆重疊(“{name}” 從 {startDate, date, medium} 到 {endDate, date, medium})",
     "error.calendarNameEmpty": "請提供一個非空的日曆名稱",
-    "error.dateRangeInvalid": "Start date ({startDate, date, medium}) cannot be after end date ({endDate, date, medium})",
+    "error.dateRangeInvalid": "開始日期 ( {startDate, date, medium} ) 不能晚於結束日期 ( {endDate, date, medium} )",
     "error.calendarInvalidNormalOpenings": "The following openings conflict with each other: {openingList}",
     "error.calendarInvalidExceptionRangeName": "At least one exception is missing a name",
     "error.calendarInvalidExceptionRangeDateOrder": "The start date ({startDate, date, medium}) is after the end date ({endDate, date, medium}) for exception “{name}”",
