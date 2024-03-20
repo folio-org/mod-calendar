@@ -1,3 +1,6 @@
+## 3.0.0 2024-03-20
+* Migrate in-house translation logic to centralized folio-spring-i18n (MODCAL-130)
+
 ## 2.5.0 2023-10-11
 * Update docker image specifier (MODCAL-128)
 
