@@ -1,9 +1,9 @@
 package org.folio.calendar.domain.legacy.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

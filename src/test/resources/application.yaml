@@ -28,6 +28,8 @@ zonky:
   test:
     database:
       postgres:
+        docker:
+          image: ${TESTCONTAINERS_POSTGRES_IMAGE:postgres:12-alpine}
         client:
           properties:
             stringtype: unspecified

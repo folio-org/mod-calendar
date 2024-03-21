@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.4</version>
+    <version>3.2.3</version>
     <relativePath />
   </parent>
   <groupId>org.folio</groupId>
@@ -50,28 +50,22 @@
     <java.version>17</java.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <folio-spring-base.version>7.2.0</folio-spring-base.version>
-    <openapi-generator.version>7.0.1</openapi-generator.version>
-    <lombok.version>1.18.30</lombok.version>
+    <folio-spring.version>8.1.0</folio-spring.version>
+    <openapi-generator.version>7.3.0</openapi-generator.version>
     <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
-    <liquibase-maven-plugin.version>4.24.0</liquibase-maven-plugin.version>
-    <icu4j.version>73.2</icu4j.version>
-    <postgresql.version>42.6.0</postgresql.version>
-    <snakeyaml.version>1.33</snakeyaml.version>
+    <icu4j.version>74.2</icu4j.version>
 
     <calendar-api-defintions-yaml-file>
       src/main/resources/api/calendar.yaml
     </calendar-api-defintions-yaml-file>
 
     <!-- Test Properties-->
-    <spring-boot-starter-test.version>3.1.4</spring-boot-starter-test.version>
-    <wiremock.version>2.35.0</wiremock.version>
-    <embedded-database-spring-test.version>2.3.0</embedded-database-spring-test.version>
-    <swagger-request-validator.version>2.37.0</swagger-request-validator.version>
+    <wiremock.version>3.4.2</wiremock.version>
+    <embedded-database-spring-test.version>2.5.0</embedded-database-spring-test.version>
+    <swagger-request-validator.version>2.40.0</swagger-request-validator.version>
     <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <hamcrest-optional.version>2.0.0</hamcrest-optional.version>
-    <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
-    <jackson-datatype-jsr310.version>2.15.2</jackson-datatype-jsr310.version>
+    <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
     <mapstruct.version>1.5.5.Final</mapstruct.version>
   </properties>
 
@@ -79,13 +73,13 @@
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>folio-spring-base</artifactId>
-      <version>${folio-spring-base.version}</version>
+      <version>${folio-spring.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.folio</groupId>
       <artifactId>folio-spring-i18n</artifactId>
-      <version>8.1.0</version>
+      <version>${folio-spring.version}</version>
     </dependency>
 
     <dependency>
@@ -112,13 +106,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
-      <version>${spring-boot-starter-test.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.github.tomakehurst</groupId>
-      <artifactId>wiremock-jre8-standalone</artifactId>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
       <version>${wiremock.version}</version>
       <scope>test</scope>
     </dependency>
@@ -126,7 +119,6 @@
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>${rest-assured.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -167,7 +159,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
     </dependency>
 
     <dependency>
@@ -178,7 +169,6 @@
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>${jackson-datatype-jsr310.version}</version>
     </dependency>
 
     <dependency>
@@ -209,7 +199,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>versions-maven-plugin</artifactId>
-        <version>2.8.1</version>
         <configuration>
           <generateBackupPoms>false</generateBackupPoms>
         </configuration>
@@ -218,7 +207,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>3.0.2</version>
         <configuration>
           <layers>
             <enabled>true</enabled>
@@ -228,7 +216,6 @@
 
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
           <execution>
             <id>filter-descriptor-inputs</id>
@@ -286,7 +273,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
           <execution>
             <phase>generate-sources</phase>
@@ -390,7 +376,6 @@
       <plugin>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-maven-plugin</artifactId>
-        <version>${liquibase-maven-plugin.version}</version>
         <configuration>
           <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
           <changeLogFile>src/main/resources/db/changelog-master.yaml</changeLogFile>
@@ -454,6 +439,7 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
