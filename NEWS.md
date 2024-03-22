@@ -1,3 +1,6 @@
+## 3.1.0 2024-03-22
+* Upgrade dependencies (Spring, …) for Quesnelia (MODCAL-133)
+
 ## 3.0.0 2024-03-20
 * Migrate in-house translation logic to centralized folio-spring-i18n (MODCAL-130)
 
