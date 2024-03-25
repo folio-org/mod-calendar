@@ -14,13 +14,13 @@
     "weekday.long.friday": "星期五",
     "weekday.long.saturday": "星期六",
     "normalOpening": "{startWeekdayShort} {startTime, time, short} - {endWeekdayShort} {endTime, time, short}",
-    "exceptionRangeMultipleDays": "「 {name} 」從{startDate, date, medium}到{endDate, date, medium}",
+    "exceptionRangeMultipleDays": "\" {name}\" 從{startDate, date, medium}到{endDate, date, medium}",
     "exceptionRangeSingleDay": "{date, date, medium} 上的“{name}”",
     "exceptionOpening": "{startDate, date, medium} {startTime, time, short}到{endDate, date, medium} {endTime, time, short}",
     "error.endpointNotFound": "此應用程式不知道如何處理對{url}的{method}請求",
     "error.endpointMethodInvalid": "該端點不接受{method}請求（支援： {methodList} ）",
     "error.unparsableData": "參數之一的類型不正確： {unlocalizedErrorMessage}",
-    "error.internalServerError": "發生內部伺服器錯誤  ({className}): {errorMessage}",
+    "error.internalServerError": "內部伺服器發生錯誤  ({className}): {errorMessage}",
     "error.calendarNotFound": "找不到指定查詢的日曆",
     "error.calendarOverlap": "此日曆與另一個日曆重疊(“{name}” 從 {startDate, date, medium} 到 {endDate, date, medium})",
     "error.calendarNameEmpty": "請提供一個非空的日曆名稱",
@@ -34,6 +34,6 @@
     "error.calendarInvalidExceptionOpenings": "The following openings within “{name}” conflict with each other: {openingList}",
     "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
     "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",
-    "error.servicePointExistingMismatch": "The period requested does exist, however, is not assigned to service point {requestedId}",
-    "error.servicePointUrlMismatch": "Service point ID in the URL ({uuid1}) does not match the payload ({uuid2})"
+    "error.servicePointExistingMismatch": "要求的區段存在，但未被歸類到服務項目 {requestedId}",
+    "error.servicePointUrlMismatch": "URL中的服務點 ID ( {uuid1} ) 與負載 ( {uuid2} ) 不符"
 }
