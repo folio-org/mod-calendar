@@ -151,7 +151,7 @@
     "dockerPull": false,
     "dockerArgs": {
       "HostConfig": {
-        "Memory": 314572800,
+        "Memory": 514572800,
         "PortBindings": { "8081/tcp": [{ "HostPort": "%p" }] }
       }
     },
