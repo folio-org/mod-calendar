@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0008-create-weekday-type
+      author: novercash@ebsco.com
+      comment:
+        Add weekday type. Replaces old 0010-initial-01-create-weekday-type and
+        0020-capitalize-weekday-enum.
+      changes:
+        - sql:
+            sql: |
+              DROP TYPE IF EXISTS "weekday";
+              CREATE TYPE "weekday" AS ENUM (
+                'SUNDAY',
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY'
+              );
+      rollback:
+        - sql:
+            sql: DROP TYPE "weekday";
