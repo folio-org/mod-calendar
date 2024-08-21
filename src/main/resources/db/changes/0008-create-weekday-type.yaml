@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0008-create-weekday-type
+      author: novercash@ebsco.com
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: |
+              SELECT count(*)
+              FROM pg_type
+                INNER JOIN pg_namespace ON pg_namespace.oid = pg_type.typnamespace
+              WHERE pg_namespace.nspname = current_schema()
+                AND pg_type.typname = 'weekday'
+      comment:
+        Add weekday type. Replaces old 0010-initial-01-create-weekday-type and
+        0020-capitalize-weekday-enum.
+      changes:
+        - sql:
+            sql: |
+              DROP TYPE IF EXISTS "weekday";
+              CREATE TYPE "weekday" AS ENUM (
+                'SUNDAY',
+                'MONDAY',
+                'TUESDAY',
+                'WEDNESDAY',
+                'THURSDAY',
+                'FRIDAY',
+                'SATURDAY'
+              );
+      rollback:
+        - sql:
+            sql: DROP TYPE "weekday";
