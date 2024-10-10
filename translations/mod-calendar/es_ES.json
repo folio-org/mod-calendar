@@ -35,5 +35,5 @@
     "error.dateInvalid": "Date “{userInputtedDateString}” could not be parsed",
     "error.periodIdConflict": "A period with ID {conflictingUuid} already exists",
     "error.servicePointExistingMismatch": "The period requested does exist, however, is not assigned to service point {requestedId}",
-    "error.servicePointUrlMismatch": "Service point ID in the URL ({uuid1}) does not match the payload ({uuid2})"
+    "error.servicePointUrlMismatch": "El punto de servicio en la URL ({uuid1}) no coincide con el punto de servicio de pagos ({uuid2})"
 }
