@@ -14,6 +14,14 @@
   <name>mod-calendar</name>
   <description>FOLIO calendar module for service point openings</description>
 
+  <pluginRepositories>
+    <pluginRepository>
+      <id>folio-nexus</id>
+      <name>FOLIO Maven repository</name>
+      <url>https://repository.folio.org/repository/maven-folio</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <licenses>
     <license>
       <name>Apache License 2.0</name>
@@ -453,6 +461,19 @@
             <phase>pre-site</phase>
             <goals>
               <goal>javadoc</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.folio</groupId>
+        <artifactId>folio-module-descriptor-validator</artifactId>
+        <version>1.0.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>validate</goal>
             </goals>
           </execution>
         </executions>
