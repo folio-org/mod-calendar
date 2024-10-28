@@ -39,12 +39,12 @@
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/dates/{servicePointId}/surrounding-openings",
-          "permissionsRequired": ["calendar.endpoint.dates.get"]
+          "permissionsRequired": ["calendar.endpoint.calendars.surroundingOpenings.get"]
         },
         {
           "methods": ["GET"],
           "pathPattern": "/calendar/dates/{servicePointId}/all-openings",
-          "permissionsRequired": ["calendar.endpoint.dates.get"]
+          "permissionsRequired": ["calendar.endpoint.calendars.allOpenings.get"]
         }
       ]
     },
@@ -105,6 +105,18 @@
     {
       "permissionName": "calendar.endpoint.calendars.get",
       "displayName": "Make GET requests to /calendar/calendars",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.endpoint.calendars.surroundingOpenings.get",
+      "displayName": "Make GET requests to /calendar/dates/{servicePointID}/surrounding-openings",
+      "description": "",
+      "visible": false
+    },
+    {
+      "permissionName": "calendar.endpoint.calendars.allOpenings.get",
+      "displayName": "Make GET requests to /calendar/dates/{servicePointId}/all-openings",
       "description": "",
       "visible": false
     },
