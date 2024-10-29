@@ -70,7 +70,8 @@
       "displayName": "Access and query calendar information",
       "description": "",
       "subPermissions": [
-        "calendar.endpoint.calendars.get",
+        "calendar.endpoint.calendars.surroundingOpenings.get",
+        "calendar.endpoint.calendars.allOpenings.get",
         "calendar.endpoint.calendars.calendarId.get",
         "calendar.endpoint.dates.get"
       ],
@@ -101,23 +102,18 @@
       ],
       "visible": false
     },
-
-    {
-      "permissionName": "calendar.endpoint.calendars.get",
-      "displayName": "Make GET requests to /calendar/calendars",
-      "description": "",
-      "visible": false
-    },
     {
       "permissionName": "calendar.endpoint.calendars.surroundingOpenings.get",
       "displayName": "Make GET requests to /calendar/dates/{servicePointID}/surrounding-openings",
       "description": "",
+      "replaces": ["calendar.endpoint.dates.get"],
       "visible": false
     },
     {
       "permissionName": "calendar.endpoint.calendars.allOpenings.get",
       "displayName": "Make GET requests to /calendar/dates/{servicePointId}/all-openings",
       "description": "",
+      "replaces": ["calendar.endpoint.dates.get"],
       "visible": false
     },
     {
