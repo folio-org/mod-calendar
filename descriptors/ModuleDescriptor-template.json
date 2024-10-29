@@ -73,7 +73,7 @@
         "calendar.endpoint.calendars.surroundingOpenings.get",
         "calendar.endpoint.calendars.allOpenings.get",
         "calendar.endpoint.calendars.calendarId.get",
-        "calendar.endpoint.dates.get"
+        "calendar.endpoint.calendars.get"
       ],
       "visible": false
     },
