@@ -102,6 +102,13 @@
       ],
       "visible": false
     },
+
+    {
+      "permissionName": "calendar.endpoint.calendars.get",
+      "displayName": "Make GET requests to /calendar/calendars",
+      "description": "",
+      "visible": false
+    },
     {
       "permissionName": "calendar.endpoint.calendars.surroundingOpenings.get",
       "displayName": "Make GET requests to /calendar/dates/{servicePointID}/surrounding-openings",
@@ -143,12 +150,6 @@
     {
       "permissionName": "calendar.endpoint.calendars.calendarId.delete",
       "displayName": "Make DELETE requests to /calendar/calendars/{id}",
-      "description": "",
-      "visible": false
-    },
-    {
-      "permissionName": "calendar.endpoint.dates.get",
-      "displayName": "Make GET requests to any endpoint in /calendar/dates",
       "description": "",
       "visible": false
     }
