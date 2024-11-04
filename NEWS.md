@@ -1,3 +1,9 @@
+## 3.2.0 2024-11-04
+* Translation updates
+* Increase default memory ([MODCAL-134](https://folio-org.atlassian.net/browse/MODCAL-134))
+* Add one-step weekday type liquibase changelog ([MODCAL-135](https://folio-org.atlassian.net/browse/MODCAL-135))
+* Update permissions ([MODCAL-136](https://folio-org.atlassian.net/browse/MODCAL-136))
+
 ## 3.1.0 2024-03-22
 * Upgrade dependencies (Spring, …) for Quesnelia (MODCAL-133)
 
