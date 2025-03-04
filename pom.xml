@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.3</version>
+    <version>3.4.3</version>
     <relativePath />
   </parent>
   <groupId>org.folio</groupId>
@@ -58,7 +58,7 @@
     <java.version>21</java.version>
     <folio-spring.version>9.0.0</folio-spring.version>
     <openapi-generator.version>7.3.0</openapi-generator.version>
-    <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
+    <lombok-maven-plugin.version>1.18.36</lombok-maven-plugin.version>
     <icu4j.version>74.2</icu4j.version>
 
     <calendar-api-defintions-yaml-file>
