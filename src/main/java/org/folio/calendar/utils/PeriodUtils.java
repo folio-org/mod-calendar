@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
@@ -51,11 +50,8 @@ public class PeriodUtils {
    * @return the corresponding {@code ExceptionRange}
    */
   public static ExceptionRange convertExceptionalPeriodToExceptionRanges(PeriodDTO period) {
-    UUID exceptionId = UUID.randomUUID();
-
     ExceptionRangeBuilder builder = ExceptionRange
       .builder()
-      .id(exceptionId)
       .name(period.getName())
       .startDate(period.getStartDate().getValue())
       .endDate(period.getEndDate().getValue());

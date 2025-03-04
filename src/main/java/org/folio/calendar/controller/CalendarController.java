@@ -52,7 +52,7 @@ public class CalendarController implements CalendarApi {
     log.info("createCalendar: Calendar passed validation, saving...");
 
     calendar.clearIds();
-    calendar.setId(UUID.randomUUID());
+    calendar.setId(null);
 
     calendar.setCreatedDate(Instant.now());
     calendar.setUpdatedDate(Instant.now());

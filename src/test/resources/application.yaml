@@ -8,14 +8,14 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog-master.yaml
+  datasource:
+    url: jdbc:tc:postgresql:16-alpine:///db?stringtype=unspecified
   jpa:
     show-sql: false
     hibernate:
       ddl-auto: none
   banner:
     location: classpath:/banner.txt
-  mvc:
-    throw-exception-if-no-handler-found: true
   web:
     resources:
       add-mappings: false
@@ -23,16 +23,6 @@ spring:
     openfeign:
       okhttp:
         enabled: true
-
-zonky:
-  test:
-    database:
-      postgres:
-        docker:
-          image: ${TESTCONTAINERS_POSTGRES_IMAGE:postgres:12-alpine}
-        client:
-          properties:
-            stringtype: unspecified
 
 management:
   endpoints:

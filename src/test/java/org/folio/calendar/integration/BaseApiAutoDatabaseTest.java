@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +18,9 @@ public abstract class BaseApiAutoDatabaseTest extends BaseApiTest {
 
   protected boolean hasCreated = false;
 
-  @AfterAll
-  void afterAll(TestInfo testInfo, @Autowired DataSource dataSource) {
-    if (testInfo.getTags().contains("idempotent")) {
-      cleanDatabase(dataSource);
-    }
-  }
-
   @AfterEach
   void afterEach(TestInfo testInfo, @Autowired DataSource dataSource) {
-    if (!testInfo.getTags().contains("idempotent")) {
-      cleanDatabase(dataSource);
-    }
+    cleanDatabase(dataSource);
   }
 
   protected void cleanDatabase(@Autowired DataSource dataSource) {

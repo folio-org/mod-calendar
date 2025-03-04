@@ -69,10 +69,3 @@ In order to invoke liquibase directly, you may use the Maven goal `liquibase:upd
 file specifies the default Okapi database credentials in order to upgrade `diku`'s installation;
 other tenants/setups can be specified by editing this, `pom.xml`, or adding command-line options to
 Maven.
-
-## Test Environment
-
-In the test environment, a real Postgres database is not used (to ensure this is fully separate from
-anything else). Instead, an
-[isolated test database](https://github.com/zonkyio/embedded-database-spring-test) is used, and the
-`/_/tenant` route is used to ensure this is initialized properly.
