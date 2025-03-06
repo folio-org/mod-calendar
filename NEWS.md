@@ -1,4 +1,4 @@
-## 3.3.0 IN PROGRESS
+## 3.3.0 2025-03-06
 * Update to Java v21 ([FOLIO-4249](https://folio-org.atlassian.net/browse/FOLIO-4249))
 
 ## 3.2.0 2024-11-04
