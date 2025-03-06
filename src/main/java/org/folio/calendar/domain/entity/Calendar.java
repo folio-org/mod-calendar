@@ -4,6 +4,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
@@ -39,7 +40,7 @@ public class Calendar implements Serializable {
    * The UUID of the calendar
    */
   @Id
-  @NotNull
+  @GeneratedValue
   @Column(name = "id")
   private UUID id;
 
@@ -127,14 +128,6 @@ public class Calendar implements Serializable {
   @CheckForNull
   @Column(name = "updated_by_user_id")
   private UUID updatedByUserId;
-
-  // provide default random ID when another is not specified
-  // SonarLint does not like that this is unused; lombok provides the builder implementation
-  @SuppressWarnings("java:S1068")
-  public static class CalendarBuilder {
-
-    private UUID id = UUID.randomUUID();
-  }
 
   @PreUpdate
   @PrePersist

@@ -1,3 +1,6 @@
+## 3.3.0 IN PROGRESS
+* Update to Java v21 ([FOLIO-4249](https://folio-org.atlassian.net/browse/FOLIO-4249))
+
 ## 3.2.0 2024-11-04
 * Translation updates
 * Increase default memory ([MODCAL-134](https://folio-org.atlassian.net/browse/MODCAL-134))

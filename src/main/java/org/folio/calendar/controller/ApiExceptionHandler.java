@@ -131,8 +131,7 @@ public class ApiExceptionHandler {
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponseDTO> handleAllOtherExceptions(Exception exception) {
-    log.error(exception);
-    log.error(exception.getMessage());
+    log.error("Unknown exception:", exception);
 
     // As a note, NullPointerException can be thrown deep in the servlet code if parsing invalid JSON.
     // However, NPE is far too generic to catch and always attribute to bad input.

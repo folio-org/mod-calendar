@@ -13,8 +13,6 @@ import io.restassured.http.Header;
 import io.restassured.path.json.config.JsonPathConfig;
 import io.restassured.specification.ProxySpecification;
 import io.restassured.specification.RequestSpecification;
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode;
 import java.util.Locale;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,7 +44,6 @@ import org.springframework.test.context.ContextConfiguration;
 @Log4j2
 @ActiveProfiles("test")
 @TestInstance(Lifecycle.PER_CLASS)
-@AutoConfigureEmbeddedDatabase(refresh = RefreshMode.NEVER)
 @ContextConfiguration(initializers = { WireMockInitializer.class })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseApiTest {

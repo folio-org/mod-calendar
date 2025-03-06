@@ -86,7 +86,6 @@ public class SampleCalendars {
   ) {
     return Calendar
       .builder()
-      .id(UUID.randomUUID())
       .name(String.format("Circ Desk 1 %s Hours", lastMonthName))
       .startDate(lastMonthStart)
       .endDate(lastMonthEnd)
@@ -117,7 +116,6 @@ public class SampleCalendars {
       .exception(
         ExceptionRange
           .builder()
-          .id(UUID.randomUUID())
           .startDate(lastMonthStart.plusDays(1))
           .endDate(lastMonthStart.plusDays(1))
           .build()
@@ -133,7 +131,6 @@ public class SampleCalendars {
   ) {
     return Calendar
       .builder()
-      .id(UUID.randomUUID())
       .name(String.format("Circ Desk 1 %s-%s Hours", thisMonthName, nextMonthName))
       .startDate(thisMonthStart)
       .endDate(nextMonthEnd)
@@ -209,7 +206,6 @@ public class SampleCalendars {
       .exception(
         ExceptionRange
           .builder()
-          .id(UUID.randomUUID())
           .startDate(thisMonthStart.plusDays(1))
           .endDate(thisMonthStart.plusDays(LONG_EXCEPTION_LENGTH))
           .opening(
@@ -229,7 +225,6 @@ public class SampleCalendars {
   protected Calendar getServicePointTwoCalendar(LocalDate nextMonthStart, LocalDate nextMonthEnd) {
     return Calendar
       .builder()
-      .id(UUID.randomUUID())
       .name("Limited Opening Sample")
       .startDate(nextMonthStart)
       .endDate(nextMonthEnd)
@@ -272,7 +267,6 @@ public class SampleCalendars {
   protected Calendar getOnlineCalendar(LocalDate lastMonthStart, LocalDate nextMonthEnd) {
     return Calendar
       .builder()
-      .id(UUID.randomUUID())
       .name("24/7 Online Access")
       .startDate(lastMonthStart)
       .endDate(nextMonthEnd)
