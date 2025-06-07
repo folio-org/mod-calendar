@@ -34,6 +34,6 @@
     "error.calendarInvalidExceptionOpenings": "Poniższe otwarcia w ramach \"{name}\" są ze sobą sprzeczne: {openingList}",
     "error.dateInvalid": "Data \"{userInputtedDateString}\" nie może być przeanalizowana",
     "error.periodIdConflict": "Okres z ID {conflictingUuid} już istnieje",
-    "error.servicePointExistingMismatch": "Okres o który wnioskowano istnieje, jednak, nie jest przypisany do punktu obsługi {requestedId}",
+    "error.servicePointExistingMismatch": "Żądany okres istnieje, nie jest jednak przypisany do punktu obsługi {requestedId}",
     "error.servicePointUrlMismatch": "ID punktu obsługi w adresie URL ({uuid1}) nie pasuje do ładunku ({uuid2})"
 }
