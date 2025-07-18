@@ -20,7 +20,7 @@
     "error.endpointNotFound": "This application does not know how to handle a {method} request to {url}",
     "error.endpointMethodInvalid": "This endpoint does not accept {method} requests (supported: {methodList})",
     "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",
-    "error.internalServerError": "An internal server error occurred ({className}): {errorMessage}",
+    "error.internalServerError": "Une erreur de serveur interne s'est produite ({className}) : {errorMessage}",
     "error.calendarNotFound": "No calendar was found with the specified query",
     "error.calendarOverlap": "This calendar overlaps with another calendar (“{name}” from {startDate, date, medium} to {endDate, date, medium})",
     "error.calendarNameEmpty": "Please provide a non-empty calendar name",
