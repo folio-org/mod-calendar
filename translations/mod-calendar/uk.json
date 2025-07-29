@@ -19,7 +19,7 @@
     "exceptionOpening": "{startDate, date, medium} {startTime, time, short} to {endDate, date, medium} {endTime, time, short}",
     "error.endpointNotFound": "Цей додаток не знає, як обробити запит {method} для {url}",
     "error.endpointMethodInvalid": "Цей ендпоінт не приймає запити {method} (підтримується: {methodList} )",
-    "error.unparsableData": "One of the parameters was the incorrect type: {unlocalizedErrorMessage}",
+    "error.unparsableData": "Один із параметрів мав неправильний тип: {unlocalizedErrorMessage}",
     "error.internalServerError": "Сталася внутрішня помилка сервера ({className}): {errorMessage}",
     "error.calendarNotFound": "За вказаним запитом не знайдено календаря",
     "error.calendarOverlap": "Цей календар перетинається з іншим календарем (“{name}” з {startDate, date, medium} до {endDate, date, medium})",
