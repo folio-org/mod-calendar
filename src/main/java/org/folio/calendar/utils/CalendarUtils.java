@@ -26,14 +26,24 @@ import org.folio.calendar.domain.types.Weekday;
 @UtilityClass
 public class CalendarUtils {
 
+  /** Number of dates from a queried date to search at a time, to improve performance */
+  private static final List<Integer> LAZY_SPLIT_AMOUNTS = List.of(
+    7,
+    30,
+    180,
+    365,
+    Integer.MAX_VALUE
+  );
+
   /**
    * Take a provided calendar and split it into a series of dates
-   * @param calendar the calendar to split into dates
-   * @param dates the map of dates to fill (in-place)
-   * @param boundStartDate the first date to include; if the calendar starts
-   *        before this date, the extra will be ignored
-   * @param boundEndDate the last date to include; if the calendar ends after
-   *        this date, the extra will be ignored
+   *
+   * @param calendar       the calendar to split into dates
+   * @param dates          the map of dates to fill (in-place)
+   * @param boundStartDate the first date to include; if the calendar starts before this date, the
+   *                       extra will be ignored
+   * @param boundEndDate   the last date to include; if the calendar ends after this date, the extra
+   *                       will be ignored
    */
   public static void splitCalendarIntoDates(
     Calendar calendar,
@@ -61,12 +71,13 @@ public class CalendarUtils {
 
   /**
    * Take a provided calendar and split its exceptions into a series of dates
-   * @param calendar the calendar with exceptions to split
-   * @param dates the map of dates to fill (in-place)
-   * @param startDate the first date to include; if the calendar starts
-   *        before this date, the extra will be ignored
-   * @param endDate the last date to include; if the calendar ends after
-   *        this date, the extra will be ignored
+   *
+   * @param calendar  the calendar with exceptions to split
+   * @param dates     the map of dates to fill (in-place)
+   * @param startDate the first date to include; if the calendar starts before this date, the extra
+   *                  will be ignored
+   * @param endDate   the last date to include; if the calendar ends after this date, the extra will
+   *                  be ignored
    */
   protected static void addExceptionsToDateMap(
     Calendar calendar,
@@ -119,13 +130,14 @@ public class CalendarUtils {
   }
 
   /**
-   * Take a provided map of weekdays/time ranges representing normal openings
-   * and split them into concrete dates for each opening
-   * @param dates the map of dates to fill (in-place)
-   * @param startDate the first date to include; if the calendar starts
-   *        before this date, the extra will be ignored
-   * @param endDate the last date to include; if the calendar ends after
-   *        this date, the extra will be ignored
+   * Take a provided map of weekdays/time ranges representing normal openings and split them into
+   * concrete dates for each opening
+   *
+   * @param dates          the map of dates to fill (in-place)
+   * @param startDate      the first date to include; if the calendar starts before this date, the
+   *                       extra will be ignored
+   * @param endDate        the last date to include; if the calendar ends after this date, the extra
+   *                       will be ignored
    * @param normalOpenings a map of weekdays to their time ranges
    */
   protected static void addNormalOpeningsToDateMap(
@@ -170,12 +182,12 @@ public class CalendarUtils {
   }
 
   /**
-   * Take a map of dates and fill in any empty slots with
-   * {@link SingleDayOpeningDTO SingleDayOpeningDTOs} representing regular
-   * closures
-   * @param dates the map to fill (in-place)
+   * Take a map of dates and fill in any empty slots with {@link SingleDayOpeningDTO
+   * SingleDayOpeningDTOs} representing regular closures
+   *
+   * @param dates     the map to fill (in-place)
    * @param startDate the first date to consider
-   * @param endDate the last date to consider
+   * @param endDate   the last date to consider
    */
   public static void fillClosedDates(
     Map<LocalDate, SingleDayOpeningDTO> dates,
@@ -200,12 +212,12 @@ public class CalendarUtils {
   }
 
   /**
-   * Convert a map of dates to {@link SingleDayOpeningDTO SingleDayOpeningDTOs}
-   * into a {@link SingleDayOpeningCollectionDTO SingleDayOpeningCollectionDTO}
-   * with pagination
-   * @param dates the map of dates to convert
+   * Convert a map of dates to {@link SingleDayOpeningDTO SingleDayOpeningDTOs} into a
+   * {@link SingleDayOpeningCollectionDTO SingleDayOpeningCollectionDTO} with pagination
+   *
+   * @param dates  the map of dates to convert
    * @param offset the number of items to skip, for pagination
-   * @param limit the maximum number of items to include, for pagination
+   * @param limit  the maximum number of items to include, for pagination
    * @return a DTO collection ready for API return
    */
   public static SingleDayOpeningCollectionDTO openingMapToCollection(
@@ -221,39 +233,60 @@ public class CalendarUtils {
   }
 
   /**
-   * Extracts one calendar at a time out of the provided calendars, splitting
-   * it into dates, until at least one opening is found.  The opening will not
-   * be returned directly, but placed into the provided {@code map}.
+   * Extracts one calendar at a time out of the provided calendars, splitting it into dates, until at
+   * least one opening is found. The opening will not be returned directly, but placed into the
+   * provided {@code map}.
    *
-   * @param map the map to store opening information in
+   * @param map              the map to store/retrieve opening information in/from
    * @param calendarIterator an iterator of calendars to examine
+   * @param focalDate        the date to search around
+   * @param direction        the direction to search in
+   * @param fallbackDate     the date to use if no opening is found
    */
-  protected static SingleDayOpeningDTO getFirstOpeningFromCalendarList(
+  public static SingleDayOpeningDTO getFirstOpeningFromCalendarList(
     SortedMap<LocalDate, SingleDayOpeningDTO> map,
     Iterator<Calendar> calendarIterator,
-    LocalDate fallbackDate,
-    Function<SortedMap<LocalDate, SingleDayOpeningDTO>, LocalDate> keyGetter,
-    Predicate<LocalDate> inRange
+    LocalDate focalDate,
+    SearchDirection direction,
+    LocalDate fallbackDate
   ) {
+    Predicate<LocalDate> isInRange;
+    Function<Calendar, LocalDate> dateHinter;
+    Function<SortedMap<LocalDate, SingleDayOpeningDTO>, LocalDate> keyGetter;
+
+    switch (direction) {
+      case FORWARD -> {
+        isInRange = openingDate -> openingDate.isAfter(focalDate);
+        dateHinter = calendar -> DateUtils.max(focalDate, calendar.getStartDate());
+        keyGetter = SortedMap::firstKey;
+      }
+      case BACKWARD -> {
+        isInRange = openingDate -> openingDate.isBefore(focalDate);
+        dateHinter = calendar -> DateUtils.min(focalDate, calendar.getEndDate());
+        keyGetter = SortedMap::lastKey;
+      }
+      default -> throw new IllegalArgumentException("SearchDirection.BOTH is not supported here");
+    }
     // find dates < date with openings while there are more calendars to consume
     // and a date has not been found yet
     while (calendarIterator.hasNext() && map.isEmpty()) {
       Calendar currentCalendar = calendarIterator.next();
 
-      SortedMap<LocalDate, SingleDayOpeningDTO> additionalDates = new TreeMap<>();
-      splitCalendarIntoDates(
+      SortedMap<LocalDate, SingleDayOpeningDTO> additionalDates = lazySplitCalendarIntoDates(
         currentCalendar,
-        additionalDates,
-        currentCalendar.getStartDate(),
-        currentCalendar.getEndDate()
+        dateHinter.apply(currentCalendar),
+        direction,
+        false
       );
 
       // remove exceptional closures for surrounding openings
       additionalDates
         .entrySet()
-        .removeIf(entry -> !entry.getValue().isOpen() || !inRange.test(entry.getValue().getDate()));
+        .removeIf(entry -> !entry.getValue().isOpen() || !isInRange.test(entry.getValue().getDate())
+        );
       map.putAll(additionalDates);
     }
+
     if (map.isEmpty()) {
       return SingleDayOpeningDTO
         .builder()
@@ -268,12 +301,111 @@ public class CalendarUtils {
   }
 
   /**
+   * Take a provided calendar and split it into a series of dates, inserting it into the provided map
+   * until the map contains at least one date before and after {@code focalDate}, or the calendar is
+   * exhausted.
+   *
+   * @param calendar  the calendar to split into dates
+   * @param focalDate the date to find adjacent openings for
+   */
+  public static SortedMap<LocalDate, SingleDayOpeningDTO> lazySplitCalendarIntoDates(
+    Calendar calendar,
+    LocalDate focalDate,
+    SearchDirection direction,
+    boolean includeClosures
+  ) {
+    SortedMap<LocalDate, SingleDayOpeningDTO> dates = new TreeMap<>();
+
+    // insert focal date first, to make first/last key operations safe
+    splitCalendarIntoDates(calendar, dates, focalDate, focalDate);
+    dates.putIfAbsent(focalDate, null);
+
+    // calculate previous
+    if (direction == SearchDirection.BACKWARD || direction == SearchDirection.BOTH) {
+      LocalDate oldestSearchDate = focalDate;
+      for (int lookbackAmount : LAZY_SPLIT_AMOUNTS) {
+        LocalDate newStartRange = DateUtils.max(
+          focalDate.minusDays(lookbackAmount),
+          calendar.getStartDate()
+        );
+
+        // already found one, or cannot go back any further
+        if (dates.firstKey().isBefore(focalDate) || newStartRange.isEqual(oldestSearchDate)) {
+          break;
+        }
+
+        splitCalendarIntoDates(calendar, dates, newStartRange, oldestSearchDate.minusDays(1));
+        if (!includeClosures) {
+          dates.headMap(focalDate).entrySet().removeIf(entry -> !entry.getValue().isOpen());
+        } else if (
+          // if we retain closures, we need more complex logic to ensure we don't break before
+          // finding an opening, if available. if closures are filtered out (as above), the regular
+          // `firstKey` check suffices.
+          dates
+            .headMap(oldestSearchDate)
+            .values()
+            .stream()
+            .anyMatch(o -> Boolean.TRUE.equals(o.isOpen()))
+        ) {
+          break;
+        }
+        oldestSearchDate = newStartRange;
+      }
+    }
+
+    // calculate next
+    if (direction == SearchDirection.FORWARD || direction == SearchDirection.BOTH) {
+      LocalDate newestSearchDate = focalDate;
+      for (int lookaheadAmount : LAZY_SPLIT_AMOUNTS) {
+        LocalDate newEndRange = DateUtils.min(
+          focalDate.plusDays(lookaheadAmount),
+          calendar.getEndDate()
+        );
+
+        // already found one, or cannot go forward any further
+        if (dates.lastKey().isAfter(focalDate) || newEndRange.isEqual(newestSearchDate)) {
+          break;
+        }
+
+        splitCalendarIntoDates(calendar, dates, newestSearchDate.plusDays(1), newEndRange);
+        if (!includeClosures) {
+          dates
+            .tailMap(focalDate.plusDays(1))
+            .entrySet()
+            .removeIf(entry -> !entry.getValue().isOpen());
+        } else if (
+          // if we retain closures, we need more complex logic to ensure we don't break before
+          // finding an opening, if available. if closures are filtered out (as above), the regular
+          // `lastKey` check suffices.
+          dates
+            .tailMap(newestSearchDate.plusDays(1))
+            .values()
+            .stream()
+            .anyMatch(o -> Boolean.TRUE.equals(o.isOpen()))
+        ) {
+          break;
+        }
+        newestSearchDate = newEndRange;
+      }
+    }
+
+    if (
+      dates.get(focalDate) == null ||
+      (!includeClosures && dates.get(focalDate).getOpenings().isEmpty())
+    ) {
+      dates.remove(focalDate);
+    }
+
+    return dates;
+  }
+
+  /**
    * Query a list of calendars for openings surrounding a given date
    *
    * @param calendars the list of calendars to examine
-   * @param date the date to query
-   * @return an {@link SurroundingOpeningsDTO SurroundingOpeningsDTO}
-   *         representing the opening information
+   * @param date      the date to query
+   * @return a {@link SurroundingOpeningsDTO SurroundingOpeningsDTO} representing the opening
+   *         information
    */
   public static SurroundingOpeningsDTO getSurroundingOpenings(
     List<Calendar> calendars,
@@ -304,11 +436,8 @@ public class CalendarUtils {
     // the current date does fall inside a calendar
     if (dateIndex >= 0) {
       Calendar currentCalendar = calendars.get(dateIndex);
-      CalendarUtils.splitCalendarIntoDates(
-        currentCalendar,
-        dates,
-        currentCalendar.getStartDate(),
-        currentCalendar.getEndDate()
+      dates.putAll(
+        CalendarUtils.lazySplitCalendarIntoDates(currentCalendar, date, SearchDirection.BOTH, true)
       );
 
       // if the calendar is closed on the queried date, do not overwrite the closure above
@@ -318,8 +447,6 @@ public class CalendarUtils {
 
       // remove exceptional closures for surrounding openings
       dates.entrySet().removeIf(entry -> !entry.getValue().isOpen());
-      // start at the calendar directly after for > date
-      dateIndex++;
     } else {
       // binary search returns next-greatest index by -(index) - 1
       // this undoes this, yielding the first place to look for > date
@@ -333,18 +460,19 @@ public class CalendarUtils {
       beforeDateMap,
       // array deque needed to provide reversed sorting
       // subList from [0, dateIndex)
-      new ArrayDeque<>(calendars.subList(0, dateIndex)).descendingIterator(),
-      date.minusDays(1),
-      SortedMap::lastKey,
-      openingDate -> openingDate.isBefore(date)
+      new ArrayDeque<>(calendars.subList(0, Math.min(dateIndex + 1, calendars.size())))
+        .descendingIterator(),
+      date,
+      SearchDirection.BACKWARD,
+      date.minusDays(1)
     );
     SingleDayOpeningDTO next = CalendarUtils.getFirstOpeningFromCalendarList(
       afterDateMap,
       // subList from [dateIndex, end)
       calendars.listIterator(dateIndex),
-      date.plusDays(1),
-      SortedMap::firstKey,
-      openingDate -> openingDate.isAfter(date)
+      date,
+      SearchDirection.FORWARD,
+      date.plusDays(1)
     );
 
     return SurroundingOpeningsDTO
@@ -353,5 +481,11 @@ public class CalendarUtils {
       .opening(current)
       .opening(next)
       .build();
+  }
+
+  public enum SearchDirection {
+    BOTH,
+    BACKWARD,
+    FORWARD,
   }
 }
