@@ -72,16 +72,6 @@ public abstract class AbstractCalendarException extends RuntimeException {
     errorBuilder = errorBuilder.code(this.getErrorCode());
     errorBuilder = errorBuilder.message(this.getMessage());
     errorBuilder = errorBuilder.data(this.getData());
-    for (StackTraceElement frame : this.getStackTrace()) {
-      errorBuilder = errorBuilder.traceItem(frame.toString());
-    }
-    if (this.getCause() != null) {
-      errorBuilder = errorBuilder.traceItem("----------------- CAUSED BY -----------------");
-      errorBuilder = errorBuilder.traceItem(this.getCause().getMessage());
-      for (StackTraceElement frame : this.getCause().getStackTrace()) {
-        errorBuilder = errorBuilder.traceItem(frame.toString());
-      }
-    }
     Map<String, Object> errorParameters = new HashMap<>();
     for (Entry<String, Object> parameter : this.getParameters().getMap().entrySet()) {
       errorParameters.put(parameter.getKey(), parameter.getValue());
