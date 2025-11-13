@@ -1,3 +1,7 @@
+## 3.3.1 2025-11-13 Sunflower CSP #3
+* Improve performance in computing surrounding openings for large calendars ([MODCAL-143](https://folio-org.atlassian.net/browse/MODCAL-143))
+* Add `apk upgrade` to Dockerfile to ensure latest security patches per upstream recommendations (#208)
+
 ## 3.3.0 2025-03-06
 * Update to Java v21 ([FOLIO-4249](https://folio-org.atlassian.net/browse/FOLIO-4249))
 
