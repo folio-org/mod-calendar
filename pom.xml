@@ -34,7 +34,7 @@
     <developerConnection>
       scm:git:git@github.com:folio-org/${project.artifactId}.git
     </developerConnection>
-    <tag>v3.0.0</tag>
+    <tag>v3.3.1</tag>
   </scm>
 
   <distributionManagement>
