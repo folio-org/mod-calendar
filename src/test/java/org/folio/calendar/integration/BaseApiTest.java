@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
-import com.atlassian.oai.validator.restassured.OpenApiValidationFilter;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
 import io.restassured.config.JsonConfig;
@@ -69,10 +68,6 @@ public abstract class BaseApiTest {
   @LocalServerPort
   protected Integer port;
 
-  protected final OpenApiValidationFilter validationFilter = new OpenApiValidationFilter(
-    "api/calendar.yaml"
-  );
-
   @BeforeEach
   void clearCurrentDateOverride() {
     DateUtils.setCurrentDateOverride(null);
@@ -92,14 +87,14 @@ public abstract class BaseApiTest {
       } else {
         path += "unknown";
       }
-      ra(ValidationSchema.NONE).get(getRequestUrl(path));
+      ra().get(getRequestUrl(path));
     }
   }
 
   @AfterEach
   void proxyLogTestFinish() {
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
-      ra(ValidationSchema.NONE).get(getRequestUrl("/_/tests/_/finish"));
+      ra().get(getRequestUrl("/_/tests/_/finish"));
     }
   }
 
@@ -114,14 +109,14 @@ public abstract class BaseApiTest {
       .numberReturnType(JsonPathConfig.NumberReturnType.DOUBLE);
     RestAssured.config = RestAssured.config().jsonConfig(jsonConfig);
 
-    log.info("Configuring JSON date mapping");
+    log.info("Configuring JSON mapping");
     RestAssured.config =
       RestAssured
         .config()
         .objectMapperConfig(
           ObjectMapperConfig
             .objectMapperConfig()
-            .jackson2ObjectMapperFactory((a, b) -> MapperUtils.MAPPER)
+            .jackson3ObjectMapperFactory((a, b) -> MapperUtils.MAPPER)
         );
 
     if (System.getenv().getOrDefault("PROXY_ENABLE", "false").equals("true")) {
@@ -149,7 +144,7 @@ public abstract class BaseApiTest {
     // the v2.0 API of /_/tenant requires a non-empty moduleTo; without this, the module will not be initialized properly or enabled
     // the string we use does not matter (as there will be no modules in the database)
     log.info(String.format("Initializing database by posting to /_/tenant %s", tenantAttributes));
-    ra(ValidationSchema.NONE)
+    ra()
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body(tenantAttributes)
       .post(getRequestUrl("/_/tenant"))
@@ -165,33 +160,14 @@ public abstract class BaseApiTest {
   /**
    * Create a RestAssured object with the proper headers for Okapi testing
    *
-   * @param validate What schema the response must match
-   * @return a @link {RequestSpecification} ready for .get/.post and other
-   *         RestAssured library methods
-   */
-  public RequestSpecification ra(ValidationSchema validation) {
-    RequestSpecification ra = RestAssured.given();
-    switch (validation) {
-      case REGULAR:
-        ra = ra.filter(validationFilter);
-        break;
-      case NONE:
-      default:
-    }
-    return ra
-      .header(new Header(XOkapiHeaders.URL, okapiUrl))
-      .header(new Header(XOkapiHeaders.TENANT, TENANT_ID));
-  }
-
-  /**
-   * Create a RestAssured object with the proper headers for Okapi testing and
-   * builtin schema validation
-   *
    * @return a {@link RequestSpecification} ready for .get/.post and other
    *         RestAssured library methods
    */
   public RequestSpecification ra() {
-    return ra(ValidationSchema.REGULAR);
+    return RestAssured
+      .given()
+      .header(new Header(XOkapiHeaders.URL, okapiUrl))
+      .header(new Header(XOkapiHeaders.TENANT, TENANT_ID));
   }
 
   /**

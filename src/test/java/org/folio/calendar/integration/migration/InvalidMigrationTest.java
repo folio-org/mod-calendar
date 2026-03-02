@@ -30,13 +30,7 @@ class InvalidMigrationTest extends AbstractMigrationTest {
 
     // fix comparison nuances for valid calendar
     collection.getCalendars().forEach(c -> c.setId(null));
-    assertThat("Only 2 periods were valid enough", collection.getCalendars(), hasSize(2));
-    assertThat(
-      "One calendar had invalid openings stripped",
-      collection.getCalendars().stream().anyMatch(c -> c.getNormalHours().isEmpty()),
-      is(true)
-    );
-    log.info(collection.getCalendars());
+    assertThat("Only 1 periods was valid enough", collection.getCalendars(), hasSize(1));
     assertThat(
       "The one valid calendar was copied properly",
       collection

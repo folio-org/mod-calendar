@@ -3,7 +3,6 @@ package org.folio.calendar.integration.api.health;
 import static org.hamcrest.Matchers.is;
 
 import org.folio.calendar.integration.BaseApiTest;
-import org.folio.calendar.integration.ValidationSchema;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -18,7 +17,7 @@ class OkapiHealthTest extends BaseApiTest {
 
   @Test
   void testOkStatusReport() {
-    ra(ValidationSchema.NONE) // must not validate as /admin/health is not in our schema
+    ra() // must not validate as /admin/health is not in our schema
       .get(getRequestUrl("/admin/health/"))
       .then()
       .statusCode(is(HttpStatus.OK.value()));

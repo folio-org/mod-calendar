@@ -1,16 +1,18 @@
 package org.folio.calendar.domain.legacy.dto;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import java.io.IOException;
+import java.io.Serializable;
 import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 /**
  * Deserializer for {@link LegacyPeriodDate LegacyPeriodDate} objects from JSON strings
  */
-public class LegacyPeriodDateDeserializer extends StdDeserializer<LegacyPeriodDate> {
+public class LegacyPeriodDateDeserializer
+  extends StdDeserializer<LegacyPeriodDate>
+  implements Serializable {
 
   @Autowired
   private transient TranslationService translationService;
@@ -24,8 +26,7 @@ public class LegacyPeriodDateDeserializer extends StdDeserializer<LegacyPeriodDa
   }
 
   @Override
-  public LegacyPeriodDate deserialize(JsonParser jsonParser, DeserializationContext context)
-    throws IOException {
-    return new LegacyPeriodDate(translationService, jsonParser.getText());
+  public LegacyPeriodDate deserialize(JsonParser jsonParser, DeserializationContext context) {
+    return new LegacyPeriodDate(translationService, jsonParser.getString());
   }
 }
