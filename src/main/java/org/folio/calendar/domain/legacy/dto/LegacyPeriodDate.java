@@ -1,13 +1,13 @@
 package org.folio.calendar.domain.legacy.dto;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDate;
 import lombok.Data;
 import org.folio.calendar.domain.request.LegacyTranslationKey;
 import org.folio.calendar.exception.ExceptionParameters;
 import org.folio.calendar.exception.InvalidDataException;
 import org.folio.spring.i18n.service.TranslationService;
+import tools.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * A JSON wrapper for LocalDates that supports serialization/deserialization as midnight GMT timestamps

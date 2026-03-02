@@ -1,7 +1,5 @@
 package org.folio.calendar.domain.legacy.mapper;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -15,6 +13,8 @@ import org.folio.spring.i18n.service.TranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Conversion class between openings from the legacy RMB-based schema to a {@link PeriodDTO Period}
@@ -37,7 +37,7 @@ public class RMBOpeningMapper implements RowMapper<PeriodDTO> {
   public PeriodDTO mapRow(ResultSet result, int rowNum) throws SQLException {
     try {
       JsonNode json = mapper.readTree(result.getString("jsonb"));
-      UUID openingId = UUID.fromString(json.get("id").asText());
+      UUID openingId = UUID.fromString(json.get("id").asString());
 
       log.info(String.format("Attempting to migrate period %s", openingId));
 
@@ -53,10 +53,10 @@ public class RMBOpeningMapper implements RowMapper<PeriodDTO> {
       return PeriodDTO
         .builder()
         .id(openingId)
-        .servicePointId(UUID.fromString(json.get("servicePointId").asText()))
-        .name(json.get("name").asText())
-        .startDate(new LegacyPeriodDate(translationService, json.get("startDate").asText()))
-        .endDate(new LegacyPeriodDate(translationService, json.get("endDate").asText()))
+        .servicePointId(UUID.fromString(json.get("servicePointId").asString()))
+        .name(json.get("name").asString())
+        .startDate(new LegacyPeriodDate(translationService, json.get("startDate").asString()))
+        .endDate(new LegacyPeriodDate(translationService, json.get("endDate").asString()))
         .openingDays(openings)
         .build();
     } catch (Exception e) {

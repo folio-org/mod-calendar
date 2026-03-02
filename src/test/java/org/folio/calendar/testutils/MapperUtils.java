@@ -1,16 +1,15 @@
 package org.folio.calendar.testutils;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.experimental.UtilityClass;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 @UtilityClass
 public class MapperUtils {
 
-  public static final ObjectMapper MAPPER = new ObjectMapper()
-    .registerModule(new JavaTimeModule())
-    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-    .setSerializationInclusion(Include.NON_NULL);
+  public static final ObjectMapper MAPPER = JsonMapper
+    .builder()
+    .changeDefaultPropertyInclusion(i -> i.withContentInclusion(JsonInclude.Include.NON_NULL))
+    .build();
 }

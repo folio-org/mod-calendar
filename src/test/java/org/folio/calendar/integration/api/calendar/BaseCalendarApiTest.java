@@ -11,7 +11,6 @@ import lombok.Singular;
 import org.folio.calendar.domain.entity.Calendar;
 import org.folio.calendar.domain.mapper.CalendarMapper;
 import org.folio.calendar.integration.BaseApiAutoDatabaseTest;
-import org.folio.calendar.integration.ValidationSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -58,7 +57,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendCalendarCreationRequest(Calendar calendar, String userId) {
-    return ra(ValidationSchema.REGULAR)
+    return ra()
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .header("x-okapi-user-id", userId)
       .body(calendarMapper.toDto(calendar))
@@ -71,9 +70,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendCalendarGetRequest(UUID id) {
-    return ra(ValidationSchema.REGULAR)
-      .pathParam("calendarId", id)
-      .get(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
+    return ra().pathParam("calendarId", id).get(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -84,9 +81,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
   public Response sendCalendarDeleteRequest(UUID id) {
     // spec must be ignored as the validator improperly flags comma-separated UUIDs
     // as being illegal
-    return ra(ValidationSchema.REGULAR)
-      .pathParam("calendarId", id)
-      .delete(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
+    return ra().pathParam("calendarId", id).delete(getRequestUrl(SINGLE_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -95,9 +90,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendMultiCalendarDeleteRequest(List<UUID> ids) {
-    return ra(ValidationSchema.REGULAR)
-      .queryParam("id", ids)
-      .delete(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
+    return ra().queryParam("id", ids).delete(getRequestUrl(COLLECTION_CALENDAR_API_ROUTE));
   }
 
   /**
@@ -129,7 +122,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    * @return the Response
    */
   public Response sendCalendarUpdateRequest(UUID id, Calendar calendar, String userId) {
-    return ra(ValidationSchema.REGULAR)
+    return ra()
       .pathParam("calendarId", id.toString())
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .header("x-okapi-user-id", userId)
@@ -169,7 +162,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    *         or Internal server error (status code 500)
    */
   public Response sendCalendarSearchRequest(SearchRequestParameters parameters) {
-    RequestSpecification request = ra(ValidationSchema.REGULAR);
+    RequestSpecification request = ra();
     if (parameters.getCalendarIds() != null && !parameters.getCalendarIds().isEmpty()) {
       request = request.queryParam("id", parameters.getCalendarIds());
     }
@@ -219,7 +212,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
     Integer offset,
     Integer limit
   ) {
-    RequestSpecification ra = ra(ValidationSchema.REGULAR)
+    RequestSpecification ra = ra()
       .pathParam("servicePointId", servicePointId.toString())
       .queryParam("startDate", startDate.toString())
       .queryParam("endDate", endDate.toString())
@@ -246,7 +239,7 @@ public abstract class BaseCalendarApiTest extends BaseApiAutoDatabaseTest {
    *         or Internal server error (status code 500)
    */
   public Response getSurroundingOpenings(UUID servicePointId, LocalDate date) {
-    return ra(ValidationSchema.REGULAR)
+    return ra()
       .pathParam("servicePointId", servicePointId.toString())
       .queryParam("date", date.toString())
       .get(getRequestUrl(GET_SURROUNDING_DATES_API_ROUTE));

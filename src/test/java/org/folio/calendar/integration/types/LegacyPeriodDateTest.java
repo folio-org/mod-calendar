@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThrows;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import org.folio.calendar.domain.legacy.dto.LegacyPeriodDate;
 import org.folio.calendar.domain.legacy.dto.LegacyPeriodDateConverter;
 import org.folio.calendar.exception.InvalidDataException;
@@ -19,7 +17,7 @@ class LegacyPeriodDateTest extends BaseApiTest {
   LegacyPeriodDateConverter converter;
 
   @Test
-  void testParseInvalidDate() throws JsonMappingException, JsonProcessingException {
+  void testParseInvalidDate() {
     assertThrows(
       "An invalid small string cannot be parsed as a legacy date",
       InvalidDataException.class,
@@ -28,7 +26,7 @@ class LegacyPeriodDateTest extends BaseApiTest {
   }
 
   @Test
-  void testParseInvalidLongDate() throws JsonMappingException, JsonProcessingException {
+  void testParseInvalidLongDate() {
     assertThrows(
       "An invalid long string cannot be parsed as a legacy date",
       InvalidDataException.class,

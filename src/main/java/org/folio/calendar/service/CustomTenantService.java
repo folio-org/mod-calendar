@@ -1,9 +1,5 @@
 package org.folio.calendar.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 @Log4j2
 @Primary
@@ -38,6 +35,8 @@ public class CustomTenantService extends TenantService {
   protected final CalendarService calendarService;
   protected final CalendarValidationService calendarValidationService;
   protected final TranslationService translationService;
+
+  protected final ObjectMapper objectMapper;
 
   protected List<Calendar> calendarsToMigrate;
 
@@ -55,12 +54,14 @@ public class CustomTenantService extends TenantService {
     FolioSpringLiquibase folioSpringLiquibase,
     CalendarService calendarService,
     CalendarValidationService calendarValidationService,
-    TranslationService translationService
+    TranslationService translationService,
+    ObjectMapper objectMapper
   ) {
     super(jdbcTemplate, context, folioSpringLiquibase);
     this.calendarService = calendarService;
     this.calendarValidationService = calendarValidationService;
     this.translationService = translationService;
+    this.objectMapper = objectMapper;
     this.calendarsToMigrate = new ArrayList<>();
   }
 
@@ -84,14 +85,9 @@ public class CustomTenantService extends TenantService {
     if (shouldMigrate) {
       log.info("Existing RMB installation detected.  Attempting migration.");
 
-      ObjectMapper mapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-        .setSerializationInclusion(Include.NON_NULL);
-
       List<PeriodDTO> periodsToMigrate = jdbcTemplate.query(
         GET_RMB_OPENINGS,
-        new RMBOpeningMapper(jdbcTemplate, mapper)
+        new RMBOpeningMapper(jdbcTemplate, objectMapper)
       );
       periodsToMigrate.removeAll(Collections.singletonList(null));
 
@@ -118,8 +114,7 @@ public class CustomTenantService extends TenantService {
         this.calendarValidationService.validate(calendar);
         this.calendarService.saveCalendar(calendar);
       } catch (RuntimeException e) {
-        log.error("Could not save calendar {}", calendar);
-        log.error(e);
+        log.error("Could not save calendar: {}", calendar, e);
       }
     }
   }

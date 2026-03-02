@@ -11,7 +11,6 @@ import org.folio.calendar.domain.dto.ErrorCodeDTO;
 import org.folio.calendar.domain.dto.ErrorDTO;
 import org.folio.calendar.domain.dto.ErrorResponseDTO;
 import org.folio.calendar.integration.BaseApiTest;
-import org.folio.calendar.integration.ValidationSchema;
 import org.folio.calendar.integration.api.calendar.BaseCalendarApiTest;
 import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
@@ -26,7 +25,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   @Test
   void testInvalidGetApiRoute() {
-    Response response = ra(ValidationSchema.NONE).get(getRequestUrl(BAD_API_ROUTE));
+    Response response = ra().get(getRequestUrl(BAD_API_ROUTE));
 
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
@@ -56,7 +55,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   @Test
   void testInvalidPostApiRoute() {
-    Response response = ra(ValidationSchema.NONE).post(getRequestUrl(BAD_API_ROUTE));
+    Response response = ra().post(getRequestUrl(BAD_API_ROUTE));
 
     response.then().statusCode(is(HttpStatus.NOT_FOUND.value()));
 
@@ -86,8 +85,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   @Test
   void testInvalidMethodToValidApiRoute() {
-    Response response = ra(ValidationSchema.NONE)
-      .patch(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
+    Response response = ra().patch(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
 
     response.then().statusCode(is(HttpStatus.METHOD_NOT_ALLOWED.value()));
 
@@ -117,7 +115,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   @Test
   void testInvalidParametersToValidApiRoute() {
-    Response response = ra(ValidationSchema.NONE)
+    Response response = ra()
       .post(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_INVALID)));
 
     response.then().statusCode(is(HttpStatus.BAD_REQUEST.value()));
@@ -148,7 +146,7 @@ class ApiExceptionHandlerTest extends BaseApiTest {
 
   @Test
   void testInvalidRequestBody() {
-    Response response = ra(ValidationSchema.NONE)
+    Response response = ra()
       .contentType(MediaType.APPLICATION_JSON_VALUE)
       .body("{}")
       .post(getRequestUrl(String.format(VALID_API_ROUTE, UUIDs.UUID_0)));
