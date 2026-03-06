@@ -57,7 +57,7 @@
   <properties>
     <java.version>21</java.version>
     <folio-spring.version>10.0.0-RC1</folio-spring.version>
-    <openapi-generator.version>7.3.0</openapi-generator.version>
+    <openapi-generator.version>7.20.0</openapi-generator.version>
     <lombok-maven-plugin.version>1.18.36</lombok-maven-plugin.version>
 
     <calendar-api-defintions-yaml-file>
@@ -69,7 +69,7 @@
     <embedded-database-spring-test.version>2.6.0</embedded-database-spring-test.version>
     <hamcrest-date-matcher.version>2.0.8</hamcrest-date-matcher.version>
     <hamcrest-optional.version>2.0.0</hamcrest-optional.version>
-    <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
     <mapstruct.version>1.6.3</mapstruct.version>
     <testcontainers.version>1.21.4</testcontainers.version>
   </properties>
@@ -405,7 +405,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.6.3</version>
         <configuration>
           <executable>java</executable>
           <arguments>
@@ -453,7 +453,7 @@
       <plugin>
         <groupId>org.folio</groupId>
         <artifactId>folio-module-descriptor-validator</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
         <executions>
           <execution>
             <goals>
