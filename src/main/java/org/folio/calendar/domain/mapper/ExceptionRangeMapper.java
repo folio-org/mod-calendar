@@ -19,7 +19,6 @@ public interface ExceptionRangeMapper {
   ExceptionRangeMapper INSTANCE = Mappers.getMapper(ExceptionRangeMapper.class);
 
   @Mapping(target = "calendarId", ignore = true)
-  @Mapping(target = "opening", ignore = true)
   ExceptionRangeDTO toDto(ExceptionRange source);
 
   default ExceptionRange fromDto(ExceptionRangeDTO source) {

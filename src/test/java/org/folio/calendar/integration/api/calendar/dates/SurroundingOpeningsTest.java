@@ -93,13 +93,13 @@ class SurroundingOpeningsTest extends BaseCalendarApiTest {
           .date(Dates.DATE_2021_08_19)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
