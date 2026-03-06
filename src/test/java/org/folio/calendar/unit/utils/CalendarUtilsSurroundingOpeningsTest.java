@@ -514,9 +514,7 @@ class CalendarUtilsSurroundingOpeningsTest {
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_12_30)
-              .build()
-          ))
-          .openings(List.of(
+              .build(),
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_23_00)
