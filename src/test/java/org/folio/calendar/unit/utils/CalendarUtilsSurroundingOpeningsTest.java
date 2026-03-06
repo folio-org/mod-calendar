@@ -151,13 +151,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_01_04)
           .open(true)
           .allDay(false)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_04_00)
               .endTime(Times.TIME_14_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build(),
         SingleDayOpeningDTO
@@ -165,13 +165,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_01_05)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build(),
         SingleDayOpeningDTO
@@ -179,13 +179,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_01_06)
           .open(true)
           .allDay(false)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_23_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -211,20 +211,18 @@ class CalendarUtilsSurroundingOpeningsTest {
             .date(Dates.DATE_2021_01_04)
             .open(true)
             .allDay(false)
-            .opening(
+            .openings(List.of(
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_00_00)
                 .endTime(Times.TIME_12_30)
-                .build()
-            )
-            .opening(
+                .build(),
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_23_00)
                 .endTime(Times.TIME_23_59)
                 .build()
-            )
+            ))
             .exceptional(false)
             .build()
         ),
@@ -234,20 +232,18 @@ class CalendarUtilsSurroundingOpeningsTest {
             .date(Dates.DATE_2021_01_04)
             .open(true)
             .allDay(false)
-            .opening(
+            .openings(List.of(
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_23_00)
                 .endTime(Times.TIME_23_59)
-                .build()
-            )
-            .opening(
+                .build(),
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_00_00)
                 .endTime(Times.TIME_12_30)
                 .build()
-            )
+            ))
             .exceptional(false)
             .build()
         )
@@ -273,13 +269,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_01_07)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -318,13 +314,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_03_18)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -349,13 +345,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_01_07)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build(),
         SingleDayOpeningDTO
@@ -394,13 +390,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_07_01)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build(),
         SingleDayOpeningDTO
@@ -416,13 +412,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_08_19)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -461,13 +457,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_08_19)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -492,13 +488,13 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_04_29)
           .open(true)
           .allDay(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build(),
         SingleDayOpeningDTO
@@ -513,20 +509,20 @@ class CalendarUtilsSurroundingOpeningsTest {
           .date(Dates.DATE_2021_05_03)
           .open(true)
           .allDay(false)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_12_30)
               .build()
-          )
-          .opening(
+          ))
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_23_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )

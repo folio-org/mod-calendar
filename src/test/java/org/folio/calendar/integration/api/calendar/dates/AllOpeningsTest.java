@@ -19,6 +19,8 @@ import org.folio.calendar.testconstants.UUIDs;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 class AllOpeningsTest extends BaseCalendarApiTest {
 
   @Test
@@ -103,13 +105,13 @@ class AllOpeningsTest extends BaseCalendarApiTest {
           .builder()
           .date(Dates.DATE_2021_01_04)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_04_00)
               .endTime(Times.TIME_14_59)
               .build()
-          )
+          ))
           .allDay(false)
           .exceptional(true)
           .exceptionName(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_THRU_JAN_4.getName())
@@ -118,13 +120,13 @@ class AllOpeningsTest extends BaseCalendarApiTest {
           .builder()
           .date(Dates.DATE_2021_01_07)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .allDay(true)
           .exceptional(false)
           .build()

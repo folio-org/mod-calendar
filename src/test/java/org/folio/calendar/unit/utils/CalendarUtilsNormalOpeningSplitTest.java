@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningRangeDTO;
@@ -52,13 +53,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_04)
           .allDay(false)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_12_30)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -86,13 +87,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_03)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -106,13 +107,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_04)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -140,13 +141,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_06)
           .allDay(false)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_23_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -160,13 +161,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_07)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -180,13 +181,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_01)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -200,13 +201,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_02)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -220,13 +221,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_03)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -253,13 +254,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_03)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -273,20 +274,18 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_04)
           .allDay(false)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_04_00)
-              .build()
-          )
-          .opening(
+              .build(),
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_23_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )
@@ -300,13 +299,13 @@ class CalendarUtilsNormalOpeningSplitTest {
           .date(Dates.DATE_2021_01_05)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(false)
           .build()
       )

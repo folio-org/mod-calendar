@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.folio.calendar.domain.dto.SingleDayOpeningDTO;
 import org.folio.calendar.domain.dto.SingleDayOpeningRangeDTO;
@@ -92,13 +93,13 @@ class CalendarUtilsExceptionSplitTest {
           .date(Dates.DATE_2021_01_04)
           .allDay(true)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_00_00)
               .endTime(Times.TIME_23_59)
               .build()
-          )
+          ))
           .exceptional(true)
           .exceptionName(ExceptionRanges.OPEN_ALL_DAY_JAN_1_THRU_JAN_4.getName())
           .build()
@@ -127,13 +128,13 @@ class CalendarUtilsExceptionSplitTest {
             .date(Dates.DATE_2021_01_01)
             .allDay(false)
             .open(true)
-            .opening(
+            .openings(List.of(
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_04_00)
                 .endTime(Times.TIME_14_59)
                 .build()
-            )
+            ))
             .exceptional(true)
             .exceptionName(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_AND_JAN_4.getName())
             .build()
@@ -167,13 +168,13 @@ class CalendarUtilsExceptionSplitTest {
             .date(Dates.DATE_2021_01_04)
             .allDay(false)
             .open(true)
-            .opening(
+            .openings(List.of(
               SingleDayOpeningRangeDTO
                 .builder()
                 .startTime(Times.TIME_04_00)
                 .endTime(Times.TIME_14_59)
                 .build()
-            )
+            ))
             .exceptional(true)
             .exceptionName(ExceptionRanges.OPEN_04_00_TO_14_59_JAN_1_AND_JAN_4.getName())
             .build()
@@ -205,20 +206,18 @@ class CalendarUtilsExceptionSplitTest {
           .date(Dates.DATE_2021_01_04)
           .allDay(false)
           .open(true)
-          .opening(
+          .openings(List.of(
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_04_00)
               .endTime(Times.TIME_14_59)
-              .build()
-          )
-          .opening(
+              .build(),
             SingleDayOpeningRangeDTO
               .builder()
               .startTime(Times.TIME_18_12)
               .endTime(Times.TIME_23_00)
               .build()
-          )
+          ))
           .exceptional(true)
           .exceptionName(ExceptionRanges.OPEN_04_00_TO_14_59_AND_18_12_TO_23_00_JAN_4.getName())
           .build()
