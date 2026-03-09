@@ -2,6 +2,7 @@ package org.folio.calendar.exception;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import lombok.Getter;
@@ -90,7 +91,7 @@ public abstract class AbstractCalendarException extends RuntimeException {
     responseBuilder = responseBuilder.timestamp(Instant.now());
     responseBuilder = responseBuilder.status(this.getStatusCode().value());
 
-    responseBuilder.error(getErrorDto());
+    responseBuilder.errors(List.of(getErrorDto()));
 
     return responseBuilder.build();
   }

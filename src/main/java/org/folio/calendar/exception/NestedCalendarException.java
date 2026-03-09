@@ -45,9 +45,7 @@ public class NestedCalendarException extends AbstractCalendarException {
     responseBuilder = responseBuilder.timestamp(Instant.now());
     responseBuilder = responseBuilder.status(this.getStatusCode().value());
 
-    for (AbstractCalendarException subException : subExceptions) {
-      responseBuilder.error(subException.getErrorDto());
-    }
+    responseBuilder.errors(subExceptions.stream().map(AbstractCalendarException::getErrorDto).toList());
 
     return responseBuilder.build();
   }

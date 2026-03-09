@@ -282,7 +282,7 @@ public class CalendarUtils {
       // remove exceptional closures for surrounding openings
       additionalDates
         .entrySet()
-        .removeIf(entry -> !entry.getValue().isOpen() || !isInRange.test(entry.getValue().getDate())
+        .removeIf(entry -> !entry.getValue().getOpen() || !isInRange.test(entry.getValue().getDate())
         );
       map.putAll(additionalDates);
     }
@@ -336,7 +336,7 @@ public class CalendarUtils {
 
         splitCalendarIntoDates(calendar, dates, newStartRange, oldestSearchDate.minusDays(1));
         if (!includeClosures) {
-          dates.headMap(focalDate).entrySet().removeIf(entry -> !entry.getValue().isOpen());
+          dates.headMap(focalDate).entrySet().removeIf(entry -> !entry.getValue().getOpen());
         } else if (
           // if we retain closures, we need more complex logic to ensure we don't break before
           // finding an opening, if available. if closures are filtered out (as above), the regular
@@ -345,7 +345,7 @@ public class CalendarUtils {
             .headMap(oldestSearchDate)
             .values()
             .stream()
-            .anyMatch(o -> Boolean.TRUE.equals(o.isOpen()))
+            .anyMatch(o -> Boolean.TRUE.equals(o.getOpen()))
         ) {
           break;
         }
@@ -372,7 +372,7 @@ public class CalendarUtils {
           dates
             .tailMap(focalDate.plusDays(1))
             .entrySet()
-            .removeIf(entry -> !entry.getValue().isOpen());
+            .removeIf(entry -> !entry.getValue().getOpen());
         } else if (
           // if we retain closures, we need more complex logic to ensure we don't break before
           // finding an opening, if available. if closures are filtered out (as above), the regular
@@ -381,7 +381,7 @@ public class CalendarUtils {
             .tailMap(newestSearchDate.plusDays(1))
             .values()
             .stream()
-            .anyMatch(o -> Boolean.TRUE.equals(o.isOpen()))
+            .anyMatch(o -> Boolean.TRUE.equals(o.getOpen()))
         ) {
           break;
         }
@@ -446,7 +446,7 @@ public class CalendarUtils {
       }
 
       // remove exceptional closures for surrounding openings
-      dates.entrySet().removeIf(entry -> !entry.getValue().isOpen());
+      dates.entrySet().removeIf(entry -> !entry.getValue().getOpen());
     } else {
       // binary search returns next-greatest index by -(index) - 1
       // this undoes this, yielding the first place to look for > date
@@ -477,9 +477,7 @@ public class CalendarUtils {
 
     return SurroundingOpeningsDTO
       .builder()
-      .opening(previous)
-      .opening(current)
-      .opening(next)
+      .openings(List.of(previous, current, next))
       .build();
   }
 
