@@ -57,7 +57,7 @@
   <properties>
     <java.version>21</java.version>
     <folio-spring.version>10.0.0</folio-spring.version>
-    <openapi-generator.version>7.20.0</openapi-generator.version>
+    <openapi-generator.version>7.21.0</openapi-generator.version>
     <lombok-maven-plugin.version>1.18.36</lombok-maven-plugin.version>
 
     <calendar-api-definitions-yaml-file>
