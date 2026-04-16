@@ -1,3 +1,6 @@
+## 4.0.0 2026-04-16 Trillium
+* Migrate to Spring Boot 4.0 ([MODCAL-145](https://folio-org.atlassian.net/browse/MODCAL-145))
+
 ## 3.3.1 2025-11-13 Sunflower CSP #3
 * Remove stack traces from error responses ([MODCAL-144](https://folio-org.atlassian.net/browse/MODCAL-144))
 * Improve performance in computing surrounding openings for large calendars ([MODCAL-143](https://folio-org.atlassian.net/browse/MODCAL-143))
