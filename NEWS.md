@@ -1,5 +1,11 @@
+## 4.0.1 2026-07-09 Trillium CSP #1
+* Prevent Sunflower tenant migration from dropping `public.f_unaccent` in mixed-version environments ([MODCAL-150](https://folio-org.atlassian.net/browse/MODCAL-150))
+
 ## 4.0.0 2026-04-16 Trillium
 * Migrate to Spring Boot 4.0 ([MODCAL-145](https://folio-org.atlassian.net/browse/MODCAL-145))
+
+## 3.3.2 2026-07-09 Sunflower CSP #9
+* Prevent Sunflower tenant migration from dropping `public.f_unaccent` in mixed-version environments ([MODCAL-150](https://folio-org.atlassian.net/browse/MODCAL-150))
 
 ## 3.3.1 2025-11-13 Sunflower CSP #3
 * Remove stack traces from error responses ([MODCAL-144](https://folio-org.atlassian.net/browse/MODCAL-144))
