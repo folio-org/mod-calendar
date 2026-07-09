@@ -1,4 +1,4 @@
-## 3.3.2 (IN PROGRESS)
+## 3.3.2 2026-07-09 Sunflower CSP #9
 * Prevent Sunflower tenant migration from dropping `public.f_unaccent` in mixed-version environments ([MODCAL-150](https://folio-org.atlassian.net/browse/MODCAL-150))
 
 ## 3.3.1 2025-11-13 Sunflower CSP #3
