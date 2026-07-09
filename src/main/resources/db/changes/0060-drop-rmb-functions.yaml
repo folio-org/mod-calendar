@@ -2,6 +2,10 @@ databaseChangeLog:
   - changeSet:
       id: 0060-drop-rmb-functions
       author: university-of-alabama/ncovercash
+      # MODCAL-150: This released changeset now qualifies f_unaccent with the
+      # tenant schema so DROP FUNCTION cannot fall through to public.f_unaccent.
+      # Keep the released checksum valid for existing tenant upgrades.
+      validCheckSum: 9:3252f087033814e5a5cf91903c578ccd
       comment: "Delete all previous RMB functions that have not been used since 2.0.0."
       changes:
         - sql:
@@ -35,7 +39,7 @@ databaseChangeLog:
         - sql:
             sql: DROP FUNCTION IF EXISTS exceptions_set_md CASCADE;
         - sql:
-            sql: DROP FUNCTION IF EXISTS f_unaccent(text) CASCADE;
+            sql: DROP FUNCTION IF EXISTS ${database.defaultSchemaName}.f_unaccent(text) CASCADE;
         - sql:
             sql: DROP FUNCTION IF EXISTS first_array_object_value(jsonb,text,text,text) CASCADE;
         - sql:
