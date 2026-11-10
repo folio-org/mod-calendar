@@ -1,3 +1,6 @@
+## 4.1.0 YYYY-MM-DD Umbrellaleaf
+* Upgrade to Java 25 and Spring Boot 4.2 ([MODCAL-152](https://folio-org.atlassian.net/browse/MODCAL-152))
+
 ## 4.0.1 2026-07-09 Trillium CSP #1
 * Prevent Sunflower tenant migration from dropping `public.f_unaccent` in mixed-version environments ([MODCAL-150](https://folio-org.atlassian.net/browse/MODCAL-150))
 
