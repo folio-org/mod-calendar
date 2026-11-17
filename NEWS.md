@@ -1,3 +1,6 @@
+## 4.0.2 2026-11-17 Trillium CSP #1
+* Bump `folio-spring-support` to 10.0.1, other minor dep updates ([MODCAL-154](https://folio-org.atlassian.net/browse/MODCAL-154))
+
 ## 4.0.1 2026-07-09 Trillium CSP #1
 * Prevent Sunflower tenant migration from dropping `public.f_unaccent` in mixed-version environments ([MODCAL-150](https://folio-org.atlassian.net/browse/MODCAL-150))
 
