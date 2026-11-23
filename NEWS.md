@@ -1,3 +1,6 @@
+## 4.0.3 2026-11-23 Trillium CSP #1
+* Downgrade `liquibase` to v4 from v5. ([MODCAL-155](https://folio-org.atlassian.net/browse/MODCAL-155))
+
 ## 4.0.2 2026-11-17 Trillium CSP #1
 * Bump `folio-spring-support` to 10.0.1, other minor dep updates ([MODCAL-154](https://folio-org.atlassian.net/browse/MODCAL-154))
 
