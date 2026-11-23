@@ -55,7 +55,7 @@
   </distributionManagement>
 
   <properties>
-    <openapi-generator.version>7.26.0</openapi-generator.version>
+    <openapi-generator.version>7.27.0</openapi-generator.version>
     <lombok-maven-plugin.version>1.18.36</lombok-maven-plugin.version>
 
     <calendar-api-definitions-yaml-file>
@@ -411,7 +411,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>3.6.4</version>
+        <version>3.7.0</version>
         <configuration>
           <executable>java</executable>
           <arguments>
