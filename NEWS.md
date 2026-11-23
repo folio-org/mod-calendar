@@ -1,3 +1,6 @@
+## 4.0.4 2026-11-23 Trillium CSP #1
+* Add `DeployConfig.json` for configuration management. ([MODCAL-151](https://folio-org.atlassian.net/browse/MODCAL-151))
+
 ## 4.0.3 2026-11-23 Trillium CSP #1
 * Downgrade `liquibase` to v4 from v5. ([MODCAL-155](https://folio-org.atlassian.net/browse/MODCAL-155))
 
